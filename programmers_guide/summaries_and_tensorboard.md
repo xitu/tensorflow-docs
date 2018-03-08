@@ -76,7 +76,7 @@ data than you need, though. Instead, consider running the merged summary op
 every `n` steps.
 
 The code example below is a modification of the
-@{$beginners$simple MNIST tutorial},
+@{$layers$simple MNIST tutorial},
 in which we have added some summary ops, and run them every ten steps. If you
 run this and then launch `tensorboard --logdir=/tmp/tensorflow/mnist`, you'll be able
 to visualize statistics, such as how the weights or accuracy varied during
@@ -137,12 +137,10 @@ with tf.name_scope('cross_entropy'):
   #
   # can be numerically unstable.
   #
-  # So here we use tf.nn.softmax_cross_entropy_with_logits on the
-  # raw outputs of the nn_layer above, and then average across
-  # the batch.
-  diff = tf.nn.softmax_cross_entropy_with_logits(targets=y_, logits=y)
+  # So here we use tf.losses.sparse_softmax_cross_entropy on the
+  # raw logit outputs of the nn_layer above.
   with tf.name_scope('total'):
-    cross_entropy = tf.reduce_mean(diff)
+    cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=y_, logits=y)
 tf.summary.scalar('cross_entropy', cross_entropy)
 
 with tf.name_scope('train'):
