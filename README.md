@@ -2,7 +2,13 @@
   <img src="https://www.tensorflow.org/images/tf_logo_transp.png"><br><br>
 </div>
 
------------------
+> [TensorFlow Docs](https://github.com/xitu/tensorflow-docs) 是由[掘金翻译计划](https://github.com/xitu/gold-miner)实时维护的 TensorFlow 官方文档中文版，维护者为全球各大公司开发人员和各著名高校研究者及学生。欢迎大家加入维护团队，欢迎提 Issue 和 PR。
+>
+> - 现已完成 [TensorFlow V1.4 官方中文文档](https://github.com/xitu/tensorflow-docs/tree/v1.4-zh-hans)
+> - 译者团队正在向 [TensorFlow V1.6 官方中文文档](https://github.com/xitu/tensorflow-docs)更新
+> - 掘金翻译计划欢迎大家的加入，详见 👉 [加入我们](https://github.com/xitu/gold-miner)
+
+---
 
 | **`Linux CPU`**                          | **`Linux GPU`**                          | **`Mac OS CPU`**                         | **`Windows CPU`**                        | **`Android`**                            |
 | ---------------------------------------- | ---------------------------------------- | ---------------------------------------- | ---------------------------------------- | ---------------------------------------- |
@@ -28,7 +34,8 @@ TensorFlow 项目致力于遵守开源软件开发中普遍接受的最佳实践
 +[![CII 最佳实践](https://bestpractices.coreinfrastructure.org/projects/1486/badge)](https://bestpractices.coreinfrastructure.org/projects/1486)
 
 ## 安装
-*在 [安装 TensorFlow](https://www.tensorflow.org/get_started/os_setup.html) 页面中查看关于稳定二进制版的安装或从源码安装的安装步骤。*
+
+**在 [安装 TensorFlow](https://www.tensorflow.org/get_started/os_setup.html) 页面中查看关于稳定二进制版的安装或从源码安装的安装步骤。**
 
 喜欢挑战的人也可以尝试我们的开发版：
 
@@ -46,7 +53,7 @@ TensorFlow 项目致力于遵守开源软件开发中普遍接受的最佳实践
 * Android: [demo APK](https://ci.tensorflow.org/view/Nightly/job/nightly-android/lastSuccessfulBuild/artifact/out/tensorflow_demo.apk), [native libs](https://ci.tensorflow.org/view/Nightly/job/nightly-android/lastSuccessfulBuild/artifact/out/native/)
   ([构建历史](https://ci.tensorflow.org/view/Nightly/job/nightly-android/))
 
-#### *开启你的第一个 TensorFlow 程序*
+#### 开启你的第一个 TensorFlow 程序
 
 ```shell
 $ python
@@ -77,3 +84,7 @@ $ python
 ## 许可
 
 [Apache 许可 2.0](LICENSE)
+
+## 贡献者
+
+待补充...
