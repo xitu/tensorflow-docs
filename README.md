@@ -30,8 +30,8 @@ Google Brain 团队的研究人员和工程师开发，用于进行机器学习�
 [TensorFlow 讨论](https://groups.google.com/a/tensorflow.org/forum/#!forum/discuss)，或直接在 [Stack Overflow](https://stackoverflow.com/questions/tagged/tensorflow) 提问。**
 
 TensorFlow 项目致力于遵守开源软件开发中普遍接受的最佳实践：
-+
-+[![CII 最佳实践](https://bestpractices.coreinfrastructure.org/projects/1486/badge)](https://bestpractices.coreinfrastructure.org/projects/1486)
+
+[![CII 最佳实践](https://bestpractices.coreinfrastructure.org/projects/1486/badge)](https://bestpractices.coreinfrastructure.org/projects/1486)
 
 ## 安装
 
@@ -41,7 +41,7 @@ TensorFlow 项目致力于遵守开源软件开发中普遍接受的最佳实践
 
 **开发版 pip 包**
 * 我们非常高兴发布 TensorFlow 的开发版，现在 pypi 提供开发版的 pip 包 [tf-nightly](https://pypi.python.org/pypi/tf-nightly) 和
-  [tf-nightly-gpu](https://pypi.python.org/pypi/tf-nightly-gpu) 项目。在干净的环境中简单运行 `pip install tf-nightly` 或 `pip install tf-nightly-gpu` 即可安装 TensorFlow 开发版。 我们为 Linux、Mac 和 Windows 提供  CPU 和 GPU 支持。
+  [tf-nightly-gpu](https://pypi.python.org/pypi/tf-nightly-gpu) 项目。在干净的环境中简单运行 `pip install tf-nightly` 或 `pip install tf-nightly-gpu` 即可安装 TensorFlow 开发版。 我们为 Linux、Mac 和 Windows 提供  CPU 和 GPU 支持。
 
 
 **独立的 whl 文件**
