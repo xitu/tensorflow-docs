@@ -1,17 +1,10 @@
 # Embeddings
 
-This document introduces the concept of embeddings, gives a simple example of
-how to train an embedding in TensorFlow, and explains how to view embeddings
-with the TensorBoard Embedding Projector
-([live example](http://projector.tensorflow.org)). The first two parts target
-newcomers to machine learning or TensorFlow, and the Embedding Projector how-to
-is for users at all levels.
+本文档介绍了 embeddings 的概念，给出了如何在 TensorFlow 中对 embedding 进行训练的简单示例，并解释了如何使用 TensorBoard Embedding Projector 查看 embeddings。前两部分是针对机器学习和 TensorFlow 的新手，而 Embedding Projector 则是针对所有水平的用户。
 
 [TOC]
 
-An **embedding** is a mapping from discrete objects, such as words, to vectors
-of real numbers. For example, a 300-dimensional embedding for English words
-could include:
+**Embedding** 是从离散对象（如单词）到实数向量的映射。例如，英文单词的 300 维 embedding 可以如下所示：
 
 ```
 blue:  (0.01359, 0.00075997, 0.24608, ..., -0.2524, 1.0048, 0.06259)
@@ -20,24 +13,11 @@ orange:  (-0.24776, -0.12359, 0.20986, ..., 0.079717, 0.23865, -0.014213)
 oranges:  (-0.35609, 0.21854, 0.080944, ..., -0.35413, 0.38511, -0.070976)
 ```
 
-The individual dimensions in these vectors typically have no inherent meaning.
-Instead, it's the overall patterns of location and distance between vectors
-that machine learning takes advantage of.
+这些向量中的各个维度通常没有固定的意义。相反，机器学习利用的是向量之间的位置和距离的整体模式。
 
-Embeddings are important for input to machine learning. Classifiers, and neural
-networks more generally, work on vectors of real numbers. They train best on
-dense vectors, where all values contribute to define an object. However, many
-important inputs to machine learning, such as words of text, do not have a
-natural vector representation. Embedding functions are the standard and
-effective way to transform such discrete input objects into useful
-continuous vectors.
+Embeddings 对于机器学习的输入非常重要。分类器（更普遍的包括神经网络）基于实数向量运行。它们在密集向量（这个向量中的所有值对对象的定义都有意义）上训练模型的最佳方式。然而，对于机器学习中很多重要的输入，比如文本中的文字，并没有自然的向量表示。Embedding 函数是将这些离散的输入对象转换为可用连续向量的业界标准做法。
 
-Embeddings are also valuable as outputs of machine learning. Because embeddings
-map objects to vectors, applications can use similarity in vector space (for
-instance, Euclidean distance or the angle between vectors) as a robust and
-flexible measure of object similarity. One common use is to find nearest
-neighbors.  Using the same word embeddings as above, for instance, here are the
-three nearest neighbors for each word and the corresponding angles:
+Embeddings 作为机器学习的输出也同样很有价值。由于 embeddings 是将对象映射到向量上，应用程序可以使用向量空间中的相似性（例如，欧几里得度量或向量夹角）作为对象间相似度健壮而灵活的度量工具。一个常见的用途就是找出最近元素。例如，使用与上面相同的单词 embeddings，这里是每个单词的三个最近元素和相应的向量夹角：
 
 ```
 blue:  (red, 47.6°), (yellow, 51.9°), (purple, 52.4°)
@@ -46,19 +26,11 @@ orange:  (yellow, 53.5°), (colored, 58.0°), (bright, 59.9°)
 oranges:  (apples, 45.3°), (lemons, 48.3°), (mangoes, 50.4°)
 ```
 
-This would tell an application that apples and oranges are in some way more
-similar (45.3° apart) than lemons and oranges (48.3° apart).
+应用程序能从这些数据中推测出在某些方面苹果和橙子（相距 45.3°）比柠檬和橙子（相距 48.3°）更相似。
 
-## Embeddings in TensorFlow
+## 在 TensorFlow 中使用 embeddings
 
-To create word embeddings in TensorFlow, we first split the text into words
-and then assign an integer to every word in the vocabulary. Let us assume that
-this has already been done, and that `word_ids` is a vector of these integers.
-For example, the sentence “I have a cat.” could be split into
-`[“I”, “have”, “a”, “cat”, “.”]` and then the corresponding `word_ids` tensor
-would have shape `[5]` and consist of 5 integers. To map these word ids
-to vectors, we need to create the embedding variable and use the
-`tf.nn.embedding_lookup` function as follows:
+要在 TensorFlow 中创建 embeddings，我们首先将文本拆分成单词，然后为词汇表中的每个单词分配一个整数。让我假设这已经完成了，并且 `word_ids` 是这些整数的一个向量。例如，“I have a cat.” 这句话可以被拆分成 `[“I”, “have”, “a”, “cat”, “.”]`，然后相应的 `word_ids` tensor 会具备维度 `[5]` 并由 5 个整数组成，我们需要创建 embeddings 变量并像下面一样使用 `tf.nn.embedding_lookup` 函数：
 
 ```
 word_embeddings = tf.get_variable(“word_embeddings”,
@@ -66,94 +38,48 @@ word_embeddings = tf.get_variable(“word_embeddings”,
 embedded_word_ids = tf.nn.embedding_lookup(word_embeddings, word_ids)
 ```
 
-After this, the tensor `embedded_word_ids` will have shape `[5, embedding_size]`
-in our example and contain the embeddings (dense vectors) for each of the 5
-words. At the end of training, `word_embeddings` will contain the embeddings
-for all words in the vocabulary.
+在此之后，在我们的例子中 tensor `embedded_word_ids` 会具备维度 `[5, embedding_size]`，其中就是这 5 个单词的每一个词的 embeddings（密集向量）。在训练结束时，`word_embeddings` 将包含词汇表中所有单词的 embeddings。
 
-Embeddings can be trained in many network types, and with various loss
-functions and data sets. For example, one could use a recurrent neural network
-to predict the next word from the previous one given a large corpus of
-sentences, or one could train two networks to do multi-lingual translation.
-These methods are described in the @{$word2vec$Vector Representations of Words}
-tutorial.
+Embeddings 可以在多种神经网络中、使用各种损失函数和数据集来训练，例如，可以使用递归神经网络在给定大规模语料库中词句的基础上，根据前一单词来预测下一个单词，或者可以训练两个网络进行多语言翻译。这些方法在 @{$word2vec$Vector Representations of Words} 教程中有详细描述。
 
-## Visualizing Embeddings
+## 将 Embeddings 可视化
 
-TensorBoard includes the **Embedding Projector**, a tool that lets you
-interactively visualize embeddings. This tool can read embeddings from your
-model and render them in two or three dimensions.
+TensorBoard 包含了 **Embedding Projector**，一个让你能够交互式查看 embeddings 的工具。这个工具可以从你的模型中读取 embeddings 并将它们渲染到二维或三维空间中。
 
-The Embedding Projector has three panels:
+Embedding Projector 有三个面板：
 
-- *Data panel* on the top left, where you can choose the run, the embedding
-  variable and data columns to color and label points by.
-- *Projections panel* on the bottom left, where you can choose the type of
-  projection.
-- *Inspector panel* on the right side, where you can search for particular
-  points and see a list of nearest neighbors.
+- *Data panel* 在顶部左侧，这里你可以选择运行，通过点击改变 embedding 变量，和数据列颜色或将他们打上标签。
+- *Projections panel* 在底部左侧，在这里你可以选择展示的类型。
+- *Inspector panel* 在右侧，这里你可以查询特殊的点并查看最近元素列表。
 
 ### Projections
-The Embedding Projector provides three ways to reduce the dimensionality of a
-data set.
+Embedding Projector 为数据集降维提供了三种方法。
 
-- *[t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding)*:
-  a nonlinear nondeterministic algorithm (T-distributed stochastic neighbor
-  embedding) that tries to preserve local neighborhoods in the data, often at
-  the expense of distorting global structure. You can choose whether to compute
-  two- or three-dimensional projections.
+- **[t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding)**：一个非线性的不确定算法，通常是以扭曲全局结构为代价试图保留数据中的局部邻域。你可以选择是否计算为二维或三维的展示。
 
-- *[PCA](https://en.wikipedia.org/wiki/Principal_component_analysis)*:
-  a linear deterministic algorithm (principal component analysis) that tries to
-  capture as much of the data variability in as few dimensions as possible. PCA
-  tends to highlight large-scale structure in the data, but can distort local
-  neighborhoods. The Embedding Projector computes the top 10 principal
-  components, from which you can choose two or three to view.
+- **[PCA](https://en.wikipedia.org/wiki/Principal_component_analysis)**：一个线性的确定算法（主成分分析），试图在尽可能少的维度上捕获尽可能多的数据可变性。PCA 倾向于从数据中发现大规模结构，但可能会扭曲局部邻域。Embedding Projector 计算前 10 个主要组件，你可以从中选择两个或三个来查看。
 
-- *Custom*: a linear projection onto horizontal and vertical axes that you
-  specify using labels in the data. You define the horizontal axis, for
-  instance, by giving text patterns for "Left" and "Right". The Embedding
-  Projector finds all points whose label matches the "Left" pattern and
-  computes the centroid of that set; similarly for "Right".  The line passing
-  through these two centroids defines the horizontal axis. The vertical axis is
-  likewise computed from the centroids for points matching the "Up" and "Down"
-  text patterns.
+- **Custom**：使用数据中的标签，得到一条在你指定的水平和垂直轴上的线性映射。例如，你通过给定的文本模式“ Left ”与“ Right ”指定水平轴，Embedding Projector 找出所有被“ Left ”模式匹配到的点，并计算该组的质心；“ Right ”也是类似。通过这两点的直线定义为水平轴。对于“ UP ”和“ DOWN ”文本模式，垂直轴也是类似的计算出两个点集的质心得出。
 
-Further useful articles are
-[How to Use t-SNE Effectively](https://distill.pub/2016/misread-tsne/) and
-[Principal Component Analysis Explained Visually](http://setosa.io/ev/principal-component-analysis/).
+获取其他有价值文章可以查看 [How to Use t-SNE Effectively](distill.pub/2016/misread-tsne/) 和 [Principal Component Analysis Explained Visually](http://setosa.io/ev/principal-component-analysis/)。
 
-### Exploration
+### 探索
 
-You can explore visually by zooming, rotating, and panning using natural
-click-and-drag gestures. Hovering your mouse over a point will show any
-[metadata](#metadata) for that point.  You can also inspect nearest-neighbor
-subsets.  Clicking on a point causes the right pane to list the nearest
-neighbors, along with distances to the current point. The nearest-neighbor
-points are also highlighted in the projection.
+你可以通过单击和拖动自然地进行缩放、旋转、平移来直观的探索。将鼠标悬停在点上将显示该点的任何[元数据](#元数据)。你也可以检查最近元素的子集。点击一个点会在右窗格列出最近的元素，以及到当前点的距离。展示区域中也突出显示最近邻点。
 
-It is sometimes useful to restrict the view to a subset of points and perform
-projections only on those points. To do so, you can select points in multiple
-ways:
+有时候我们只需要观察点集的一部分，将视图聚焦在这一部分上是非常有帮助的。为此，你可以通过多种方式选择点：
 
-- After clicking on a point, its nearest neighbors are also selected.
-- After a search, the points matching the query are selected.
-- Enabling selection, clicking on a point and dragging defines a selection
-  sphere.
+- 点击一个点后，最近的元素也会被选择。
+- 搜索后，选中匹配的的点集。
+- 启用选择，单击一个点并拖动定义一个选择范围。
 
-Then click the "Isolate *nnn* points" button at the top of the Inspector pane
-on the right hand side. The following image shows 101 points selected and ready
-for the user to click "Isolate 101 points":
+然后点击右侧检查器面板顶部的“ Isolate **nnn** points ”按钮，下图显示了 101 个被选中的点，并且" Isolate 101 points "可供用户点击。
 
-![Selection of nearest neighbors](https://www.tensorflow.org/images/embedding-nearest-points.png "Selection of nearest neighbors")
+![选中最近的相邻元素](https://www.tensorflow.org/images/embedding-nearest-points.png "Selection of nearest neighbors")
 
-*Selection of the nearest neighbors of “important” in a word embedding dataset.*
+**在文字 embedding 数据集中选中" import "的最近相邻元素。**
 
-Advanced tip: filtering with custom projection can be powerful. Below, we
-filtered the 100 nearest neighbors of “politics” and projected them onto the
-“worst” - “best” vector as an x axis. The y axis is random. As a result, one
-finds on the right side “ideas”, “science”, “perspective”, “journalism” but on
-the left “crisis”, “violence” and “conflict”.
+提示：使用选中功能来自定义展示很强大。下面，我们选择了“ politics ”的最近的 100 个相邻元素并将他们映射到“ worst ”-“ best ”向量作为的 X 轴上。Y 轴是随机的。因此，在右边是“ ideas ”、“ science ”、“ perspective ”、“ journalism ”，而在左边则是” crisis “、“ violence ”和“ conflict ”。
 
 <table width="100%;">
   <tr>
@@ -174,26 +100,15 @@ the left “crisis”, “violence” and “conflict”.
   </tr>
 </table>
 
-To share your findings, you can use the bookmark panel in the bottom right
-corner and save the current state (including computed coordinates of any
-projection) as a small file. The Projector can then be pointed to a set of one
-or more of these files, producing the panel below. Other users can then walk
-through a sequence of bookmarks.
+如果你想要分享你的发现，可以使用右下角的书签面板，并将当前状态（包括任何展示栏中的计算坐标）保存为小文件。然后可以将  Projector 指向一组这样一个或多个的文件，制作下面的板块。其他用户就可以查看这一系列书签了解它们。
 
 <img src="https://www.tensorflow.org/images/embedding-bookmark.png" alt="Bookmark panel" style="width:300px;">
 
-### Metadata
+### 元数据
 
-If you are working with an embedding, you'll probably want to attach
-labels/images to the data points. You can do this by generating a metadata file
-containing the labels for each point and clicking "Load data" in the data panel
-of the Embedding Projector.
+如果你正在使用 embedding，则可能需要将坐标/图像附加到数据点上。你可以通过生成包含每个点标签的元数据文件，然后在 Embedding Projector 的数据面板中单击“Load data”来执行操作。
 
-The metadata can be either labels or images, which are
-stored in a separate file. For labels, the format should
-be a [TSV file](https://en.wikipedia.org/wiki/Tab-separated_values)
-(tab characters shown in red) whose first line contains column headers
-(shown in bold) and subsequent lines contain the metadata values. For example:
+元数据可以是标签或图像，它们储存在单独的文件中。对于标签，格式应该是 [TSV file](https://en.wikipedia.org/wiki/Tab-separated_values)（表示为红色的制表符），其第一行包含列标题（以粗体显示），后续行包含元数据值。例如：
 
 <code>
 <b>Word<span style="color:#800;">\t</span>Frequency</b><br/>
@@ -202,20 +117,9 @@ be a [TSV file](https://en.wikipedia.org/wiki/Tab-separated_values)
   ...
 </code>
 
-The order of lines in the metadata file is assumed to match the order of
-vectors in the embedding variable, except for the header.  Consequently, the
-(i+1)-th line in the metadata file corresponds to the i-th row of the embedding
-variable.  If the TSV metadata file has only a single column, then we don’t
-expect a header row, and assume each row is the label of the embedding. We
-include this exception because it matches the commonly-used "vocab file"
-format.
+ 除标题外，元数据文件中行的顺序与 embedding 变量中的向量的顺序应该是相匹配的。因此，元数据文件中的第（i + 1）行对应于 embedding 变量的第 i 行。如果 TSV 元数据文件只有一个列，并假设每一行都是 embedding 的标签。这是一个特外，但它确实符合常用的“ vocab file ”格式。
 
-To use images as metadata, you must produce a single
-[sprite image](https://www.google.com/webhp#q=what+is+a+sprite+image),
-consisting of small thumbnails, one for each vector in the embedding.  The
-sprite should store thumbnails in row-first order: the first data point placed
-in the top left and the last data point in the bottom right, though the last
-row doesn't have to be filled, as shown below.
+要将图片用作元数据，你必须制作一个 [sprite image](https://www.google.com/webhp#q=what+is+a+sprite+image)，其中包含小缩略图，在 embedding 过程中一个该文件可供每个向量使用。它应该按行先存储缩略图：第一个数据点放在左上角，尽管最后一行不需要填充，最后一个数据点放在右下角，如下图所示。
 
 <table style="border: none;">
 <tr style="background-color: transparent;">
@@ -235,25 +139,15 @@ row doesn't have to be filled, as shown below.
 </tr>
 </table>
 
-Follow [this link]("https://www.tensorflow.org/images/embedding-mnist.mp4" )
-to see a fun example of thumbnail images in the Embedding Projector.
+打开[这个链接]("https://www.tensorflow.org/images/embedding-mnist.mp4" )查看一个有趣的 Embedding Projector 中图像缩略图案例。
 
+## 小型问答会
 
-## Mini-FAQ
+**“embedding” 是一个操作还是一个对象？**
+都是，人们讨论在一个矢量空间中 embedding 词语（操作）和生成单词 embedding（对象）。两者共同点在于 embedding 的概念都是将离散对象映射到矢量的过程。创建或者应用映射是一个操作，但映射本身是一个对象。
 
-**Is "embedding" an action or a thing?**
-Both. People talk about embedding words in a vector space (action) and about
-producing word embeddings (things).  Common to both is the notion of embedding
-as a mapping from discrete objects to vectors. Creating or applying that
-mapping is an action, but the mapping itself is a thing.
+**embedding 是高维还是低维？**
+这不一定。例如，与包括数百万个单词和短语的矢量空间相比，只包含 300 维的矢量空间通常只能被称为低维的（并且密集）。但在数学意义上，它是高维的，显示出许多与我们人类直觉了解的二维和三维空间截然不同的特性。
 
-**Are embeddings high-dimensional or low-dimensional?**
-It depends. A 300-dimensional vector space of words and phrases, for instance,
-is often called low-dimensional (and dense) when compared to the millions of
-words and phrases it can contain. But mathematically it is high-dimensional,
-displaying many properties that are dramatically different from what our human
-intuition has learned about 2- and 3-dimensional spaces.
-
-**Is an embedding the same as an embedding layer?**
-No. An *embedding layer* is a part of neural network, but an *embedding* is a more
-general concept.
+**embedding 和 embedding 层是一样的吗？**
+不是，**embedding 层**是神经网络的一部分，而 **embedding** 则是一个普通的概念。

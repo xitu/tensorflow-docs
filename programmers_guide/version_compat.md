@@ -1,54 +1,34 @@
-# TensorFlow Version Compatibility
+# TensorFlow 版本兼容性
 
-This document is for users who need backwards compatibility across different
-versions of TensorFlow (either for code or data), and for developers who want
-to modify TensorFlow while preserving compatibility.
+本文适用于需要保持不同版本 TensorFlow 代码及数据向后兼容性的使用者，以及旨在修改 TensorFlow 的同时保持兼容性的开发人员。
 
-## Semantic Versioning 2.0
+## 语义化版本 2.0
 
-TensorFlow follows Semantic Versioning 2.0 ([semver](http://semver.org)) for its
-public API. Each release version of TensorFlow has the form `MAJOR.MINOR.PATCH`.
-For example, TensorFlow version 1.2.3 has `MAJOR` version 1, `MINOR` version 2,
-and `PATCH` version 3. Changes to each number have the following meaning:
+TensorFlow 的公共 API 沿袭自语义化版本 2.0（[semver](http://semver.org)）。 每个 TensorFlow 发布版本号都以 `MAJOR.MINOR.PATCH` 的形式命名（译注：“主版本.副版本.补丁版本”）。
+例如，TensorFlow 1.2.3 版本的 `MAJOR` 为 1，`MINOR` 为 2，`PATCH` 为 3。每个版本号的更改具有以下含义：
 
-* **MAJOR**:  Potentially backwards incompatible changes.  Code and data that
-  worked with a previous major release will not necessarily work with the new
-  release. However, in some cases existing TensorFlow graphs and checkpoints
-  may be migratable to the newer release; see
-  [Compatibility of graphs and checkpoints](#compatibility_of_graphs_and_checkpoints)
-  for details on data compatibility.
+* **MAJOR**： 更改可能不具有向后兼容性。之前发布的版本中所运行的代码和数据在新版本中用不上了。然而，有些情况下现有的 TensorFlow 图和检验点最好可以迁移到新版本。查看 [Compatibility of graphs and checkpoints](#compatibility_of_graphs_and_checkpoints) 以获取数据兼容性的细节。
 
-* **MINOR**: Backwards compatible features, speed improvements, etc.  Code and
-  data that worked with a previous minor release *and* which depends only on the
-  public API will continue to work unchanged.  For details on what is and is
-  not the public API, see [What is covered](#what_is_covered).
+* **MINOR**：向后兼容特性和速度的改善等。之前发布的版本中所运行的代码和数据仅依赖于公共 API，它们将不加改动地继续运行。如果想查阅公共 API 和非公共 API 的细节信息，请移步 [What is covered](#what_is_covered)。
 
-* **PATCH**: Backwards compatible bug fixes.
+* **PATCH**：向后兼容性bug的修复。
 
-For example, release 1.0.0 introduced backwards *incompatible* changes from
-release 0.12.1.  However, release 1.1.1 was backwards *compatible* with release
-1.0.0.
+例如 1.0.0 发布版本基于 0.12.1 发布版本引入了不具有向后兼容性的改动。然而，1.1.1 发布版本则向后兼容 1.0.0 发布版本。
 
-## What is covered
+## 涉及的内容
 
-Only the public APIs of TensorFlow are backwards compatible across minor and
-patch versions.  The public APIs consist of
+TensorFlow 中只有公共 APIs 在副版本和补丁版本之间兼容。公共 APIs 由以下几部分组成：
 
-* All the documented [Python](../api_docs/python) functions and classes in the
-  `tensorflow` module and its submodules, except for
-    * functions and classes in `tf.contrib`
-    * functions and classes whose names start with `_` (as these are private)
-  Note that the code in the `examples/` and `tools/` directories is not
-  reachable through the `tensorflow` Python module and is thus not covered by
-  the compatibility guarantee.
+* `tensorflow`模块及其子模块中记录在册的全部 [Python](../api_docs/python) 函数和类，除了：
+    * `tf.contrib` 中的函数和类；
+    * 以 `_` 开头命名的函数和类（因为它们是私有的）。
+  请注意 `examples/` 和 `tools/` 路径下的代码无法通过 `tensorflow` 的 Python 模块访问，因此无法保证其兼容性。
 
-  If a symbol is available through the `tensorflow` Python module or its
-  submodules, but is not documented, then it is **not** considered part of the
-  public API.
+  如果某个符号可以被 `tensorflow` 模块及其子模块调用但没有被记录在册，它被认为不属于公共 API 的一部分。
 
-* The [C API](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/c/c_api.h).
+* [C API](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/c/c_api.h)。
 
-* The following protocol buffer files:
+* 下列 protocol buffer 文件：
     * [`attr_value`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/attr_value.proto)
     * [`config`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/config.proto)
     * [`event`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/util/event.proto)
@@ -60,241 +40,125 @@ patch versions.  The public APIs consist of
     * [`tensor_shape`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/tensor_shape.proto)
     * [`types`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/types.proto)
 
-<a name="not_covered"></a>
-## What is *not* covered
+## 未涉及的内容
 
-Some API functions are explicitly marked as "experimental" and can change in
-backward incompatible ways between minor releases. These include:
+某些 API 函数被显式标记为“实验性”，它们可以在不同副版本之间进行非兼容性改动，包括：
 
-*   **Experimental APIs**: The @{tf.contrib} module and its submodules in Python
-    and any functions in the C API or fields in protocol buffers that are
-    explicitly commented as being experimental. In particular, any field in a
-    protocol buffer which is called "experimental" and all its fields and
-    submessages can change at any time.
+* **实验性的 APIs**：Python 中的 @{tf.contrib} 模块及其子模块、C API 中的全部函数，以及 protocol buffers 中标记为实验性的字段。尤其是某个 protocol buffer 中被叫做“实验性”的域，其内的全部字段和子消息可以随时改动。
 
-*   **Other languages**: TensorFlow APIs in languages other than Python and C,
-    such as:
+* **其他语言**：除 Python 和 C 外的其他语言编写的 TensorFlow APIs，这些语言包括：
 
-  - @{$cc/guide$C++} (exposed through header files in
-    [`tensorflow/cc`](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/cc)).
-  - [Java](../api_docs/java/reference/org/tensorflow/package-summary),
+  - @{$cc/guide$C++} (在头文件 
+    [`tensorflow/cc`](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/cc) 中公开)。
+  - [Java](../api_docs/java/reference/org/tensorflow/package-summary)，
   - [Go](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go)
 
-*   **Details of composite ops:** Many public functions in Python expand to
-    several primitive ops in the graph, and these details will be part of any
-    graphs saved to disk as `GraphDef`s. These details may change for
-    minor releases. In particular, regressions tests that check for exact
-    matching between graphs are likely to break across minor releases, even
-    though the behavior of the graph should be unchanged and existing
-    checkpoints will still work.
+* **组合操作的细节**：许多 Python 中的公共函数扩展为图中的若干原语，这些细节将会是任何以 `GraphDef` 形式保存到磁盘中的图的一部分。这些细节可能在副版本之间发生改动。 特别地，即使图的行为并未发生变化且存在将要运行的检验点，回归测试也可能跨副版本以检测各图之间的严格适配性。
 
-*   **Floating point numerical details:** The specific floating point values
-    computed by ops may change at any time.  Users should rely only on
-    approximate accuracy and numerical stability, not on the specific bits
-    computed. Changes to numerical formulas in minor and patch releases should
-    result in comparable or improved accuracy, with the caveat that in machine
-    learning improved accuracy of specific formulas may result in decreased
-    accuracy for the overall system.
+* **浮点数细节**：操作数计算所得的具体浮点数随时可能发生改变。使用者应该仅依赖于浮点数的大约的精度特性和数值稳定性，而不是具体的按位计算。在副版本或在补丁版本中改变数值计算公式应得到同样或更高的精度。额外说明一下，在机器学习中，提高特定公式的精度可能会使整体系统精度下降。
 
-*   **Random numbers:** The specific random numbers computed by the
-    @{$python/constant_op#Random_Tensors$random ops} may change at any time.
-    Users should rely only on approximately correct distributions and
-    statistical strength, not the specific bits computed. However, we will make
-    changes to random bits rarely (or perhaps never) for patch releases.  We
-    will, of course, document all such changes.
+* **随机数**：由 @{$python/constant_op#Random_Tensors$random ops} 计算所得的具体随机数随时可能发生改变。使用者应该仅依赖于随机数的大约的分布精确性和统计强度，而不是具体的按位计算。然而我们很少甚至绝不在补丁版本中改变随机数位，当然，相关文档会发生改变。
 
-*   **Version skew in distributed Tensorflow:** Running two different versions
-    of TensorFlow in a single cluster is unsupported. There are no guarantees
-    about backwards compatibility of the wire protocol.
+* **分布式 Tensorflow 中的版本偏差**： 不支持在同一个群集中运行两种不同的 TensorFlow 版本。多从机通信有线协议不会保证向后兼容性。
 
-*   **Bugs:** We reserve the right to make backwards incompatible behavior
-    (though not API) changes if the current implementation is clearly broken,
-    that is, if it contradicts the documentation or if a well-known and
-    well-defined intended behavior is not properly implemented due to a bug.
-    For example, if an optimizer claims to implement a well-known optimization
-    algorithm but does not match that algorithm due to a bug, then we will fix
-    the optimizer. Our fix may break code relying on the wrong behavior for
-    convergence. We will note such changes in the release notes.
+* **Bugs**：如果当前的实现明显出现故障，也就是说，实现与文档矛盾或由于 bug 而无法恰当地表现出已知且明确的预期行为。在这种情况下，我们保留修改向后不兼容行为（并非由API实现）的权利。例如，如果一个已知的算法优化程序因为 bug 的存在而无法适配那个算法，我们就会修复这个程序。我们将根据错误行为侵入代码并定位到错误源头。我们将会在发布版本中记录这种改变。
 
-*   **Error messages:** We reserve the right to change the text of error
-    messages. In addition, the type of an error may change unless the type is
-    specified in the documentation. For example, a function documented to
-    raise an `InvalidArgument` exception will continue to
-    raise `InvalidArgument`, but the human-readable message contents can change.
+* **错误信息**：我们保留改变错误信息文本的权利。另外，只有那些在文档中记录的特定错误类型才可能发生改变。例如在文档中，可能抛出 `InvalidArgument` 异常的某个函数仍然会抛出  `InvalidArgument` 异常，改变的只是供我们阅读的信息内容。
 
-## Compatibility of graphs and checkpoints
+## 图和检验点的兼容性
 
-You'll sometimes need to preserve graphs and checkpoints.
-Graphs describe the data flow of ops to be run during training and
-inference, and checkpoints contain the saved tensor values of variables in a
-graph.
+有时你需要保留图形和检验点。
+图形描述训练期间将被执行的操作的数据流和训练结果，检验点包含图中已保存的变量的张量值。
 
-Many TensorFlow users save graphs and trained models to disk for
-later evaluation or additional training, but end up running their saved graphs
-or models on a later release. In compliance with semver, any graph or checkpoint
-written out with one version of TensorFlow can be loaded and evaluated with a
-later version of TensorFlow with the same major release.  However, we will
-endeavor to preserve backwards compatibility even across major releases when
-possible, so that the serialized files are usable over long periods of time.
+许多 TensorFlow 使用者将图和训练好的模型保存到磁盘以期为后续评估或另外的训练所使用，最终却在后续发布版本中运行它们。遵从语义版本的约定，TensorFlow 生成的任何图或检验点能够被后续相同主版本号的 TensorFlow 加载和评估。然而，如果可能的话，我们甚至会在不同主版本号之间尽力保留向后兼容性，以使序列化文件能够长期使用。
 
 
-Graphs are serialized via the `GraphDef` protocol buffer.  To facilitate (rare)
-backwards incompatible changes to graphs, each `GraphDef` has a version number
-separate from the TensorFlow version.  For example, `GraphDef` version 17
-deprecated the `inv` op in favor of `reciprocal`.  The semantics are:
+图形可以通过 `GraphDef` protocol buffer 序列化。为了推进图的向后不兼容改变的实行（极少出现这种情况），每个 `GraphDef` 都有一个独立于 TensorFlow 版本的版本号。例如，`GraphDef` 版本 17 不推荐使用 `inv` 操作，而推荐使用 `reciprocal`。它有以下语义：
 
-* Each version of TensorFlow supports an interval of `GraphDef` versions.  This
-  interval will be constant across patch releases, and will only grow across
-  minor releases.  Dropping support for a `GraphDef` version will only occur
-  for a major release of TensorFlow.
+* 每个 TensorFlow 版本支持 GraphDef 间隔版本。间隔版本不随补丁版本发布而改变，只有副版本发布时才会改变。在 TensorFlow 主版本发布时，才会发生放弃对某个 `GraphDef` 版本的支持这种情况。
 
-* Newly created graphs are assigned the latest `GraphDef` version number.
+* 新建的图会分配到最新的 `GraphDef` 版本号。
 
-* If a given version of TensorFlow supports the `GraphDef` version of a graph,
-  it will load and evaluate with the same behavior as the TensorFlow version
-  used to generate it (except for floating point numerical details and random
-  numbers), regardless of the major version of TensorFlow.  In particular, all
-  checkpoint files will be compatible.
+* 如果某个给定的 TensorFlow 版本支持一个图的  `GraphDef` 版本，它将会以和当初生成这个图的 TensorFlow 版本同样的行为加载并评估它（浮点数数值细节和随机数除外），不论 TensorFlow 的主版本是多少。尤其要注意，所有的检验点文件将会是兼容的。
 
-* If the `GraphDef` *upper* bound is increased to X in a (minor) release, there
-  will be at least six months before the *lower* bound is increased to X.  For
-  example (we're using hypothetical version numbers here):
-    * TensorFlow 1.2 might support `GraphDef` versions 4 to 7.
-    * TensorFlow 1.3 could add `GraphDef` version 8 and support versions 4 to 8.
-    * At least six months later, TensorFlow 2.0.0 could drop support for
-      versions 4 to 7, leaving version 8 only.
+* 如果一个发布版（副版本）中的 `GraphDef` 增加到了上限 X，那么要等下限增加到 X,至少需要六个月。例如（在这里，版本号是我们假定的）：
+    * TensorFlow 1.2 版本可能支持 4 到 7 版本号的 `GraphDef` 版本。
+    * TensorFlow 1.3 可以添加 `GraphDef` 版本 8 并且支持 4 to 8 版本号的版本。
+    * 至少六个月后，TensorFlow 2.0.0 才能放弃支持 4 到 7 版本号的 `GraphDef` 版本而仅保留版本 8的 `GraphDef`。
 
-Finally, when support for a `GraphDef` version is dropped, we will attempt to
-provide tools for automatically converting graphs to a newer supported
-`GraphDef` version.
+最后，当 `GraphDef` 版本不再被支持时，我们将会尝试提供一系列工具用以将图自动转换为更新的被支持的 `GraphDef` 版本。
 
-## Graph and checkpoint compatibility when extending TensorFlow
+## 扩展 TensorFlow 时的图和检验点兼容性
 
-This section is relevant only when making incompatible changes to the `GraphDef`
-format, such as when adding ops, removing ops, or changing the functionality
-of existing ops.  The previous section should suffice for most users.
+只有 `GraphDef` 格式产生不兼容的更改时，本节内容才具有相关性。这些更改包括添加操作、移除操作以及更改现有操作的功能。对于多数使用者，前面几节已经足够。
 
-### Backward and partial forward compatibility
+### 向后兼容性和部分向前兼容性
 
-Our versioning scheme has three requirements:
+我们的版本体系有三个要求：
 
-*   **Backward compatibility** to support loading graphs and checkpoints
-    created with older versions of TensorFlow.
-*   **Forward compatibility** to support scenarios where the producer of a
-    graph or checkpoint is upgraded to a newer version of TensorFlow before
-    the consumer.
-*   Enable evolving TensorFlow in incompatible ways. For example, removing Ops,
-    adding attributes, and removing attributes.
+* **向后兼容性**应支持加载由老版本 TensorFlow 创建的图和检验点。
+* **向前兼容性**应支持图和检验点的生产者先于消费者升级 TensorFlow 的版本这种情况。
+* 能够以不兼容方式更迭。例如，移除操作、增加属性以及移除属性。
 
-Note that while the `GraphDef` version mechanism is separate from the TensorFlow
-version, backwards incompatible changes to the `GraphDef` format are still
-restricted by Semantic Versioning.  This means functionality can only be removed
-or changed between `MAJOR` versions of TensorFlow (such as `1.7` to `2.0`).
-Additionally, forward compatibility is enforced within Patch releases (`1.x.1`
-to `1.x.2` for example).
+需要注意的是，虽然 `GraphDef` 版本机制独立于 TensorFlow 版本，不向后兼容的 `GraphDef` 格式改变仍受限于语义化版本号。这意味着只能在主版本之间移除或更改功能，比如 `1.7` 版本升至 `2.0` 版本。此外，各个补丁版本之间被强制保持向前兼容性，比如 `1.x.1` 版本升至 `1.x.2` 版本。 
 
-To achieve backward and forward compatibility and to know when to enforce changes
-in formats, graphs and checkpoints have metadata that describes when they
-were produced. The sections below detail the TensorFlow implementation and
-guidelines for evolving `GraphDef` versions.
+为了实现向后和向前兼容性，并且为了解何时该强制改变格式，图和检验点拥有描述自己何时生成的元数据。下节将详述 `GraphDef` 的 TensorFlow 实现和版本更迭指南。
 
-### Independent data version schemes
+### 独立数据版本体系
 
-There are different data versions for graphs and checkpoints. The two data
-formats evolve at different rates from each other and also at different rates
-from TensorFlow. Both versioning systems are defined in
-[`core/public/version.h`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/public/version.h).
-Whenever a new version is added, a note is added to the header detailing what
-changed and the date.
+图和检验点有不同的数据版本。这两种数据格式的更迭速率彼此不同，也不同于 TensorFlow 的更迭速率。两种版本系统均定义于 [`core/public/version.h`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/public/version.h)。
+每添加一个新版本，就会有一条记录被添加到头文件以详细描述更改的内容以及更改日期。
 
-### Data, producers, and consumers
+### 数据、生产者以及消费者
 
-We distinguish between the following kinds of data version information:
-* **producers**: binaries that produce data.  Producers have a version
-  (`producer`) and a minimum consumer version that they are compatible with
-  (`min_consumer`).
-* **consumers**: binaries that consume data.  Consumers have a version
-  (`consumer`) and a minimum producer version that they are compatible with
-  (`min_producer`).
+我们会区分以下种类的数据版本信息：
 
-Each piece of versioned data has a [`VersionDef
-versions`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/versions.proto)
-field which records the `producer` that made the data, the `min_consumer`
-that it is compatible with, and a list of `bad_consumers` versions that are
-disallowed.
+* **生产者**：生产数据的二进制文件。生产者拥有一个（`producer`）版本，以及一个和（`min_consumer`）兼容的最低消费者版本。
+* **消费者**：生产数据的二进制文件。消费者有一个（`consumer`）版本，以及一个和（`min_producer`）兼容的最低生产者版本。
 
-By default, when a producer makes some data, the data inherits the producer's
-`producer` and `min_consumer` versions. `bad_consumers` can be set if specific
-consumer versions are known to contain bugs and must be avoided. A consumer can
-accept a piece of data if the following are all true:
+每个版本数据段都有一个 [`VersionDef
+versions`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/versions.proto) 字段用于记录生成这些数据的 `producer`、与之兼容的 `min_consumer`，以及一个不被接受的 `bad_consumers` 版本列表。
 
-*   `consumer` >= data's `min_consumer`
-*   data's `producer` >= consumer's `min_producer`
-*   `consumer` not in data's `bad_consumers`
+默认情况下，当一名生产者生成一些数据，这些数据会继承生产者的 `producer` 和 `min_consumer` 版本。如果已经知道特定版本包含 bugs 且必须被避免，也可以设置 `bad_consumers` 。如果下列条件全部成立，消费者就可以接受数据段：
 
-Since both producers and consumers come from the same TensorFlow code base,
-[`core/public/version.h`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/public/version.h)
-contains a main data version which is treated as either `producer` or
-`consumer` depending on context and both `min_consumer` and `min_producer`
-(needed by producers and consumers, respectively). Specifically,
+* `consumer` >= 数据的 `min_consumer`
+* 数据的 `producer` >= 消费者的 `min_producer`
+* `consumer` 不存在于数据的 `bad_consumers` 内
 
-*   For `GraphDef` versions, we have `TF_GRAPH_DEF_VERSION`,
-    `TF_GRAPH_DEF_VERSION_MIN_CONSUMER`, and
-    `TF_GRAPH_DEF_VERSION_MIN_PRODUCER`.
-*   For checkpoint versions, we have `TF_CHECKPOINT_VERSION`,
-    `TF_CHECKPOINT_VERSION_MIN_CONSUMER`, and
-    `TF_CHECKPOINT_VERSION_MIN_PRODUCER`.
+由于生产者和消费者均来源于 TensorFlow 代码库，[`core/public/version.h`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/public/version.h) 包含一个视上下文及其 `min_consumer` 和  `min_producer`（分别为生产者和消费者所需）情况而解析为 `producer` 或 `consumer` 的主数据版本。特别地，
 
-### Evolving GraphDef versions
+* 对于 `GraphDef` 版本，我们使用 `TF_GRAPH_DEF_VERSION`、	`TF_GRAPH_DEF_VERSION_MIN_CONSUMER`，以及 `TF_GRAPH_DEF_VERSION_MIN_PRODUCER` 标识。
+* 对于检验点版本，我们使用 `TF_CHECKPOINT_VERSION`、`TF_CHECKPOINT_VERSION_MIN_CONSUMER`，以及 `TF_CHECKPOINT_VERSION_MIN_PRODUCER` 标识。
 
-This section explains how to use this versioning mechanism to make different
-types of changes to the `GraphDef` format.
+### GraphDef 版本更迭
 
-#### Add an Op
+本节将阐述如何利用版本机制来区分 `GraphDef` 格式的改变。
 
-Add the new Op to both consumers and producers at the same time, and do not
-change any `GraphDef` versions. This type of change is automatically
-backward compatible, and does not impact forward compatibility plan since
-existing producer scripts will not suddenly use the new functionality.
+#### 增加一个操作
 
-#### Add an Op and switch existing Python wrappers to use it
+同时为消费者和生产者添加一个新操作，并且不改变任何 `GraphDef` 版本。这种类型的改变自动向后兼容，而且不影响向前兼容性计划，因为现有生产者脚本不会突然使用新功能。
 
-1.  Implement new consumer functionality and increment the `GraphDef` version.
-2.  If it is possible to make the wrappers use the new functionality only in
-    cases that did not work before, the wrappers can be updated now.
-3.  Change Python wrappers to use the new functionality. Do not increment
-    `min_consumer`, since models that do not use this Op should not break.
+#### 增加一个操作并使现有 Python 包装器转而使用它
 
-#### Remove or restrict an Op's functionality
+1.  实现新的消费者功能并递增 `GraphDef` 版本。
+2.  如果能使包装器使用过去没有的新功能，那么可以立刻更新包装器。
+3.  更改 Python 包装器以使用新功能。不要递增 `min_consumer` ，因为未使用新功能的机型并不会停止运行。
 
-1.  Fix all producer scripts (not TensorFlow itself) to not use the banned Op or
-    functionality.
-2.  Increment the `GraphDef` version and implement new consumer functionality
-    that bans the removed Op or functionality for GraphDefs at the new version
-    and above. If possible, make TensorFlow stop producing `GraphDefs` with the
-    banned functionality. To do so, add the
-    [`REGISTER_OP(...).Deprecated(deprecated_at_version,
-    message)`](https://github.com/tensorflow/tensorflow/blob/b289bc7a50fc0254970c60aaeba01c33de61a728/tensorflow/core/ops/array_ops.cc#L1009).
-3.  Wait for a major release for backward compatibility purposes.
-4.  Increase `min_producer` to the GraphDef version from (2) and remove the
-    functionality entirely.
+#### 移除或限制某个操作的功能
 
-#### Change an Op's functionality
+1. 修复全部生产者脚本（不是 TensorFlow 本身）以避免使用禁用的操作和功能。
+2. 递增 `GraphDef` 版本，实现新的禁止在新版本及其后续版本中移除 GraphDefs 操作或功能的消费者功能。可能的话，可以使用禁用功能使 TensorFlow 不生成 `GraphDefs`。想要这么做的话，请添加 [`REGISTER_OP(...).Deprecated(deprecated_at_version,message)`](https://github.com/tensorflow/tensorflow/blob/b289bc7a50fc0254970c60aaeba01c33de61a728/tensorflow/core/ops/array_ops.cc#L1009)。
+3. 等待兼顾向后兼容性的主版本的发布。
+4. 在第（2）点中递增 GraphDef 的 `min_producer`，并且完全移除其功能。
 
-1.  Add a new similar Op named `SomethingV2` or similar and go through the
-    process of adding it and switching existing Python wrappers to use it, which
-    may take three weeks if forward compatibility is desired.
-2.  Remove the old Op (Can only take place with a major version change due to
-    backward compatibility).
-3.  Increase `min_consumer` to rule out consumers with the old Op, add back the
-    old Op as an alias for `SomethingV2`, and go through the process to switch
-    existing Python wrappers to use it.
-4.  Go through the process to remove `SomethingV2`.
+#### 更改某个操作的功能
 
-#### Ban a single unsafe consumer version
+1. 增加一个新的名为 `SomethingV2` 或 similer 的相似操作，并经历添加且使现有 Python 包装器转而使用它的过程，如果希望保持向前兼容性，这将花费三周。
+2. 移除旧操作（由于要保持向后兼容性，只能改变主版本号）。
+3. 递增 `min_consumer` 以使消费者无法使用旧操作，将旧操作以别名 `SomethingV2` 添加回去，并经历添加且使现有 Python 包装器转而使用它的过程。
+4. 经历移除 `SomethingV2` 的过程。
 
-1.  Bump the `GraphDef` version and add the bad version to `bad_consumers` for
-    all new GraphDefs. If possible, add to `bad_consumers` only for GraphDefs
-    which contain a certain Op or similar.
-2.  If existing consumers have the bad version, push them out as soon as
-    possible.
+#### 禁用单一不安全版本
+
+1. 为全部的新 GraphDef 替换掉 `GraphDef` 版本，并且在 `bad_consumers` 中添加错误版本。如果可能的话，只为包含确定操作或相似操作的 GraphDef 添加 `bad_consumers`。
+2. 如果现有消费者拥有错误版本，请尽快淘汰这些版本。

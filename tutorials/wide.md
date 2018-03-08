@@ -1,188 +1,175 @@
-# TensorFlow Linear Model Tutorial
+# TensorFlow 线性模型教程
 
-In this tutorial, we will use the tf.estimator API in TensorFlow to solve a
-binary classification problem: Given census data about a person such as age,
-education, marital status, and occupation (the features), we will try to predict
-whether or not the person earns more than 50,000 dollars a year (the target
-label). We will train a **logistic regression** model, and given an individual's
-information our model will output a number between 0 and 1, which can be
-interpreted as the probability that the individual has an annual income of over
-50,000 dollars.
+在这个教程中,我们将使用 Tensorflow 中的 tf.estimator API 来解决二分类问题：
+给定含有年龄、性别、教育程度和职业（的这些特征）的人口普查数据，
+我们将用其预测每个人是否达到年收入 50,000 美元（目标标签）。
+我们会训练一个 **Logistic 回归**模型，对于每个人的信息，输出 0 或 1，表明这个人是否能达到年收入 50,000 美元。
 
-## Setup
+## 起步
 
-To try the code for this tutorial:
+为了尝试本教程中的代码：
 
-1.  @{$install$Install TensorFlow} if you haven't already.
+1.  @{$install$Install TensorFlow} 如果你还没有安装。
 
-2.  Download [the tutorial code](https://github.com/tensorflow/models/tree/master/official/wide_deep/).
+2.  下载 [教程代码](https://www.tensorflow.org/code/tensorflow/examples/learn/wide_n_deep_tutorial.py)。
 
-3. Execute the data download script we provide to you:
+3.  安装 pandas 库（用作数据分析的库）。tf.estimator 不依赖于 pandas，但是支持它，在本教程中也使用了 pandas。安装 pandas：
 
-        $ python data_download.py
+    a. 安装 `pip`：
 
-4. Execute the tutorial code with the following command to train the linear
-model described in this tutorial:
+        # Ubuntu/Linux 64 位
+        $ sudo apt-get install python-pip python-dev
 
-        $ python wide_deep.py --model_type=wide
+        # macOS
+        $ sudo easy_install pip
+        $ sudo easy_install --upgrade six
 
-Read on to find out how this code builds its linear model.
+    b. 使用 `pip` 安装 pandas：
 
-## Reading The Census Data
+        $ pip install -U pandas
 
-The dataset we'll be using is the
-[Census Income Dataset](https://archive.ics.uci.edu/ml/datasets/Census+Income).
-We have provided
-[data_download.py](https://github.com/tensorflow/models/tree/master/official/wide_deep/data_download.py)
-which downloads the code and performs some additional cleanup.
+    如果你在安装 pandas 中遇到了麻烦，请参阅 pandas 网站中的 [说明](https://pandas.pydata.org/pandas-docs/stable/install.html)。
 
-Since the task is a binary classification problem, we'll construct a label
-column named "label" whose value is 1 if the income is over 50K, and 0
-otherwise. For reference, see `input_fn` in
-[wide_deep.py](https://github.com/tensorflow/models/tree/master/official/wide_deep/wide_deep.py).
+4. 使用以下命令执行教程代码，这将训练本教程中描述的线性模型：
 
-Next, let's take a look at the dataframe and see which columns we can use to
-predict the target label. The columns can be grouped into two types—categorical
-and continuous columns:
+        $ python wide_n_deep_tutorial.py --model_type=wide
 
-*   A column is called **categorical** if its value can only be one of the
-    categories in a finite set. For example, the relationship status of a person
-    (wife, husband, unmarried, etc.) or the education level (high school,
-    college, etc.) are categorical columns.
-*   A column is called **continuous** if its value can be any numerical value in
-    a continuous range. For example, the capital gain of a person (e.g. $14,084)
-    is a continuous column.
+以下内容说明了此代码是如何建立线性模型的。
 
-Here's a list of columns available in the Census Income dataset:
 
-| Column Name    | Type        | Description                       |
-| -------------- | ----------- | --------------------------------- |
-| age            | Continuous  | The age of the individual         |
-| workclass      | Categorical | The type of employer the          |
-:                :             : individual has (government,       :
-:                :             : military, private, etc.).         :
-| fnlwgt         | Continuous  | The number of people the census   |
-:                :             : takers believe that observation   :
-:                :             : represents (sample weight). Final :
-:                :             : weight will not be used.          :
-| education      | Categorical | The highest level of education    |
-:                :             : achieved for that individual.     :
-| education_num  | Continuous  | The highest level of education in |
-:                :             : numerical form.                   :
-| marital_status | Categorical | Marital status of the individual. |
-| occupation     | Categorical | The occupation of the individual. |
-| relationship   | Categorical | Wife, Own-child, Husband,         |
-:                :             : Not-in-family, Other-relative,    :
-:                :             : Unmarried.                        :
-| race           | Categorical | White, Asian-Pac-Islander,        |
-:                :             : Amer-Indian-Eskimo, Other, Black. :
-| gender         | Categorical | Female, Male.                     |
-| capital_gain   | Continuous  | Capital gains recorded.           |
-| capital_loss   | Continuous  | Capital Losses recorded.          |
-| hours_per_week | Continuous  | Hours worked per week.            |
-| native_country | Categorical | Country of origin of the          |
-:                :             : individual.                       :
-| income_bracket | Categorical | ">50K" or "<=50K", meaning        |
-:                :             : whether the person makes more     :
-:                :             : than $50,000 annually.            :
+## 读取人口普查数据
 
-## Converting Data into Tensors
-
-When building a tf.estimator model, the input data is specified by means of an
-Input Builder function. This builder function will not be called until it is
-later passed to tf.estimator.Estimator methods such as `train` and `evaluate`.
-The purpose of this function is to construct the input data, which is
-represented in the form of @{tf.Tensor}s or @{tf.SparseTensor}s.
-In more detail, the input builder function returns the following as a pair:
-
-1.  `features`: A dict from feature column names to `Tensors` or
-    `SparseTensors`.
-2.  `labels`: A `Tensor` containing the label column.
-
-The keys of the `features` will be used to construct columns in the next
-section. Because we want to call the `train` and `evaluate` methods with
-different data, we define a method that returns an input function based on the
-given data. Note that the returned input function will be called while
-constructing the TensorFlow graph, not while running the graph. What it is
-returning is a representation of the input data as the fundamental unit of
-TensorFlow computations, a `Tensor` (or `SparseTensor`).
-
-Each continuous column in the train or test data will be converted into a
-`Tensor`, which in general is a good format to represent dense data. For
-categorical data, we must represent the data as a `SparseTensor`. This data
-format is good for representing sparse data. Our `input_fn` uses the `tf.data`
-API, which makes it easy to apply transformations to our dataset:
+我们将使用的数据集是 [人口普查收入数据集](https://archive.ics.uci.edu/ml/datasets/Census+Income)。 您可以自行下载 [训练数据](https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data) 和 [测试数据](https：//archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.test) 或使用如下代码：
 
 ```python
-def input_fn(data_file, num_epochs, shuffle, batch_size):
-  """Generate an input function for the Estimator."""
-  assert tf.gfile.Exists(data_file), (
-      '%s not found. Please make sure you have either run data_download.py or '
-      'set both arguments --train_data and --test_data.' % data_file)
-
-  def parse_csv(value):
-    print('Parsing', data_file)
-    columns = tf.decode_csv(value, record_defaults=_CSV_COLUMN_DEFAULTS)
-    features = dict(zip(_CSV_COLUMNS, columns))
-    labels = features.pop('income_bracket')
-    return features, tf.equal(labels, '>50K')
-
-  # Extract lines from input files using the Dataset API.
-  dataset = tf.data.TextLineDataset(data_file)
-
-  if shuffle:
-    dataset = dataset.shuffle(buffer_size=_SHUFFLE_BUFFER)
-
-  dataset = dataset.map(parse_csv, num_parallel_calls=5)
-
-  # We call repeat after shuffling, rather than before, to prevent separate
-  # epochs from blending together.
-  dataset = dataset.repeat(num_epochs)
-  dataset = dataset.batch(batch_size)
-
-  iterator = dataset.make_one_shot_iterator()
-  features, labels = iterator.get_next()
-  return features, labels
+import tempfile
+import urllib
+train_file = tempfile.NamedTemporaryFile()
+test_file = tempfile.NamedTemporaryFile()
+urllib.urlretrieve("https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data", train_file.name)
+urllib.urlretrieve("https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.test", test_file.name)
 ```
 
-## Selecting and Engineering Features for the Model
-
-Selecting and crafting the right set of feature columns is key to learning an
-effective model. A **feature column** can be either one of the raw columns in
-the original dataframe (let's call them **base feature columns**), or any new
-columns created based on some transformations defined over one or multiple base
-columns (let's call them **derived feature columns**). Basically, "feature
-column" is an abstract concept of any raw or derived variable that can be used
-to predict the target label.
-
-### Base Categorical Feature Columns
-
-To define a feature column for a categorical feature, we can create a
-`CategoricalColumn` using the tf.feature_column API. If you know the set of all
-possible feature values of a column and there are only a few of them, you can
-use `categorical_column_with_vocabulary_list`. Each key in the list will get
-assigned an auto-incremental ID starting from 0. For example, for the
-`relationship` column we can assign the feature string "Husband" to an integer
-ID of 0 and "Not-in-family" to 1, etc., by doing:
+在 CSV 文件下载完成后，将它们读到 pandas 的 dataframes 里。
 
 ```python
-relationship = tf.feature_column.categorical_column_with_vocabulary_list(
-    'relationship', [
-        'Husband', 'Not-in-family', 'Wife', 'Own-child', 'Unmarried',
-        'Other-relative'])
+import pandas as pd
+CSV_COLUMNS = [
+    "age", "workclass", "fnlwgt", "education", "education_num",
+    "marital_status", "occupation", "relationship", "race", "gender",
+    "capital_gain", "capital_loss", "hours_per_week", "native_country",
+    "income_bracket"]
+df_train = pd.read_csv(train_file.name, names=CSV_COLUMNS, skipinitialspace=True)
+df_test = pd.read_csv(test_file.name, names=CSV_COLUMNS, skipinitialspace=True, skiprows=1)
 ```
 
-What if we don't know the set of possible values in advance? Not a problem. We
-can use `categorical_column_with_hash_bucket` instead:
+由于该任务是一个二分类问题，我们将创建一个名为“标签”的标签列，如果收入超过 50K 美元，那么它的值为 1，否则为 0。
+
+```python
+train_labels = (df_train["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
+test_labels = (df_test["income_bracket"].apply(lambda x: ">50K" in x)).astype(int)
+```
+
+接下来，我们来看 dataframe，看看我们可以使用哪些列来预测目标标签。这些列可以分为两类：分类和连续的列：
+
+*   如果某列的数据只可能是有限集合中的某个值，那么这一列就称之为**分类**。比如，一个人的出生国家（美国，印度，日本，等等）或者教育程度（高中，大学，等等）就是分类的列。
+*   如果某列的数据是连续范围内的任何一个数值，那么这一列就称之为**连续**。比如，一个人的资本收入（比如 14,084 美元）就是连续的列。
+
+以下是人口普查收入数据集中可用的列的列表：
+
+| 列名            | 类型 | 描述                                   | {.sortable}
+| -------------- | --- | -------------------------------------- |
+| age            | 连续 | 市民的年龄。                             |
+| workclass      | 分类 | 市民职位的类型(政府, 军队, 私人, 等等)。    |
+| fnlwgt         | 连续 | 人口普查员认为该市民所代表的人数(样本权重)。  :
+:                :             : 最终的权重不会被使用。             :
+| education      | 分类 | 市民的最高学历。                          |
+| education_num  | 连续 | 市民最高学历的数字形式。                   |
+| marital_status | 分类 | 市民的婚姻状况。                          |
+| occupation     | 分类 | 市民的职位。                             |
+| relationship   | 分类 | Wife, Own-child, Husband,              |
+:                :     : Not-in-family, Other-relative,         :
+:                :     : Unmarried. 妻子, 育儿, 丈夫, 未在家庭,     :
+:                :     : 其他亲属, 未婚。这些值之一。                :
+| race           | 分类 | White, Asian-Pac-Islander,             |
+:                :     : Amer-Indian-Eskimo, Other, Black.      :
+:                :     : 白种人, 亚太岛民, 美洲-印度-爱斯基摩人,     :
+:                :     : 其他, 黑种人。这些值之一。 :
+| gender         | 分类 | Female, Male.女性，男性。这些值之一。     |
+| capital_gain   | 连续 | 收益资本。                              |
+| capital_loss   | 连续 | 损失资本。                              |
+| hours_per_week | 连续 | 每周工作时间。                           |
+| native_country | 分类 | 市民的出生国家。                         |
+| income         | 分类 | ">50K" 或 "<=50K",表明该人的年收入       |
+:                :     : 是否超过 50,000 美元                    :
+
+
+## 将数据转换成张量(Tensor)
+
+当建立了一个 tf.estimator 模型，输入数据是通过输入构建函数来指定的。
+这个构建函数在传递给 tf.estimator.Estimator 方法（如 `train` 和 `evaluate`）之前不会被调用。
+这个函数是用来构建输入数据，它以 @{tf.Tensor}s 或者 @{tf.SparseTensor} 的形式表示。具体来说，
+输入构建函数返回以下一对数据：
+
+1. `feature_cols`：从特征列中被命名为 `Tensors` 或 `SparseTensors` 的字典。
+2. `label`：包含标签列的 `Tensor`。
+
+`feature_cols` 的键值将会在下一节中用到。 因为我们想分别使用不同的数据调用 `train` 和 `evaluate` 方法，
+所以我们定义一个方法，根据给定的数据返回一个输入函数。
+请注意，返回的输入函数将在 TensorFlow 图被构造时进行调用，而不是在其运行时被调用。
+它返回的 `Tensor`（或`SparseTensor`）是作为 TensorFlow 计算的基本单位的输入数据。
+
+我们使用 `tf.estimator.inputs.pandas_input_fn` 方法从 pandas 的 dataframe 中创建一个输入函数。
+训练或测试数据的 dataframe 中的每个连续列都将被转换成一个 `Tensor`，一般来说这是表示稠密数据的一种很好的格式。
+对于分类数据，我们必须将数据表示为 `SparseTensor`。这种数据格式适合用来表示稀疏数据。
+表示输入数据的另一种更高级的方法是构建代表文件或其他数据源的 @{$python/io_ops#inputs-and-readers$Inputs And Readers}，并在 TensorFlow 运行图时遍历文件。
+
+```python
+def input_fn(data_file, num_epochs, shuffle):
+  """输入构建函数"""
+  df_data = pd.read_csv(
+      tf.gfile.Open(data_file),
+      names=CSV_COLUMNS,
+      skipinitialspace=True,
+      engine="python",
+      skiprows=1)
+  # 去掉 NaN 数据
+  df_data = df_data.dropna(how="any", axis=0)
+  labels = df_data["income_bracket"].apply(lambda x: ">50K" in x).astype(int)
+  return tf.estimator.inputs.pandas_input_fn(
+      x=df_data,
+      y=labels,
+      batch_size=100,
+      num_epochs=num_epochs,
+      shuffle=shuffle,
+      num_threads=5)
+```
+## 为模型选择和构造特征
+
+选择和构造正确的特征是学习有效模型的关键。
+**特征列**可以是原始数据框中的原始列之一（我们称之为**基本特征列**），
+也可以是基于在一个或多个基本列上定义的进行某些转换而创建的任何新列（我们称之为**派生特征列**）。
+基本上来说，“特征列"是用于预测目标标签的任何原始或派生变量的抽象概念。
+
+### 基本分类特征列
+
+要为分类特征定义特征列，我们可以使用 tf.feature_column API 创建一个 `CategoricalColumn`。
+如果您知道该列的所有可能的特征值的集合，并且只有很少可能的特征值，您可以使用 `categorical_column_with_vocabulary_list`。
+例如，对于 `gender` 列，我们可以通过执行以下操作将特征字符串 `Female` 分配给整数 0，`Male` 分配给整数 1：
+
+```python
+gender = tf.feature_column.categorical_column_with_vocabulary_list(
+    "gender", ["Female", "Male"])
+```
+
+如果我们不知道所有可能的特征值的集合怎么办？没关系。我们可以使用 `categorical_column_with_hash_bucket` 来代替。
 
 ```python
 occupation = tf.feature_column.categorical_column_with_hash_bucket(
-    'occupation', hash_bucket_size=1000)
+    "occupation", hash_bucket_size=1000)
 ```
 
-What will happen is that each possible value in the feature column `occupation`
-will be hashed to an integer ID as we encounter them in training. See an example
-illustration below:
+以上代码会把 `occupation` 的每个可能的特征值散列成一个整数 ID （就像训练时那么散列）。看以下这个例子：
 
 ID  | Feature
 --- | -------------
@@ -194,268 +181,215 @@ ID  | Feature
 375 | `"Protective-serv"`
 ... |
 
-No matter which way we choose to define a `SparseColumn`, each feature string
-will be mapped into an integer ID by looking up a fixed mapping or by hashing.
-Note that hashing collisions are possible, but may not significantly impact the
-model quality. Under the hood, the `LinearModel` class is responsible for
-managing the mapping and creating `tf.Variable` to store the model parameters
-(also known as model weights) for each feature ID. The model parameters will be
-learned through the model training process we'll go through later.
+不论我们如何选择定义一个 `SparseColumn` 的方式，都会通过查找一个固定的映射或散列，将每个特征字符串映射到一个整数 ID。
+请注意，散列冲突是可能的，但可能不会显著影响模型质量。
+在这种情况下，LinearModel 类负责管理映射并创建 `tf.Variable` 来存储每个特征 ID 的模型参数（也称为模型权重）。
+模型参数将会通过我们之后会用到的模型训练来学习。
 
-We'll do the similar trick to define the other categorical features:
+我们会使用类似的技巧来定义其他的分类特征：
 
 ```python
 education = tf.feature_column.categorical_column_with_vocabulary_list(
-    'education', [
-        'Bachelors', 'HS-grad', '11th', 'Masters', '9th', 'Some-college',
-        'Assoc-acdm', 'Assoc-voc', '7th-8th', 'Doctorate', 'Prof-school',
-        '5th-6th', '10th', '1st-4th', 'Preschool', '12th'])
-
+    "education", [
+        "Bachelors", "HS-grad", "11th", "Masters", "9th",
+        "Some-college", "Assoc-acdm", "Assoc-voc", "7th-8th",
+        "Doctorate", "Prof-school", "5th-6th", "10th", "1st-4th",
+        "Preschool", "12th"
+    ])
 marital_status = tf.feature_column.categorical_column_with_vocabulary_list(
-    'marital_status', [
-        'Married-civ-spouse', 'Divorced', 'Married-spouse-absent',
-        'Never-married', 'Separated', 'Married-AF-spouse', 'Widowed'])
-
+    "marital_status", [
+        "Married-civ-spouse", "Divorced", "Married-spouse-absent",
+        "Never-married", "Separated", "Married-AF-spouse", "Widowed"
+    ])
 relationship = tf.feature_column.categorical_column_with_vocabulary_list(
-    'relationship', [
-        'Husband', 'Not-in-family', 'Wife', 'Own-child', 'Unmarried',
-        'Other-relative'])
-
+    "relationship", [
+        "Husband", "Not-in-family", "Wife", "Own-child", "Unmarried",
+        "Other-relative"
+    ])
 workclass = tf.feature_column.categorical_column_with_vocabulary_list(
-    'workclass', [
-        'Self-emp-not-inc', 'Private', 'State-gov', 'Federal-gov',
-        'Local-gov', '?', 'Self-emp-inc', 'Without-pay', 'Never-worked'])
-
-# To show an example of hashing:
-occupation = tf.feature_column.categorical_column_with_hash_bucket(
-    'occupation', hash_bucket_size=1000)
+    "workclass", [
+        "Self-emp-not-inc", "Private", "State-gov", "Federal-gov",
+        "Local-gov", "?", "Self-emp-inc", "Without-pay", "Never-worked"
+    ])
+native_country = tf.feature_column.categorical_column_with_hash_bucket(
+    "native_country", hash_bucket_size=1000)
 ```
 
-### Base Continuous Feature Columns
+### 基本连续特征列
 
-Similarly, we can define a `NumericColumn` for each continuous feature column
-that we want to use in the model:
+同样地，我们可以为每一个我们想在模型中使用的连续特征列定义一个 `NumericColumn`：
 
 ```python
-age = tf.feature_column.numeric_column('age')
-education_num = tf.feature_column.numeric_column('education_num')
-capital_gain = tf.feature_column.numeric_column('capital_gain')
-capital_loss = tf.feature_column.numeric_column('capital_loss')
-hours_per_week = tf.feature_column.numeric_column('hours_per_week')
+age = tf.feature_column.numeric_column("age")
+education_num = tf.feature_column.numeric_column("education_num")
+capital_gain = tf.feature_column.numeric_column("capital_gain")
+capital_loss = tf.feature_column.numeric_column("capital_loss")
+hours_per_week = tf.feature_column.numeric_column("hours_per_week")
 ```
 
-### Making Continuous Features Categorical through Bucketization
+###　通过桶化连续性特征的分类
 
-Sometimes the relationship between a continuous feature and the label is not
-linear. As a hypothetical example, a person's income may grow with age in the
-early stage of one's career, then the growth may slow at some point, and finally
-the income decreases after retirement. In this scenario, using the raw `age` as
-a real-valued feature column might not be a good choice because the model can
-only learn one of the three cases:
+有时连续特征和标签之间的关系不是线性的。
+假设一下，一个人的收入在职业生涯初期可能会随着年龄的增长而增长，然后增长会有所放缓，退休后收入会减少。
+在这种情况下，使用原始的 `age` 作为实值特征列可能不是一个好的选择，因为模型只能学习到三种情况之一：
 
-1.  Income always increases at some rate as age grows (positive correlation),
-1.  Income always decreases at some rate as age grows (negative correlation), or
-1.  Income stays the same no matter at what age (no correlation)
+1. 收入总是随着年龄的增加而增加（正相关）。
+2. 收入总是随着年龄的增加而减少（负相关）。
+3. 收入总是和年龄无关。（不相关）。
 
-If we want to learn the fine-grained correlation between income and each age
-group separately, we can leverage **bucketization**. Bucketization is a process
-of dividing the entire range of a continuous feature into a set of consecutive
-bins/buckets, and then converting the original numerical feature into a bucket
-ID (as a categorical feature) depending on which bucket that value falls into.
-So, we can define a `bucketized_column` over `age` as:
+如果我们想要学习收入和每个年龄组之间的细粒度的相关性，我们需要利用**桶化**。
+桶化是将连续特征的整个范围划分为一组连续的 箱/桶 的过程，然后根据值落入哪个桶中，
+就将其原始数值特征转换为桶 ID（作为一个分类特征）。
+所以，我们可以定义 `bucketized_column` 为 `age`：
 
 ```python
 age_buckets = tf.feature_column.bucketized_column(
     age, boundaries=[18, 25, 30, 35, 40, 45, 50, 55, 60, 65])
 ```
+其中 `boundaries` 是桶边界的列表。在上述情况下，有 10 个边界值，产生了 11 个年龄组桶（从 0-17，18-24，25-29...到65及其以上）。
 
-where the `boundaries` is a list of bucket boundaries. In this case, there are
-10 boundaries, resulting in 11 age group buckets (from age 17 and below, 18-24,
-25-29, ..., to 65 and over).
+### 使用 CrossedColumn 相交多列
 
-### Intersecting Multiple Columns with CrossedColumn
-
-Using each base feature column separately may not be enough to explain the data.
-For example, the correlation between education and the label (earning > 50,000
-dollars) may be different for different occupations. Therefore, if we only learn
-a single model weight for `education="Bachelors"` and `education="Masters"`, we
-won't be able to capture every single education-occupation combination (e.g.
-distinguishing between `education="Bachelors" AND occupation="Exec-managerial"`
-and `education="Bachelors" AND occupation="Craft-repair"`). To learn the
-differences between different feature combinations, we can add **crossed feature
-columns** to the model.
+分别使用每个基本特征列可能并不足以解释数据。
+例如，不同职业的受教育水平与目标标签（赚取大于 50,000 美元）的关系可能不同。
+因此，如果我们只学习 `education="Bachelors"` 和 `education="Masters"` 的单个模型权重，
+就无法获取到每一个教育--职业的组合（例如 `education="Bachelors" AND occupation="Exec-managerial"` 和 `education="Bachelors" AND occupation="Craft-repair"` 就是不同的）。
+要了解不同特征组合之间的差异，我们可以引入**交叉特征列**到这个模型中。
 
 ```python
 education_x_occupation = tf.feature_column.crossed_column(
-    ['education', 'occupation'], hash_bucket_size=1000)
+    ["education", "occupation"], hash_bucket_size=1000)
 ```
 
-We can also create a `CrossedColumn` over more than two columns. Each
-constituent column can be either a base feature column that is categorical
-(`SparseColumn`), a bucketized real-valued feature column (`BucketizedColumn`),
-or even another `CrossColumn`. Here's an example:
+我们也可以在两个以上的列上创建一个 `CrossedColumn`。
+每一个构成的列可以是分类基本特征列（`SparseColumn`），一个经过桶化的实值特征列（`BucketizedColumn`），或甚至是其他的 `CrossedColumn`。
+举个例子：
 
 ```python
 age_buckets_x_education_x_occupation = tf.feature_column.crossed_column(
-    [age_buckets, 'education', 'occupation'], hash_bucket_size=1000)
+    [age_buckets, "education", "occupation"], hash_bucket_size=1000)
 ```
 
-## Defining The Logistic Regression Model
+## 定义 Logistic 回归模型
 
-After processing the input data and defining all the feature columns, we're now
-ready to put them all together and build a Logistic Regression model. In the
-previous section we've seen several types of base and derived feature columns,
-including:
 
-*   `CategoricalColumn`
-*   `NumericColumn`
-*   `BucketizedColumn`
-*   `CrossedColumn`
+在处理输入数据并定义所有特征列后，我们现在准备将它们放在一起并构建一个 Logistic 回归模型。
+在上一节中，我们已经看到了几种类型的基本和派生特征列，包括：
 
-All of these are subclasses of the abstract `FeatureColumn` class, and can be
-added to the `feature_columns` field of a model:
+* `CategoricalColumn`
+* `NumericColumn`
+* `BucketizedColumn`
+* `CrossedColumn`
+
+所有的这些列都是抽象类 `FeatureColumn` 的子类，并且都可以添加到模型的 `feature_columns` 字段中：
 
 ```python
 base_columns = [
-    education, marital_status, relationship, workclass, occupation,
+    gender, native_country, education, occupation, workclass, relationship,
     age_buckets,
 ]
 crossed_columns = [
     tf.feature_column.crossed_column(
-        ['education', 'occupation'], hash_bucket_size=1000),
+        ["education", "occupation"], hash_bucket_size=1000),
     tf.feature_column.crossed_column(
-        [age_buckets, 'education', 'occupation'], hash_bucket_size=1000),
+        [age_buckets, "education", "occupation"], hash_bucket_size=1000),
+    tf.feature_column.crossed_column(
+        ["native_country", "occupation"], hash_bucket_size=1000)
 ]
 
 model_dir = tempfile.mkdtemp()
-model = tf.estimator.LinearClassifier(
+m = tf.estimator.LinearClassifier(
     model_dir=model_dir, feature_columns=base_columns + crossed_columns)
 ```
 
-The model also automatically learns a bias term, which controls the prediction
-one would make without observing any features (see the section "How Logistic
-Regression Works" for more explanations). The learned model files will be stored
-in `model_dir`.
+该模型也会自动学习一个偏置项，偏置项控制着不预测任何特征的预测（更多解释请参见“Logistic 回归是如何工作的”一节）。
+经过学习的模型文件将被存储在 `model_dir` 中。
 
-## Training and Evaluating Our Model
+## 训练和评估我们的模型
 
-After adding all the features to the model, now let's look at how to actually
-train the model. Training a model is just a single command using the
-tf.estimator API:
+将所有的特征添加到模型之后，是时候让我们看看该如何训练这个模型了。
+使用 TF.Learn API 训练一个模型只需一行代码：
 
 ```python
-model.train(input_fn=lambda: input_fn(train_data, num_epochs, True, batch_size))
+# 将 num_epochs 设为 None 表示需要获得无限的数据流。
+m.train(
+    input_fn=input_fn(train_file_name, num_epochs=None, shuffle=True),
+    steps=train_steps)
 ```
 
-After the model is trained, we can evaluate how good our model is at predicting
-the labels of the holdout data:
+在模型训练完成后，我们可以评估我们的模型在对保留数据预测目标标签时的好坏：
 
 ```python
-results = model.evaluate(input_fn=lambda: input_fn(
-    test_data, 1, False, batch_size))
+results = m.evaluate(
+    input_fn=input_fn(test_file_name, num_epochs=1, shuffle=False),
+    steps=None)
+print("model directory = %s" % model_dir)
 for key in sorted(results):
-  print('%s: %s' % (key, results[key]))
+  print("%s: %s" % (key, results[key]))
 ```
 
-The first line of the final output should be something like
-`accuracy: 0.83557522`, which means the accuracy is 83.6%. Feel free to try more
-features and transformations and see if you can do even better!
+输出的第一行应该类似于 `accuracy: 0.83557522`，表示准确率达到了 83.6%。
+你可以尝试更多的特征和转换，看看你能不能做得更好！
 
-After the model is evaluated, we can use the model to predict whether an individual has an annual income of over
-50,000 dollars given an individual's information input.
-```python
-  pred_iter = model.predict(input_fn=lambda: input_fn(FLAGS.test_data, 1, False, 1))
-  for pred in pred_iter:
-    print(pred['classes'])
-```
+如果你想要看完整的代码，你可以下载我们的 [样例代码](https://www.tensorflow.org/code/tensorflow/examples/learn/wide_n_deep_tutorial.py)，
+然后将 `model_type` 设为 `wide`。
 
-The model prediction output would be like `[b'1']` or `[b'0']` which means whether corresponding individual has an annual income of over 50,000 dollars or not.
 
-If you'd like to see a working end-to-end example, you can download our
-[example code](https://github.com/tensorflow/models/tree/master/official/wide_deep/wide_deep.py)
-and set the `model_type` flag to `wide`.
+## 添加正则化以防止过拟合
 
-## Adding Regularization to Prevent Overfitting
+正则化是一种用来避免**过拟合**的方法。
+模型在训练数据上表现良好，但模型在以前从未见过的测试数据（如实时流量）上很糟糕时，就是过拟合。
+过拟合通常发生在模型过于复杂的情况下，例如相对于观测的训练数据的数量使用了太多的参数。
+正则化允许你控制你的模型的复杂性，并且使模型对于未知数据具有良好的鲁棒性。
 
-Regularization is a technique used to avoid **overfitting**. Overfitting happens
-when your model does well on the data it is trained on, but worse on test data
-that the model has not seen before, such as live traffic. Overfitting generally
-occurs when a model is excessively complex, such as having too many parameters
-relative to the number of observed training data. Regularization allows for you
-to control your model's complexity and makes the model more generalizable to
-unseen data.
-
-In the Linear Model library, you can add L1 and L2 regularizations to the model
-as:
+在这个线性模型库中，你可以为模型添加 L1 或 L2 正则化：
 
 ```
-model = tf.estimator.LinearClassifier(
+m = tf.estimator.LinearClassifier(
     model_dir=model_dir, feature_columns=base_columns + crossed_columns,
     optimizer=tf.train.FtrlOptimizer(
-        learning_rate=0.1,
-        l1_regularization_strength=1.0,
-        l2_regularization_strength=1.0))
+      learning_rate=0.1,
+      l1_regularization_strength=1.0,
+      l2_regularization_strength=1.0))
 ```
+L1 和 L2 正则化之间的一个重要区别是，L1正则化倾向于使模型权重保持为零，从而创建更稀疏的模型，
+而 L2 正则化也尝试使模型权重接近于零，但不一定是零。
+因此，如果您增加 L1 正则化的强度，您会有一个较小的模型尺寸，因为许多模型权重都为零。
+通常在特征空间非常大有很稀疏的时候，以及在你的资源限制让你无法保存一个过大的模型时，L1 正则化是可取的。
 
-One important difference between L1 and L2 regularization is that L1
-regularization tends to make model weights stay at zero, creating sparser
-models, whereas L2 regularization also tries to make the model weights closer to
-zero but not necessarily zero. Therefore, if you increase the strength of L1
-regularization, you will have a smaller model size because many of the model
-weights will be zero. This is often desirable when the feature space is very
-large but sparse, and when there are resource constraints that prevent you from
-serving a model that is too large.
 
-In practice, you should try various combinations of L1, L2 regularization
-strengths and find the best parameters that best control overfitting and give
-you a desirable model size.
+在实践中，你应该尝试 L1，L2 正则化强度的各种组合，找到控制过拟合的最佳参数，你会得到一个理想大小的模型。
 
-## How Logistic Regression Works
+## Logistic 回归是如何工作的
 
-Finally, let's take a minute to talk about what the Logistic Regression model
-actually looks like in case you're not already familiar with it. We'll denote
-the label as \\(Y\\), and the set of observed features as a feature vector
-\\(\mathbf{x}=[x_1, x_2, ..., x_d]\\). We define \\(Y=1\\) if an individual
-earned > 50,000 dollars and \\(Y=0\\) otherwise. In Logistic Regression, the
-probability of the label being positive (\\(Y=1\\)) given the features
-\\(\mathbf{x}\\) is given as:
+
+最后，让我们花一点时间谈一谈 Logistic 回归模型实际上是什么样子的，以免你还不熟悉它。
+我们定义标签为 \\(Y\\) ，然后设置可观测的特征为一个特征向量，即 \\(\mathbf{x}=[x_1, x_2, ..., x_d]\\)。
+我们再定义 \\(Y=1\\) 表明一个人年收入大于或等于 50,000 美元，反之为 \\(Y=0\\)。
+在 Logistic 回归中，对给定特征 \\(\mathbf{x}\\) 预测标签为正 (\\(Y=1\\)) 的概率是：
 
 $$ P(Y=1|\mathbf{x}) = \frac{1}{1+\exp(-(\mathbf{w}^T\mathbf{x}+b))}$$
 
-where \\(\mathbf{w}=[w_1, w_2, ..., w_d]\\) are the model weights for the
-features \\(\mathbf{x}=[x_1, x_2, ..., x_d]\\). \\(b\\) is a constant that is
-often called the **bias** of the model. The equation consists of two parts—A
-linear model and a logistic function:
+其中 \\(\mathbf{w}=[w_1, w_2, ..., w_d]\\) 是特征 \\(\mathbf{x}=[x_1, x_2, ..., x_d]\\) 的模型权重。
+\\(b\\) 是一个被称为模型**偏置项**的常量。该方程由两部分组成——一个线性模型和一个 Logistic 函数：
 
-*   **Linear Model**: First, we can see that \\(\mathbf{w}^T\mathbf{x}+b = b +
-    w_1x_1 + ... +w_dx_d\\) is a linear model where the output is a linear
-    function of the input features \\(\mathbf{x}\\). The bias \\(b\\) is the
-    prediction one would make without observing any features. The model weight
-    \\(w_i\\) reflects how the feature \\(x_i\\) is correlated with the positive
-    label. If \\(x_i\\) is positively correlated with the positive label, the
-    weight \\(w_i\\) increases, and the probability \\(P(Y=1|\mathbf{x})\\) will
-    be closer to 1. On the other hand, if \\(x_i\\) is negatively correlated
-    with the positive label, then the weight \\(w_i\\) decreases and the
-    probability \\(P(Y=1|\mathbf{x})\\) will be closer to 0.
+*   **线性模型**：首先，我们可以看到 \\(\mathbf{w}^T\mathbf{x}+b = b +
+    w_1x_1 + ... +w_dx_d\\) 是一个线性模型，它的输出是输入特征 \\(\mathbf{x}\\)。
+    偏置项 \\(b\\) 是没有观测到任何特征的预测情况。模型权重 \\(w_i\\) 表明了特征 \\(x_i\\) 是否和正标签
+    相关。如果 \\(x_i\\) 和正标签是正相关的，那么当权重 \\(w_i\\) 增大时，\\(P(Y=1|\mathbf{x})\\) 概率会
+    更接近于 1。反而言之，如果 \\(x_i\\) 和正标签是负相关的，那么当权重 \\(w_i\\) 减小时，
+    \\(P(Y=1|\mathbf{x})\\) 概率会更接近于 0。
 
-*   **Logistic Function**: Second, we can see that there's a logistic function
-    (also known as the sigmoid function) \\(S(t) = 1/(1+\exp(-t))\\) being
-    applied to the linear model. The logistic function is used to convert the
-    output of the linear model \\(\mathbf{w}^T\mathbf{x}+b\\) from any real
-    number into the range of \\([0, 1]\\), which can be interpreted as a
-    probability.
+*   **Logistic 函数**：其次，我们可以看这个 logistic 函数（也被称之为 sigmoid 函数）\\(S(t) = 1/(1+\exp(-t))\\) 
+    也被应用到这个线性模型中。这个 logistic 函数是用于将线性函模型的输出 \\(\mathbf{w}^T\mathbf{x}+b\\) 从任意实数
+    转变成 \\([0, 1]\\) 的范围，我们可以将其称之为概率。
 
-Model training is an optimization problem: The goal is to find a set of model
-weights (i.e. model parameters) to minimize a **loss function** defined over the
-training data, such as logistic loss for Logistic Regression models. The loss
-function measures the discrepancy between the ground-truth label and the model's
-prediction. If the prediction is very close to the ground-truth label, the loss
-value will be low; if the prediction is very far from the label, then the loss
-value would be high.
+模型训练是一个优化问题：目标是找到一组模型权重（即模型参数），在训练数据上最小化**损失函数**，
+例如 Logistic 回归模型的 logistic 损失。
+损失函数量化真实标签和模型预测结果之间的差异。
+如果预测结果与真实标签非常接近，损失值会很低；如果预测结果与真实标签很远，那么损失值就会很高。
 
-## Learn Deeper
+## 深入学习
 
-If you're interested in learning more, check out our
-@{$wide_and_deep$Wide & Deep Learning Tutorial} where we'll show you how to
-combine the strengths of linear models and deep neural networks by jointly
-training them using the tf.estimator API.
+如果你很想深入学习，可以看看我们的 @{$wide_and_deep$Wide & Deep Learning Tutorial}，
+在其中我们会向你展示如何使用 tf.estimator API 结合线性模型与深度神经网络优势去训练模型。

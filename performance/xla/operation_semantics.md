@@ -1,305 +1,92 @@
-# Operation Semantics
+# 操作语义
 
-The following describes the semantics of operations defined in the
-[`ComputationBuilder`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)
-interface. Typically, these operations map one-to-one to operations defined in
-the RPC interface in
-[`xla_data.proto`](https://www.tensorflow.org/code/tensorflow/compiler/xla/xla_data.proto).
+本文档描述了操作的语义，即 [`ComputationBuilder`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 接口中所定义的那些操作的语义。通常来说，这些操作与 [`xla_data.proto`](https://www.tensorflow.org/code/tensorflow/compiler/xla/xla_data.proto) 中的 RPC 接口所定义的那些操作是一一对应的。
 
-A note on nomenclature: the generalized data type XLA deals with is an
-N-dimensional array holding elements of some uniform type (such as 32-bit
-float). Throughout the documentation, *array* is used to denote an
-arbitrary-dimensional array. For convenience, special cases have more specific
-and familiar names; for example a *vector* is a 1-dimensional array and a
-*matrix* is a 2-dimensional array.
+关于术语：XLA 通常所处理的数据类型为元素类型一致的 N-维数组（比如元素全是 32 比特浮点类型）。在本文档中，**数组** 一词用于表示任意维度的数组。为方便起见，那些特例则使用人们约定俗成的更具体的名称；比如，1维数组称为**向量**，2维数组称为**矩阵**。
 
-## BatchNormGrad
+## 广播（Broadcast）
 
-See also
-[`ComputationBuilder::BatchNormGrad`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)
-and [the original batch normalization paper](https://arxiv.org/abs/1502.03167)
-for a detailed description of the algorithm.
+另请参阅 [`ComputationBuilder::Broadcast`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-Calculates gradients of batch norm.
+通过在数组中复制数据来增加其维度。
 
-<b> `BatchNormGrad(operand, scale, mean, variance, grad_output, epsilon, feature_index)` </b>
+<b> `广播(operand, broadcast_sizes)` </b>
 
-| Arguments       | Type                    | Semantics                        |
-| --------------  | ----------------------- | -------------------------------- |
-| `operand`       | `ComputationDataHandle` | n dimensional array to be        |
-:                 :                         : normalized (x)                   :
-| `scale`         | `ComputationDataHandle` | 1 dimensional array              |
-:                 :                         : (\\(\gamma\\))                   :
-| `mean`          | `ComputationDataHandle` | 1 dimensional array (\\(\mu\\))  |
-| `variance`      | `ComputationDataHandle` | 1 dimensional array              |
-:                 :                         : (\\(\sigma^2\\))                 :
-| `grad_output`   | `ComputationDataHandle` | Gradients passed to              |
-:                 :                         : `BatchNormTraining`              :
-:                 :                         : (\\( \nabla y\\))                :
-| `epsilon`       | `float`                 | Epsilon value (\\(\epsilon\\))   |
-| `feature_index` | `int64`                 | Index to feature dimension in    |
-:                 :                         : `operand`                        :
-
-For each feature in the feature dimension (`feature_index` is the index for the
-feature dimension in `operand`), the operation calculates the gradients with
-respect to `operand`, `offset` and `scale` across all the other dimensions. The
-`feature_index` must be a valid index for the feature dimension in `operand`.
-
-The three gradients are defined by the following formulas (Assuming a
-4-dimensional tensor as `operand` and (l) is the index for feature dimension):
-
-\\( coef_l = \frac{1}{mwh}\sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h (\nabla y_{ijkl} * (x_{ijkl} - \mu_l) / (\sigma^2_{l}+\epsilon)) \\)
-
-\\( \nabla x_{ijkl} = \gamma_{l} * (1/\sqrt{\sigma^2_{l}+\epsilon}) * [\nabla y_{ijkl} - mean(\nabla y) - (x_{ijkl} - \mu_{l}) * coef_l] \\)
-
-\\( \nabla \beta_l = \sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h \nabla y_{ijkl} \\)
-
-\\( \nabla \gamma_l = \sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h \nabla y_{ijkl} * ((x_{ijkl} - \mu_l) / \sqrt{\sigma^2_{l}+\epsilon}) \\)
-
-The inputs `mean` and `variance` represents moments value
-across batch and spatial dimensions.
-
-The output type is a tuple of three handles:
-
-|Outputs       | Type                    | Semantics                            |
-|------------- | ----------------------- | ------------------------------------ |
-|`grad_operand`| `ComputationDataHandle` | gradient with respect to input       |
-:              :                         : `operand` (\\( \nabla x\\))          :
-|`grad_scale`  | `ComputationDataHandle` | gradient with respect to input       |
-:              :                         : `scale` (\\( \nabla \gamma\\))       :
-|`grad_offset` | `ComputationDataHandle` | gradient with respect to input       |
-:              :                         : `offset`(\\( \nabla \beta\\))        :
-
-
-## BatchNormInference
-
-See also
-[`ComputationBuilder::BatchNormInference`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) and
-[the original batch normalization paper](https://arxiv.org/abs/1502.03167)
-for a detailed description of the algorithm.
-
-Normalizes an array across batch and spatial dimensions.
-
-<b> `BatchNormInference(operand, scale, offset, mean, variance, epsilon, feature_index)` </b>
-
-| Arguments       | Type                    | Semantics                       |
-| --------------  | ----------------------- | ------------------------------- |
-| `operand`       | `ComputationDataHandle` | n dimensional array to be       |
-:                 :                         : normalized                      :
-| `scale`         | `ComputationDataHandle` | 1 dimensional array             |
-| `offset`        | `ComputationDataHandle` | 1 dimensional array             |
-| `mean`          | `ComputationDataHandle` | 1 dimensional array             |
-| `variance`      | `ComputationDataHandle` | 1 dimensional array             |
-| `epsilon`       | `float`                 | Epsilon value                   |
-| `feature_index` | `int64`                 | Index to feature dimension in   |
-:                 :                         : `operand`                       :
-
-For each feature in the feature dimension (`feature_index` is the index for the
-feature dimension in `operand`), the operation calculates the mean and variance
-across all the other dimensions and uses the mean and variance to normalize each
-element in `operand`. The `feature_index` must be a valid index for the feature
-dimension in `operand`.
-
-`BatchNormInference`  is equivalent to calling `BatchNormTraining` without
-computing `mean` and `variance` for each batch. It uses the input `mean` and
-`variance` instead as estimated values. The purpose of this op is to reduce
-latency in inference, hence the name `BatchNormInference`.
-
-The output is an n-dimensional, normalized array with the same shape as input
-`operand`.
-
-## BatchNormTraining
-
-See also
-[`ComputationBuilder::BatchNormTraining`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) and
-[`the original batch normalization paper`](https://arxiv.org/abs/1502.03167)
-for a detailed description of the algorithm.
-
-Normalizes an array across batch and spatial dimensions.
-
-<b> `BatchNormTraining(operand, scale, offset, epsilon, feature_index)` </b>
-
-| Arguments       | Type                    | Semantics                        |
-| --------------- | ----------------------- | -------------------------------- |
-| `operand`       | `ComputationDataHandle` | n dimensional array to be        |
-:                 :                         : normalized (x)                   :
-| `scale`         | `ComputationDataHandle` | 1 dimensional array              |
-:                 :                         : (\\(\gamma\\))                   :
-| `offset`        | `ComputationDataHandle` | 1 dimensional array              |
-:                 :                         : (\\(\beta\\))                    :
-| `epsilon`       | `float`                 | Epsilon value (\\(\epsilon\\))   |
-| `feature_index` | `int64`                 | Index to feature dimension       |
-:                 :                         : in `operand`                     :
-
-For each feature in the feature dimension (`feature_index` is the index for the
-feature dimension in `operand`), the operation calculates the mean and variance
-across all the other dimensions and uses the mean and variance to normalize each
-element in `operand`. The `feature_index` must be a valid index for the feature
-dimension in `operand`.
-
-The algorithm goes as follows for each batch in `operand` \\(x\\) that
-contains `m` elements with `w` and `h` as the size of spatial dimensions
-(assuming `operand` is an 4 dimensional array):
-
-- Calculates batch mean \\(\mu_l\\) for each feature `l` in feature dimension:
-\\(\mu_l=\frac{1}{mwh}\sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h x_{ijkl}\\)
-
-- Calculates batch variance \\(\sigma^2_l\\):
-\\(\sigma^2_l=\frac{1}{mwh}\sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h (x_{ijkl} - \mu_l)^2\\)
-
-- Normalizes, scales and shifts:
-\\(y_{ijkl}=\frac{\gamma_l(x_{ijkl}-\mu_l)}{\sqrt[2]{\sigma^2_l+\epsilon}}+\beta_l\\)
-
-The epsilon value, usually a small number, is added to avoid divide-by-zero errors.
-
-The output type is a tuple of three `ComputationDataHandle`s:
-
-| Outputs      | Type                    | Semantics                            |
-| ------------ | ----------------------- | -------------------------------------|
-| `output`     | `ComputationDataHandle` | n dimensional array with the same    |
-:              :                         : shape as input `operand` (y)         :
-| `batch_mean` | `ComputationDataHandle` | 1 dimensional array (\\(\mu\\))      |
-| `batch_var`  | `ComputationDataHandle` | 1 dimensional array (\\(\sigma^2\\)) |
-
-The `batch_mean` and `batch_var` are moments calculated across the batch and
-spatial dimensions using the formulas above.
-
-## BitcastConvertType
-
-See also
-[`ComputationBuilder::BitcastConvertType`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-Similar to a `tf.bitcast` in TensorFlow, performs an element-wise bitcast
-operation from a data shape to a target shape. The dimensions must match, and
-the conversion is an element-wise one; e.g. `s32` elements become `f32` elements
-via bitcast routine. Bitcast is implemented as a low-level cast, so machines
-with different floating-point representations will give different results.
-
-<b> `BitcastConvertType(operand, new_element_type)` </b>
-
-Arguments          | Type                    | Semantics
------------------- | ----------------------- | ---------------------------
-`operand`          | `ComputationDataHandle` | array of type T with dims D
-`new_element_type` | `PrimitiveType`         | type U
-
-The dimensions of the operand and the target shape must match. The bit-width of
-the source and destination element types must be equal. The source
-and destination element types must not be tuples.
-
-## Broadcast
-
-See also
-[`ComputationBuilder::Broadcast`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-Adds dimensions to an array by duplicating the data in the array.
-
-<b> `Broadcast(operand, broadcast_sizes)` </b>
-
-Arguments         | Type                    | Semantics
+参数         | 类型                    | 语义
 ----------------- | ----------------------- | -------------------------------
-`operand`         | `ComputationDataHandle` | The array to duplicate
-`broadcast_sizes` | `ArraySlice<int64>`     | The sizes of the new dimensions
+`operand`         | `ComputationDataHandle` | 待复制的数组
+`broadcast_sizes` | `ArraySlice<int64>`     | 新维度的形状大小
 
-The new dimensions are inserted on the left, i.e. if `broadcast_sizes` has
-values `{a0, ..., aN}` and the operand shape has dimensions `{b0, ..., bM}` then
-the shape of the output has dimensions `{a0, ..., aN, b0, ..., bM}`.
+新的维度被插入在操作数（operand）的左侧，即，若 `broadcast_sizes` 的值为 `{a0, ..., aN}`，而操作数（operand）的维度形状为 `{b0, ..., bM}`，则广播后输出的维度形状为 `{a0, ..., aN, b0, ..., bM}`。
 
-The new dimensions index into copies of the operand, i.e.
+新的维度指标被插入到操作数（operand）副本中，即
 
 ```
 output[i0, ..., iN, j0, ..., jM] = operand[j0, ..., jM]
 ```
 
-For example, if `operand` is a scalar `f32` with value `2.0f`, and
-`broadcast_sizes` is `{2, 3}`, then the result will be an array with shape
-`f32[2, 3]` and all the values in the result will be `2.0f`.
+比如，若 `operand` 为一个值为 `2.0f` 的标量，而 `broadcast_sizes` 为 `{2, 3}`，则结果为形状为 `f32[2, 3]` 的一个数组，且它的所有元素的值都为 `2.0f`。
 
-## Call
+## 调用（Call）
 
-See also
-[`ComputationBuilder::Call`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::Call`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-Invokes a computation with the given arguments.
+给定参数情况下，会触发计算。
 
 <b> `Call(computation, args...)` </b>
 
-| Arguments     | Type                     | Semantics                        |
+| 参数     | 类型                     | 语义                        |
 | ------------- | ------------------------ | -------------------------------- |
-| `computation` | `Computation`            | computation of type `T_0, T_1,   |
-:               :                          : ..., T_N -> S` with N parameters :
-:               :                          : of arbitrary type                :
-| `args`        | sequence of N            | N arguments of arbitrary type    |
-:               : `ComputationDataHandle`s :                                  :
+| `computation` | `Computation`            | 类型为 `T_0, T_1, ..., T_N ->S` 的计算，它有 N 个任意类型的参数  |
+| `args`        | N 个 `ComputationDataHandle` 的序列            | 任意类型的 N 个 参数 |
 
-The arity and types of the `args` must match the parameters of the
-`computation`. It is allowed to have no `args`.
+参数 `args` 的数目和类型必须与计算 `computation` 相匹配。当然，没有参数 `args` 也是允许的。
 
-## Clamp
+## 钳制（Clamp）
 
-See also
-[`ComputationBuilder::Clamp`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::Clamp`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-Clamps an operand to within the range between a minimum and maximum value.
+将一个操作数钳制到一个区间中，即在一个最小值和一个最大值之间。
 
 <b> `Clamp(computation, args...)` </b>
 
-| Arguments     | Type                    | Semantics                        |
+| 参数     | 类型                    | 语义                        |
 | ------------- | ----------------------- | -------------------------------- |
-| `computation` | `Computation`           | computation of type `T_0, T_1,   |
-:               :                         : ..., T_N -> S` with N parameters :
-:               :                         : of arbitrary type                :
-| `min`         | `ComputationDataHandle` | array of type T                  |
-| `operand`     | `ComputationDataHandle` | array of type T                  |
-| `max`         | `ComputationDataHandle` | array of type T                  |
+| `computation` | `Computation`           | 类型为 `T_0, T_1,..., T_N -> S` 的计算，它有 N 个任意类型的参数 |
+| `operand`     | `ComputationDataHandle` | 类型为 T 的数组 |
+| `min`         | `ComputationDataHandle` | 类型为 T 的数组 |
+| `max`         | `ComputationDataHandle` | 类型为 T 的数组 |
 
-Given an operand and minimum and maximum values, returns the operand if it is in
-the range between the minimum and maximum, else returns the minimum value if the
-operand is below this range or the maximum value if the operand is above this
-range.  That is, `clamp(a, x, b) =  min(max(a, x), b)`.
+输入是一个操作数和最大最小值，如果操作数位于最大最小值之间，则返回操作数，如果操作数小于最小值，则返回最小值，如果操作数大于最大值，则返回最大值。即 `clamp(x, a, b) =  max(min(x, a), b)`。
 
-All three arrays must be the same shape. Alternately, as a restricted form of
-[broadcasting](broadcasting.md), `min` and/or `max` can be a scalar of type `T`.
+输入的三个数组的维度形状必须是一样的。不过，也可以采用一种最严格的[广播](broadcasting.md)形式，即 `min` 和/或 `max` 可以是类型为 `T` 的一个标量。
 
-Example with scalar `min` and `max`:
+`min` 和 `max` 为标量的示例如下：
 
 ```
 let operand: s32[3] = {-1, 5, 9};
 let min: s32 = 0;
 let max: s32 = 6;
 ==>
-Clamp(min, operand, max) = s32[3]{0, 5, 6};
+Clamp(operand, min, max) = s32[3]{0, 5, 6};
 ```
 
-## Collapse
+## 折叠（Collapse）
 
-See also
-[`ComputationBuilder::Collapse`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)
-and the @{tf.reshape} operation.
+另请参阅 [`ComputationBuilder::Collapse`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 和 @{tf.reshape} 操作。
 
-Collapses dimensions of an array into one dimension.
+将一个数组的多个维度折叠为一个维度。
 
 <b> `Collapse(operand, dimensions)` </b>
 
-| Arguments    | Type                    | Semantics                           |
+| 参数    | 类型                    | 语义                           |
 | ------------ | ----------------------- | ----------------------------------- |
-| `operand`    | `ComputationDataHandle` | array of type T                     |
-| `dimensions` | `int64` vector          | in-order, consecutive subset of T's |
-:              :                         : dimensions.                         :
+| `operand`    | `ComputationDataHandle` | 类型为 T 的数组   |
+| `dimensions` | `int64` 矢量          | T 的维度形状的依次连续子集 |
 
-Collapse replaces the given subset of the operand's dimensions by a single
-dimension. The input arguments are an arbitrary array of type T and a
-compile-time-constant vector of dimension indices. The dimension indices must be
-an in-order (low to high dimension numbers), consecutive subset of T's
-dimensions. Thus, {0, 1, 2}, {0, 1}, or {1, 2} are all valid dimension sets, but
-{1, 0} or {0, 2} are not. They are replaced by a single new dimension, in the
-same position in the dimension sequence as those they replace, with the new
-dimension size equal to the product of original dimension sizes. The lowest
-dimension number in `dimensions` is the slowest varying dimension (most major)
-in the loop nest which collapses these dimension, and the highest dimension
-number is fastest varying (most minor). See the @{tf.reshape} operator
-if more general collapse ordering is needed.
+折叠操作将操作数的指定的维度子集折叠为一个维度。输入参数为类型 T 的任意数组，和一个编译时为常数的维度指标。维度指标必须是依次排列的，即由低维到高维，且为 T 的维度形状的连续子集。因而，{0, 1, 2}，{0, 1}，或 {1, 2} 都是合规的维度子集，而 {1, 0} 和 {0, 2} 则不是。维度子集所表示的那部分维度会在同样的位置被替换一个新的维度，大小为被替换维度形状大小的乘积。`dimensions` 中的最低维度为折叠这些维度的循环中变化最慢的维度（主序），而最高维度为变化最快的那个维度（次序）。如果想了解更多的一般性的折叠次序问题，请参见 @{tf.reshape} 操作。
 
-For example, let v be an array of 24 elements:
+比如，令 v 为包含 24 个元素的数组：
 
 ```
 let v = f32[4x2x3] {{{10, 11, 12},  {15, 16, 17}},
@@ -307,21 +94,21 @@ let v = f32[4x2x3] {{{10, 11, 12},  {15, 16, 17}},
                     {{30, 31, 32},  {35, 36, 37}},
                     {{40, 41, 42},  {45, 46, 47}}};
 
-// Collapse to a single dimension, leaving one dimension.
+// 折叠至一个维度，即只留下一个维度
 let v012 = Collapse(v, {0,1,2});
 then v012 == f32[24] {10, 11, 12, 15, 16, 17,
                       20, 21, 22, 25, 26, 27,
                       30, 31, 32, 35, 36, 37,
                       40, 41, 42, 45, 46, 47};
 
-// Collapse the two lower dimensions, leaving two dimensions.
+// 折叠两个较低维度，剩下两个维度
 let v01 = Collapse(v, {0,1});
 then v01 == f32[4x6] {{10, 11, 12, 15, 16, 17},
                       {20, 21, 22, 25, 26, 27},
                       {30, 31, 32, 35, 36, 37},
                       {40, 41, 42, 45, 46, 47}};
 
-// Collapse the two higher dimensions, leaving two dimensions.
+// 折叠两个较高维度，剩下两个维度
 let v12 = Collapse(v, {1,2});
 then v12 == f32[8x3] {{10, 11, 12},
                       {15, 16, 17},
@@ -334,38 +121,29 @@ then v12 == f32[8x3] {{10, 11, 12},
 
 ```
 
-## Concatenate
+## 串连（Concatenate）
 
-See also
-[`ComputationBuilder::ConcatInDim`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::ConcatInDim`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-Concatenate composes an array from multiple array operands. The array is of the
-same rank as each of the input array operands (which must be of the same rank as
-each other) and contains the arguments in the order that they were specified.
+串连操作是将多个数组操作数合并成一个数组。输出数组与输入数组的秩必须是一样的（即要求输入数组的秩也要相同），并且它按输入次序包含了输入数组的所有元素。
 
 <b> `Concatenate(operands..., dimension)` </b>
 
-| Arguments   | Type                    | Semantics                            |
+| 参数 | 类型 | 语义 |
 | ----------- | ----------------------- | ------------------------------------ |
-| `operands`  | sequence of N           | N arrays of type T with dimensions   |
-:             : `ComputationDataHandle` : [L0, L1, ...]. Requires N >= 1.      :
-| `dimension` | `int64`                 | A value in the interval `[0, N)`     |
-:             :                         : that names the dimension to be       :
-:             :                         : concatenated between the `operands`. :
+| `operands`  | N 个 `ComputationDataHandle` 的序列 | 类型为 T 维度为 [L0, L1, ...] 的 N 个数组。要求 N>=1 |
+| `dimension` | `int64` | 区间 `[0, N)` 中的一个整数值，令那些 `operands` 能够串连起来的维度名 |
 
-With the exception of `dimension` all dimensions must be the same. This is
-because XLA does not support "ragged" arrays. Also note that rank-0 values
-cannot be concatenated (as it's impossible to name the dimension along which the
-concatenation occurs).
+除了 `dimension` 之外，其它维度都必须是一样的。这是因为 XLA 不支持 "不规则" 数组。还要注意的是，0-阶的标量值是无法串连在一起的（因为无法确定串连到底发生在哪个维度）。
 
-1-dimensional example:
+1-维示例：
 
 ```
 Concat({{2, 3}, {4, 5}, {6, 7}}, 0)
 >>> {2, 3, 4, 5, 6, 7}
 ```
 
-2-dimensional example:
+2-维示例：
 
 ```
 let a = {
@@ -385,191 +163,29 @@ Concat({a, b}, 0)
 }
 ```
 
-Diagram:
+图表：
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="https://www.tensorflow.org/images/ops_concatenate.png">
 </div>
 
-## Conditional
-
-See also [`ComputationBuilder::Conditional`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-<b> `Conditional(pred, true_operand, true_computation, false_operand,
-    false_computation)` </b>
-
-| Arguments           | Type                    | Semantics                   |
-| ------------------- | ----------------------- | --------------------------- |
-| `pred`              | `ComputationDataHandle` | Scalar of type `PRED`       |
-| `true_operand`      | `ComputationDataHandle` | Argument of type `T_0`      |
-| `true_computation`  | `Computation`           | Computation of type `T_0 -> |
-:                     :                         : S`                          :
-| `false_operand`     | `ComputationDataHandle` | Argument of type `T_1`      |
-| `false_computation` | `Computation`           | Computation of type `T_1 -> |
-:                     :                         : S`                          :
-
-Executes `true_computation` if `pred` is `true`, `false_computation` if `pred`
-is `false`, and returns the result.
-
-The `true_computation` must take in a single argument of type `T_0` and will be
-invoked with `true_operand` which must be of the same type. The
-`false_computation` must take in a single argument of type `T_1` and will be
-invoked with `false_operand` which must be of the same type. The type of the
-returned value of `true_computation` and `false_computation` must be the same.
-
-Note that only one of `true_computation` and `false_computation` will be
-executed depending on the value of `pred`.
-
-## Conv (convolution)
-
-See also
-[`ComputationBuilder::Conv`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-As ConvWithGeneralPadding, but the padding is specified in a short-hand way as
-either SAME or VALID. SAME padding pads the input (`lhs`) with zeroes so that
-the output has the same shape as the input when not taking striding into
-account. VALID padding simply means no padding.
-
-## ConvWithGeneralPadding (convolution)
-
-See also
-[`ComputationBuilder::ConvWithGeneralPadding`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-Computes a convolution of the kind used in neural networks. Here, a convolution
-can be thought of as a n-dimensional window moving across a n-dimensional base
-area and a computation is performed for each possible position of the window.
-
-| Arguments        | Type                    | Semantics                     |
-| ---------------- | ----------------------- | ----------------------------- |
-| `lhs`            | `ComputationDataHandle` | rank n+2 array of inputs      |
-| `rhs`            | `ComputationDataHandle` | rank n+2 array of kernel      |
-:                  :                         : weights                       :
-| `window_strides` | `ArraySlice<int64>`     | size n array of kernel strides|
-| `padding`        | `ArraySlice<pair<int64, | size n array of (low, high)   |
-:                  : int64>>`                : padding                       :
-| `lhs_dilation`   | `ArraySlice<int64>`     | size n lhs dilation factor    |
-:                  :                         : array                         |
-| `rhs_dilation`   | `ArraySlice<int64>`     | size n rhs dilation factor
-:                  :                         : array                         |
-
-Let n be the number of spatial dimensions. The `lhs` argument is a rank n+2
-array describing the base area. This is called the input, even though of course
-the rhs is also an input. In a neural network, these are the input activations.
-The n+2 dimensions are, in this order:
-
-*   `batch`: Each coordinate in this dimension represents an independent input
-    for which convolution is carried out.
-*   `z/depth/features`: Each (y,x) position in the base area has a vector
-    associated to it, which goes into this dimension.
-*   `spatial_dims`: Describes the `n` spatial dimensions that define the base
-    area that the window moves across.
-
-The `rhs` argument is a rank n+2 array describing the convolutional
-filter/kernel/window. The dimensions are, in this order:
-
-*   `output-z`: The `z` dimension of the output.
-*   `input-z`: The size of this dimension should equal the size of the `z`
-    dimension in lhs.
-*   `spatial_dims`: Describes the `n` spatial dimensions that define the n-d
-    window that moves across the base area.
-
-The `window_strides` argument specifies the stride of the convolutional window
-in the spatial dimensions. For example, if the stride in the first spatial
-dimension is 3, then the window can only be placed at coordinates where the
-first spatial index is divisible by 3.
-
-The `padding` argument specifies the amount of zero padding to be applied to the
-base area. The amount of padding can be negative -- the absolute value of
-negative padding indicates the number of elements to remove from the specified
-dimension before doing the convolution. `padding[0]` specifies the padding for
-dimension `y` and `padding[1]` specifies the padding for dimension `x`. Each
-pair has the low padding as the first element and the high padding as the second
-element. The low padding is applied in the direction of lower indices while the
-high padding is applied in the direction of higher indices. For example, if
-`padding[1]` is `(2,3)` then there will be a padding by 2 zeroes on the left and
-by 3 zeroes on the right in the second spatial dimension. Using padding is
-equivalent to inserting those same zero values into the input (`lhs`) before
-doing the convolution.
-
-The `lhs_dilation` and `rhs_dilation` arguments specify the dilation factor to
-be applied to the lhs and rhs, respectively, in each spatial dimension. If the
-dilation factor in a spatial dimension is d, then d-1 holes are implicitly
-placed between each of the entries in that dimension, increasing the size of the
-array. The holes are filled with a no-op value, which for convolution means
-zeroes.
-
-Dilation of the rhs is also called atrous convolution. For more details, see
-@{tf.nn.atrous_conv2d}. Dilation of the lhs is also called transposed
-convolution. For more details, see @{tf.nn.conv2d_transpose}.
-
-The output shape has these dimensions, in this order:
-
-*   `batch`: Same size as `batch` on the input (`lhs`).
-*   `z`: Same size as `output-z` on the kernel (`rhs`).
-*   `spatial_dims`: One value for each valid placement of the convolutional
-    window.
-
-The valid placements of the convolutional window are determined by the strides
-and the size of the base area after padding.
-
-To describe what a convolution does, consider a 2d convolution, and pick some
-fixed `batch`, `z`, `y`, `x` coordinates in the output. Then `(y,x)` is a
-position of a corner of the window within the base area (e.g. the upper left
-corner, depending on how you interpret the spatial dimensions). We now have a 2d
-window, taken from the base area, where each 2d point is associated to a 1d
-vector, so we get a 3d box. From the convolutional kernel, since we fixed the
-output coordinate `z`, we also have a 3d box. The two boxes have the same
-dimensions, so we can take the sum of the element-wise products between the two
-boxes (similar to a dot product). That is the output value.
-
-Note that if `output-z` is e.g., 5, then each position of the window produces 5
-values in the output into the `z` dimension of the output. These values differ
-in what part of the convolutional kernel is used - there is a separate 3d box of
-values used for each `output-z` coordinate. So you could think of it as 5
-separate convolutions with a different filter for each of them.
-
-Here is pseudo-code for a 2d convolution with padding and striding:
-
-```
-for (b, oz, oy, ox) {  // output coordinates
-  value = 0;
-  for (iz, ky, kx) {  // kernel coordinates and input z
-    iy = oy*stride_y + ky - pad_low_y;
-    ix = ox*stride_x + kx - pad_low_x;
-    if ((iy, ix) inside the base area considered without padding) {
-      value += input(b, iz, iy, ix) * kernel(oz, iz, ky, kx);
-    }
-  }
-  output(b, oz, oy, ox) = value;
-}
-```
-
 ## ConvertElementType
 
-See also
-[`ComputationBuilder::ConvertElementType`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::ConvertElementType`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-Similar to an element-wise `static_cast` in C++, performs an element-wise
-conversion operation from a data shape to a target shape. The dimensions must
-match, and the conversion is an element-wise one; e.g. `s32` elements become
-`f32` elements via an `s32`-to-`f32` conversion routine.
+类似于 C++ 中逐个元素的 `static_cast` 运算，本操作也从一个数据形状到目标形状执行逐个元素的转换操作；比如，通过一个 `s32`-to-`f32` 的转换程序，`s32` 元素变成了 `f32` 元素。
 
 <b> `ConvertElementType(operand, new_element_type)` </b>
 
-Arguments          | Type                    | Semantics
+ 参数 | 类型 | 语义                                         
 ------------------ | ----------------------- | ---------------------------
-`operand`          | `ComputationDataHandle` | array of type T with dims D
-`new_element_type` | `PrimitiveType`         | type U
+`operand`          | `ComputationDataHandle` | 类型为 T 维度为 D 的数组
+`new_element_type` | `PrimitiveType`         | 类型 U
 
-The dimensions of the operand and the target shape must match. The source and
-destination element types must not be tuples.
+如果操作数（operand）的维度和目标形状不匹配，或者执行一个非法的转换（比如输入或目标为一个元组），则会产生错误。
 
-A conversion such as `T=s32` to `U=f32` will perform a normalizing int-to-float
-conversion routine such as round-to-nearest-even.
+诸如 `T=s32` 至 `U=f32` 的转换，将执行通常的 int-to-float 的转换过程，比如 round-to-nearest-even。
 
-> Note: The precise float-to-int and visa-versa conversions are currently
-> unspecified, but may become additional arguments to the convert operation in
-> the future.  Not all possible conversions have been implemented for all
->targets.
+> 注意：精确的 float-to-int 或反过程目前仍没有指定，但在将来，可能会在转换操作的额外参数中指定。不是所有目标的所有可能的转换都已经实现。
 
 ```
 let a: s32[3] = {0, 1, 2};
@@ -577,58 +193,114 @@ let b: f32[3] = convert(a, f32);
 then b == f32[3]{0.0, 1.0, 2.0}
 ```
 
+## Conv (卷积)
+
+另请参阅 [`ComputationBuilder::Conv`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+类似于 ConvWithGeneralPadding，但是边缘填充（padding）方式比较简单，要么是 SAME 要么是 VALID。SAME 方式将对输入（`lhs`）边缘填充零，使得不考虑步长（striding）的情况下输出与输入的维度形状一致。VALID 填充方式则表示没有填充。
+
+## ConvWithGeneralPadding (卷积)
+
+另请参阅 [`ComputationBuilder::ConvWithGeneralPadding`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+在神经网络中要做这种卷积的计算。在这里，一个卷积可想象为一个 n-维窗口在一个 n-维底空间上移动，而窗口的每个可能的位置都触发一次计算。
+
+| 参数 | 类型 | 语义                                         |
+| ---------------- | ----------------------- | ----------------------------- |
+| `lhs`            | `ComputationDataHandle` | 秩为 n+2 的输入数组   |
+| `rhs`            | `ComputationDataHandle` | 秩为 n+2 的内核权重数组 |
+| `window_strides` | `ArraySlice<int64>`     | n-维内核步长数组 |
+| `padding`        | `ArraySlice<pair<int64, int64>>` | n-维 (低, 高) 填充数据     |
+| `lhs_dilation`   | `ArraySlice<int64>`     | n-维左边扩张因子数组 |
+| `rhs_dilation`   | `ArraySlice<int64>`     | n-维右边扩张因子数组 |
+
+令 n 为空间维度的数目。`lhs` 参数是一个 n+2 阶数组，它描述底空间区域的维度。它被为输入，其实 rhs 也是输入。在神经网络中，它们都属于输入激励。n+2 维的含义依次为：
+
+*   `batch`: 此维中每个坐标表示执行卷积的一个独立输入
+*   `z/depth/features`: 基空间区域中的每个 (y,x) 位置都指定有一个矢量，由这个维度来表示
+*   `spatial_dims`: 描述了定义了底空间区域的那 `n` 个空间维度，窗口要在它上面移动
+
+`rhs` 参数是一个 n+2 阶的数组，它描述了卷积过滤器/内核/窗口。这些维度的含义依次为：
+
+*   `output-z`: 输出的 `z` 维度。
+*   `input-z`: 此维度的大小等于 lhs 参数的 `z` 维度的大小。
+*   `spatial_dims`: 描述了定义此 n-维窗口的那 `n` 个空间维度，此窗口用于在底空间上移动。
+
+`window_strides` 参数指定了卷积窗口在空间维度上的步长。比如，如果步长为 3，则窗口只用放在第一个空间维度指标为 3 的倍数的那些位置上。
+
+`padding` 参数指定了在底空间区域边缘填充多少个零。填充数目可以是负值 -- 这时数目绝对值表示执行卷积前要移除多少个元素。`padding[0]` 指定维度 `y` 的填充对子，`padding[1]` 指定的是维度 `x` 的填充对子。每个填充对子包含两个值，第一个值指定低位填充数目，第二个值指定高位填充数目。低位填充指的是低指标方向的填充，高位填充则是高指标方向的填充。比如，如果 `padding[1]` 为 `(2,3)`，则在第二个空间维度上，左边填充 2 个零，右边填充 3 个零。填充等价于在执行卷积前在输入 (`lhs`) 中插入这些零值。
+
+`lhs_dilation` 和 `rhs_dilation` 参数指定了扩张系数，分别应用于 lhs 和 rhs 的每个空间维度上。如果在一个空间维度上的扩张系数为 d，则 d-1 个洞将被插入到这个维度的每一项之间，从而增加数组的大小。这些洞被填充上 no-op 值，对于卷积来说表示零值。
+
+rhs 的扩张也被称为深黑卷积（atrous convolution）。更多细节请参考 @{tf.nn.atrous_conv2d}。 lhs 的扩张又被称为反卷积（deconvolution）。
+
+输出形状的维度含义依次为：
+
+*   `batch`: 和输入（`lhs`）具有相同的 `batch` 大小。
+*   `z`: 和内核（`rhs`）具有相同的 `output-z` 大小。
+*   `spatial_dims`: 卷积窗口的每个合法放置值。
+
+卷积窗口的合法放置是由步长和填充后的底空间区域大小所决定的。
+
+为描述卷积到底干了什么，考虑一个二维卷积，为输出选择某个固定的 `batch`，`z`，`y`，`x` 坐标。则 `(y,x)` 是底空间区域中的某个窗口的一个角的位置（比如左上角，具体是哪个要看你如何编码其空间维度）。现在，我们从底空间区域中得到了一个二维窗口，其中每一个二维点都指定有一个一维矢量，所以，我们得到一个三维盒子。对于卷积过滤器而言，因为我们固定了输出坐标 `z`，我们也有一个三维盒子。这两个盒子具有相同的维度，所以我们可以让它们逐个元素地相乘并相加（类似于点乘）。最后得到输出值。
+
+注意，如果 `output-z` 等于一个数，比如 5，则此窗口的每个位置都在输出的 `z` 维 上产生 5 个值。这些值对应于卷积过滤器的不同部分，即每个 `output-z` 坐标，都由一个独立的三维盒子生成。所以，你可以将其想象成 5 个分立的卷积，每个都用了不同的过滤器。
+
+下面是一个考虑了填充和步长的二维卷积伪代码：
+
+```
+for (b, oz, oy, ox) {  // 输出坐标
+  value = 0;
+  for (iz, ky, kx) {  // 内核坐标和输入 z
+    iy = oy*stride_y + ky - pad_low_y;
+    ix = ox*stride_x + kx - pad_low_x;
+    if (底空间区域内的(iy, ix)是不在填充位置上的) {
+      value += input(b, iz, iy, ix) * kernel(oz, iz, ky, kx);
+    }
+  }
+  output(b, oz, oy, ox) = value;
+}
+```
+
+
+
 ## CrossReplicaSum
 
-See also
-[`ComputationBuilder::CrossReplicaSum`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::CrossReplicaSum`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-Computes a sum across replicas.
+跨多个副本（replica）的求和。
 
 <b> `CrossReplicaSum(operand)` </b>
 
-| Arguments    | Type                    | Semantics                          |
+| 参数 | 类型 | 语义                                         |
 | ------------ | ----------------------- | ---------------------------------- |
-| `operand`    | `ComputationDataHandle` | Array to sum across replicas.      |
+| `operand`    | `ComputationDataHandle` | 跨多个副本待求和的数组。   |
 
-The output shape is the same as the input shape. For example, if there are two
-replicas and the operand has the value `(1.0, 2.5)` and `(3.0, 5.25)`
-respectively on the two replicas, then the output value from this op will be
-`(4.0, 7.75)` on both replicas.
+输出的维度形状与输入形状一样。比如，如果有两个副本，而操作数在这两个副本上的值分别为 `(1.0, 2.5)` 和 `(3.0, 5.1)`，则此操作在两个副本上的输出值都是 `(4.0, 7.6)`。
 
-Computing the result of CrossReplicaSum requires having one input from each
-replica, so if one replica executes a CrossReplicaSum node more times than
-another, then the former replica will wait forever. Since the replicas are all
-running the same program, there are not a lot of ways for that to happen, but it
-is possible when a while loop's condition depends on data from infeed and the
-data that is infed causes the while loop to iterate more times on one replica
-than another.
+计算 CrossReplicaSum 的结果需要从每个副本中获得一个输入，所以，如果一个副本执行一个 CrossReplicaSum 结点的次数多于其它副本，则前一个副本将永久等待。因此这些副本都运行的是同一个程序，这种情况发生的机会并不多，其中一种可能的情况是，一个 while 循环的条件依赖于输入的数据，而被输入的数据导致此循环在一个副本上执行的次数多于其它副本。
 
 ## CustomCall
 
-See also
-[`ComputationBuilder::CustomCall`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::CustomCall`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-Call a user-provided function within a computation.
+在计算中调用由用户提供的函数。
 
 <b> `CustomCall(target_name, args..., shape)` </b>
 
-| Arguments     | Type                     | Semantics                        |
+| 参数 | 类型 | 语义                                         |
 | ------------- | ------------------------ | -------------------------------- |
-| `target_name` | `string`                 | Name of the function. A call     |
-:               :                          : instruction will be emitted      :
-:               :                          : which targets this symbol name.  :
-| `args`        | sequence of N            | N arguments of arbitrary type,   |
-:               : `ComputationDataHandle`s : which will be passed to the      :
-:               :                          : function.                        :
-| `shape`       | `Shape`                  | Output shape of the function     |
+| `target_name` | `string`                 | 函数名称。一个指向这个符号名称的调用指令会被发出 |
+| `args`        | N 个 `ComputationDataHandle` 的序列            | 传递给此函数的 N 个任意类型的参数 |
+| `shape`       | `Shape`                  | 此函数的输出维度形状  |
 
-The function signature is the same, regardless of the arity or type of args:
+不管参数的数目和类型，此函数的签名（signature）都是一样的。
 
 ```
 extern "C" void target_name(void* out, void** in);
 ```
 
-For example, if CustomCall is used as follows:
+比如，如果使用 CustomCall 如下：
 
 ```
 let x = f32[2] {1,2};
@@ -637,7 +309,7 @@ let y = f32[2x3] {{10, 20, 30}, {40, 50, 60}};
 CustomCall("myfunc", {x, y}, f32[3x3])
 ```
 
-Here is an example of an implementation of `myfunc`:
+`myfunc` 实现的一个示例如下：
 
 ```
 extern "C" void myfunc(void* out, void** in) {
@@ -657,164 +329,735 @@ extern "C" void myfunc(void* out, void** in) {
 }
 ```
 
-The user-provided function must not have side-effects and its execution must be
-idempotent.
+这个用户提供的函数不能有副作用，而且它的执行结果必须是确定的（即两次同样的调用不能有不同结果）。
 
-> Note: The opaque nature of the user-provided function restricts optimization
-> opportunities for the compiler. Try to express your computation in terms of
-> native XLA ops whenever possible; only use CustomCall as a last resort.
+> 注：用户函数的黑箱特点限制了编译器的优化潜力。所以，尽量使用原生的 XLA 操作来表示你的计算；只有在迫不得已的情况下才使用 CustomCall。
 
-## Dot
+## 点乘（Dot）
 
-See also
-[`ComputationBuilder::Dot`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::Dot`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
 <b> `Dot(lhs, rhs)` </b>
 
-Arguments | Type                    | Semantics
+ 参数 | 类型 | 语义                                     
 --------- | ----------------------- | ---------------
-`lhs`     | `ComputationDataHandle` | array of type T
-`rhs`     | `ComputationDataHandle` | array of type T
+`lhs`     | `ComputationDataHandle` | 类型为 T 的数组
+`rhs`     | `ComputationDataHandle` | 类型为 T 的数组
 
-The exact semantics of this operation depend on the ranks of the operands:
+此操作的具体语义由它的两个操作数的秩来决定：
 
-| Input                   | Output                | Semantics               |
+| 输入 | 输出 | 语义                                     |
 | ----------------------- | --------------------- | ----------------------- |
-| vector [n] `dot` vector | scalar                | vector dot product      |
-: [n]                     :                       :                         :
-| matrix [m x k] `dot`    | vector [m]            | matrix-vector           |
-: vector [k]              :                       : multiplication          :
-| matrix [m x k] `dot`    | matrix [m x n]        | matrix-matrix           |
-: matrix [k x n]          :                       : multiplication          :
+| 矢量 [n] `dot` 矢量 [n] | 标量 | 矢量点乘 |
+| 矩阵 [m x k] `dot` 矢量 [k]   | 矢量 [m]            | 矩阵矢量乘法 |
+| 矩阵 [m x k] `dot` 矩阵 [k x n]   | 矩阵 [m x n]        | 矩阵矩阵乘法 |
 
-The operation performs sum of products over the last dimension of `lhs` and the
-one-before-last dimension of `rhs`. These are the "contracted" dimensions. The
-contracted dimensions of `lhs` and `rhs` must be of the same size. In practice,
-it can be used to perform dot products between vectors, vector/matrix
-multiplications or matrix/matrix multiplications.
+此操作执行的是 `lhs` 的最后一维与 `rhs` 的倒数第二维之间的乘法结果的求和。因而计算结果会导致维度的 "缩减"。`lhs` 和 `rhs` 缩减的维度必须具有相同的大小。在实际中，我们会用到矢量之间的点乘，矢量/矩阵点乘，以及矩阵间的乘法。
 
-## DotGeneral
+## 逐个元素的二元算术操作
 
-See also
-[`ComputationBuilder::DotGeneral`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::Add`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-<b> `DotGeneral(lhs, rhs, dimension_numbers)` </b>
+XLA 支持多个逐个元素的二元算术操作。
 
-| Arguments | Type                    | Semantics
-| --------- | ----------------------- | ---------------
-| `lhs`     | `ComputationDataHandle` | array of type T
-| `rhs`     | `ComputationDataHandle` | array of type T
-| `dimension_numbers` | `DotDimensionNumbers` | array of type T
+<b> `Op(lhs, rhs)` </b>
 
-As Dot, but allows contracting and batch dimension numbers to be specified for
-both the 'lhs' and 'rhs'.
+其中 `Op` 可以是如下操作之一：`Add` (加法), `Sub` (减法), `Mul` (乘法), `Div` (除法), `Rem` (余数), `Max` (最大值), `Min` (最小值), `LogicalAnd` (逻辑且), 或 `LogicalOr` (逻辑或)。
 
-| DotDimensionNumbers Fields | Type                    | Semantics
-| --------- | ----------------------- | ---------------
-| 'lhs_contracting_dimensions' | repeated int64 | 'lhs' contracting dimension numbers |
-| 'rhs_contracting_dimensions' | repeated int64 | 'rhs' contracting dimension numbers |
-| 'lhs_batch_dimensions' | repeated int64 | 'lhs' batch dimension numbers |
-| 'rhs_batch_dimensions' | repeated int64 | 'rhs' batch dimension numbers |
+ 参数 | 类型 | 语义                                     
+--------- | ----------------------- | ----------------------------------------
+`lhs`     | `ComputationDataHandle` | 左手边操作数：类型为 T 的数组
+`rhs`     | `ComputationDataHandle` | 右手边操作数：类型为 T 的数组
 
-DotGeneral performs the sum of products over contracting dimensions specified
-in 'dimension_numbers'.
+这两个参数的维度形状要么相似，要么兼容。关于维度形状相似或兼容的准确含义，参见文档 @{$broadcasting$broadcasting}。 一个这样的二元操作的结果的维度形状为两个输入数组的广播的结果。虽然可以广播，但不同秩的数组之间的运算是不支持的，除非其中之一是标量。
 
-Associated contracting dimension numbers from the 'lhs' and 'rhs' do not need
-to be the same, but must be listed in the same order in both
-'lhs/rhs_contracting_dimensions' arrays and have the same dimension sizes.
-There must be exactly one contracting dimension on both 'lhs' and 'rhs'.
+当 `Op` 为 `Rem` 时，结果的符号与被除数一致，而结果的绝对值总是小于除数的绝对值。
 
-Example with contracting dimension numbers:
+不过，还是可以用如下接口来支持不同秩操作数的广播：
+
+<b> `Op(lhs, rhs, broadcast_dimensions)` </b>
+
+其中 `Op` 的含义同上。这种接口用于具有不同秩的数组之间的算术操作（比如将一个矩阵与一个矢量相加）。
+
+额外的参数 `broadcast_dimensions` 为一个整数指标的切片，用于将低阶操作数的秩扩张至高阶操作数的秩。`broadcast_dimensions` 将低阶形状映射到高阶形状上。扩张后的形状的未被映射的维度将被填充为大小为 1 的退化维度。然后执行退化维度广播，即让维度形状沿这些退化维度扩大，使得与两个操作数的形状相等。更多细节请参阅 @{$broadcasting$广播页面}。
+
+## 逐个元素的比较操作
+
+另请参阅 [`ComputationBuilder::Eq`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+XLA 还支持标准的逐个元素的二元比较操作。注意：当比较浮点类型时，遵循的是标准的 IEEE 754 浮点数语义。
+
+<b> `Op(lhs, rhs)` </b>
+
+其中 `Op` 可以是如下操作之一：`Eq` (相等), `Ne` (不等), `Ge` (大于或等于), `Gt` (大于), `Le` (小于或等于), `Le` (小于)。
+
+ 参数 | 类型 | 语义                                     
+--------- | ----------------------- | ----------------------------------------
+`lhs`     | `ComputationDataHandle` | 左手边操作数：类型为 T 的数组
+`rhs`     | `ComputationDataHandle` | 右手边操作数：类型为 T 的数组
+
+这两个参数的维度形状要么相似要么兼容。维度形状的相似或兼容的具体含义参见文档 @{$broadcasting$broadcasting}。操作结果的维度形状为输入数组的形状广播的结果，结果中的元素类型为 `PERD`。在这类操作中，不同秩的数组之间的操作是不支持的，除非其中之一为标量。
+
+要想用广播来比较不同秩的数组，需要用到如下接口：
+
+<b> `Op(lhs, rhs, broadcast_dimensions)` </b>
+
+其中 `Op` 含义同上。这种接口应该用于不同阶的数组之间的比较操作（比如将一个矩阵加到一个矢量上）。
+
+额外的 `broadcast_dimensions` 操作数是一个整数的指标切片，用于指定将操作数广播时的维度。关于其语义的细节内容可参考 @{$broadcasting$广播页面}。
+
+## 逐个元素的一元函数
+
+ComputationBuilder 支持下列逐个元素的一元函数：
+
+<b>`Abs(operand)`</b> 逐个元素的绝对值 `x -> |x|`。
+
+<b>`Ceil(operand)`</b> 逐个元素的整数上界 `x -> ⌈x⌉`。
+
+<b>`Cos(operand)`</b> 逐个元素的余弦 `x -> cos(x)`。
+
+<b>`Exp(operand)`</b> 逐个元素的自然幂指数 `x -> e^x`。
+
+<b>`Floor(operand)`</b> 逐个元素的整数下界 `x -> ⌊x⌋`。
+
+<b>`IsFinite(operand)`</b> 测试 `operand` 的每个元素是否是有限的，即不是正无穷或负无穷，也不是 `NoN`。返回一个 `PRED` 值的数组，维度形状与输入一致，一个元素为 `true` 当且仅当相应的输入元素是有限的。
+
+<b>`Log(operand)`</b> 逐个元素的自然对数 `x -> ln(x)`。
+
+<b>`LogicalNot(operand)`</b> 逐个元素的逻辑非 `x -> !(x)`。
+
+<b>`Neg(operand)`</b> 逐个元素取负值 `x -> -x`。
+
+<b>`Sign(operand)`</b> 逐个元素求符号 `x -> sgn(x)`，其中 
+
+$$\text{sgn}(x) = \begin{cases} -1 & x < 0\\ 0 & x = 0\\ 1 & x > 0 \end{cases}$$
+
+它使用的是 `operand` 的元素类型的比较运算符。
+
+<b>`Tanh(operand)`</b> 逐个元素的双曲正切 `x -> tanh(x)`。
+
+
+ 参数 | 类型 | 语义                                     
+--------- | ----------------------- | ---------------------------
+`operand` | `ComputationDataHandle` | 函数的操作数
+
+此函数应用于 `operand` 数组的每个元素上，结果是同样形状的一个数组。`operand` 也可以是一个标量，即 0 阶张量。
+
+
+## BatchNormTraining
+
+关于此算法的细节描述，请参阅 [`ComputationBuilder::BatchNormTraining`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 和 [`原始批量标准化论文`](https://arxiv.org/abs/1502.03167)。
+
+<b> 警告：尚没有在 GPU 后端上实现 </b>
+
+在一个批次的多个空间维度上进行标准化。
+
+<b> `BatchNormTraining(operand, scale, offset, epsilon, feature_index)` </b>
+
+| 参数 | 类型 | 语义                                     |
+| --------------- | ----------------------- | -------------------------------- |
+| `operand`       | `ComputationDataHandle` | 待标准化的 n 维数组      |
+| `scale`         | `ComputationDataHandle` | 1 维数组 (\\(\gamma\\)) |
+| `offset`        | `ComputationDataHandle` | 1 维数组 (\\(\beta\\ )) |
+| `epsilon`       | `float`                 | Epsilon 值 (\\(\epsilon\\))   |
+| `feature_index` | `int64`                 | 在 `operand` 中的特征维度的索引   |
+
+对于特征维度中的每个特征 (`feature_index` 为 `operand` 中的特征维度的索引)，此操作会计算出关于其它所有维度的数据的均值和方差，然后用这个均值和标准差来对 `operand` 中的每个元素进行标准化。如果传入一个非法的 `feature_index`，则会产生一个错误。
+
+此算法对 `operand` \\(x\\) 中的每个批次做如下运算（假定 `operand` 是一个 4 维数组，它包含 `m` 个元素，`w` 和 `h` 为其空间维度的大小）：
+
+- 对特征维度中的每个特征 `l` 计算批次的均值 \\(\mu_l\\) ：
+\\(\mu_l=\frac{1}{mwh}\sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h x_{ijkl}\\)
+
+- 计算批次的方差 \\(\sigma^2_l\\)：
+\\(\sigma^2_l=\frac{1}{mwh}\sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h (x_{ijkl} - \mu_l)^2\\)
+
+- 标准化，缩放和平移：
+\\(y_{ijkl}=\frac{\gamma_l(x_{ijkl}-\mu_l)}{\sqrt[2]{\sigma^2_l+\epsilon}}+\beta_l\\)
+
+epsilon 值通常是一个较小的数，加上它可以避免除以零。
+
+输出类型是三个 ComputationDataHandles 的三元组：
+
+| 输出 | 类型 | 语义 |
+| ------------ | ----------------------- | -------------------------------------|
+| `output`     | `ComputationDataHandle` | n 维数组，维度形状与输入 `operand` (y) 一样  |
+| `batch_mean` | `ComputationDataHandle` | 1 维数组 (\\(\mu\\))      |
+| `batch_var`  | `ComputationDataHandle` | 1 维数组 (\\(\sigma^2\\)) |
+
+`batch_mean` 和 `batch_var` 是该批次的多个空间维度上用上述公式计算出来的统计矩（moment）。
+
+## BatchNormInference
+
+另请参阅 [`ComputationBuilder::BatchNormInference`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+<b> 警告：尚未实现 </b>
+
+在一个批次的多个空间维度上对一个数组进行标准化。
+
+<b> `BatchNormInference(operand, scale, offset, mean, variance, epsilon, feature_index)` </b>
+
+| 参数 | 类型 | 语义                                     |
+| --------------  | ----------------------- | ------------------------------- |
+| `operand`       | `ComputationDataHandle` | 待标准化的 n 维数组 to be       |
+| `scale`         | `ComputationDataHandle` | 1 维数组             |
+| `offset`        | `ComputationDataHandle` | 1 维数组             |
+| `mean`          | `ComputationDataHandle` | 1 维数组             |
+| `variance`      | `ComputationDataHandle` | 1 维数组             |
+| `epsilon`       | `float`                 | Epsilon 值 |
+| `feature_index` | `int64`                 | 在 `operand` 中的特征维度的索引    |
+
+对于特征维度中的每个特征（`feature_index` 为 `operand` 中的特征维度的索引），此操作会计算出关于其它所有维度的数据的均值和方差，然后用这个均值和方差对 `operand` 中的每个元素进行标准化。如果一个非法的 `feature_index` 传入了，则会产生一个错误。
+
+`BatchNormInference` 等价于对每个批次不计算均值和方差而调用 `BatchNormTraining`，它使用的是输入的均值 `mean` 和方差 `variance`，而非估计值。这个操作的目的是减少推断时的延迟，因而得名 `BatchNormInference`。
+
+输出是一个 n 维标准化过的数组，维度形状与输入 `operand` 一致。
+`operand`.
+
+## BatchNormGrad
+
+另请参阅 [`ComputationBuilder::BatchNormGrad`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+<b> 警告：尚未实现 </b>
+
+计算批次标准化的梯度。
+
+<b> `BatchNormGrad(operand, scale, mean, variance, grad_output, epsilon, feature_index)` </b>
+
+| 参数 | 类型 | 语义                                     |
+| --------------  | ----------------------- | -------------------------------- |
+| `operand`       | `ComputationDataHandle` | 待标准化的 n 维数组 (x)     |
+| `scale`         | `ComputationDataHandle` | 1 维数组 (\\(\gamma\\))       |
+| `mean`          | `ComputationDataHandle` | 1 维数组 (\\(\mu\\))  |
+| `variance`      | `ComputationDataHandle` | 1 维数组 (\\(\sigma^2\\))          |
+| `grad_output`   | `ComputationDataHandle` | 传入到 `BatchNormTraining` 的梯度 (\\( \nabla y\\)) |
+| `epsilon`       | `float`                 | Epsilon 值 (\\(\epsilon\\))   |
+| `feature_index` | `int64`                 | `operand` 中的特征维度的索引  |
+
+对于特征维度中的每个特征 (`feature_index` 为 `operand` 中的特征维度的索引），此操作计算出其它所有维度的关于 `operand`、`offset` 和 `scale` 的梯度。如果传入一个非法的 `feature_index`，则会产生一个错误。
+
+这三个梯度由下列公式来定义：
+
+\\( \nabla x = \nabla y * \gamma * \sqrt{\sigma^2+\epsilon} \\)
+
+\\( \nabla \gamma = sum(\nabla y * (x - \mu) * \sqrt{\sigma^2 + \epsilon}) \\)
+
+\\( \nabla \beta = sum(\nabla y) \\)
+
+输入的均值和方差表示对于一个批次和多个空间维度的统计矩。
+
+输出类型是 ComputationDataHandle 的三元组：
+
+| 输出 | 类型 | 语义 |
+|------------- | ----------------------- | ------------------------------------|
+|`grad_operand`| `ComputationDataHandle` | 关于输入 `operand` 的梯度   |
+|`grad_offset` | `ComputationDataHandle` | 关于输入 `offset` 的梯度    |
+|`grad_scale`  | `ComputationDataHandle` | 关于输入 `scale` 的梯度    |
+
+
+## GetTupleElement
+
+另请参阅 [`ComputationBuilder::GetTupleElement`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+对编译时常量的元组，该操作能提供索引的功能。
+
+输入值必须是编译时常量值，这样才可以通过形状推理获得结果值的类型。
+
+概念上，这类似于 C++ 中的 `std::get<int N>(t)`：
 
 ```
-lhs = { {1.0, 2.0, 3.0},
-        {4.0, 5.0, 6.0} }
-
-rhs = { {1.0, 1.0, 1.0},
-        {2.0, 2.0, 2.0} }
-
-DotDimensionNumbers dnums;
-dnums.add_lhs_contracting_dimensions(1);
-dnums.add_rhs_contracting_dimensions(1);
-
-DotGeneral(lhs, rhs, dnums) -> { {6.0, 12.0},
-                                 {15.0, 30.0} }
+let v: f32[10] = f32[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+let s: s32 = 5;
+let t: (f32[10], s32) = tuple(v, s);
+let element_1: s32 = gettupleelement(t, 1);  // 推断出的形状匹配 s32.
 ```
 
-Associated batch dimension numbers from the 'lhs' and 'rhs' must have the same
-dimension number, must be listed in the same order in both arrays, must
-have the same dimension sizes, and must be ordered before contracting and
-non-contracting/non-batch dimension numbers.
+另见 @{tf.tuple}。
 
-Example with batch dimension numbers (batch size 2, 2x2 matrices):
+## Infeed
+
+另请参阅 [`ComputationBuilder::Infeed`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+
+<b> `Infeed(shape)` </b>
+
+| 参数 | 类型 | 语义                                              |
+| -------- | ------- | ----------------------------------------------------- |
+| `shape`  | `Shape` | 从 Infeed 界面读得的数据的维度形状。此形状的数据布局必须与发送到设备上的数据相匹配；否则此行为是未定义的 |
+
+从设备的隐式 Infeed 流界面读取单个数据项，根据给定的形状和布局来进行解析，并返回一个此数据的一个 `ComputationDataHandle`。在一个计算中允许有多个 Infeed 操作，但这些 Infeed 操作之间必须有全序。比如，下面代码中两个 Infeed 是有全序的，因为在不同 while 循环之间有依赖关系。如果没有全序，编译器会产生一个错误。
 
 ```
-lhs = { { {1.0, 2.0},
-          {3.0, 4.0} },
-        { {5.0, 6.0},
-          {7.0, 8.0} } }
+result1 = while (condition, init = init_value) {
+  Infeed(shape)
+}
 
-rhs = { { {1.0, 0.0},
-          {0.0, 1.0} },
-        { {1.0, 0.0},
-          {0.0, 1.0} } }
-
-DotDimensionNumbers dnums;
-dnums.add_lhs_contracting_dimensions(2);
-dnums.add_rhs_contracting_dimensions(1);
-dnums.add_lhs_batch_dimensions(0);
-dnums.add_rhs_batch_dimensions(0);
-
-DotGeneral(lhs, rhs, dnums) -> { { {1.0, 2.0},
-                                   {3.0, 4.0} },
-                                 { {5.0, 6.0},
-                                   {7.0, 8.0} } }
+result2 = while (condition, init = result1) {
+  Infeed(shape)
+}
 ```
 
-| Input                               | Output            | Semantics        |
-| ----------------------------------- | ----------------- | ---------------- |
-| [b0, m, k] `dot` [b0, k, n]         | [b0, m, n]        |  batch matmul    |
-| [b0, b1, m, k] `dot` [b0, b1, k, n] | [b0, b1, m, n]    |  batch matmul    |
+嵌套的元组形状是不支持的。对于一个空的元组形状，Infeed 操作直接是一个 nop，因而不会从设备的 Infeed 中读取任何数据。
 
-It follows that the resulting dimension number starts with the batch dimension,
-then the 'lhs' non-contracting/non-batch dimension, and finally the 'rhs'
-non-contracting/non-batch dimension.
+> 注意：我们计划支持没有全序的多个 Infeed 操作，在这种情况下，编译器将提供信息，确定这些 Infeed 操作在编译后的程序中如何串行化。
+
+
+## 映射（Map）
+
+另请参阅 [`ComputationBuilder::Map`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+<b> `Map(operands..., computation)` </b>
+
+| 参数 | 类型 | 语义                      |
+| ----------------- | ------------------------ | ----------------------------- |
+| `operands`        | N 个 `ComputationDataHandle` 的序列 | 类型为 T_0..T_{N-1} 的 N 个数组 |
+| `computation`     | `Computation`            | 类型为`T_0, T_1, ..., T_{N + M -1} -> S` 的计算，有 N 个类型为 T 的参数，和 M 个任意类型的参数 |
+| `dimensions`       | `int64` array           | 映射维度的数组  |
+| `static_operands` | M 个 `ComputationDataHandle` 的序列  | 任意类型的 M 个数组  |
+
+将一个标量函数作用于给定的 `operands` 数组，可产生相同维度的数组，其中每个元素都是映射函数（mapped function）作用于相应输入数组中相应元素的结果，而 `static_operands` 是 `computation` 的额外输入。
+
+此映射函数可以是任意计算过程，只不过它必须有 N 类类型为 `T` 的标量参数，和类型为 `S` 的输出。输出的维度与输入 `operands` 相同，只不过元素类型 T 换成了 S。
+
+比如，`Map(op1, op2, op3, computation, par1)` 用 `elem_out <-
+computation(elem1, elem2, elem3, par1)` 将输入数组中的每个（多维）指标映射产生输出数组。
+
+## 填充（Pad）
+
+另请参阅 [`ComputationBuilder::Pad`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+<b> `Pad(operand, padding_value, padding_config)` </b>
+
+| 参数 | 类型 | 语义                      |
+| ---------------- | ----------------------- | ----------------------------- |
+| `operand`        | `ComputationDataHandle` | 类型为 `T` 的标量的数组 |
+| `padding_value`  | `ComputationDataHandle` | 类型为 `T` 的标量，用于填充 |
+| `padding_config` | `PaddingConfig`         | 每个维度的两端的填充量 (low, high) |
+
+通过在数组周围和数组之间进行填充，可以将给定的 `operand` 数组扩大，其中 `padding_value` 和 `padding_config` 用于配置每个维度的边缘填充和内部填充的数目。
+
+`PaddingConfig` 是 `PaddingConfigDimension` 的一个重复字段，它对于每个维度都包含有三个字段：`edge_padding_low`, `edge_padding_high` 和 `interior_padding`。`edge_padding_low` 和 `edge_padding_high` 分别指定了该维度上低端（指标为 0 那端）和高端（最高指标那端）上的填充数目。边缘填充数目可以是负值 -- 负的填充数目的绝对值表示从指定维度移除元素的数目。`interior_padding` 指定了在每个维度的任意两个相邻元素之间的填充数目。逻辑上，内部填充应发生在边缘填充之前，所有在负边缘填充时，会从经过内部填充的操作数之上再移除边缘元素。如果边缘填充配置为 (0, 0)，且内部填充值都是 0，则此操作是一个 no-op。下图展示的是二维数组上不同 `edge_padding` 和 `interior_padding` 值的示例。
+
+<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
+  <img style="width:100%" src="https://www.tensorflow.org/images/ops_pad.png">
+</div>
+
+
+## Reduce
+
+另请参阅 [`ComputationBuilder::Reduce`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+将一个归约函数作用于一个数组。
+
+<b> `Reduce(operand, init_value, computation, dimensions)` </b>
+
+| 参数 | 类型 | 语义                        |
+| ------------- | ----------------------- | -------------------------------- |
+| `operand`     | `ComputationDataHandle` | 类型为 `T` 的数组            |
+| `init_value`  | `ComputationDataHandle` | 类型为 `T` 的标量        |
+| `computation` | `Computation`           | 类型为 `T, T -> T`的计算  |
+| `dimensions`  | `int64` 数组 | 待归约的未排序的维度数组 |
+
+概念上看，归约（Reduce）操作将输入数组中的一个或多个数组归约为标量。结果数组的秩为 `rank(operand) - len(dimensions)`。 `init_value` 是用于每次归约的初值，如果后端有需求也可以在计算中插入到任何地方。所以，在大多数情况下，`init_value` 应该为归约函数的一个单位元（比如，加法中的 0）。
+
+归约函数的执行顺序是任意的，即可能是非确定的。因而，约化函数不应该对运算的结合性敏感。
+
+有些归约函数，比如加法，对于浮点数并没有严格遵守结合率。不过，如果对数据的值域进行限制，大多数实际情况中，浮点加法已经足够满足结合率。当然，我们也可以构造出完全不遵守结合率的归约函数，这时，XLA 归约就会产生不正确或不可预测的结果。
+
+下面是一个示例，对 1D 数组 [10, 11, 12, 13] 进行归约，归约函数为 `f` （即参数 `computation`），则计算结果为：
+
+`f(10, f(11, f(12, f(init_value, 13)))`
+
+但它还有其它很多种可能性，比如：
+
+`f(init_value, f(f(10, f(init_value, 11)), f(f(init_value, 12), f(13,
+init_value))))`
+
+下面是一段实现归约的伪代码，归约计算为求和，初值为 0。
+
+```python
+result_shape <- 从 operand_shape 的维度中移除所有待归约的维度
+
+# 遍历 result_shape 中的所有元素，这里，r 的数目等于 result 的秩
+for r0 in range(result_shape[0]), r1 in range(result_shape[1]), ...:
+  # 初始化 result 的元素
+  result[r0, r1...] <- 0
+
+  # 遍历所有的归约维度
+  for d0 in range(dimensions[0]), d1 in range(dimensions[1]), ...:
+    # 用 operand 的元素的值来增加 result 中的元素的值
+    # operand 的元素的索引由所有的 ri 和 di 按正确的顺序构造而来
+    # （构造得到的索引用来访问 operand 的整个形状）
+    result[r0, r1...] += operand[ri... di]
+```
+
+下面是一个对 2D 数组（矩阵）进行归约的示例。其形状的秩为 2，0 维大小为 2，1 维大小为 3：
+
+<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
+  <img style="width:35%" src="https://www.tensorflow.org/images/ops_2d_matrix.png">
+</div>
+
+对 0 维或 1 维进行求和归约：
+
+<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
+  <img style="width:35%" src="https://www.tensorflow.org/images/ops_reduce_from_2d_matrix.png">
+</div>
+
+注意，两个归约结果都是一维数组。图中将一个显示为行，另一个显示为列，但这只是为了可视化效果。
+
+下面是一个更复杂的 3D 数组的例子。它的秩为 3 ，形状为 (4,2,3)。为简单起见，我们让 1 到 6 这几个数字沿 0 维复制 4 份。
+
+<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
+  <img style="width:35%" src="https://www.tensorflow.org/images/ops_reduce_from_3d_matrix.png">
+</div>
+
+类似于二维的情况，我们可以只归约一个维度。如果我们归约第 0 维，我们得到一个二阶数组，它沿第 0 维的所有值会合并为一个标量：
+
+```text
+|  4   8  12 |
+| 16  20  24 |
+```
+
+如果我们归约第 2 维，结果仍然是一个二阶数组，沿第 2 维的所有值合并为一个标量：
+
+```text
+| 6  15 |
+| 6  15 |
+| 6  15 |
+| 6  15 |
+```
+
+注意，输出中剩下的维度的顺序与它们在输入中的相对顺序保持一致，只不过维度的名称（数字）会发生变化，因为数组的秩发生了变化。
+
+我们也可以归约多个维度。对 0 维和 1 维进行求和归约，将得到一个一维数组 `| 20 28 36 |`。
+
+对这个三维数组的所有元素进行求和归约，得到一个标量 `84`。
+
+## ReducePrecision
+
+另请参阅 [`ComputationBuilder::ReducePrecision`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+当浮点数转换为低精度格式（比如 IEEE-FP16）然后转换回原格式时，值可能会发生变化，ReducePrecision 对这种变化进行建模。低精度格式中的指数（exponent）和尾数（mantissa）的比特数目是可以任意指定的，不过不是所有硬件实现都支持所有的比特数设置。
+
+<b> `ReducePrecision(operand, mantissa_bits, exponent_bits)` </b>
+
+| 参数 | 类型 | 语义                    |
+| ------------------- | ----------------------- | ---------------------------- |
+| `operand`           | `ComputationDataHandle` | 浮点类型 `T` 的数组 |
+| `exponent_bits`     | `int32`                 | 低精度格式中的指数比特数目 |
+| `mantissa_bits`     | `int32`                 | 低精度格式中的尾数比特数目 |
+
+结果为类型为 `T` 的数组。输入值被舍入至与给定尾数比特的数字最接近的那个值（采用的是"偶数优先"原则）。而超过指数比特所允许的值域时，输入值会被视为正无穷或负无穷。`NaN` 值会保留，不过它可能会被转换为规范化的 NaN 值。
+
+低精度格式必须至少有一个指数比特（为了区分零和无穷，因为两者的尾数比特数都为零），且尾数比特数必须是非负的。指数或尾数的比特数目可能会超过类型 `T`；这种情况下，相应部分的转换就仅仅是一个 no-op 了。
+
+
+## ReduceWindow
+
+另请参阅 [`ComputationBuilder::ReduceWindow`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+将一个归约函数应用于输入多维数组的每个窗口内的所有元素上，输出一个多维数组，其元素个数等于合法窗口的位置数目。一个池化层可以表示为一个 `ReduceWindow`。
+
+<b> `ReduceWindow(operand, init_value, computation, window_dimensions,
+window_strides, padding)` </b>
+
+| 参数 | 类型 | 语义                    |
+| ------------------- | ----------------------- | ---------------------------- |
+| `operand`           | `ComputationDataHandle` | 类型为 T 的 N 维数组。这是窗口放置的底空间区域  |
+| `init_value`        | `ComputationDataHandle` | 归约的初始值。细节请参见 [规约](#reduce)。 |
+| `computation`       | `Computation`           | 类型为 `T, T -> T`的归约函数，应用于每个窗口内的所有元素  |
+| `window_dimensions` | `ArraySlice<int64>`     | 表示窗口维度值的整数数组  |
+| `window_strides`    | `ArraySlice<int64>`     | 表示窗口步长值的整数数组 |
+| `padding`           | `Padding`               | 窗口的边缘填充类型（Padding\:\:kSame 或 Padding\:\:kValid） |
+
+下列代码和图为一个使用 `ReduceWindow` 的示例。输入是一个大小为 [4x6] 的矩阵，window_dimensions 和 window_stride_dimensions 都是 [2x3]。
+
+```
+// 创建一个归约计算（求最大值）
+Computation max;
+{
+  ComputationBuilder builder(client_, "max");
+  auto y = builder.Parameter(0, ShapeUtil::MakeShape(F32, {}), "y");
+  auto x = builder.Parameter(1, ShapeUtil::MakeShape(F32, {}), "x");
+  builder.Max(y, x);
+  max = builder.Build().ConsumeValueOrDie();
+}
+
+// 用最大值归约计算来创建一个 ReduceWindow 计算
+ComputationBuilder builder(client_, "reduce_window_2x3");
+auto shape = ShapeUtil::MakeShape(F32, {4, 6});
+auto input = builder.Parameter(0, shape, "input");
+builder.ReduceWindow(
+    input, *max,
+    /*init_val=*/builder.ConstantLiteral(LiteralUtil::MinValue(F32)),
+    /*window_dimensions=*/{2, 3},
+    /*window_stride_dimensions=*/{2, 3},
+    Padding::kValid);
+```
+
+<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
+  <img style="width:35%" src="https://www.tensorflow.org/images/ops_reduce_window.png">
+</div>
+
+在一个维度上步长为 1 表示在此维度上两个相邻窗口间隔一个元素，为了让窗口互相不重叠，window_stride_dimensions 和 window_dimensions 应该要相等。下图给出了两种不同步长设置的效果。边缘填充应用于输入的每个维度，计算过程实际发生在填充之后的数组上。
+
+<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
+  <img style="width:75%" src="https://www.tensorflow.org/images/ops_reduce_window_stride.png">
+</div>
+
+归约函数的执行顺序是任意的，因而结果可能是非确定性的。所以，归约函数应该不能对计算的结合性太过敏感。更多细节，参见 [`Reduce`](#reduce) 关于结合性的讨论。
+
+## Reshape
+
+另请参阅 [`ComputationBuilder::Reshape`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 和 [`Collapse`](#collapse) 操作。
+
+变形操作（reshape）是将一个数组的维度变成另外一种维度设置。
+
+<b> `Reshape(operand, new_sizes)` </b>
+<b> `Reshape(operand, dimensions, new_sizes)` </b>
+
+参数 | 类型 | 语义
+------------ | ----------------------- | ---------------------------------------
+`operand`    | `ComputationDataHandle` | 类型为 T 的数组
+`dimensions` | `int64` vector          | 维度折叠的顺序
+`new_sizes`  | `int64` vector          | 新维度大小的矢量
+
+从概念上看，变形操作首先将一个数组拉平为一个一维矢量，然后将此矢量展开为一个新的形状。输入参数是一个类型为 T 的任意数组，一个编译时常量的维度指标数组，以及表示结果维度大小的一个编译时常量的数组。
+如果给出了 `dimensions` 参数，这个矢量中的值必须是 T 的所有维度的一个置换，其默认值为 `{0, ..., rank - 1}`。`dimensions` 中的维度的顺序是从最慢变化维（最主序）到最快变化维（最次序），按照这个顺序依次将所有元素折叠到一个维度上。`new_sizes` 矢量决定了输出数组的维度大小。`new_sizes[0]` 表示第 0 维的大小，`new_sizes[1]` 表示的是第 1 维的大小，依此类推。`new_sizes` 中的维度值的乘积必须等于 operand 的维度值的乘积。将折叠的一维数组展开为由 `new_sizes` 定义的多维数组时，`new_sizes` 中的维度的顺序也是最慢变化维（最主序）到最快变化维（最次序）。
+
+比如，令 v 为包含 24 个元素的数组：
+
+```
+let v = f32[4x2x3] {{{10, 11, 12}, {15, 16, 17}},
+                    {{20, 21, 22}, {25, 26, 27}},
+                    {{30, 31, 32}, {35, 36, 37}},
+                    {{40, 41, 42}, {45, 46, 47}}};
+
+依次折叠:
+let v012_24 = Reshape(v, {0,1,2}, {24});
+then v012_24 == f32[24] {10, 11, 12, 15, 16, 17, 20, 21, 22, 25, 26, 27,
+                         30, 31, 32, 35, 36, 37, 40, 41, 42, 45, 46, 47};
+
+let v012_83 = Reshape(v, {0,1,2}, {8,3});
+then v012_83 == f32[8x3] {{10, 11, 12}, {15, 16, 17},
+                          {20, 21, 22}, {25, 26, 27},
+                          {30, 31, 32}, {35, 36, 37},
+                          {40, 41, 42}, {45, 46, 47}};
+
+乱序折叠:
+let v021_24 = Reshape(v, {1,2,0}, {24});
+then v012_24 == f32[24]  {10, 20, 30, 40, 11, 21, 31, 41, 12, 22, 32, 42,
+                          15, 25, 35, 45, 16, 26, 36, 46, 17, 27, 37, 47};
+
+let v021_83 = Reshape(v, {1,2,0}, {8,3});
+then v021_83 == f32[8x3] {{10, 20, 30}, {40, 11, 21},
+                          {31, 41, 12}, {22, 32, 42},
+                          {15, 25, 35}, {45, 16, 26},
+                          {36, 46, 17}, {27, 37, 47}};
+
+
+let v021_262 = Reshape(v, {1,2,0}, {2,6,2});
+then v021_262 == f32[2x6x2] {{{10, 20}, {30, 40},
+                              {11, 21}, {31, 41},
+                              {12, 22}, {32, 42}},
+                             {{15, 25}, {35, 45},
+                              {16, 26}, {36, 46},
+                              {17, 27}, {37, 47}}};
+```
+
+作为特例，单元素数组和标量之间可以用变形操作相互转化。比如：
+
+```
+Reshape(f32[1x1] {{5}}, {0,1}, {}) == 5;
+Reshape(5, {}, {1,1}) == f32[1x1] {{5}};
+```
+
+## Rev (倒置)
+
+另请参阅 [`ComputationBuilder::Rev`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+<b>`Rev(operand, dimensions)`</b>
+
+参数 | 类型 | 语义
+------------ | ----------------------- | ---------------------
+`operand`    | `ComputationDataHandle` | 类型为 T 的数组 
+`dimensions` | `ArraySlice<int64>`     | 待倒置的维度
+
+倒置操作将 `operand` 数组沿指定的维度 `dimensions` 将元素的顺序反转，产生一个形状相同的数组。operand 数组的每个元素被存储在输出数组的变换后的位置上。元素的原索引位置在每个待倒置维度上都被反转了，得到其在输出数组中的索引位置（即，如果一个大小为 N 的维度是待倒置的，则索引 i 被变换为 N-i-i）。
+
+`Rev` 操作的一个用途是在神经网络的梯度计算时沿两个窗口维度对卷积权重值进行倒置。
+
+## RngBernoulli
+
+另请参阅 [`ComputationBuilder::RngBernoulli`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+RngBernoulli 构造一个符合 Bernoulli 随机分布的指定形状的随机数组。输入参数是一个 F32 类型的标量，和一个表示输出形状的类型为 `U32` 的数组。
+
+<b>`RngBernoulli(mean, shape)`</b>
+
+| 参数 | 类型 | 语义                             |
+| --------- | ----------------------- | ------------------------------------- |
+| `mean`    | `ComputationDataHandle` | 类型为 F32 的标量，指定生成的数的均值 |
+| `shape`   | `Shape`                 | 类型为 U32 的输出的形状 |
+
+## RngNormal
+
+另请参阅 [`ComputationBuilder::RngNormal`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+RngNormal 构造一个符合 $$(\mu, \sigma)$$ 正态随机分布的指定形状的随机数组。参数 `mu` 和 `sigma` 为 F32 类型的标量值，而输出形状为 U32 的数组。
+
+<b>`RngNormal(mean, sigma, shape)`</b>
+
+| 参数 | 类型 | 语义                              |
+| --------- | ----------------------- | -------------------------------------- |
+| `mu`      | `ComputationDataHandle` | 类型为 F32 的标量，指定生成的数的均值  |
+| `sigma`   | `ComputationDataHandle` | 类型为 F32 的标量，指定生成的数的标准差  |
+| `shape`   | `Shape`                 | 类型为 U32 的输出的形状 |
+
+## RngUniform
+
+另请参阅 [`ComputationBuilder::RngUniform`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+RngNormal 构造一个符合区间 $$[a,b)$$ 上的均匀分布的指定形状的随机数组。参数和输出形状可以是 F32、S32 或 U32，但是类型必须是一致的。此外，参数必须是标量值。如果 $$b <= a$$，输出结果与具体的实现有关。
+
+<b>`RngUniform(a, b, shape)`</b>
+
+| 参数 | 类型 | 语义                         |
+| --------- | ----------------------- | --------------------------------- |
+| `a`       | `ComputationDataHandle` | 类型为 T 的标量，指定区间的下界 |
+| `b`       | `ComputationDataHandle` | 类型为 T 的标量，指定区间的上界 |
+| `shape`   | `Shape`                 | 类型为 T 的输出的形状 |
+
+## SelectAndScatter
+
+另请参阅 [`ComputationBuilder::SelectAndScatter`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+这个操作可视为一个复合操作，它先在 `operand` 数组上计算 `ReduceWindow`，以从每个窗口中选择一个数，然后将 `source` 数组散布到选定元素的指标位置上，从而构造出一个与 `operand` 数组形状一样的输出数组。二元函数 `select` 用于从每个窗口中选出一个元素，当调用此函数时，第一个参数的指标矢量的字典序小于第二个参数的指标矢量。如果第一个参数被选中，则 `select` 返回 `true`，如果第二个参数被选中，则返回 `false`。而且该函数必须满足传递性，即如果 `select(a, b)` 和 `select(b, c)` 都为 `true`，则 `select(a, c)` 也为 `true`。这样，被选中的元素不依赖于指定窗口中元素访问的顺序。
+
+`scatter` 函数作用在输出数组的每个选中的指标上。它有两个标量参数：
+
+1. 输出数组中选中指标处的值
+2. `source` 中被放置到选中指标处的值
+
+它根据这两个参数返回一个标量值，用于更新输出数组中选中指标处的值。最开始的时候，输出数组所有指标处的值都被设为 `init_value`。
+
+输出数组与 `operand` 数组的形状相同，而 `source` 数组必须与 `operand` 上应用 `ReduceWindow` 之后的形状相同。 `SelectAndScatter` 可用于神经网络池化层中梯度值的反向传播。
+
+<b>`SelectAndScatter(operand, select, window_dimensions, window_strides,
+padding, source, init_value, scatter)`</b>
+
+| 参数 | 类型 | 语义                    |
+| ------------------- | ----------------------- | ---------------------------- |
+| `operand`           | `ComputationDataHandle` | 类型为 T 的数组，窗口在它上面滑动 |
+| `select`            | `Computation`           | 类型为 `T, T -> PRED` 的二元计算，它被应用到每个窗口中的所有元素上；如果选中第一个元素返回 `true`，如果选中第二个元素返回 `false` |
+| `window_dimensions` | `ArraySlice<int64>`     | 表示窗口维度值的整数数组 |
+| `window_strides`    | `ArraySlice<int64>`     | 表示窗口步长值的整数数组 |
+| `padding`           | `Padding`               | 窗口边缘填充类型（Padding\:\:kSame 或 Padding\:\:kValid）|
+| `source`            | `ComputationDataHandle` | 类型为 T 的数组，它的值用于散布 |
+| `init_value`        | `ComputationDataHandle` | 类型为 T 的标量值，用于输出数组的初值 |
+| `scatter`           | `Computation`           | 类型为 `T, T -> T` 的二元计算，应用于 source 的每个元素和它的目标元素 |
+
+下图为 `SelectAndScatter` 的示例，其中 `select` 函数计算它的参数中的最大值。注意，当窗口重叠时，如图 (2) 所示，`operand` 的一个指标可能会被不同窗口多次选中。在此图中，值为 9 的元素被顶部的两个窗口（蓝色和红色）选中，从而二元加法函数 `scatter` 产生值为 8 的输出值（2+6）。
+
+<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
+  <img style="width:100%"
+    src="https://www.tensorflow.org/images/ops_scatter_to_selected_window_element.png">
+</div>
+
+`scatter` 函数的执行顺序是任意的，因而可能会出现不确定的结果。所以，`scatter` 函数不应该对计算的结合性过于敏感。更多细节，参见 [`Reduce`](#reduce) 一节中关于结合性的讨论。
+
+## Select
+
+另请参阅 [`ComputationBuilder::Select`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+`Select` 根据一个预测数组的值，由两个输入数组的元素构造出一个输出数组。
+
+<b> `Select(pred, on_true, on_false)` </b>
+
+参数 | 类型 | 语义
+---------- | ----------------------- | ------------------
+`pred`     | `ComputationDataHandle` | 类型为 PRED 的数组
+`on_true`  | `ComputationDataHandle` | 类型为 T 的数组
+`on_false` | `ComputationDataHandle` | 类型为 T 的数组
+
+`on_true` 数组和 `on_false` 数组的形状必须一样，这也是输出数组的形状。`pred` 数组的维度必须与 `on_true` 和 `on_false` 相同，元素类型应为 `PRED`。
+
+对于 `pred` 的每个元素 `P`，若其值为 `true`，则输出数组中的相应元素取值于 `on_true`，若其值为 `false`，则取值于 `on_false`。这里还支持一种受限的 [广播]{broadcasting.md) 形式，即 `pred` 可以是类型为 `PRED` 的标量。在这种情况下，如果 `pred` 为 `true`，则输出数组完全取值于 `on_true`，如果 `pred` 为 `false`，则完全取值于 `on_false`。
+
+非标量的 `pred` 示例：
+
+```
+let pred: PRED[4] = {true, false, false, true};
+let v1: s32[4] = {1, 2, 3, 4};
+let v2: s32[4] = {100, 200, 300, 400};
+==>
+Select(pred, v1, v2) = s32[4]{1, 200, 300, 4};
+```
+
+标量 `pred` 示例：
+
+```
+let pred: PRED = true;
+let v1: s32[4] = {1, 2, 3, 4};
+let v2: s32[4] = {100, 200, 300, 400};
+==>
+Select(pred, v1, v2) = s32[4]{1, 2, 3, 4};
+```
+
+XLA 还支持两个元组之间的选择，这时元组被视为标量。如果 `on_true` 和 `on_false` 是元组（必须是相同形状的），则 `pred` 必须是类型为 `PRED` 的标量。
+
+
+## Slice
+
+另请参阅 [`ComputationBuilder::Slice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
+
+`Slice` 用于从输入数组中提取出一个子数组。子数组与输入数组的秩相同，它的值在输入数组的包围盒中，此包围盒的维度和指标作为 slice 操作的参数而给出。
+
+<b> `Slice(operand, start_indices, limit_indices)` </b>
+
+| 参数 | 类型 | 语义                        |
+| --------------- | ----------------------- | -------------------------------- |
+| `operand`       | `ComputationDataHandle` | 类型为 T 的 N 维数组 |
+| `start_indices` | `ArraySlice<int64>`     | N 个整数的数组，包含每个维度的切片的起始指标。值必须大于等于零 |
+| `limit_indices` | `ArraySlice<int64>`     | N 个整数的数组，包含每个维度的切片的结束指标（不包含）。每个维度的结束指标必须严格大于其起始指标，且小于等于维度大小 |
+
+1-维示例：
+
+```
+let a = {0.0, 1.0, 2.0, 3.0, 4.0}
+Slice(a, {2}, {4}) produces:
+  {2.0, 3.0}
+```
+
+2-维示例：
+
+```
+let b =
+ { {0.0,  1.0,  2.0},
+   {3.0,  4.0,  5.0},
+   {6.0,  7.0,  8.0},
+   {9.0, 10.0, 11.0} }
+
+Slice(b, {2, 1}, {4, 3}) produces:
+  { { 7.0,  8.0},
+    {10.0, 11.0} }
+```
 
 ## DynamicSlice
 
-See also
-[`ComputationBuilder::DynamicSlice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::DynamicSlice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-DynamicSlice extracts a sub-array from the input array at dynamic
-`start_indices`. The size of the slice in each dimension is passed in
-`size_indices`, which specify the end point of exclusive slice intervals in each
-dimension: [start, start + size). The shape of `start_indices` must be rank ==
-1, with dimension size equal to the rank of `operand`.
-Note: handling of out-of-bounds slice indices (generated by incorrect runtime
-calculation of 'start_indices') is currently implementation-defined. Currently,
-slice indices are computed modulo input dimension sizes to prevent out-of-bound
-array accesses, but this behavior may change in future implementations.
+DynamicSlice 在动态的 `start_indices` 处从输出数组中提取出子数组。每个维度切片的大小由 `size_indices` 数组给出，它指定了每个维度切片的区间大小：[start, start + size)。`start_indices` 必须是一维的，维度大小等于 `operand` 的秩。
+注意：目前，对于切片指标越界的处理（运行时生成了错误的 `start_indices`）是由具体实现决定的。当前的做法是，让切片指标对输入维度大小取模，从而避免数组的越界访问，但这种行为方式在未来的实现中可能会发生变化。
 
 <b> `DynamicSlice(operand, start_indices, size_indices)` </b>
 
-| Arguments       | Type                    | Semantics                        |
+| 参数 | 类型 | 语义                        |
 | --------------- | ----------------------- | -------------------------------- |
-| `operand`       | `ComputationDataHandle` | N dimensional array of type T    |
-| `start_indices` | `ComputationDataHandle` | Rank 1 array of N integers       |
-:                 :                         : containing the starting indices  :
-:                 :                         : of the slice for each dimension. :
-:                 :                         : Value must be greater than or    :
-:                 :                         : equal to zero.                   :
-| `size_indices`  | `ArraySlice<int64>`     | List of N integers containing    |
-:                 :                         : the slice size for each          :
-:                 :                         : dimension. Each value must be    :
-:                 :                         : strictly greater than zero, and  :
-:                 :                         : start + size must be less than   :
-:                 :                         : or equal to the size of the      :
-:                 :                         : dimension to avoid wrapping      :
-:                 :                         : modulo dimension size.           :
+| `operand`       | `ComputationDataHandle` | 类型为 T 的 N 维数组   |
+| `start_indices` | `ComputationDataHandle` | N 个整数构成的 1 阶数组，包含每个维度的切片的起始指标。值必须大于等于零 |
+| `size_indices`  | `ArraySlice<int64>`     | N 个整数的列表，包含每个维度的切片大小。每个值必须严格大于零，且 start + size 必须小于等于维度大小，避免发生对维度大小取模的运算 |
 
-1-dimensional example:
+1-维示例:
 
 ```
 let a = {0.0, 1.0, 2.0, 3.0, 4.0}
@@ -824,7 +1067,7 @@ DynamicSlice(a, s, {2}) produces:
   {2.0, 3.0}
 ```
 
-2-dimensional example:
+2-维示例:
 
 ```
 let b =
@@ -840,40 +1083,21 @@ DynamicSlice(b, s, {2, 2}) produces:
 ```
 ## DynamicUpdateSlice
 
-See also
-[`ComputationBuilder::DynamicUpdateSlice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::DynamicUpdateSlice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-DynamicUpdateSlice generates a result which is the value of the input array
-`operand`, with a slice `update` overwritten at `start_indices`.
-The shape of `update` determines the shape of the sub-array of the result which
-is updated.
-The shape of `start_indices` must be rank == 1, with dimension size equal to
-the rank of `operand`.
-Note: handling of out-of-bounds slice indices (generated by incorrect runtime
-calculation of 'start_indices') is currently implementation-defined. Currently,
-slice indices are computed modulo update dimension sizes to prevent out-of-bound
-array accesses, but this behavior may change in future implementations.
+DynamicUpdateSlice 将输入数组 `operand` 中的一部分值更新，即在 `start_indices` 处用 `update` 覆盖原数据。`update` 的形状决定了结果中被更新的子数组的形状。`start_indices` 的形状必须是一维的，维度大小等于 `operand` 的秩。
+
+注意：目前，对于切片指标越界的处理（运行时生成了错误的 `start_indices`）是由具体实现决定的。当前的做法是，让切片指标对输入维度大小取模，从而避免数组的越界访问，但这种行为方式在未来的实现中可能会发生变化。
 
 <b> `DynamicUpdateSlice(operand, update, start_indices)` </b>
 
-| Arguments       | Type                    | Semantics                        |
+| 参数 | 类型 | 语义                        |
 | --------------- | ----------------------- | -------------------------------- |
-| `operand`       | `ComputationDataHandle` | N dimensional array of type T    |
-| `update`        | `ComputationDataHandle` | N dimensional array of type T    |
-:                 :                         : containing the slice update.     :
-:                 :                         : Each dimension of update shape    :
-:                 :                         : must be strictly greater than    :
-:                 :                         : zero, and start + update must be :
-:                 :                         : less than operand size for each  :
-:                 :                         : dimension to avoid generating    :
-:                 :                         : out-of-bounds update indices.    :
-| `start_indices` | `ComputationDataHandle` | Rank 1 array of N integers       |
-:                 :                         : containing the starting indices  :
-:                 :                         : of the slice for each dimension. :
-:                 :                         : Value must be greater than or    :
-:                 :                         : equal to zero.                   :
+| `operand`       | `ComputationDataHandle` | 类型为 T 的 N 维    |
+| `update`        | `ComputationDataHandle` | 类型为 T 的 N 维，包含切片更新。更新形状的每个维度必须严格大于零， start+update 必须小于 operand 每个维度的大小，避免产生越界更新指标  |
+| `start_indices` | `ComputationDataHandle` | N 个整数的 1 阶数组，包含每个维度的切片的起始指标。值必须大于或等于零 |
 
-1-dimensional example:
+1-维示例:
 
 ```
 let a = {0.0, 1.0, 2.0, 3.0, 4.0}
@@ -884,7 +1108,7 @@ DynamicUpdateSlice(a, u, s) produces:
   {0.0, 1.0, 5.0, 6.0, 4.0}
 ```
 
-2-dimensional example:
+2-维示例:
 
 ```
 let b =
@@ -906,1163 +1130,43 @@ DynamicUpdateSlice(b, u, s) produces:
    {9.0, 16.0, 17.0} }
 ```
 
-## Element-wise binary arithmetic operations
-
-See also
-[`ComputationBuilder::Add`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-A set of element-wise binary arithmetic operations is supported.
-
-<b> `Op(lhs, rhs)` </b>
-
-Where `Op` is one of `Add` (addition), `Sub` (subtraction), `Mul`
-(multiplication), `Div` (division), `Rem` (remainder), `Max` (maximum), `Min`
-(minimum), `LogicalAnd` (logical AND), or `LogicalOr` (logical OR).
-
-Arguments | Type                    | Semantics
---------- | ----------------------- | ----------------------------------------
-`lhs`     | `ComputationDataHandle` | left-hand-side operand: array of type T
-`rhs`     | `ComputationDataHandle` | right-hand-side operand: array of type T
-
-The arguments' shapes have to be either similar or compatible. See the
-@{$broadcasting$broadcasting} documentation about what it means for shapes to
-be compatible. The result of an operation has a shape which is the result of
-broadcasting the two input arrays. In this variant, operations between arrays of
-different ranks are *not* supported, unless one of the operands is a scalar.
-
-When `Op` is `Rem`, the sign of the result is taken from the dividend, and the
-absolute value of the result is always less than the divisor's absolute value.
-
-An alternative variant with different-rank broadcasting support exists for these
-operations:
-
-<b> `Op(lhs, rhs, broadcast_dimensions)` </b>
-
-Where `Op` is the same as above. This variant of the operation should be used
-for arithmetic operations between arrays of different ranks (such as adding a
-matrix to a vector).
-
-The additional `broadcast_dimensions` operand is a slice of integers used to
-expand the rank of the lower-rank operand up to the rank of the higher-rank
-operand. `broadcast_dimensions` maps the dimensions of the lower-rank shape to
-the dimensions of the higher-rank shape. The unmapped dimensions of the expanded
-shape are filled with dimensions of size one. Degenerate-dimension broadcasting
-then broadcasts the shapes along these degenerate dimensions to equalize the
-shapes of both operands. The semantics are described in detail on the
-@{$broadcasting$broadcasting page}.
-
-## Element-wise comparison operations
-
-See also
-[`ComputationBuilder::Eq`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-A set of standard element-wise binary comparison operations is supported. Note
-that standard IEEE 754 floating-point comparison semantics apply when comparing
-floating-point types.
-
-<b> `Op(lhs, rhs)` </b>
-
-Where `Op` is one of `Eq` (equal-to), `Ne` (not equal-to), `Ge`
-(greater-or-equal-than), `Gt` (greater-than), `Le` (less-or-equal-than), `Lt`
-(less-than).
-
-Arguments | Type                    | Semantics
---------- | ----------------------- | ----------------------------------------
-`lhs`     | `ComputationDataHandle` | left-hand-side operand: array of type T
-`rhs`     | `ComputationDataHandle` | right-hand-side operand: array of type T
-
-The arguments' shapes have to be either similar or compatible. See the
-@{$broadcasting$broadcasting} documentation about what it means for shapes to
-be compatible. The result of an operation has a shape which is the result of
-broadcasting the two input arrays with the element type `PRED`. In this variant,
-operations between arrays of different ranks are *not* supported, unless one of
-the operands is a scalar.
-
-An alternative variant with different-rank broadcasting support exists for these
-operations:
-
-<b> `Op(lhs, rhs, broadcast_dimensions)` </b>
-
-Where `Op` is the same as above. This variant of the operation should be used
-for comparison operations between arrays of different ranks (such as adding a
-matrix to a vector).
-
-The additional `broadcast_dimensions` operand is a slice of integers specifying
-the dimensions to use for broadcasting the operands. The semantics are described
-in detail on the @{$broadcasting$broadcasting page}.
-
-## Element-wise unary functions
-
-ComputationBuilder supports these element-wise unary functions:
-
-<b>`Abs(operand)`</b> Element-wise abs `x -> |x|`.
-
-<b>`Ceil(operand)`</b> Element-wise ceil `x -> ⌈x⌉`.
-
-<b>`Cos(operand)`</b> Element-wise cosine `x -> cos(x)`.
-
-<b>`Exp(operand)`</b> Element-wise natural exponential `x -> e^x`.
-
-<b>`Floor(operand)`</b> Element-wise floor `x -> ⌊x⌋`.
-
-<b>`IsFinite(operand)`</b> Tests whether each element of `operand` is finite,
-i.e., is not positive or negative infinity, and is not `NaN`. Returns an array
-of `PRED` values with the same shape as the input, where each element is `true`
-if and only if the corresponding input element is finite.
-
-<b>`Log(operand)`</b> Element-wise natural logarithm `x -> ln(x)`.
-
-<b>`LogicalNot(operand)`</b> Element-wise logical not `x -> !(x)`.
-
-<b>`Neg(operand)`</b> Element-wise negation `x -> -x`.
-
-<b>`Sign(operand)`</b> Element-wise sign operation `x -> sgn(x)` where
-
-$$\text{sgn}(x) = \begin{cases} -1 & x < 0\\ 0 & x = 0\\ 1 & x > 0 \end{cases}$$
-
-using the comparison operator of the element type of `operand`.
-
-<b>`Tanh(operand)`</b> Element-wise hyperbolic tangent `x -> tanh(x)`.
-
-
-Arguments | Type                    | Semantics
---------- | ----------------------- | ---------------------------
-`operand` | `ComputationDataHandle` | The operand to the function
-
-The function is applied to each element in the `operand` array, resulting in an
-array with the same shape. It is allowed for `operand` to be a scalar (rank 0).
-
-## Gather
-
-The XLA gather operation stitches together several slices (each slice at a
-potentially different runtime offset) of an input tensor into an output tensor.
-
-### General Semantics
-
-See also
-[`ComputationBuilder::Gather`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-For a more intuitive description, see the "Informal Description" section below.
-
-<b> `gather(operand, gather_indices, output_window_dims, elided_window_dims, window_bounds, gather_dims_to_operand_dims)` </b>
-
-|Arguments         | Type                    | Semantics                       |
-|----------------- | ----------------------- | --------------------------------|
-|`operand`         | `ComputationDataHandle` | The tensor we’re gathering      |
-:                  :                         : from.                           :
-|`gather_indices`  | `ComputationDataHandle` | Tensor containing the starting  |
-:                  :                         : indices of the slices we're     :
-:                  :                         : we're stitching together into   :
-:                  :                         : the output tensor.              :
-|`index_vector_dim`  | `int64`               | The dimension in                |
-:                  :                         : `gather_indices` that contains  :
-:                  :                         : the starting indices.           :
-|`output_window_dims` | `ArraySlice<int64>`  | The set of dimensions in the    |
-:                  :                         : output shape that are _window   :
-:                  :                         : dimensions_ (defined below).    :
-:                  :                         : Not all window dimensions may   :
-:                  :                         : be present in the output shape. :
-|`elided_window_dims` | `ArraySlice<int64>`  | The set of _window dimensions_  |
-:                  :            : that are not present in the output shape.    :
-:                  :            : `window_bounds[i]` must be `1` for all `i`   :
-:                  :            : in `elided_window_dims`.                     :
-|`window_bounds`   | `ArraySlice<int64>`    | `window_bounds[i]` is the bounds |
-:                  :            : for  window dimension `i`. This includes     :
-:                  :            : both the window dimensions that are          :
-:                  :            : explicitly part of the output shape (via     :
-:                  :            : `output_window_dims`) and the window         :
-:                  :            : dimensions that are elided (via              :
-:                  :            : `elided_window_dims`).                       :
-|`gather_dims_to_operand_dims` | `ArraySlice<int64>` | A dimension map (the    |
-:                  :            : array is interpreted as mapping `i` to       :
-:                  :            : `gather_dims_to_operand_dims[i]`)  from      :
-:                  :            : the gather indices in `gather_indices` to    :
-:                  :            : the operand index space.  It has to be       :
-:                  :            : one-to-one and total.                        :
-
-For every index `Out` in the output tensor, we compute two things (more
-precisely described later):
-
-  - An index into `gather_indices.rank` - `1` dimensions of `gather_indices`,
-    which gives us a starting index of a slice, _operand slice_, in the operand
-    tensor.  These `gather_indices.rank` - `1` dimensions are all the dimensions
-    in `gather_indices` except `index_vector_dim`.
-
-  - A _window index_ that has the same rank as the operand.  This index is
-    composed of the values in `Out` at dimensions `output_window_dims`, embedded
-    with zeroes according to `elided_window_dims`.
-
-The _window index_ is the relative index of the element in _operand slice_ that
-should be present in the output at index `Out`.
-
-The output is a tensor of rank `output_window_dims.size` + `gather_indices.rank`
-- `1`.  Additionally, as a shorthand, we define `output_gather_dims` of type
-`ArraySlice<int64>` as the set of dimensions in the output shape but not in
-`output_window_dims`, in ascending order.  E.g. if the output tensor has rank
-`5`, `output_window_dims` is {`2`, `4`} then `output_gather_dims` is {`0`, `1`,
-`3`}
-
-If `index_vector_dim` is equal to `gather_indices.rank` we implicitly
-consider `gather_indices` to have a trailing `1` dimension (i.e. if
-`gather_indices` was of shape `[6,7]` and `index_vector_dim` is `2` then
-we implicitly consider the shape of `gather_indices` to be `[6,7,1]`).
-
-The bounds for the output tensor along dimension `i` is computed as follows:
-
-  1. If `i` is present in `output_gather_dims` (i.e. is equal to
-     `output_gather_dims[k]` for some `k`) then we pick the corresponding
-     dimension bounds out of `gather_indices.shape`, skipping
-     `index_vector_dim` (i.e. pick `gather_indices.shape.dims`[`k`] if `k`
-     < `index_vector_dim` and `gather_indices.shape.dims`[`k`+`1`]
-     otherwise).
-  2. If `i` is present in `output_window_dims` (i.e. equal to
-     `output_window_dims`[`k`] for some `k`) then we pick the corresponding
-     bound out of `window_bounds` after accounting for `elided_window_dims`
-     (i.e. we pick `adjusted_window_bounds`[`k`] where `adjusted_window_bounds`
-     is `window_bounds` with the bounds at indices `elided_window_dims`
-     removed).
-
-The operand index `In` corresponding to an output index `Out` is computed as
-follows:
-
-  1. Let `G` = { `Out`[`k`] for `k` in `output_gather_dims` }.  Use `G` to slice
-     out vector `S` such that `S`[`i`] = `gather_indices`[Combine(`G`, `i`)]
-     where Combine(A, b) inserts b at position `index_vector_dim` into A.
-     Note that this is well defined even if `G` is empty -- if `G` is empty then
-     `S` = `gather_indices`.
-  2. Create an index, `S`<sub>`in`</sub>, into `operand` using `S` by
-     scattering `S` using the `gather_dims_to_operand_dims` map
-     (`S`<sub>`in`</sub> is the starting indices for _operand slice_ mentioned
-     above).  More precisely:
-       1. `S`<sub>`in`</sub>[`gather_dims_to_operand_dims`[`k`]] = `S`[`k`] if `k` <
-          `gather_dims_to_operand_dims.size`.
-       2. `S`<sub>`in`</sub>[`_`] = `0` otherwise.
-  3. Create an index `W`<sub>`in`</sub> into `operand` by scattering the indices
-     at the output window dimensions in `Out` according to
-     the `elided_window_dims` set (`W`<sub>`in`</sub> is the _window index_
-     mentioned above).  More precisely:
-       1. `W`<sub>`in`</sub>[`window_dims_to_operand_dims`(`k`)] = `Out`[`k`] if
-          `k` < `output_window_dims.size` (`window_dims_to_operand_dims` is
-          defined below).
-       2. `W`<sub>`in`</sub>[`_`] = `0` otherwise.
-  4. `In` is `W`<sub>`in`</sub> + `S`<sub>`in`</sub> where + is element-wise
-     addition.
-
-`window_dims_to_operand_dims` is the monotonic function with domain [`0`,
-`output_window_dims.size`) and range [`0`, `operand.rank`) \
-`elided_window_dims`.  So if, e.g., `output_window_dims.size` is `4`,
-`operand.rank` is `6` and `elided_window_dims` is {`0`, `2`} then
-`window_dims_to_operand_dims` is {`0`→`1`, `1`→`3`, `2`→`4`, `3`→`5`}.
-
-### Informal Description and Examples
-
-`index_vector_dim` is set to `gather_indices.rank` - `1` in all of the
-examples that follow.  More interesting values for `index_vector_dim`
-does not change the operation fundamentally, but makes the visual representation
-more cumbersome.
-
-To get an intuition on how all of the above fits together, let's look at an
-example that gathers 5 slices of shape `[8,6]` from a `[16,11]` tensor.  The
-position of a slice into the `[16,11]` tensor can be represented as an index
-vector of shape `S64[2]`, so the set of 5 positions can be represented as a
-`S64[5,2]` tensor.
-
-The behavior of the gather operation can then be depicted as an index
-transformation that takes [`G`,`W`<sub>`0`</sub>,`W`<sub>`1`</sub>], an index in
-the output shape, and maps it to an element in the input tensor in the following
-way:
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:100%" src="../../images/ops_xla_gather_0.svg">
-</div>
-
-We first select an (`X`,`Y`) vector from the gather indices tensor using `G`.
-The element in the output tensor at index
-[`G`,`W`<sub>`0`</sub>,`W`<sub>`1`</sub>] is then the element in the input
-tensor at index [`X`+`W`<sub>`0`</sub>,`Y`+`W`<sub>`1`</sub>].
-
-`window_bounds` is `[8,6]`, which decides the range of W<sub>`0`</sub> and
-W<sub>`1`</sub>, and this in turn decides the bounds of the slice.
-
-This gather operation acts as a batch dynamic slice with `G` as the batch
-dimension.
-
-The gather indices may be multidimensional.  For instance, a more general
-version of the example above using a "gather indices" tensor of shape `[4,5,2]`
-would translate indices like this:
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:100%" src="../../images/ops_xla_gather_1.svg">
-</div>
-
-Again, this acts as a batch dynamic slice `G`<sub>`0`</sub> and
-`G`<sub>`1`</sub> as the batch dimensions.  The window bounds are still `[8,6]`.
-
-The gather operation in XLA generalizes the informal semantics outlined above in
-the following ways:
-
- 1. We can configure which dimensions in the output shape are the window
-    dimensions (dimensions containing `W`<sub>`0`</sub>, `W`<sub>`1`</sub> in
-    the last example).  The output gather dimensions (dimensions containing
-    `G`<sub>`0`</sub>, `G`<sub>`1`</sub> in the last example) are defined to be
-    the output dimensions that are not window dimensions.
-
- 2. The number of output window dimensions explicitly present in the output
-    shape may be smaller than the input rank.  These "missing" dimensions, which
-    are listed explicitly as `elided_window_dims`, must have a window bound of
-    `1`.  Since they have a window bound of `1` the only valid index for them is
-    `0` and eliding them does not introduce ambiguity.
-
- 3. The slice extracted from the "Gather Indices" tensor ((`X`, `Y`) in the last
-    example) may have fewer elements than the input tensor rank, and an explicit
-    mapping dictates how the index should be expanded to have the same rank as
-    the input.
-
-As a final example, we use (2) and (3) to implement `tf.gather_nd`:
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:100%" src="../../images/ops_xla_gather_2.svg">
-</div>
-
-`G`<sub>`0`</sub> and `G`<sub>`1`</sub> are used to slice out a starting index
-from the gather indices tensor as usual, except the starting index has only one
-element, `X`.  Similarly, there is only one output window index with the value
-`W`<sub>`0`</sub>.  However, before being used as indices into the input tensor,
-these are expanded in accordance to "Gather Index Mapping"
-(`gather_dims_to_operand_dims` in the formal description) and "Window Mapping"
-(`window_dims_to_operand_dims` in the formal description) into
-[`0`,`W`<sub>`0`</sub>] and [`X`,`0`] respectively, adding up to
-[`X`,`W`<sub>`0`</sub>].  In other words, the output index
-[`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`W`<sub>`0`</sub>] maps to the input index
-[`GatherIndices`[`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`0`],`X`] which gives us
-the semantics for `tf.gather_nd`.
-
-`window_bounds` for this case is `[1,11]`.  Intuitively this means that every
-index `X` in the gather indices tensor picks an entire row and the result is the
-concatenation of all these rows.
-
-## GetTupleElement
-
-See also
-[`ComputationBuilder::GetTupleElement`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-Indexes into a tuple with a compile-time-constant value.
-
-The value must be a compile-time-constant so that shape inference can determine
-the type of the resulting value.
-
-This is analogous to `std::get<int N>(t)` in C++. Conceptually:
-
-```
-let v: f32[10] = f32[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-let s: s32 = 5;
-let t: (f32[10], s32) = tuple(v, s);
-let element_1: s32 = gettupleelement(t, 1);  // Inferred shape matches s32.
-```
-
-See also @{tf.tuple}.
-
-## Infeed
-
-See also
-[`ComputationBuilder::Infeed`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-<b> `Infeed(shape)` </b>
-
-| Argument | Type    | Semantics                                             |
-| -------- | ------- | ----------------------------------------------------- |
-| `shape`  | `Shape` | Shape of the data read from the Infeed interface. The |
-:          :         : layout field of the shape must be set to match the    :
-:          :         : layout of the data sent to the device; otherwise its  :
-:          :         : behavior is undefined.                                :
-
-Reads a single data item from the implicit Infeed streaming interface of the
-device, interpreting the data as the given shape and its layout, and returns a
-`ComputationDataHandle` of the data. Multiple Infeed operations are allowed in a
-computation, but there must be a total order among the Infeed operations. For
-example, two Infeeds in the code below have a total order since there is a
-dependency between the while loops.
-
-```
-result1 = while (condition, init = init_value) {
-  Infeed(shape)
-}
-
-result2 = while (condition, init = result1) {
-  Infeed(shape)
-}
-```
-
-Nested tuple shapes are not supported. For an empty tuple shape, the Infeed
-operation is effectively a no-op and proceeds without reading any data from the
-Infeed of the device.
-
-> Note: We plan to allow multiple Infeed operations without a total order, in
-> which case the compiler will provide information about how the Infeed
-> operations are serialized in the compiled program.
-
-## Map
-
-See also
-[`ComputationBuilder::Map`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-<b> `Map(operands..., computation)` </b>
-
-| Arguments         | Type                     | Semantics                     |
-| ----------------- | ------------------------ | ----------------------------- |
-| `operands`        | sequence of N            | N arrays of types T_0..T_{N-1}|
-:                   : `ComputationDataHandle`s :                               :
-| `computation`     | `Computation`            | computation of type `T_0,     |
-:                   :                          : T_1, ..., T_{N + M -1} -> S`  :
-:                   :                          : with N parameters of type T   :
-:                   :                          : and M of arbitrary type       :
-| `dimensions`       | `int64` array           | array of map dimensions    |
-| `static_operands` | sequence of M            | M arrays of arbitrary type    |
-:                   : `ComputationDataHandle`s :                               :
-
-Applies a scalar function over the given `operands` arrays, producing an array
-of the same dimensions where each element is the result of the mapped function
-applied to the corresponding elements in the input arrays with `static_operands`
-given as additional input to `computation`.
-
-The mapped function is an arbitrary computation with the restriction that it has
-N inputs of scalar type `T` and a single output with type `S`. The output has
-the same dimensions as the operands except that the element type T is replaced
-with S.
-
-For example: `Map(op1, op2, op3, computation, par1)` maps `elem_out <-
-computation(elem1, elem2, elem3, par1)` at each (multi-dimensional) index in the
-input arrays to produce the output array.
-
-## Pad
-
-See also
-[`ComputationBuilder::Pad`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-<b> `Pad(operand, padding_value, padding_config)` </b>
-
-| Arguments        | Type                    | Semantics                     |
-| ---------------- | ----------------------- | ----------------------------- |
-| `operand`        | `ComputationDataHandle` | array of type `T`             |
-| `padding_value`  | `ComputationDataHandle` | scalar of type `T` to fill in |
-:                  :                         : the added padding             :
-| `padding_config` | `PaddingConfig`         | padding amount on both edges  |
-:                  :                         : (low, high) and between the   :
-:                  :                         : elements of each dimension    :
-
-Expands the given `operand` array by padding around the array as well as between
-the elements of the array with the given `padding_value`. `padding_config`
-specifies the amount of edge padding and the interior padding for each
-dimension.
-
-`PaddingConfig` is a repeated field of `PaddingConfigDimension`, which contains
-three fields for each dimension: `edge_padding_low`, `edge_padding_high`, and
-`interior_padding`. `edge_padding_low` and `edge_padding_high` specify the
-amount of padding added at the low-end (next to index 0) and the high-end (next
-to the highest index) of each dimension respectively. The amount of edge padding
-can be negative -- the absolute value of negative padding indicates the number
-of elements to remove from the specified dimension. `interior_padding` specifies
-the amount of padding added between any two elements in each dimension. Interior
-padding occurs logically before edge padding, so in the case of negative edge
-padding elements are removed from the interior-padded operand. This operation is
-a no-op if the edge padding pairs are all (0, 0) and the interior padding values
-are all 0. The figure below shows examples of different `edge_padding` and
-`interior_padding` values for a two-dimensional array.
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:100%" src="https://www.tensorflow.org/images/ops_pad.png">
-</div>
-
-## Recv
-
-See also
-[`ComputationBuilder::Recv`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-<b> `Recv(shape, channel_handle)` </b>
-
-| Arguments        | Type            | Semantics                            |
-| ---------------- | --------------- | ------------------------------------ |
-| `shape`          | `Shape`         | shape of the data to receive         |
-| `channel_handle` | `ChannelHandle` | unique identifier for each send/recv pair |
-
-Receives data of the given shape from a `Send` instruction in another
-computation that shares the same channel handle. Returns a
-ComputationDataHandle for the received data.
-
-The client API of `Recv` operation represents synchronous communication.
-However, the instruction is internally decomposed into 2 HLO instructions
-(`Recv` and `RecvDone`) to enable asynchronous data transfers. See also
-[`HloInstruction::CreateRecv` and `HloInstruction::CreateRecvDone`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/hlo_instruction.h).
-
-<b>`Recv(const Shape& shape, int64 channel_id)`</b>
-
-Allocates resources required to receive data from a `Send` instruction with the
-same channel_id. Returns a context for the allocated resources, which is used
-by a following `RecvDone` instruction to wait for the completion of the data
-transfer. The context is a tuple of {receive buffer (shape), request identifier
-(U32)} and it can only be used by a `RecvDone` instruction.
-
-<b> `RecvDone(HloInstruction context)` </b>
-
-Given a context created by a `Recv` instruction, waits for the data transfer to
-complete and returns the received data.
-
-## Reduce
-
-See also
-[`ComputationBuilder::Reduce`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-Applies a reduction function to an array.
-
-<b> `Reduce(operand, init_value, computation, dimensions)` </b>
-
-| Arguments     | Type                    | Semantics                        |
-| ------------- | ----------------------- | -------------------------------- |
-| `operand`     | `ComputationDataHandle` | array of type `T`                |
-| `init_value`  | `ComputationDataHandle` | scalar of type `T`               |
-| `computation` | `Computation`           | computation of type `T, T -> T`  |
-| `dimensions`  | `int64` array           | unordered array of dimensions to |
-:               :                         : reduce                           :
-
-Conceptually, this operation reduces one or more dimensions in the input array
-into scalars. The rank of the result array is `rank(operand) - len(dimensions)`.
-`init_value` is the initial value used for every reduction and may also be
-inserted anywhere during computation if the back-end chooses to do so. So in
-most cases `init_value` should be an identity of the reduction function (for
-example, 0 for addition).
-
-The evaluation order of the reduction function is arbitrary and may be
-non-deterministic. Therefore, the reduction function should not be overly
-sensitive to reassociation.
-
-Some reduction functions like addition are not strictly associative for floats.
-However, if the range of the data is limited, floating-point addition is close
-enough to being associative for most practical uses. It is possible to conceive
-of some completely non-associative reductions, however, and these will produce
-incorrect or unpredictable results in XLA reductions.
-
-As an example, when reducing across the one dimension in a 1D array with values
-[10, 11, 12, 13], with reduction function `f` (this is `computation`) then that
-could be computed as
-
-`f(10, f(11, f(12, f(init_value, 13)))`
-
-but there are also many other possibilities, e.g.
-
-`f(init_value, f(f(10, f(init_value, 11)), f(f(init_value, 12), f(13,
-init_value))))`
-
-The following is a rough pseudo-code example of how reduction could be
-implemented, using summation as the reduction computation with an initial value
-of 0.
-
-```python
-result_shape <- remove all dims in dimensions from operand_shape
-
-# Iterate over all elements in result_shape. The number of r's here is equal
-# to the rank of the result
-for r0 in range(result_shape[0]), r1 in range(result_shape[1]), ...:
-  # Initialize this result element
-  result[r0, r1...] <- 0
-
-  # Iterate over all the reduction dimensions
-  for d0 in range(dimensions[0]), d1 in range(dimensions[1]), ...:
-    # Increment the result element with the value of the operand's element.
-    # The index of the operand's element is constructed from all ri's and di's
-    # in the right order (by construction ri's and di's together index over the
-    # whole operand shape).
-    result[r0, r1...] += operand[ri... di]
-```
-
-Here's an example of reducing a 2D array (matrix). The shape has rank 2,
-dimension 0 of size 2 and dimension 1 of size 3:
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:35%" src="https://www.tensorflow.org/images/ops_2d_matrix.png">
-</div>
-
-Results of reducing dimensions 0 or 1 with an "add" function:
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:35%" src="https://www.tensorflow.org/images/ops_reduce_from_2d_matrix.png">
-</div>
-
-Note that both reduction results are 1D arrays. The diagram shows one as column
-and another as row just for visual convenience.
-
-For a more complex example, here is a 3D array. Its rank is 3, dimension 0 of
-size 4, dimension 1 of size 2 and dimension 2 of size 3. For simplicity, the
-values 1 to 6 are replicated across dimension 0.
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:35%" src="https://www.tensorflow.org/images/ops_reduce_from_3d_matrix.png">
-</div>
-
-Similarly to the 2D example, we can reduce just one dimension. If we reduce
-dimension 0, for example, we get a rank-2 array where all values across
-dimension 0 were folded into a scalar:
-
-```text
-|  4   8  12 |
-| 16  20  24 |
-```
-
-If we reduce dimension 2, we also get a rank-2 array where all values across
-dimension 2 were folded into a scalar:
-
-```text
-| 6  15 |
-| 6  15 |
-| 6  15 |
-| 6  15 |
-```
-
-Note that the relative order between the remaining dimensions in the input is
-preserved in the output, but some dimensions may get assigned new numbers (since
-the rank changes).
-
-We can also reduce multiple dimensions. Add-reducing dimensions 0 and 1 produces
-the 1D array `| 20 28 36 |`.
-
-Reducing the 3D array over all its dimensions produces the scalar `84`.
-
-## ReducePrecision
-
-See also
-[`ComputationBuilder::ReducePrecision`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-Models the effect of converting floating-point values to a lower-precision
-format (such as IEEE-FP16) and back to the original format.  The number of
-exponent and mantissa bits in the lower-precision format can be specified
-arbitrarily, although all bit sizes may not be supported on all hardware
-implementations.
-
-<b> `ReducePrecision(operand, mantissa_bits, exponent_bits)` </b>
-
-| Arguments           | Type                    | Semantics                    |
-| ------------------- | ----------------------- | ---------------------------- |
-| `operand`           | `ComputationDataHandle` | array of floating-point type |
-:                     :                         : `T`.                         :
-| `exponent_bits`     | `int32`                 | number of exponent bits in   |
-:                     :                         : lower-precision format       :
-| `mantissa_bits`     | `int32`                 | number of mantissa bits in   |
-:                     :                         : lower-precision format       :
-
-The result is an array of type `T`.  The input values are rounded to the nearest
-value representable with the given number of mantissa bits (using "ties to even"
-semantics), and any values that exceed the range specified by the number of
-exponent bits are clamped to positive or negative infinity.  `NaN` values are
-retained, although they may be converted to canonical `NaN` values.
-
-The lower-precision format must have at least one exponent bit (in order to
-distinguish a zero value from an infinity, since both have a zero mantissa), and
-must have a non-negative number of mantissa bits.  The number of exponent or
-mantissa bits may exceed the corresponding value for type `T`; the corresponding
-portion of the conversion is then simply a no-op.
-
-## ReduceWindow
-
-See also
-[`ComputationBuilder::ReduceWindow`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-Applies a reduction function to all elements in each window of the input
-multi-dimensional array, producing an output multi-dimensional array with the
-same number of elements as the number of valid positions of the window. A
-pooling layer can be expressed as a `ReduceWindow`.
-
-<b> `ReduceWindow(operand, init_value, computation, window_dimensions,
-window_strides, padding)` </b>
-
-| Arguments           | Type                    | Semantics                    |
-| ------------------- | ----------------------- | ---------------------------- |
-| `operand`           | `ComputationDataHandle` | N dimensional array          |
-:                     :                         : containing elements of type  :
-:                     :                         : T. This is the base area on  :
-:                     :                         : which the window is placed.  :
-| `init_value`        | `ComputationDataHandle` | Starting value for the       |
-:                     :                         : reduction. See [Reduce]      :
-:                     :                         : (#reduce) for details.       :
-| `computation`       | `Computation`           | Reduction function of type   |
-:                     :                         : `T, T -> T`, to apply to all :
-:                     :                         : elements in each window      :
-| `window_dimensions` | `ArraySlice<int64>`     | array of integers for window |
-:                     :                         : dimension values             :
-| `window_strides`    | `ArraySlice<int64>`     | array of integers for window |
-:                     :                         : stride values                :
-| `padding`           | `Padding`               | padding type for window      |
-:                     :                         : (Padding\:\:kSame or         :
-:                     :                         : Padding\:\:kValid)           :
-
-Below code and figure shows an example of using `ReduceWindow`. Input is a
-matrix of size [4x6] and both window_dimensions and window_stride_dimensions are
-[2x3].
-
-```
-// Create a computation for the reduction (maximum).
-Computation max;
-{
-  ComputationBuilder builder(client_, "max");
-  auto y = builder.Parameter(0, ShapeUtil::MakeShape(F32, {}), "y");
-  auto x = builder.Parameter(1, ShapeUtil::MakeShape(F32, {}), "x");
-  builder.Max(y, x);
-  max = builder.Build().ConsumeValueOrDie();
-}
-
-// Create a ReduceWindow computation with the max reduction computation.
-ComputationBuilder builder(client_, "reduce_window_2x3");
-auto shape = ShapeUtil::MakeShape(F32, {4, 6});
-auto input = builder.Parameter(0, shape, "input");
-builder.ReduceWindow(
-    input, *max,
-    /*init_val=*/builder.ConstantLiteral(LiteralUtil::MinValue(F32)),
-    /*window_dimensions=*/{2, 3},
-    /*window_stride_dimensions=*/{2, 3},
-    Padding::kValid);
-```
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:35%" src="https://www.tensorflow.org/images/ops_reduce_window.png">
-</div>
-
-Stride of 1 in a dimension specifies that the position of a window in the
-dimension is 1 element away from its adjacent window. In order to specify that
-no windows overlap with each other, window_stride_dimensions should be equal to
-window_dimensions. The figure below illustrates the use of two different stride
-values. Padding is applied to each dimension of the input and the calculations
-are the same as though the input came in with the dimensions it has after
-padding.
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:75%" src="https://www.tensorflow.org/images/ops_reduce_window_stride.png">
-</div>
-
-The evaluation order of the reduction function is arbitrary and may be
-non-deterministic. Therefore, the reduction function should not be overly
-sensitive to reassociation. See the discussion about associativity in the
-context of [`Reduce`](#reduce) for more details.
-
-## Reshape
-
-See also
-[`ComputationBuilder::Reshape`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)
-and the [`Collapse`](#collapse) operation.
-
-Reshapes the dimensions of an array into a new configuration.
-
-<b> `Reshape(operand, new_sizes)` </b>
-<b> `Reshape(operand, dimensions, new_sizes)` </b>
-
-Arguments    | Type                    | Semantics
------------- | ----------------------- | ---------------------------------------
-`operand`    | `ComputationDataHandle` | array of type T
-`dimensions` | `int64` vector          | order in which dimensions are collapsed
-`new_sizes`  | `int64` vector          | vector of sizes of new dimensions
-
-Conceptually, reshape first flattens an array into a one-dimensional vector of
-data values, and then refines this vector into a new shape. The input arguments
-are an arbitrary array of type T, a compile-time-constant vector of dimension
-indices, and a compile-time-constant vector of dimension sizes for the result.
-The values in the `dimension` vector, if given, must be a permutation of all of
-T's dimensions; the default if not given is `{0, ..., rank - 1}`. The order of
-the dimensions in `dimensions` is from slowest-varying dimension (most major) to
-fastest-varying dimension (most minor) in the loop nest which collapses the
-input array into a single dimension. The `new_sizes` vector determines the size
-of the output array. The value at index 0 in `new_sizes` is the size of
-dimension 0, the value at index 1 is the size of dimension 1, and so on. The
-product of the `new_size` dimensions must equal the product of the operand's
-dimension sizes. When refining the collapsed array into the multidimensional
-array defined by `new_sizes`, the dimensions in `new_sizes` are ordered from
-slowest varying (most major) and to fastest varying (most minor).
-
-For example, let v be an array of 24 elements:
-
-```
-let v = f32[4x2x3] {{{10, 11, 12}, {15, 16, 17}},
-                    {{20, 21, 22}, {25, 26, 27}},
-                    {{30, 31, 32}, {35, 36, 37}},
-                    {{40, 41, 42}, {45, 46, 47}}};
-
-In-order collapse:
-let v012_24 = Reshape(v, {0,1,2}, {24});
-then v012_24 == f32[24] {10, 11, 12, 15, 16, 17, 20, 21, 22, 25, 26, 27,
-                         30, 31, 32, 35, 36, 37, 40, 41, 42, 45, 46, 47};
-
-let v012_83 = Reshape(v, {0,1,2}, {8,3});
-then v012_83 == f32[8x3] {{10, 11, 12}, {15, 16, 17},
-                          {20, 21, 22}, {25, 26, 27},
-                          {30, 31, 32}, {35, 36, 37},
-                          {40, 41, 42}, {45, 46, 47}};
-
-Out-of-order collapse:
-let v021_24 = Reshape(v, {1,2,0}, {24});
-then v012_24 == f32[24]  {10, 20, 30, 40, 11, 21, 31, 41, 12, 22, 32, 42,
-                          15, 25, 35, 45, 16, 26, 36, 46, 17, 27, 37, 47};
-
-let v021_83 = Reshape(v, {1,2,0}, {8,3});
-then v021_83 == f32[8x3] {{10, 20, 30}, {40, 11, 21},
-                          {31, 41, 12}, {22, 32, 42},
-                          {15, 25, 35}, {45, 16, 26},
-                          {36, 46, 17}, {27, 37, 47}};
-
-
-let v021_262 = Reshape(v, {1,2,0}, {2,6,2});
-then v021_262 == f32[2x6x2] {{{10, 20}, {30, 40},
-                              {11, 21}, {31, 41},
-                              {12, 22}, {32, 42}},
-                             {{15, 25}, {35, 45},
-                              {16, 26}, {36, 46},
-                              {17, 27}, {37, 47}}};
-```
-
-As a special case, reshape can transform a single-element array to a scalar and
-vice versa. For example,
-
-```
-Reshape(f32[1x1] {{5}}, {0,1}, {}) == 5;
-Reshape(5, {}, {1,1}) == f32[1x1] {{5}};
-```
-
-## Rev (reverse)
-
-See also
-[`ComputationBuilder::Rev`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-<b>`Rev(operand, dimensions)`</b>
-
-Arguments    | Type                    | Semantics
------------- | ----------------------- | ---------------------
-`operand`    | `ComputationDataHandle` | array of type T
-`dimensions` | `ArraySlice<int64>`     | dimensions to reverse
-
-Reverses the order of elements in the `operand` array along the specified
-`dimensions`, generating an output array of the same shape. Each element of the
-operand array at a multidimensional index is stored into the output array at a
-transformed index. The multidimensional index is transformed by reversing the
-index in each dimension to be reversed (i.e., if a dimension of size N is one of
-the reversing dimensions, its index i is transformed into N - 1 - i).
-
-One use for the `Rev` operation is to reverse the convolution weight array along
-the two window dimensions during the gradient computation in neural networks.
-
-## RngNormal
-
-See also
-[`ComputationBuilder::RngNormal`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-Constructs an output of a given shape with random numbers generated following
-the $$N(\mu, \sigma)$$ normal distribution. The parameters `mu` and `sigma`, and
-output shape have to have elemental type F32. The parameters furthermore have to
-be scalar valued.
-
-<b>`RngNormal(mean, sigma, shape)`</b>
-
-| Arguments | Type                    | Semantics                              |
-| --------- | ----------------------- | -------------------------------------- |
-| `mu`      | `ComputationDataHandle` | Scalar of type F32 specifying mean of  |
-:           :                         : generated numbers                      :
-| `sigma`   | `ComputationDataHandle` | Scalar of type F32 specifying standard |
-:           :                         : deviation of generated numbers         :
-| `shape`   | `Shape`                 | Output shape of type F32               |
-
-## RngUniform
-
-See also
-[`ComputationBuilder::RngUniform`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-Constructs an output of a given shape with random numbers generated following
-the uniform distribution over the interval $$[a,b)$$. The parameters and output
-shape may be either F32, S32 or U32, but the types have to be consistent.
-Furthermore, the parameters need to be scalar valued. If $$b <= a$$ the result
-is implementation-defined.
-
-<b>`RngUniform(a, b, shape)`</b>
-
-| Arguments | Type                    | Semantics                         |
-| --------- | ----------------------- | --------------------------------- |
-| `a`       | `ComputationDataHandle` | Scalar of type T specifying lower |
-:           :                         : limit of interval                 :
-| `b`       | `ComputationDataHandle` | Scalar of type T specifying upper |
-:           :                         : limit of interval                 :
-| `shape`   | `Shape`                 | Output shape of type T            |
-
-## Select
-
-See also
-[`ComputationBuilder::Select`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-Constructs an output array from elements of two input arrays, based on the
-values of a predicate array.
-
-<b> `Select(pred, on_true, on_false)` </b>
-
-Arguments  | Type                    | Semantics
----------- | ----------------------- | ------------------
-`pred`     | `ComputationDataHandle` | array of type PRED
-`on_true`  | `ComputationDataHandle` | array of type T
-`on_false` | `ComputationDataHandle` | array of type T
-
-The arrays `on_true` and `on_false` must have the same shape. This is also the
-shape of the output array. The array `pred` must have the same dimensionality as
-`on_true` and `on_false`, with the `PRED` element type.
-
-For each element `P` of `pred`, the corresponding element of the output array is
-taken from `on_true` if the value of `P` is `true`, and from `on_false` if the
-value of `P` is `false`. As a restricted form of [broadcasting]
-(broadcasting.md), `pred` can be a scalar of type `PRED`. In this case, the
-output array is taken wholly from `on_true` if `pred` is `true`, and from
-`on_false` if `pred` is `false`.
-
-Example with non-scalar `pred`:
-
-```
-let pred: PRED[4] = {true, false, false, true};
-let v1: s32[4] = {1, 2, 3, 4};
-let v2: s32[4] = {100, 200, 300, 400};
-==>
-Select(pred, v1, v2) = s32[4]{1, 200, 300, 4};
-```
-
-Example with scalar `pred`:
-
-```
-let pred: PRED = true;
-let v1: s32[4] = {1, 2, 3, 4};
-let v2: s32[4] = {100, 200, 300, 400};
-==>
-Select(pred, v1, v2) = s32[4]{1, 2, 3, 4};
-```
-
-Selections between tuples are supported. Tuples are considered to be scalar
-types for this purpose. If `on_true` and `on_false` are tuples (which must have
-the same shape!) then `pred` has to be a scalar of type `PRED`.
-
-## SelectAndScatter
-
-See also
-[`ComputationBuilder::SelectAndScatter`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-This operation can be considered as a composite operation that first computes
-`ReduceWindow` on the `operand` array to select an element from each window, and
-then scatters the `source` array to the indices of the selected elements to
-construct an output array with the same shape as the operand array. The binary
-`select` function is used to select an element from each window by applying it
-across each window, and it is called with the property that the first
-parameter's index vector is lexicographically less than the second parameter's
-index vector. The `select` function returns `true` if the first parameter is
-selected and returns `false` if the second parameter is selected, and the
-function must hold transitivity (i.e., if `select(a, b)` and `select(b, c)` are
-`true`, then `select(a, c)` is also `true`) so that the selected element does
-not depend on the order of the elements traversed for a given window.
-
-The function `scatter` is applied at each selected index in the output array. It
-takes two scalar parameters:
-
-1.  Current value at the selected index in the output array
-2.  The scatter value from `source` that applies to the selected index
-
-It combines the two parameters and returns a scalar value that's used to update
-the value at the selected index in the output array. Initially, all indices of
-the output array are set to `init_value`.
-
-The output array has the same shape as the `operand` array and the `source`
-array must have the same shape as the result of applying a `ReduceWindow`
-operation on the `operand` array. `SelectAndScatter` can be used to
-backpropagate the gradient values for a pooling layer in a neural network.
-
-<b>`SelectAndScatter(operand, select, window_dimensions, window_strides,
-padding, source, init_value, scatter)`</b>
-
-| Arguments           | Type                    | Semantics                    |
-| ------------------- | ----------------------- | ---------------------------- |
-| `operand`           | `ComputationDataHandle` | array of type T over which   |
-:                     :                         : the windows slide            :
-| `select`            | `Computation`           | binary computation of type   |
-:                     :                         : `T, T -> PRED`, to apply to  :
-:                     :                         : all elements in each window; :
-:                     :                         : returns `true` if the first  :
-:                     :                         : parameter is selected and    :
-:                     :                         : returns `false` if the       :
-:                     :                         : second parameter is selected :
-| `window_dimensions` | `ArraySlice<int64>`     | array of integers for window |
-:                     :                         : dimension values             :
-| `window_strides`    | `ArraySlice<int64>`     | array of integers for window |
-:                     :                         : stride values                :
-| `padding`           | `Padding`               | padding type for window      |
-:                     :                         : (Padding\:\:kSame or         :
-:                     :                         : Padding\:\:kValid)           :
-| `source`            | `ComputationDataHandle` | array of type T with the     |
-:                     :                         : values to scatter            :
-| `init_value`        | `ComputationDataHandle` | scalar value of type T for   |
-:                     :                         : the initial value of the     :
-:                     :                         : output array                 :
-| `scatter`           | `Computation`           | binary computation of type   |
-:                     :                         : `T, T -> T`, to apply each   :
-:                     :                         : scatter source element with  :
-:                     :                         : its destination element      :
-
-The figure below shows examples of using `SelectAndScatter`, with the `select`
-function computing the maximal value among its parameters. Note that when the
-windows overlap, as in the figure (2) below, an index of the `operand` array may
-be selected multiple times by different windows. In the figure, the element of
-value 9 is selected by both of the top windows (blue and red) and the binary
-addition `scatter` function produces the output element of value 8 (2 + 6).
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:100%"
-    src="https://www.tensorflow.org/images/ops_scatter_to_selected_window_element.png">
-</div>
-
-The evaluation order of the `scatter` function is arbitrary and may be
-non-deterministic. Therefore, the `scatter` function should not be overly
-sensitive to reassociation. See the discussion about associativity in the
-context of [`Reduce`](#reduce) for more details.
-
-## Send
-
-See also
-[`ComputationBuilder::Send`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-<b> `Send(operand, channel_handle)` </b>
-
-| Arguments        | Type                    | Semantics                        |
-| ---------------- | ----------------------- | -------------------------------- |
-| `operand`        | `ComputationDataHandle` | data to send (array of type T)   |
-| `channel_handle` | `ChannelHandle`         | unique identifier for each send/recv pair |
-
-Sends the given operand data to a `Recv` instruction in another computation
-that shares the same channel handle. Does not return any data.
-
-Similar to the `Recv` operation, the client API of `Send` operation represents
-synchronous communication, and is internally decomposed into 2 HLO instructions
-(`Send` and `SendDone`) to enable asynchronous data transfers. See also
-[`HloInstruction::CreateSend` and `HloInstruction::CreateSendDone`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/hlo_instruction.h).
-
-<b>`Send(HloInstruction operand, int64 channel_id)`</b>
-
-Initiates an asynchronous transfer of the operand to the resources allocated by
-the `Recv` instruction with the same channel id. Returns a context, which is
-used by a following `SendDone` instruction to wait for the completion of the
-data transfer. The context is a tuple of {operand (shape), request identifier
-(U32)} and it can only be used by a `SendDone` instruction.
-
-<b> `SendDone(HloInstruction context)` </b>
-
-Given a context created by a `Send` instruction, waits for the data transfer to
-complete.  The instruction does not return any data.
-
-<b> Scheduling of channel instructions </b>
-
-The execution order of the 4 instructions for each channel (`Recv`, `RecvDone`,
-`Send`, `SendDone`) is as below.
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:70%" src="../../images/send_recv_order.png">
-</div>
-
-* `Recv` happens before `Send`
-* `Send` happens before `RecvDone`
-* `Recv` happens before `RecvDone`
-* `Send` happens before `SendDone`
-
-When the backend compilers generate a linear schedule for each computation that
-communicates via channel instructions, there must not be cycles across the
-computations. For example, below schedules lead to deadlocks.
-
-<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:100%" src="../../images/send_recv_schedule.png">
-</div>
-
-## Slice
-
-See also
-[`ComputationBuilder::Slice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
-
-Slicing extracts a sub-array from the input array. The sub-array is of the same
-rank as the input and contains the values inside a bounding box within the input
-array where the dimensions and indices of the bounding box are given as
-arguments to the slice operation.
-
-<b> `Slice(operand, start_indices, limit_indices)` </b>
-
-| Arguments       | Type                    | Semantics                        |
-| --------------- | ----------------------- | -------------------------------- |
-| `operand`       | `ComputationDataHandle` | N dimensional array of type T    |
-| `start_indices` | `ArraySlice<int64>`     | List of N integers containing    |
-:                 :                         : the starting indices of the      :
-:                 :                         : slice for each dimension. Values :
-:                 :                         : must be greater than or equal to :
-:                 :                         : zero.                            :
-| `limit_indices` | `ArraySlice<int64>`     | List of N integers containing    |
-:                 :                         : the ending indices (exclusive)   :
-:                 :                         : for the slice for each           :
-:                 :                         : dimension. Each value must be    :
-:                 :                         : strictly greater than the        :
-:                 :                         : respective `start_indices` value :
-:                 :                         : for the dimension and less than  :
-:                 :                         : or equal to the size of the      :
-:                 :                         : dimension.                       :
-
-1-dimensional example:
-
-```
-let a = {0.0, 1.0, 2.0, 3.0, 4.0}
-Slice(a, {2}, {4}) produces:
-  {2.0, 3.0}
-```
-
-2-dimensional example:
-
-```
-let b =
- { {0.0,  1.0,  2.0},
-   {3.0,  4.0,  5.0},
-   {6.0,  7.0,  8.0},
-   {9.0, 10.0, 11.0} }
-
-Slice(b, {2, 1}, {4, 3}) produces:
-  { { 7.0,  8.0},
-    {10.0, 11.0} }
-```
-
 ## Sort
 
-See also
-[`ComputationBuilder::Sort`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::Sort`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-Sorts the elements in the operand.
+`Sort` 用于对输入数组中的元素进行排序。
 
 <b>`Sort(operand)`</b>
 
-Arguments | Type                    | Semantics
+参数 | 类型 | 语义
 --------- | ----------------------- | -------------------
-`operand` | `ComputationDataHandle` | The operand to sort
+`operand` | `ComputationDataHandle` | 待排序数组
 
 ## Transpose
 
-See also the @{tf.reshape} operation.
+另请参阅 @{tf.reshape} 操作。
 
 <b>`Transpose(operand)`</b>
 
-Arguments     | Type                    | Semantics
+参数 | 类型 | 语义
 ---------     | ----------------------- | -------------------------
-`operand`     | `ComputationDataHandle` | The operand to transpose.
-`permutation` | `ArraySlice<int64>`     | How to permute the dimensions.
+`operand`     | `ComputationDataHandle` | 待转置的数组
+`permutation` | `ArraySlice<int64>`     | 指定维度重排列的方式
 
 
-Permutes the operand dimensions with the given permutation, so
-`∀ i . 0 ≤ i < rank ⇒ input_dimensions[permutation[i]] = output_dimensions[i]`.
+Transpose 将 operand 数组的维度重排列，所以
+`∀ i . 0 ≤ i < rank ⇒ input_dimensions[permutation[i]] = output_dimensions[i]`。
 
-This is the same as Reshape(operand, permutation,
-                            Permute(permutation, operand.shape.dimensions)).
+这等价于 Reshape(operand, permutation, Permute(permutation, operand.shape.dimensions))。
+
 
 ## Tuple
 
-See also
-[`ComputationBuilder::Tuple`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::Tuple`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-A tuple containing a variable number of data handles, each of which has its own
-shape.
+一个元组（tuple）包含一些数据句柄，它们各自都有自己的形状。
 
-This is analogous to `std::tuple` in C++. Conceptually:
+概念上看，它类似于 C++ 中的 `std::tuple`：
 
 ```
 let v: f32[10] = f32[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -2070,47 +1174,29 @@ let s: s32 = 5;
 let t: (f32[10], s32) = tuple(v, s);
 ```
 
-Tuples can be deconstructed (accessed) via the [`GetTupleElement`]
-(#gettupleelement) operation.
+元组可通过 [`GetTupleElement`](#gettupleelement) 操作来解析（访问）。
 
 ## While
 
-See also
-[`ComputationBuilder::While`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::While`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
 <b> `While(condition, body, init)` </b>
 
-| Arguments   | Type          | Semantics                                      |
+| 参数 | 类型 | 语义                                      |
 | ----------- | ------------- | ---------------------------------------------- |
-| `condition` | `Computation` | Computation of type `T -> PRED` which defines  |
-:             :               : the termination condition of the loop.         :
-| `body`      | `Computation` | Computation of type `T -> T` which defines the |
-:             :               : body of the loop.                              :
-| `init`      | `T`           | Initial value for the parameter of `condition` |
-:             :               : and `body`.                                    :
+| `condition` | `Computation` | 类型为 `T -> PRED` 的计算，它定义了循环终止的条件 |
+| `body`      | `Computation` | 类型为 `T -> T` 的计算，它定义了循环体 |
+| `init`      | `T`           | `condition` 和 `body` 的参数的初始值 |
 
-Sequentially executes the `body` until the `condition` fails. This is similar to
-a typical while loop in many other languages except for the differences and
-restrictions listed below.
+`While` 顺序执行循环体 `body` ，直到 `condition` 失败。这类似于很多语言中的 while 循环，不过，它有如下的区别和限制：
 
-*   A `While` node returns a value of type `T`, which is the result from the
-    last execution of the `body`.
-*   The shape of the type `T` is statically determined and must be the same
-    across all iterations.
-*   `While` nodes are not allowed to be nested. (This restriction may be lifted
-    in the future on some targets.)
+*   一个 `While` 结点有一个类型为 `T` 的返回值，它是最后一次执行 `body` 的结果。
+*   类型为 `T` 的形状是由统计确定的，在整个迭代过程中，它都是保持不变的。
+*   `While` 结点之间不允许嵌套。这个限制可能会在未来某些目标平台上取消。
 
-The T parameters of the computations are initialized with the `init` value in
-the first iteration and are automatically updated to the new result from `body`
-in each subsequent iteration.
+该计算的类型为 T 的那些参数使用 `init` 作为迭代的第一次计算的初值，并在接下来的迭代中由 `body` 来更新。
 
-One main use case of the `While` node is to implement the repeated execution of
-training in neural networks. Simplified pseudocode is shown below with a graph
-that represents the computation. The code can be found in
-[`while_test.cc`](https://www.tensorflow.org/code/tensorflow/compiler/xla/tests/while_test.cc).
-The type `T` in this example is a `Tuple` consisting of an `int32` for the
-iteration count and a `vector[10]` for the accumulator. For 1000 iterations, the
-loop keeps adding a constant vector to the accumulator.
+`While` 结点的一个主要使用安例是实现神经网络中的训练的重复执行。下面是一个简化版的伪代码，和一个表示计算过程的图。实际代码可以在 [`while_test.cc`](https://www.tensorflow.org/code/tensorflow/compiler/xla/tests/while_test.cc) 中找到。此例中的 `T` 类型为一个 `Tuple`，它包含一个 `int32` 值，表示迭代次数，还有一个 `vector[10]`，用于累加结果。它有 1000 次迭代，每一次都会将一个常数矢量累加到 result(1) 上。
 
 ```
 // Pseudocode for the computation.
@@ -2126,3 +1212,5 @@ while (result(0) < 1000) {
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="https://www.tensorflow.org/images/ops_while.png">
 </div>
+
+

@@ -1,75 +1,46 @@
 # Installing TensorFlow for C
 
-TensorFlow provides a C API defined in
-[`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/c/c_api.h),
-which is suitable for
-[building bindings for other languages](https://www.tensorflow.org/extend/language_bindings).
-The API leans towards simplicity and uniformity rather than convenience.
+TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/c/c_api.h)中定义了一套 C API，用来提供适合于[建立和其他语言的绑定](https://www.tensorflow.org/extend/language_bindings).
+这套 API 倾向于简单性和一致性，而不是方便。
+
+## 支持的平台
+
+你可能会在下面的操作系统上安装用于 C 的 TensorFlow：
+
+  * Linux
+  * Mac OS X
 
 
-## Supported Platforms
-
-This guide explains how to install TensorFlow for C.  Although these
-instructions might also work on other variants, we have only tested
-(and we only support) these instructions on machines meeting the
-following requirements:
-
-  * Linux, 64-bit, x86
-  * macOS X, Version 10.12.6 (Sierra) or higher
-
-
-## Installation
-
-Take the following steps to install the TensorFlow for C library and
-enable TensorFlow for C:
-
-  1. Decide whether you will run TensorFlow for C on CPU(s) only or
-     with the help of GPU(s). To help you decide, read the section
-     entitled "Determine which TensorFlow to install" in one of the
-     following guides:
-
+## 安装
+采取下面几步来安装用于 C 的 TensorFlow 库，然后打开用于 C 的 TensorFlow：
+  1.选择你将会仅仅运行用于 C 的 TensoFlow 在 CPU（S）上，还是有 GPU（S）的帮助。为了帮你做出选择，在以下指南中阅读这一节，标题为决定安装哪个TensorFlow”：
        * @{$install_linux#determine_which_tensorflow_to_install$Installing TensorFlow on Linux}
-       * @{$install_mac#determine_which_tensorflow_to_install$Installing TensorFlow on macOS}
+       * @{$install_mac#determine_which_tensorflow_to_install$Installing TensorFlow on Mac OS}
 
-  2. Download and extract the TensorFlow C library into `/usr/local/lib` by
-     invoking the following shell commands:
-
+  2.通过调用下面的 shell 命令，下载并且解压 TensorFlow 的 C 库到 `/usr/local/lib`：
          TF_TYPE="cpu" # Change to "gpu" for GPU support
-         OS="linux" # Change to "darwin" for macOS
+         OS="linux" # Change to "darwin" for Mac OS
          TARGET_DIRECTORY="/usr/local"
          curl -L \
-           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.6.0.tar.gz" |
+           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.4.0-rc0.tar.gz" |
            sudo tar -C $TARGET_DIRECTORY -xz
 
-     The `tar` command extracts the TensorFlow C library into the `lib`
-     subdirectory of `TARGET_DIRECTORY`. For example, specifying `/usr/local`
-     as `TARGET_DIRECTORY` causes `tar` to extract the TensorFlow C library
-     into `/usr/local/lib`.
+`tar` 命令会解压 TensorFlow C 库到 `TARGET_DIRECTORY` 的子目录 `lib`中。比如指定 `/usr/local` 作为 `TARGET_DIRECTORY`，那么 `tar` 就会解压TensorFlow C 库到 `/usr/local/lib`。
 
-     If you'd prefer to extract the library into a different directory,
-     adjust `TARGET_DIRECTORY` accordingly.
+如果你更希望解压库到不同的目录，那么相应的调整 `TARGET_DIRECTORY`。
 
-  3. In Step 2, if you specified a system directory (for example, `/usr/local`)
-     as the `TARGET_DIRECTORY`, then run `ldconfig` to configure the linker.
-     For example:
+  3. 在上一步中，如果你指定了一个系统目录（比如，`/usr/local`)作为 `TARGET_DIRECTORY`，然后运行 `ldconfig` 配置链接器。
+  比如：
+  <pre><b>sudo ldconfig</b></pre>
+  如果你指定了一个 `TARGET_DIRECTORY` 而不是系统目录，（比如，`~/mydir`），那么你必须设定你的解压目录（比如，`~/mydir/lib`）到两个环境变量中。
+  比如:
+  <pre> <b>export LIBRARY_PATH=$LIBRARY_PATH:~/mydir/lib</b> # For both Linux and Mac OS X
+  <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/mydir/lib</b> # For Linux only
+  <b>export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:~/mydir/lib</b> # For Mac OS X only</pre>
 
-     <pre><b>sudo ldconfig</b></pre>
+## 验证你的安装
 
-     If you assigned a `TARGET_DIRECTORY` other than a system
-     directory (for example, `~/mydir`), then you must append the extraction
-     directory (for example, `~/mydir/lib`) to two environment variables.
-     For example:
-
-     <pre> <b>export LIBRARY_PATH=$LIBRARY_PATH:~/mydir/lib</b> # For both Linux and macOS X
-     <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/mydir/lib</b> # For Linux only
-     <b>export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:~/mydir/lib</b> # For macOS X only</pre>
-
-
-
-## Validate your installation
-
-After installing TensorFlow for C, enter the following code into a file named
-`hello_tf.c`:
+在安装完成之后，新建文件，输入以下代码，文件命名为 `hello_tf.c`:
 
 ```c
 #include <stdio.h>
@@ -81,38 +52,23 @@ int main() {
 }
 ```
 
-### Build and Run
+### 编译和运行
 
-Build `hello_tf.c` by invoking the following command:
-
-
+调用以下命令来编译 `hello_tf.c`
 <pre><b>gcc hello_tf.c</b></pre>
-
-
-Running the resulting executable should output the following message:
-
-
+运行生成的可执行文件应该输出以下消息:
 <pre><b>a.out</b>
 Hello from TensorFlow C library version <i>number</i></pre>
 
+### 定位问题
 
-### Troubleshooting
-
-If building the program fails, the most likely culprit is that `gcc` cannot
-find the TensorFlow C library.  One way to fix this problem is to specify
-the `-I` and `-L` options to `gcc`.  For example, if the `TARGET_LIBRARY`
-was `/usr/local`, you would invoke `gcc` as follows:
+如果程序编译失败，最有可能的错误是 `gcc` 找不到 TensorFlow C 库.解决这个问题的方法是为 `gcc` 指定 `-I` 和 `-L` 选项.比如，`TARGET_LIBRARY` 是`/usr/local`，你应该这样调用 `gcc`：
 
 <pre><b>gcc -I/usr/local/include -L/usr/local/lib hello_tf.c -ltensorflow</b></pre>
 
-If executing `a.out` fails, ask yourself the following questions:
+如果执行 `a.out` 失败,你就要问问自己这几个问题了：
+  * 这个程序编译有没有错误？
+  * 是否按第三步 [安装](#安装), 指定了正确的环境变量的目录?
+  * 是否有正确的 `export` 这些环境变量?
 
-  * Did the program build without error?
-  * Have you assigned the correct directory to the environment variables
-    noted in Step 3 of [Installation](#installation)?
-  * Did you export those environment variables?
-
-If you are still seeing build or execution error messages, search (or post to)
-[StackOverflow](www.stackoverflow.com/questions/tagged/tensorflow) for
-possible solutions.
-
+如果你仍然会有编译或者运行的错误信息, 请到 [StackOverflow](www.stackoverflow.com/questions/tagged/tensorflow) 寻找或者请求可能的解决方案.

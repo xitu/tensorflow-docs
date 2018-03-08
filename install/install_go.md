@@ -1,88 +1,62 @@
-# Installing TensorFlow for Go
+# 安装 Go 版本 Tensorflow
 
-TensorFlow provides APIs for use in Go programs. These APIs are particularly
-well-suited to loading models created in Python and executing them within
-a Go application. This guide explains how to install and set up the
-[TensorFlow Go package](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go).
+TensorFlow 提供了 Go 程序中可以调用的 API。这些 API 非常适合加载 Python 创建的模型以及在 Go 应用中执行。本文将介绍如何安装和配置 [TensorFlow Go 包](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go)。
 
-Warning: The TensorFlow Go API is *not* covered by the TensorFlow
-[API stability guarantees](https://www.tensorflow.org/programmers_guide/version_semantics).
+**警告：** TensorFlow Go 语言 API 并不属于 TensorFlow [API 稳定性保障](https://www.tensorflow.org/programmers_guide/version_semantics)。
 
 
-## Supported Platforms
+## 支持的平台
 
-This guide explains how to install TensorFlow for Go.  Although these
-instructions might also work on other variants, we have only tested
-(and we only support) these instructions on machines meeting the
-following requirements:
+你可以在下面的操作系统上安装 Go 版本 TensorFlow：
 
-  * Linux, 64-bit, x86
-  * macOS X, 10.12.6 (Sierra) or higher
+  * Linux
+  * Mac OS X
 
 
-## Installation
+## 安装
 
-TensorFlow for Go depends on the TensorFlow C library. Take the following
-steps to install this library and enable TensorFlow for Go:
+Go 版本 TensorFlow 依赖于 TensorFlow C 语言库。按照下面的步骤安装这个库并启用 TensorFlow：
 
-  1. Decide whether you will run TensorFlow for Go on CPU(s) only or with
-     the help of GPU(s). To help you decide, read the section entitled
-     "Determine which TensorFlow to install" in one of the following guides:
+  1. 决定在运行 TensorFlow 时仅仅启用 CPU 还是和 GPU 一起启用。为了帮助你做这个决定，请阅读以下指南中的“决定安装哪个 TensorFlow ”部分：
 
-     * @{$install_linux#determine_which_tensorflow_to_install$Installing TensorFlow on Linux}
-     * @{$install_mac#determine_which_tensorflow_to_install$Installing TensorFlow on macOS}
+     * @{$install_linux#determine_which_tensorflow_to_install$在 Linux 中安装 TensorFlow}
+     * @{$install_mac#determine_which_tensorflow_to_install$在 macOS 中安装 TensorFlow}
 
-  2. Download and extract the TensorFlow C library into `/usr/local/lib` by
-     invoking the following shell commands:
+  2. 通过执行以下命令下载并解压 TensorFlow C 语言库到 `/usr/local/lib` 目录:
 
          TF_TYPE="cpu" # Change to "gpu" for GPU support
          TARGET_DIRECTORY='/usr/local'
          curl -L \
-           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-$(go env GOOS)-x86_64-1.6.0.tar.gz" |
+           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-$(go env GOOS)-x86_64-1.4.0-rc0.tar.gz" |
          sudo tar -C $TARGET_DIRECTORY -xz
 
-     The `tar` command extracts the TensorFlow C library into the `lib`
-     subdirectory of `TARGET_DIRECTORY`. For example, specifying `/usr/local`
-     as `TARGET_DIRECTORY` causes `tar` to extract the TensorFlow C library
-     into `/usr/local/lib`.
+     `tar` 命令会解压 TensorFlow C 语言库到 `TARGET_DIRECTORY` 的子目录 `lib`。比如，指定 `/usr/local` 作为 `TARGET_DIRECTORY` 使得 `tar` 命令可以将 TensorFlow C 语言库解压到 `/usr/local/lib`。
+     如果你想把库文件解压到其他目录，更换 `TARGET_DIRECTORY` 就可以了。
 
-     If you'd prefer to extract the library into a different directory,
-     adjust `TARGET_DIRECTORY` accordingly.
-
-  3. In Step 2, if you specified a system directory (for example, `/usr/local`)
-     as the `TARGET_DIRECTORY`, then run `ldconfig` to configure the linker.
-     For example:
+  3. 在第二步中，如果你指定了一个系统目录（比如 `/usr/local`）作为 `TARGET_DIRECTORY`，那么需要运行 `ldconfig` 来配置链接。例如：
 
      <pre><b>sudo ldconfig</b></pre>
 
-     If you assigned a `TARGET_DIRECTORY` other than a system
-     directory (for example, `~/mydir`), then you must append the extraction
-     directory (for example, `~/mydir/lib`) to two environment variables
-     as follows:
+     如果你指定的 `TARGET_DIRECTORY` 不是一个系统目录（比如 `~/mydir`），那么你必须要将这个解压目录（比如 `~/mydir/lib`）添加到下面这两个环境变量中：
 
-     <pre> <b>export LIBRARY_PATH=$LIBRARY_PATH:~/mydir/lib</b> # For both Linux and macOS X
-     <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/mydir/lib</b> # For Linux only
-     <b>export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:~/mydir/lib</b> # For macOS X only</pre>
+     <pre> <b>export LIBRARY_PATH=$LIBRARY_PATH:~/mydir/lib</b> # 用于 Linux 和 Mac OS X
+     <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/mydir/lib</b> # 仅用于 Linux
+     <b>export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:~/mydir/lib</b> # 仅用于 Mac OS X</pre>
 
-  4. Now that the TensorFlow C library is installed, invoke `go get` as follows
-     to download the appropriate packages and their dependencies:
+  4. 现在 TensorFlow C 语言库已经安装好了，执行 `go get` 来下载对应的包和相应的依赖：
 
      <pre><b>go get github.com/tensorflow/tensorflow/tensorflow/go</b></pre>
 
-  5. Invoke `go test` as follows to validate the TensorFlow for Go
-     installation:
+  5. 执行 `go test` 来验证 Go 版本 TensorFlow 是否安装成功： 
 
      <pre><b>go test github.com/tensorflow/tensorflow/tensorflow/go</b></pre>
 
-If `go get` or `go test` generate error messages, search (or post to)
-[StackOverflow](http://www.stackoverflow.com/questions/tagged/tensorflow)
-for possible solutions.
+如果 `go get` 或者 `go test` 产生错误信息了，可以在 [StackOverflow](http://www.stackoverflow.com/questions/tagged/tensorflow) 上通过搜索和提问来获取可能的解决方法。
 
 
 ## Hello World
 
-After installing TensorFlow for Go, enter the following code into a
-file named `hello_tf.go`:
+安装完 Go 版本 TensorFlow 之后，在 `hello_tf.go` 文件中输入下面的代码：
 
 ```go
 package main
@@ -115,28 +89,23 @@ func main() {
 }
 ```
 
-For a more advanced example of TensorFlow in Go, look at the
-[example in the API documentation](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go#ex-package),
-which uses a pre-trained TensorFlow model to label contents of an image.
+关于 TensorFlow Go 语言的进阶示例请查看 [example in the API documentation](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go#ex-package)，这个例子使用了一个通过 TensorFlow 预训练的模型来标记图片的内容。
 
 
-### Running
+### 运行
 
-Run `hello_tf.go` by invoking the following command:
+通过调用下面的命令来运行 `hello_tf.go`：
 
 <pre><b>go run hello_tf.go</b>
 Hello from TensorFlow version <i>number</i></pre>
 
-The program might also generate multiple warning messages of the
-following form, which you can ignore:
+这个程序可能会输出类似下面的警告信息，你可以忽略它们：
 
 <pre>W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library
 wasn't compiled to use *Type* instructions, but these are available on your
 machine and could speed up CPU computations.</pre>
 
 
-## Building from source code
+## 使用源码编译
 
-TensorFlow is open-source. You may build TensorFlow for Go from the
-TensorFlow source code by following the instructions in a
-[separate document](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/go/README.md).
+TensorFlow 是开源的。你可以按照这个[单独的文档](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/go/README.md)中的指引使用 TensorFlow 的源码来编译 Go 版本 TensorFlow 。

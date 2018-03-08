@@ -1,204 +1,127 @@
-# Broadcasting semantics
+# 语义广播
 
-This document describes how the broadcasting semantics in XLA work.
+本文档描述 XLA 中 语义的广播是如何工作的。
 
-## What is broadcasting?
+## 何为广播？
 
-Broadcasting is the process of making arrays with different shapes have
-compatible shapes for arithmetic operations. The terminology is borrowed from
-Numpy
-[(broadcasting)](http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html).
 
-Broadcasting may be required for operations between multi-dimensional arrays of
-different ranks, or between multi-dimensional arrays with different but
-compatible shapes. Consider the addition `X+v` where `X` is a matrix (an array
-of rank 2) and `v` is a vector (an array of rank 1). To perform element-wise
-addition, XLA needs to "broadcast" the vector `v` to the same rank as the
-matrix `X`, by replicating `v` a certain number of times. The vector's length
-has to match at least one of the dimensions of the matrix.
+广播是让不同形状的数组的变得相容从而参与算术操作的一种过程。这个术语来自于 Numpy [(广播)](http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html)。
 
-For example:
+广播在一些操作中会用到，比如不同阶的多维数组之间的操作，或具有不同但相容的形状的多维数组之间的操作。以加法 `X+v` 为例，这里 `X` 是一个矩阵（2阶数组），`v` 是一个矢量（1阶数组）。为执行逐个元素的加法，XLA 需要将矢量 `v` "广播" 为和 `X` 一样的秩，即将 `v` 复制多次。此矢量的长度必需至少与矩阵的某一维度相同。
+
+比如：
 
     |1 2 3| + |7 8 9|
     |4 5 6|
 
-The matrix's dimensions are (2,3), the vector's are (3). The vector is broadcast
-by replicating it over rows to get:
+此矩阵的维度为 (2,3)，矢量的维度为 (3)。矢量通过逐行复制得到和矩阵相同的秩：
 
     |1 2 3| + |7 8 9| = |8  10 12|
     |4 5 6|   |7 8 9|   |11 13 15|
 
-In Numpy, this is called [broadcasting]
-(http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html).
+在 Numpy 中，这个过程被称为 [广播](http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html)。
 
-## Principles
+## 广播的原则
 
-The XLA language is as strict and explicit as possible, avoiding implicit and
-"magical" features. Such features may make some computations slightly easier to
-define, at the cost of more assumptions baked into user code that will be
-difficult to change in the long term. If necessary, implicit and magical
-features can be added in client-level wrappers.
+XLA 是一个使用 XLA 语言的底层基础设施，它要求语法尽可能地严格和显式声明，避免隐式变换和某些 "神奇" 的功能，即使它们会让一些计算稍微容易定义，但带来代价是，在代码中引入了过多的假设，长远来看是难于改变的。如果确有必要，可以在客户层封装代码中加入这些隐式的和神奇的功能。
 
-In regards to broadcasting, explicit broadcasting specifications on operations
-between arrays of different ranks is required. This is different from Numpy,
-which infers the specification when possible.
+对于广播而言，当操作不同秩的数组时，我们要求采用显式地指定广播。这一点和 Numpy 不同，后者会尽可能地推断出广播规范。
 
-## Broadcasting a lower-rank array onto a higher-rank array
+## 将低阶数组广播为高阶数组
 
-*Scalars* can always be broadcast over arrays without an explicit specification
-of broadcasting dimensions. An element-wise binary operation between a scalar
-and an array means applying the operation with the scalar for each element in
-the array. For example, adding a scalar to a matrix means producing a matrix
-each element of which is a sum of the scalar with the corresponding input
-matrix's element.
+**标量**总是可以广播为数组而无需显式指定维度的广播规范。因而，一个标量和一个数据之间的逐个元素二元操作相当于将此标量作用于数组的每个元素。比如，将一个标量加上一个矩阵上，相当于产生一个矩阵，其每个是原矩阵相应元素加上该标量。
 
     |1 2 3| + 7 = |8  9  10|
     |4 5 6|       |11 12 13|
 
-Most broadcasting needs can be captured by using a tuple of dimensions on a
-binary operation. When the inputs to the operation have different ranks, this
-broadcasting tuple specifies which dimension(s) in the **higher-rank** array to
-match with the **lower-rank** array.
+在二元操作中，大部分广播需求可通过一个维度元组来得到。当操作的输入具有不同的秩时，此广播元组指定了**更高阶**数组中的哪些维度与**更低阶**数组中的维度匹配。
 
-Consider the previous example, instead of adding a scalar to a (2,3) matrix, add
-a vector of dimension (3) to a matrix of dimensions (2,3). *Without specifying
-broadcasting, this operation is invalid.* To correctly request matrix-vector
-addition, specify the broadcasting dimension to be (1), meaning the vector's
-dimension is matched to dimension 1 of the matrix. In 2D, if dimension 0 is
-considered as rows and dimension 1 as columns, this means that each element of
-the vector becomes a column of a size matching the number of rows in the matrix:
+还是考虑前面的示例，我们将加法中的标量换成维度为 (3) 的矢量，矩阵维度为 (2,3)。**如果不指定广播，这个操作是非法的。** 为了正确地进行矩阵-矢量加法，需要将广播维度指定为 (1)，意思是矢量的维度与矩阵的第 1 维匹配。在 2D 中，如果维度 0 视为行，维度 1 视为列，则此广播意味着此矢量的每一个元素变成一列，列的长度与输入矩阵行数相同：
 
     |7 8 9| ==> |7 8 9|
                 |7 8 9|
 
-As a more complex example, consider adding a 3-element vector (dimension (3)) to
-a 3x3 matrix (dimensions (3,3)). There are two ways broadcasting can happen for
-this example:
+考虑一个更复杂的例子，让一个 3 元素矢量（维度为 (3)）与一个 3x3 矩阵（维度为 (3,3)）相加。这时，有两种可能的广播方式：
 
-(1) A broadcasting dimension of 1 can be used. Each vector element becomes a
-column and the vector is duplicated for each row in the matrix.
+(1) 维度为 1 的广播。矢量的每个元素变成一列，此矢量为矩阵的每一行复制一次。
 
     |7 8 9| ==> |7 8 9|
                 |7 8 9|
                 |7 8 9|
 
-(2) A broadcasting dimension of 0 can be used. Each vector element becomes a row
-and the vector is duplicated for each column in the matrix.
+(2) 维度为 0 的广播。矢量的每个元素变成一行，此矢量为矩阵的每一列复制一次。
 
      |7| ==> |7 7 7|
      |8|     |8 8 8|
      |9|     |9 9 9|
 
-> Note: when adding a 2x3 matrix to a 3-element vector, a broadcasting dimension
-> of 0 is invalid.
+> 注意：当让一个 2x3 矩阵加上一个 3 元素的矢量时，维度为 0 的广播是非法的。
 
-The broadcasting dimensions can be a tuple that describes how a smaller rank
-shape is broadcast into a larger rank shape. For example, given a 2x3x4 cuboid
-and a 3x4 matrix, a broadcasting tuple (1,2) means matching the matrix to
-dimensions 1 and 2 of the cuboid.
+广播维度可以是一个元组，用于描述秩更小的形状如何广播为一个更大秩的形状。比如，给定一个 2x3x4 的方阵和一个 3x4 矩阵，广播元组 (1,2) 表示让矩阵的维度匹配到方阵的第 1 维和第 2 维。
 
-This type of broadcast is used in the binary ops in `ComputationBuilder`, if the
-`broadcast_dimensions` argument is given. For example, see
-[ComputationBuilder::Add](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.cc).
-In the XLA source code, this type of broadcasting is sometimes called "InDim"
-broadcasting.
+这种广播类型用于 `ComputationBuilder` 中的二元操作，使用时需要指定 `broadcast_dimensions` 参数。比如，参见源码 [ComputationBuilder::Add](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.cc)。
+在 XLA 源码中，这种广播类型有时候称为 "InDim" 广播。
 
-### Formal definition
+### 形式化定义
 
-The broadcasting attribute allows matching a lower-rank array to a higher-rank
-array, by specifying which dimensions of the higher-rank array to match. For
-example, for an array with dimensions MxNxPxQ, a vector with dimension T can be
-matched as follows:
+广播允许低阶数组匹配高阶数组，即指定高阶数组中的哪些维度用于匹配。比如，对于维度为 MxNxPxQ 的数组，维度为 T 的矢量可以按下列方式匹配：
 
-              MxNxPxQ
+             MxNxPxQ
 
-    dim 3:          T
-    dim 2:        T
-    dim 1:      T
-    dim 0:    T
+    3 维:          T
+    2 维:        T
+    1 维:      T
+    0 维:    T
 
-In each case, T has to be equal to the matching dimension of the higher-rank
-array. The vector's values are then broadcast from the matched dimension to all
-the other dimensions.
+在每一种情况中，T 必须与高阶数组的相应维度相等。然后，矢量的值会被传播到其它的所有的维度。
 
-To match a TxV matrix onto the MxNxPxQ array, a pair of broadcasting dimensions
-are used:
+为了将 TxV 矩阵匹配到 MxNxPxQ 数组上，需要用到一对广播维度：
 
-              MxNxPxQ
-    dim 2,3:      T V
-    dim 1,2:    T V
-    dim 0,3:  T     V
-    etc...
+             MxNxPxQ
+    2,3 维:      T V
+    1,2 维:    T V
+    0,3 维:  T     V
+    等等
 
-The order of dimensions in the broadcasting tuple has to be the order in which
-the lower-rank array's dimensions are expected to match the higher-rank array's
-dimensions. The first element in the tuple says which dimension in the
-higher-rank array has to match dimension 0 in the lower-rank array. The second
-element for dimension 1, and so on. The order of broadcast dimensions has to be
-strictly increasing. For example, in the previous example it is illegal to match
-V to N and T to P; it is also illegal to match V to both P and N.
+广播元组中的维度的顺序必须与低阶数组保持一致。元组中的第一个元素指的是高阶数组中的那个维度必须与低阶数组的第 0 维匹配；第二个元素匹配第 1 维，依此类推。广播维度还必须是严格递增的。比如，在前面的示例中，不允许让 V 匹配 N 且让 T 匹配 P；让 V 同时匹配 P 和 N 同样是非法的。
 
-## Broadcasting similar-rank arrays with degenerate dimensions
+## 广播具有退化维度的秩相似的数组
 
-A related broadcasting problem is broadcasting two arrays that have the same
-rank but different dimension sizes. Similarly to Numpy's rules, this is only
-possible when the arrays are *compatible*. Two arrays are compatible when all
-their dimensions are compatible. Two dimensions are compatible if:
+一个常见的广播问题是广播具有相同的秩但是不同的维度大小的两个数组。类似于 Numpy 的规则，只有在两个数组**相容**的条件下这种广播才有可能。两个数组的所有维度相容时，它们才是相容的。两个维度相容的条件是：
 
-*   They are equal, or
-*   One of them is 1 (a "degenerate" dimension)
+  * 它们相等，或
+  * 其中之一为 1 (即"退化"的维度)
 
-When two compatible arrays are encountered, the result shape has the maximum
-among the two inputs at every dimension index.
+当两个相容的数组相遇时，它们的操作结果的形状的各个维度都为输入在各维度上的最大值。
 
-Examples:
+示例：
 
-1.  (2,1) and (2,3) broadcast to (2,3).
-2.  (1,2,5) and (7,2,5) broadcast to (7,2,5)
-3.  (7,2,5) and (7,1,5) broadcast to (7,2,5)
-4.  (7,2,5) and (7,2,6) are incompatible and cannot be broadcast.
+  1.  (2,1) 和 (2,3) 广播为 (2,3).
+  2.  (1,2,5) 和 (7,2,5) 广播为 (7,2,5)
+  3.  (7,2,5) 和 (7,1,5) 广播为 (7,2,5)
+  4.  (7,2,5) 和 (7,2,6) 不相容，无法广播
 
-A special case arises, and is also supported, where each of the input arrays has
-a degenerate dimension at a different index. In this case, the result is an
-"outer operation": (2,1) and (1,3) broadcast to (2,3). For more examples,
-consult the [Numpy documentation on
-broadcasting](http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html).
+其中有一种特例，即每个输入数组都在一个不同的维度上具有退化的维度。这时，结果为它们的"外操作"：(2,1) 和 (1,3) 广播为 (2,3)。更多示例，参考 [Numpy 关于广播的文档](http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html)。
 
-## Broadcast composition
+## 广播的复合
 
-Broadcasting of a lower-rank array to a higher-rank array **and** broadcasting
-using degenerate dimensions can both be performed in the same binary operation.
-For example, a vector of size 4 and an matrix of size 1x2 can be added together
-using broadcast dimensions value of (0):
+一个低阶数组到高阶数组的广播和退化维度的广播可用于同一个二元操作上。比如，大小为 4 的矢量和大小为 1x2 的矩阵可以用广播维度 (0) 来实现相加：
 
-    |1 2 3 4| + [5 6]    // [5 6] is a 1x2 matrix, not a vector.
+    |1 2 3 4| + [5 6]    // [5 6] 是一个 1x2 矩阵，不是矢量
 
-First the vector is broadcast up to rank 2 (matrix) using the broadcast
-dimensions. The single value (0) in the broadcast dimensions indicates that
-dimension zero of the vector matches to dimension zero of the matrix. This
-produces an matrix of size 4xM where the value M is chosen to match the
-corresponding dimension size in the 1x2 array. Therefore, a 4x2 matrix is
-produced:
+首先，矢量通过传播维度广播为 2 阶矩阵。单个值的广播维度 (0) 表示矢量的 0 维匹配矩阵的 0 维。这就会产生一个大小为 4xM 的矩阵，其中 M 用于匹配 1x2 数组中的相应维度的大小。因而，产生了一个 4x2 矩阵：
 
     |1 1| + [5 6]
     |2 2|
     |3 3|
     |4 4|
 
-Then "degenerate dimension broadcasting" broadcasts dimension zero of the 1x2
-matrix to match the corresponding dimension size of the right hand side:
+然后，"退化维度广播" 将 1x2 矩阵的零维广播并匹配右手边的矩阵的相应维度大小：
 
     |1 1| + |5 6|     |6  7|
     |2 2| + |5 6|  =  |7  8|
     |3 3| + |5 6|     |8  9|
     |4 4| + |5 6|     |9 10|
 
-A more complicated example is a matrix of size 1x2 added to an array of size
-4x3x1 using broadcast dimensions of (1, 2). First the 1x2 matrix is broadcast up
-to rank 3 using the broadcast dimensions to produces an intermediate Mx1x2 array
-where the dimension size M is determined by the size of the larger operand (the
-4x3x1 array) producing a 4x1x2 intermediate array. The M is at dimension 0
-(left-most dimension) because the dimensions 1 and 2 are mapped to the
-dimensions of the original 1x2 matrix as the broadcast dimension are (1, 2).
-This intermediate array can be added to the 4x3x1 matrix using broadcasting of
-degenerate dimensions to produce a 4x3x2 array result.
+更复杂的一个例子是将一个大小为 1x2 的矩阵加到一个大小为 4x3x1 的数组上，广播维度为 (1,2)。首先，1x2 矩阵通过广播维度变为 3 阶方阵，这是一个大小为 Mx1x2 的中间结果，其中 M 由更大的那个操作数（这里是 4x3x1 的数组）的大小决定，因而得到 4x1x2 的中间数组。M 在零维上（最左边的维度），是因为 1 维和 2 维都被映射到了原来的 1x2 的矩阵上。这个中间数组可以通过退化维度广播来加到 4x3x1 矩阵上，最后产生一个 4x3x2 数组。
+

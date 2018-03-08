@@ -1,54 +1,29 @@
-# Using AOT compilation
+# 使用提前编译
 
-## What is tfcompile?
+## 什么是 tfcompile？
 
-`tfcompile` is a standalone tool that ahead-of-time (AOT) compiles TensorFlow
-graphs into executable code. It can reduce total binary size, and also avoid
-some runtime overheads. A typical use-case of `tfcompile` is to compile an
-inference graph into executable code for mobile devices.
+`tfcompile` 是一个将 TensorFlow 图提前（AOT）编译成可执行代码的独立工具。它可以减少二进制文件的尺寸，同时避免一些运行时的消耗。`tfcompile` 一个典型的用途是将一个推理图编译成用于移动设备的可执行代码。
 
-The TensorFlow graph is normally executed by the TensorFlow runtime. This incurs
-some runtime overhead for execution of each node in the graph. This also leads
-to a larger total binary size, since the code for the TensorFlow runtime needs
-to be available, in addition to the graph itself. The executable code produced
-by `tfcompile` does not use the TensorFlow runtime, and only has dependencies on
-kernels that are actually used in the computation.
+TensorFlow 图通常由 TensorFlow 运行时执行。这会导致为了执行图中的每个节点而造成一些运行时消耗。同时也增加了二进制文件的尺寸，因为除了图自身，用于 TensorFlow 运行时的代码需要在运行时获得。而由 `tfcompile` 生成的可执行代码不使用 TensorFlow 运行时，并且只依赖实际用于计算的内核。
 
-The compiler is built on top of the XLA framework. The code bridging TensorFlow
-to the XLA framework resides under
-[tensorflow/compiler](https://www.tensorflow.org/code/tensorflow/compiler/),
-which also includes support for @{$jit$just-in-time (JIT) compilation} of
-TensorFlow graphs.
+编译器构建在 XLA 框架的基础上。桥接 TensorFlow 到 XLA 框架的代码位于 [tensorflow/compiler](https://www.tensorflow.org/code/tensorflow/compiler/) 目录下，这个目录同时包含对 TensorFlow 图 @{$jit$just-in-time (JIT) compilation} 的支持。
 
-## What does tfcompile do?
+## tfcompile 做了什么？
 
-`tfcompile` takes a subgraph, identified by the TensorFlow concepts of
-feeds and fetches, and generates a function that implements that subgraph.
-The `feeds` are the input arguments for the function, and the `fetches` are the
-output arguments for the function. All inputs must be fully specified by the
-feeds; the resulting pruned subgraph cannot contain Placeholder or Variable
-nodes. It is common to specify all Placeholders and Variables as feeds, which
-ensures the resulting subgraph no longer contains these nodes. The generated
-function is packaged as a `cc_library`, with a header file exporting the
-function signature, and an object file containing the implementation. The user
-writes code to invoke the generated function as appropriate.
+`tfcompile` 接受一个子图，子图由反馈和提取（TensorFlow 中的概念）确定，并生成一个实现这个子图的函数。`feed` 是函数的入参，`fetch` 是函数的出参。所有的输入必须由反馈声明；输出的裁剪后的子图不能包含位置占位符和变量节点。通常将所有的位置占位符和变量声明为反馈，以确保输出的子图中不再包含这些节点。生成的函数会和一个导出函数签名的头文件，以及一个包含实现的对象文件一起作为  `cc_library` 打包。用户可以视情况编写代码调用生成的函数。
 
-## Using tfcompile
+## 使用 tfcompile
 
-This section details high level steps for generating an executable binary with
-`tfcompile` from a TensorFlow subgraph. The steps are:
+这一节详细介绍如何使用 `tfcompile` 从 TensorFlow 子图生成一个可执行二进制文件。步骤如下：
 
-*   Step 1: Configure the subgraph to compile
-*   Step 2: Use the `tf_library` build macro to compile the subgraph
-*   Step 3: Write code to invoke the subgraph
-*   Step 4: Create the final binary
+*   步骤一：配置用于编译的子图
+*   步骤二：使用 `tf_library` 构建编译子图的宏
+*   步骤三：编写调用子图的代码
+*   步骤四：创建最终的二进制文件
 
-### Step 1: Configure the subgraph to compile
+### 步骤一：配置用于编译的子图
 
-Identify the feeds and fetches that correspond to the input and output
-arguments for the generated function. Then configure the `feeds` and `fetches`
-in a [`tensorflow.tf2xla.Config`](https://www.tensorflow.org/code/tensorflow/compiler/tf2xla/tf2xla.proto)
-proto.
+对应生成的函数的入参和出参，确定反馈和提取。然后在 [`tensorflow.tf2xla.Config`](https://www.tensorflow.org/code/tensorflow/compiler/tf2xla/tf2xla.proto) 原型中配置 `feed` 和 `fetch`。
 
 ```textproto
 # Each feed is a positional input argument for the generated function.  The order
@@ -77,13 +52,9 @@ fetch {
 }
 ```
 
-### Step 2: Use tf_library build macro to compile the subgraph
+### 步骤二：使用 tf_library 构建编译子图的宏
 
-This step converts the graph into a `cc_library` using the `tf_library` build
-macro. The `cc_library` consists of an object file containing the code generated
-from the graph, along with a header file that gives access to the generated
-code. `tf_library` utilizes `tfcompile` to compile the TensorFlow graph into
-executable code.
+这一步通过 `tf_library` 构建宏将图转变成 `cc_library`。`cc_library` 由一个包含从图生成的代码的对象文件，和一个提供对生成代码的访问权限的头文件构成。`tf_library` 利用 `tfcompile` 将 TensorFlow 图编译成可执行代码。
 
 ```build
 load("//third_party/tensorflow/compiler/aot:tfcompile.bzl", "tf_library")
@@ -112,39 +83,21 @@ tf_library(
 )
 ```
 
-> To generate the GraphDef proto (test_graph_tfmatmul.pb) for this example, run
-> [make_test_graphs.py]("https://www.tensorflow.org/code/tensorflow/compiler/aot/tests/make_test_graphs.py")
-> and specify the output location with the --out_dir flag.
+> 为了给示例生成 GraphDef 原型（test_graph_tfmatmul.pb），运行 [make_test_graphs.py]("https://www.tensorflow.org/code/tensorflow/compiler/aot/tests/make_test_graphs.py")，并通过 --out_dir 标志声明输出地址。
 
-Typical graphs contain @{$python/state_ops$`Variables`}
-representing the weights that are learned via training, but `tfcompile` cannot
-compile a subgraph that contain `Variables`. The
-[freeze_graph.py](https://www.tensorflow.org/code/tensorflow/python/tools/freeze_graph.py)
-tool converts variables into constants, using values stored in a checkpoint
-file. As a convenience, the `tf_library` macro supports the `freeze_checkpoint`
-argument, which runs the tool. For more examples see
-[tensorflow/compiler/aot/tests/BUILD](https://www.tensorflow.org/code/tensorflow/compiler/aot/tests/BUILD).
+典型图包含 @{$python/state_ops$`Variables`}，代表通过训练习得的权重，但 `tfcompile` 不能编译一个包含 `Variable` 的子图。[freeze_graph.py](https://www.tensorflow.org/code/tensorflow/python/tools/freeze_graph.py) 工具通过将值存入一个检查点文件将变量转变成常量。`tf_library` 宏支持传入运行工具的 `freeze_checkpoint` 参数，更多示例可以查看 [tensorflow/compiler/aot/tests/BUILD](https://www.tensorflow.org/code/tensorflow/compiler/aot/tests/BUILD)。
 
-> Constants that show up in the compiled subgraph are compiled directly into the
-> generated code. To pass the constants into the generated function, rather than
-> having them compiled-in, simply pass them in as feeds.
+> 出现在编译的子图中的常量会被直接编译到生成的代码中。为了将常量传入而不是编译进生成的函数，只需将它们作为反馈传入。
 
-For details on the `tf_library` build macro, see
-[tfcompile.bzl](https://www.tensorflow.org/code/tensorflow/compiler/aot/tfcompile.bzl).
+更多关于 `tf_library` 构建宏的细节，查看 
+[tfcompile.bzl](https://www.tensorflow.org/code/tensorflow/compiler/aot/tfcompile.bzl)。
 
-For details on the underlying `tfcompile` tool, see
-[tfcompile_main.cc](https://www.tensorflow.org/code/tensorflow/compiler/aot/tfcompile_main.cc).
+更多关于底层 `tfcompile` 工具，查看 
+[tfcompile_main.cc](https://www.tensorflow.org/code/tensorflow/compiler/aot/tfcompile_main.cc)。
 
-### Step 3: Write code to invoke the subgraph
+### 步骤三：编写用以调用子图的代码
 
-This step uses the header file (`test_graph_tfmatmul.h`) generated by the
-`tf_library` build macro in the previous step to invoke the generated code. The
-header file is located in the `bazel-genfiles` directory corresponding to the
-build package, and is named based on the name attribute set on the `tf_library`
-build macro. For example, the header generated for `test_graph_tfmatmul` would
-be `test_graph_tfmatmul.h`. Below is an abbreviated version of what is
-generated. The generated file, in `bazel-genfiles`, contains additional useful
-comments.
+这一步使用在上一步通过 `tf_library` 构建宏生成的头文件（`test_graph_tfmatmul.h`）来调用生成代码。头文件位于和构建包相同的 `bazel-genfiles` 目录下，并基于设置在 `tf_library` 构建宏上的 name 属性命名。例如，为 `test_graph_tfmatmul` 生成的头文件是 `test_graph_tfmatmul.h`。下面是生成文件的简化版。`bazel-genfiles` 中的生成文件还会包含一些有用的注释。
 
 ```c++
 namespace foo {
@@ -193,28 +146,13 @@ class MatMulComp {
 }  // end namespace foo
 ```
 
-The generated C++ class is called `MatMulComp` in the `foo::bar` namespace,
-because that was the `cpp_class` specified in the `tf_library` macro. All
-generated classes have a similar API, with the only difference being the methods
-to handle arg and result buffers. Those methods differ based on the number and
-types of the buffers, which were specified by the `feed` and `fetch` arguments
-to the `tf_library` macro.
+根据 `tf_library` 宏中声明的 `cpp_class`，生成了 `foo::bar` 命名空间下 `MatMulComp` C++ 类。所有生成的类都具有相似的 API，唯一的区别在于处理参数和输出缓存的方法上。这些方法的区别在于缓存的数量和类型，而这又取决于 `tf_library` 宏接受的 `feed` 和 `fetch` 参数。
 
-There are three types of buffers managed within the generated class: `args`
-representing the inputs, `results` representing the outputs, and `temps`
-representing temporary buffers used internally to perform the computation. By
-default, each instance of the generated class allocates and manages all of these
-buffers for you. The `AllocMode` constructor argument may be used to change this
-behavior. A convenience library is provided in
-[`tensorflow/compiler/aot/runtime.h`](https://www.tensorflow.org/code/tensorflow/compiler/aot/runtime.h)
-to help with manual buffer allocation; usage of this library is optional. All
-buffers should be aligned to 32-byte boundaries.
+在生成的类中有三种类型的缓存：`args` 代表输入，`results` 代表输出，以及 `temps` 代表用于内部执行计算的临时缓存。默认情况下，生成类的每个实例都会分配和管理所有缓存。通过设置构造函数参数 `AllocMode` 可以改变这一行为。[`tensorflow/compiler/aot/runtime.h`](https://www.tensorflow.org/code/tensorflow/compiler/aot/runtime.h) 提供的库可以帮助手动分配缓存；库的使用是可选的。所有的缓存都应该对齐 32 位界限。
 
-The generated C++ class is just a wrapper around the low-level code generated by
-XLA.
+生成的 C++ 类只不过是在 XLA 生成的底层代码基础上的一层封装。
 
-Example of invoking the generated function based on
-[`tfcompile_test.cc`](https://www.tensorflow.org/code/tensorflow/compiler/aot/tests/tfcompile_test.cc):
+调用基于 [`tfcompile_test.cc`](https://www.tensorflow.org/code/tensorflow/compiler/aot/tests/tfcompile_test.cc) 生成的函数的示例：
 
 ```c++
 #define EIGEN_USE_THREADS
@@ -250,11 +188,9 @@ int main(int argc, char** argv) {
 }
 ```
 
-### Step 4: Create the final binary
+### 步骤四：创建最终的二进制文件
 
-This step combines the library generated by `tf_library` in step 2 and the code
-written in step 3 to create a final binary. Below is an example `bazel` BUILD
-file.
+这一步将第二步中 `tf_library` 生成的库和第三步中编写的代码结合起来，创建最终的二进制文件。下面是 `bazel` 构建文件的一个示例。
 
 ```build
 # Example of linking your binary

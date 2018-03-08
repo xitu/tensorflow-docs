@@ -1,5 +1,3 @@
-# Sequence-to-Sequence Models
+# 序列到序列模型
 
-Please check out the
-[tensorflow neural machine translation tutorial](https://github.com/tensorflow/nmt)
-for building sequence-to-sequence models with the latest Tensorflow API.
+请参见 [Tensorflow 神经机器翻译（NMT）教程](https://github.com/tensorflow/nmt)，以使用最新的 Tensorflow API 构建序列到序列（seq2seq）模型。

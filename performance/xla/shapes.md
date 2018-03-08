@@ -1,62 +1,49 @@
-# Shapes and Layout
+# 形状和布局
 
-The XLA `Shape` proto
+XLA 的 `Shape` 协议缓存（proto）
 ([xla_data.proto](https://www.tensorflow.org/code/tensorflow/compiler/xla/xla_data.proto))
-describes the rank, size, and data type of an N-dimensional array (*array* in
-short).
+描述了一个 N 维数组（简称*数组*）的秩、尺寸和数据类型。
 
-## Terminology, Notation, and Conventions
+## 术语、符号和约定
 
-*   The rank of an array is equal to the number of dimensions. The *true rank*
-    of an array is the number of dimensions which have a size greater than 1.
+*   一个数组的秩等于维度的数目。一个数组的*真秩*则为大于 1 的那些维度的数目。
 
-*   Dimensions are numbered from `0` up to `N-1` for an `N` dimensional array.
-    The dimension numbers are arbitrary labels for convenience. The order of
-    these dimension numbers does not imply a particular minor/major ordering in
-    the layout of the shape. The layout is determined by the `Layout` proto.
+*   对于一个 `N` 维数组，维度的取值维 `0` 到 `N-1`。这些维度数字只不过是出于方便性而给出的一些比较任意的标签。
+    它们的顺序并没有反映数组内存布局的主从次序。内存布局是由 `Layout` 协议缓存确定的。
 
-*   By convention, dimensions are listed in increasing order of dimension
-    number. For example, for a 3-dimensional array of size `[A x B x C]`,
-    dimension 0 has size `A`, dimension 1 has size `B` and dimension 2 has size
-    `C`.
+*   按照习惯，维度列表是按照维度数升序排列的。比如，一个三维数组的尺寸为 `[A x B x C]`，0 维大小为 `A`，1 维大小为 `B`，而 2 维大小为 `C`。
 
-    Some utilities in XLA also support negative indexing, similarly to Python;
-    dimension -1 is the last dimension (equivalent to `N-1` for an `N`
-    dimensional array). For example, for the 3-dimensional array described
-    above, dimension -1 has size `C`, dimension -2 has size `B` and so on.
+    XLA 中有些工具也支持负值索引，这和 Python 类似；维度 -1 指的是最后一个维度（对于 `N` 维数组，-1 等价于 `N-1`）。
+    比如，对于前面描述的三位数组，-1 维的大小为 `C`，-2 维大小为 `B`，以此类推。
 
-*   Two, three, and four dimensional arrays often have specific letters
-    associated with dimensions. For example, for a 2D array:
+*   二维、三维和四维数组通常为特定的字母来表示每个维度。比如，对于二维数组：
+    
+    *   0 维： `y`
+    *   1 维： `x`
+    
+    对于三维数组：
+    
+    *   0 维： `z`
+    *   1 维： `y`
+    *   2 维： `x`
+    
+    对于四维数组：
+    
+    *   0 维： `p`
+    *   1 维： `z`
+    *   2 维： `y`
+    *   3 维： `x`
 
-    *   dimension 0: `y`
-    *   dimension 1: `x`
-
-    For a 3D array:
-
-    *   dimension 0: `z`
-    *   dimension 1: `y`
-    *   dimension 2: `x`
-
-    For a 4D array:
-
-    *   dimension 0: `p`
-    *   dimension 1: `z`
-    *   dimension 2: `y`
-    *   dimension 3: `x`
-
-*   Functions in the XLA API which take dimensions do so in increasing order of
-    dimension number. This matches the ordering used when passing dimensions as
-    an `initializer_list`; e.g.
-
+*   XLA API 中的函数接收的维度参数是按照升序排列的，这作为 `initializer_list` 传入的维度顺序是一致的，比如：
+  
     `ShapeUtil::MakeShape(F32, {A, B, C, D})`
-
-    Will create a shape whose dimension size array consists of the sequence
+  
+    将生成一个形状，它的维度尺寸列表为如下序列：
     `[A, B, C, D]`.
 
-## Layout
+## 布局
 
-The `Layout` proto describes how an array is represented in memory. The `Layout`
-proto includes the following fields:
+`Layout`（布局）协议缓存描述了如何在内存中表示一个数组。这个 `Layout` 协议缓存包含如下几个数据域：
 
 ```
 message Layout {
@@ -66,71 +53,55 @@ message Layout {
 }
 ```
 
-### Minor-to-major dimension ordering
+### 维度的主次排序
 
-The only required field is `minor_to_major`. This field describes the
-minor-to-major ordering of the dimensions within a shape. Values in
-`minor_to_major` are an ordering of the dimensions of the array (`0` to `N-1`
-for an `N` dimensional array) with the first value being the most-minor
-dimension up to the last value which is the most-major dimension. The most-minor
-dimension is the dimension which changes most rapidly when stepping through the
-elements of the array laid out in linear memory.
+`minor_to_major` （次-到-主）是唯一一个必要的数据域。这个域描述了一个形状中的维度的主次排序。
+`minor_to_major` 中的值是数组（对于 `N` 维数组，取值为 `0` 到 `N-1`）的维度的排序，第一个值是维度中最次要的维度，
+而，依次排列，最后一个值为最主要的维度。最次要的维度指的是在数组的线性内存中移动时变化最剧烈的那个维度。
 
-For example, consider the following 2D array of size `[2 x 3]`:
+比如，考虑如下二维数组，其尺寸为 `[2 x 3]`：
 
 ```
 a b c
 d e f
 ```
 
-Here dimension `0` is size 2, and dimension `1` is size 3. If the
-`minor_to_major` field in the layout is `[0, 1]` then dimension `0` is the
-most-minor dimension and dimension `1` is the most-major dimension. This
-corresponds to the following layout in linear memory:
+这里的 `0` 维大小为 2，`1` 维大小为 3。如果布局的 `minor_to_major` 域为 `[0, 1]`，
+则 `0` 维为最次要维度，`1` 维为最主要维度，对应于如下线性内存布局：
 
 ```
 a d b e c f
 ```
 
-This minor-to-major dimension order of `0` up to `N-1` is akin to *column-major*
-(at rank 2). Assuming a monotonic ordering of dimensions, another name we may
-use to refer to this layout in the code is simply "dim 0 is minor".
 
-On the other hand, if the `minor_to_major` field in the layout is `[1, 0]` then
-the layout in linear memory is:
+这里的维度主次顺序类似于二维矩阵的*列主序*。假设维度主次顺序是单调的，这种布局的另一种叫法是“0 维是最次序”。
+
+相反，如果布局中的 `minor_to_major` 域为 `[1, 0]`，则线性内存布局为：
 
 ```
 a b c d e f
 ```
 
-A minor-to-major dimension order of `N-1` down to `0` for an `N` dimensional
-array is akin to *row-major* (at rank 2). Assuming a monotonic ordering of
-dimensions, another name we may use to refer to this layout in the code is
-simply "dim 0 is major".
+对于 `N` 维数组，`N-1` 依次减小为 `0` 的主次排序类似域二维矩阵的*行主序*。假设维度的主次顺序是单调的，这种布局的另一种叫法是“0 维是最主序”。
 
-#### Default minor-to-major ordering
+#### 默认主次排序
 
-The default layout for newly created Shapes is "dimension order is
-major-to-minor" (akin to row-major at rank 2).
+新创建的形状的默认主次排序是“维度顺序是主到次”，类似于二维矩阵的行主序。
 
-### Padding
+### 边缘填充
 
-Padding is defined in the optional `padded_dimensions` and `padding_value`
-fields. The field `padded_dimensions` describes the sizes (widths) to which each
-dimension is padded. If present, the number of elements in `padded_dimensions`
-must equal the rank of the shape.
+边缘填充定义在可选的 `padded_dimensions` 和 `padding_value` 这两个域中。
+`padded_dimensions` 描述了每个维度边缘填充的数目（宽度）。如果指定了这个域，`padded_dimensions` 
+中的元素个数必须等于形状的秩。
 
-For example, given the `[2 x 3]` array defined above, if `padded_dimension` is
-`[3, 5]` then dimension 0 is padded to a width of 3 and dimension 1 is padded to
-a width of 5. The layout in linear memory (assuming a padding value of 0 and
-column-major layout) is:
+以前面定义的 `[2 x 3]` 数组为例，如果 `padded_dimension` 为 `[3, 5]`，则 0 维边缘填充的宽度为 3，而 1 维是 5 。
+其线性内存布局为（假设填充值为 0，且为列主序）：
 
 ```
 a d 0 b e 0 c f 0 0 0 0 0 0 0
 ```
 
-This is equivalent to the layout of the following array with the same
-minor-to-major dimension order:
+这等价于采用相同主次排序的下列数组的内存布局：
 
 ```
 a b c 0 0
@@ -138,13 +109,8 @@ d e f 0 0
 0 0 0 0 0
 ```
 
-### Indexing into arrays
+### 数组的索引
 
-The class `IndexUtil` in
-[index_util.h](https://www.tensorflow.org/code/tensorflow/compiler/xla/index_util.h)
-provides utilities for converting between multidimensional indices and linear
-indices given a shape and layout. Multidimensional indices include a `int64`
-index for each dimension. Linear indices are a single `int64` value which
-indexes into the buffer holding the array. See `shape_util.h` and
-`layout_util.h` in the same directory for utilities that simplify creation and
-manipulation of shapes and layouts.
+`IndexUtil` 这个类定义在 [index_util.h](https://www.tensorflow.org/code/tensorflow/compiler/xla/index_util.h) 文件中，
+它提供了一些在给定形状和布局的情况下多维索引和线性索引之间的转换工具。多维索引为每个维度指定了一个 `int64` 索引。线性索引只不过是单个 `int64` 的值，
+它是数组线性缓存的索引。想要了解更多关于简化形状和布局的创建和操作的工具，参见 `shape_util.h` 和 `layout_util.h` 这两个文件，它们在同一个源码目录下。

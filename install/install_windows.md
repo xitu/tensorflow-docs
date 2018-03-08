@@ -1,228 +1,91 @@
-# Installing TensorFlow on Windows
+本指南说明了如何在 Windows 系统上安装 TensorFlow。
+## 选择准备安装的 TensorFlow 类型
+从以下选项中选择您需要安装的 TensorFlow 类型：
 
-This guide explains how to install TensorFlow on Windows. Although these
-instructions might also work on other Windows variants, we have only
-tested (and we only support) these instructions on machines meeting the
-following requirements:
-
-  * 64-bit, x86 desktops or laptops
-  * Windows 7 or later
+-  **仅支持 CPU 的 TensorFlow。** 如果系统无 NVIDIA® GPU，则必须安装该版本。需要说明的是，该版本的 TensorFlow 相比另一版本更容易安装（通常 5 到 10 分钟即可完成安装），因此即使系统包含 NVIDIA GPU，我们仍然推荐您优先安装该版本。
 
 
-## Determine which TensorFlow to install
+- **支持 GPU 的 TensorFlow。** 一般而言，TensorFlow 程序在 GPU 上的运行速度要明显高于在 CPU 上的。因此，如果您的系统含符合以下先决条件的 NVIDIA ® GPU，且需要运行性能关键型应用程序，那么您最终需要安装此版本的 TensorFlow。
 
-You must choose one of the following types of TensorFlow to install:
+### 运行支持 GPU 版本 TensorFlow 的要求
+若使用本指南中介绍的任一方式来安装支持 GPU 的 TensorFlow，那么您必须在系统中安装如下 NVIDIA 软件：
 
-  * **TensorFlow with CPU support only**. If your system does not have a
-    NVIDIA® GPU, you must install this version. Note that this version of
-    TensorFlow is typically much easier to install (typically,
-    in 5 or 10 minutes), so even if you have an NVIDIA GPU, we recommend
-    installing this version first. Prebuilt binaries will use AVX instructions. 
-  * **TensorFlow with GPU support**. TensorFlow programs typically run
-    significantly faster on a GPU than on a CPU. Therefore, if your
-    system has a NVIDIA® GPU meeting the prerequisites shown below
-    and you need to run performance-critical applications, you should
-    ultimately install this version.
+- CUDA® Toolkit 8.0。详细说明请查看[ NVIDIA 官方文档](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/)。请确保您已按照 NVIDIA 官方文档描述将相关的 Cuda 路径名称添加到 %PATH% 环境变量中。
 
-### Requirements to run TensorFlow with GPU support
+- 与 CUDA Toolkit 8.0 相关的 NVIDIA 驱动。
 
-If you are installing TensorFlow with GPU support using one of the mechanisms
-described in this guide, then the following NVIDIA software must be
-installed on your system:
+- cuDNN v6.1版本。详细说明请查看[ NVIDIA 官方文档](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/)。需要注意的是，一般而言，cuDNN 的安装地址和其他 CUDA DLL 是不同的。同时，请确保将安装 cuDNN DLL 的目录添加到 %PATH% 环境变量中。。
 
-  * CUDA® Toolkit 9.0. For details, see
-    [NVIDIA's
-    documentation](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/)
-    Ensure that you append the relevant Cuda pathnames to the `%PATH%`
-    environment variable as described in the NVIDIA documentation.
-  * The NVIDIA drivers associated with CUDA Toolkit 9.0.
-  * cuDNN v7.0. For details, see
-    [NVIDIA's documentation](https://developer.nvidia.com/cudnn).
-    Note that cuDNN is typically installed in a different location from the
-    other CUDA DLLs. Ensure that you add the directory where you installed
-    the cuDNN DLL to your `%PATH%` environment variable.
-  * GPU card with CUDA Compute Capability 3.0 or higher for building
-    from source and 3.5 or higher for our binaries. See
-    [NVIDIA documentation](https://developer.nvidia.com/cuda-gpus) for a
-    list of supported GPU cards.
+- 带有 CUDA Compute Capability 3.0 或更高版本的 GPU 卡。请在 [NVIDIA 官方文档]（http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/) 中查询具备条件的 GPU 清单。
 
-If you have a different version of one of the preceding packages, please
-change to the specified versions.  In particular, the cuDNN version
-must match exactly: TensorFlow will not load if it cannot find `cuDNN64_7.dll`.
-To use a different version of cuDNN, you must build from source.
+如果您使用的版本与上述要求不一致，请更新为规定的版本。特别说明的是，cuDNN 的版本必须与要求的一致：如果无法找到 cuDNN64_6.dll，那么 TensorFlow 将无法加载。如果您想使用其他版本的 cuDNN，您需要从源代码开始重新编译。
 
-## Determine how to install TensorFlow
+## 选择安装 TensorFlow 的方式
+您需要选择安装 TensorFlow 的方式。当前的可选方式如下：
+- 原生的 pip 
+- 使用 Anaconda
 
-You must pick the mechanism by which you install TensorFlow. The
-supported choices are as follows:
+原生 pip 无需安装虚拟环境，可以直接在系统安装 TensorFlow。由于原生的一个 pip 安装应用并没有被隔离在一个独立的应用中，使用 pip 安装方法可能会影响到系统里其他基于 Python 的安装。但是，如果您了解您系统里的 pip 和 Python 环境，那么使用原生 pip 安装仅仅只需要一条命令就够了。而且，如果您使用原生的 pip 安装方法，那么用户可以从系统的任何路径去运行 TensorFlow 程序。
 
-  * "native" pip
-  * Anaconda
+在 Anaconda 中，你可以使用 conda 去创建一个虚拟环境（virtural environment）。但是，如果是使用 Anaconda 方式，我们依然推荐使用 pip 安装命令来安装 TensorFlow，而不是 conda 安装命令。
 
-Native pip installs TensorFlow directly on your system without going
-through a virtual environment.  Since a native pip installation is not
-walled-off in a separate container, the pip installation might interfere
-with other Python-based installations on your system. However, if you
-understand pip and your Python environment, a native pip installation
-often entails only a single command! Furthermore, if you install with
-native pip, users can run TensorFlow programs from any directory on
-the system.
+**注意：** conda 包是由社区提供的，而不是官方。也就是说，TensorFlow 团队并不会测试也不会维护 conda 包。使用 conda 包需要您自己承担风险。
 
-In Anaconda, you may use conda to create a virtual environment.
-However, within Anaconda, we recommend installing TensorFlow with the
-`pip install` command, not with the `conda install` command.
+## 使用原生pip安装
+如果您的机器上没有安装以下版本的Python，请立刻安装：
+- [Python 3.5.x 64-bit from python.org](https://www.python.org/downloads/release/python-352/)
+- [Python 3.6.x 64-bit from python.org](https://www.python.org/downloads/release/python-362/)
 
-**NOTE:** The conda package is community supported, not officially supported.
-That is, the TensorFlow team neither tests nor maintains this conda package.
-Use that package at your own risk.
+在 Windows 上，TensorFlow 支持 Python3.5.x 版本和 Python 3.6.x 版本。需要注意的是， Python 3 使用的是 pip3 包管理， 这也是您用来安装 TensorFlow 的程序。
+打开一个终端，开始安装 TensorFlow。然后在终端上运行正确的 pip3 安装命令。 安装仅支持 CPU 版本的 TensorFlow，请输入下面的命令：
+`C:\> pip3 install --upgrade tensorflow`
 
+安装 GPU 版本的 TensorFlow，请输入下面的命令：
+`C:\> pip3 install --upgrade tensorflow-gpu`
 
-## Installing with native pip
+## 使用 Anaconda 进行安装
+**Anaconda 的安装包是由社区提供，非官方提供的。**
+在 Anaconda 的环境下，按照以下步骤进行 TensorFlow 的安装：
+1.根据网页 [Anaconda 下载站点]（https://www.anaconda.com/download/）说明下载并安装 Anaconda。 
+2.请通过使用以下命令来创建一个名为 tensorflow 的 conda 环境：
+`C:\> conda create -n tensorflow pip python=3.5`
+3.通过输入以下命令来激活一个 conda 环境：
+`C:\> activate tensorflow`
+`(tensorflow)C:\>  # Your prompt should change `
+4.在 conda 环境里输入正确的命令来安装 TensorFlow。 安装仅支持 CPU 版本的 TensorFlow，请输入下面的命令：
+`(tensorflow)C:\> pip install --ignore-installed --upgrade tensorflow `
+如果是安装 GPU 版本的 TensorFlow，请输入下面的命令：
+`(tensorflow)C:\> pip install --ignore-installed --upgrade tensorflow-gpu `
 
-If one of the following versions of Python is not installed on your machine,
-install it now:
-
-  * [Python 3.5.x 64-bit from python.org](https://www.python.org/downloads/release/python-352/)
-  * [Python 3.6.x 64-bit from python.org](https://www.python.org/downloads/release/python-362/)
-
-TensorFlow supports Python 3.5.x and 3.6.x on Windows.
-Note that Python 3 comes with the pip3 package manager, which is the
-program you'll use to install TensorFlow.
-
-To install TensorFlow, start a terminal. Then issue the appropriate
-<tt>pip3 install</tt> command in that terminal.  To install the CPU-only
-version of TensorFlow, enter the following command:
-
-<pre>C:\> <b>pip3 install --upgrade tensorflow</b></pre>
-
-To install the GPU version of TensorFlow, enter the following command:
-
-<pre>C:\> <b>pip3 install --upgrade tensorflow-gpu</b></pre>
-
-## Installing with Anaconda
-
-**The Anaconda installation is community supported, not officially supported.**
-
-Take the following steps to install TensorFlow in an Anaconda environment:
-
-  1. Follow the instructions on the
-     [Anaconda download site](https://www.continuum.io/downloads)
-     to download and install Anaconda.
-
-  2. Create a conda environment named <tt>tensorflow</tt>
-     by invoking the following command:
-
-     <pre>C:\> <b>conda create -n tensorflow pip python=3.5</b> </pre>
-
-  3. Activate the conda environment by issuing the following command:
-
-     <pre>C:\> <b>activate tensorflow</b>
-     (tensorflow)C:\>  # Your prompt should change </pre>
-
-  4. Issue the appropriate command to install TensorFlow inside your conda
-     environment. To install the CPU-only version of TensorFlow, enter the
-     following command:
-
-     <pre>(tensorflow)C:\> <b>pip install --ignore-installed --upgrade tensorflow</b> </pre>
-
-     To install the GPU version of TensorFlow, enter the following command
-     (on a single line):
-
-     <pre>(tensorflow)C:\> <b>pip install --ignore-installed --upgrade tensorflow-gpu</b> </pre>
-
-## Validate your installation
-
-Start a terminal.
-
-If you installed through Anaconda, activate your Anaconda environment.
-
-Invoke python from your shell as follows:
-
-<pre>$ <b>python</b></pre>
-
-Enter the following short program inside the python interactive shell:
-
+## 安装验证
+打开一个终端。
+如果您采用 Anaconda 方式安装，则进入 Anaconda 环境。
+采用下列方式从你的 shell 激活 python:
+`$python`
+在 python 交互 shell 中输入下列代码：
 ```python
 >>> import tensorflow as tf
 >>> hello = tf.constant('Hello, TensorFlow!')
 >>> sess = tf.Session()
 >>> print(sess.run(hello))
 ```
-
-If the system outputs the following, then you are ready to begin writing
-TensorFlow programs:
-
+如果系统的输出如下所示，那就说明您可以开始在上面撰写 TensorFlow 的程序了：
 <pre>Hello, TensorFlow!</pre>
+如果您刚刚接触 TensorFlow，请参考文档[TensorFlow 入门指南](https://github.com/xitu/tensorflow/blob/zh-hans/tensorflow/docs_src/get_started/get_started.md)。
 
-If you are new to TensorFlow, see @{$get_started/premade_estimators$Getting Started with TensorFlow}.
+如果系统输出了一个错误信息而不是一个打招呼提示，请查看[常见安装问题](#常见安装问题)。
 
-If the system outputs an error message instead of a greeting, see [Common
-installation problems](#common_installation_problems).
+这里也有一个关于 Windows 上 TensorFlow 安装很有用的[文档](https://gist.github.com/mrry/ee5dbcfdd045fa48a27d56664411d41c)。
 
-There is also a helpful [script](https://gist.github.com/mrry/ee5dbcfdd045fa48a27d56664411d41c)
-for Windows TensorFlow installation issues.
 
-## Common installation problems
+## 常见安装问题
+我们使用 Stack Overflow 来记录 TensorFlow 的安装问题和修正方法。下表中包含有一些常见安装问题在 Stack Overflow 上的回答链接。如果您遇到的错误消息或安装问题不在下表中，请在 Stack Overflow 上搜索它的答案。如果 Stack Overflow 上并没有显示这个错误消息或者安装问题的答案，请在 Stack Overflow 上提一个关于这个错误消息或者安装问题的新问题，并给这个问题指定一个 `tensorflow` 的标签。
 
-We are relying on Stack Overflow to document TensorFlow installation problems
-and their remedies.  The following table contains links to Stack Overflow
-answers for some common installation problems.
-If you encounter an error message or other
-installation problem not listed in the following table, search for it
-on Stack Overflow.  If Stack Overflow doesn't show the error message,
-ask a new question about it on Stack Overflow and specify
-the `tensorflow` tag.
-
-<table>
-<tr> <th>Stack Overflow Link</th> <th>Error Message</th> </tr>
-
-<tr>
-  <td><a href="https://stackoverflow.com/q/41007279">41007279</a></td>
-  <td>
-  <pre>[...\stream_executor\dso_loader.cc] Couldn't open CUDA library nvcuda.dll</pre>
-  </td>
-</tr>
-
-<tr>
-  <td><a href="https://stackoverflow.com/q/41007279">41007279</a></td>
-  <td>
-  <pre>[...\stream_executor\cuda\cuda_dnn.cc] Unable to load cuDNN DSO</pre>
-  </td>
-</tr>
-
-<tr>
-  <td><a href="http://stackoverflow.com/q/42006320">42006320</a></td>
-  <td><pre>ImportError: Traceback (most recent call last):
-File "...\tensorflow\core\framework\graph_pb2.py", line 6, in <module>
-from google.protobuf import descriptor as _descriptor
-ImportError: cannot import name 'descriptor'</pre>
-  </td>
-</tr>
-
-<tr>
-  <td><a href="https://stackoverflow.com/q/42011070">42011070</a></td>
-  <td><pre>No module named "pywrap_tensorflow"</pre></td>
-</tr>
-
-<tr>
-  <td><a href="https://stackoverflow.com/q/42217532">42217532</a></td>
-  <td>
-  <pre>OpKernel ('op: "BestSplits" device_type: "CPU"') for unknown op: BestSplits</pre>
-  </td>
-</tr>
-
-<tr>
-  <td><a href="https://stackoverflow.com/q/43134753">43134753</a></td>
-  <td>
-  <pre>The TensorFlow library wasn't compiled to use SSE instructions</pre>
-  </td>
-</tr>
-
-<tr>
-  <td><a href="https://stackoverflow.com/q/38896424">38896424</a></td>
-  <td>
-  <pre>Could not find a version that satisfies the requirement tensorflow</pre>
-  </td>
-</tr>
-
-</table>
+| Stack Overflow 链接 | 错误消息 |
+| ---------- | --------------- |
+| [41007279](https://stackoverflow.com/questions/41007279/tensorflow-on-windows-couldnt-open-cuda-library-cudnn64-5-dll) | [...\stream_executor\dso_loader.cc] Couldn't open CUDA library nvcuda.dll |
+| [41007279](https://stackoverflow.com/questions/41007279/tensorflow-on-windows-couldnt-open-cuda-library-cudnn64-5-dll) | [...\stream_executor\cuda\cuda_dnn.cc] Unable to load cuDNN DSO |
+| [42006320](https://stackoverflow.com/questions/42011070/on-windows-running-import-tensorflow-generates-no-module-named-pywrap-tenso) | ImportError: Traceback (most recent call last):  File "...\tensorflow\core\framework\graph_pb2.py", line 6, in  <br>from google.protobuf import descriptor as _descriptor  <br>ImportError: cannot import name 'descriptor'  |
+| [42011070](https://stackoverflow.com/questions/42011070/on-windows-running-import-tensorflow-generates-no-module-named-pywrap-tenso) | No module named "pywrap_tensorflow" |
+| [42217532](https://stackoverflow.com/questions/42217532/tensorflow-version-1-0-0-rc2-on-windows-opkernel-op-bestsplits-device-typ) | OpKernel ('op: "BestSplits" device_type: "CPU"') for unknown op: BestSplits |
+| [43134753](https://stackoverflow.com/questions/43134753/tensorflow-wasnt-compiled-to-use-sse-etc-instructions-but-these-are-availab) | The TensorFlow library wasn't compiled to use SSE instructions |

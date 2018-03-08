@@ -1,106 +1,54 @@
-# Adding a Custom Filesystem Plugin
+# 添加一个定制的文件系统插件
 
-## Background
+## 背景
 
-The TensorFlow framework is often used in multi-process and
-multi-machine environments, such as Google data centers, Google Cloud
-Machine Learning, Amazon Web Services (AWS), and on-site distributed clusters.
-In order to both share and save certain types of state produced by TensorFlow,
-the framework assumes the existence of a reliable, shared filesystem. This
-shared filesystem has numerous uses, for example:
+TensorFlow 框架经常用于多进程和多机环境，比如谷歌数据中心，谷歌机器学习云，亚马逊网络服务（AWS）以及实地分布集群。为了分享和保存 TensorFlow 创建的某些类型的状态，框架会假设存在可靠的、共享的文件系统。这个共享的文件系统有诸多用途，比如：
 
-*   Checkpoints of state are often saved to a distributed filesystem for
-    reliability and fault-tolerance.
-*   Training processes communicate with TensorBoard by writing event files
-    to a directory, which TensorBoard watches. A shared filesystem allows this
-    communication to work even when TensorBoard runs in a different process or
-    machine.
+*   状态的检查点通常保存到一个分布式文件系统用来保证可靠性和容错性。
+*   训练进程通过将事件文件写入一个由 TensorBoard 监听的目录与 TensorBoard 通讯。共享的文件系统允许即使 TensorBoard 运行在不同的进程和机器上，通讯仍然能够正常进行。
 
-There are many different implementations of shared or distributed filesystems in
-the real world, so TensorFlow provides an ability for users to implement a
-custom FileSystem plugin that can be registered with the TensorFlow runtime.
-When the TensorFlow runtime attempts to write to a file through the `FileSystem`
-interface, it uses a portion of the pathname to dynamically select the
-implementation that should be used for filesystem operations. Thus, adding
-support for your custom filesystem requires implementing a `FileSystem`
-interface, building a shared object containing that implementation, and loading
-that object at runtime in whichever process needs to write to that filesystem.
+现实中已经有很多不同的共享或分布式文件系统的实现，所以 TensorFLow 提供实现一个定制的文件系统插件的方法，可以注册到 TensorFlow 运行时中。当 TensorFlow 运行时尝试通过 `FileSystem` 接口写入一个文件，它使用路径名的一部分来动态选择用于文件系统操作的实现。因此，为了支持定制的文件系统需要实现一个 `FileSystem` 接口，构建一个包含实现的共享对象，并在运行时加载对象到任意需要写入文件系统的进程中。
 
-Note that TensorFlow already includes many filesystem implementations, such as:
+注意 TensorFlow 已经包含很多文件系统的实现，例如：
 
-*   A standard POSIX filesystem
+*   标准 POSIX 文件系统
 
-    Note: NFS filesystems often mount as a POSIX interface, and so standard
-    TensorFlow can work on top of NFS-mounted remote filesystems.
+    注意：NFS 文件系统通常作为一个 POSIX 接口挂载，所以标准 TensorFlow 能够运行在挂载了 NFS 的远程文件系统上。
 
-*   HDFS - the Hadoop File System
-*   GCS - Google Cloud Storage filesystem
-*   S3 - Amazon Simple Storage Service filesystem
-*   A "memory-mapped-file" filesystem
+*   HDFS - Hadoop 文件系统
+*   GCS - 谷歌云存储文件系统
+*   “内存映射文件”文件系统
 
-The rest of this guide describes how to implement a custom filesystem.
+接下来讲如何实现一个定制的文件系统。
 
-## Implementing a custom filesystem plugin
+## 实现一个定制的文件系统插件
 
-To implement a custom filesystem plugin, you must do the following:
+为了实现一个定制的文件系统插件，必须执行如下操作：
 
-*   Implement subclasses of `RandomAccessFile`, `WriteableFile`,
-    `AppendableFile`, and `ReadOnlyMemoryRegion`.
-*   Implement the `FileSystem` interface as a subclass.
-*   Register the `FileSystem` implementation with an appropriate prefix pattern.
-*   Load the filesystem plugin in a process that wants to write to that
-    filesystem.
+*   实现 `RandomAccessFile`、`WriteableFile`、`AppendableFile` 和 `ReadOnlyMemoryRegion` 子类。
+*   实现 `FileSystem` 接口作为一个子类。
+*   使用合适的前缀模式注册 `FileSystem` 实现。
+*   在想要写入文件系统的进程中加载文件系统插件。
 
-### The FileSystem interface
+### FileSystem 接口
 
-The `FileSystem` interface is an abstract C++ interface defined in
-[file_system.h](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/file_system.h).
-An implementation of the `FileSystem` interface should implement all relevant
-the methods defined by the interface. Implementing the interface requires
-defining operations such as creating `RandomAccessFile`, `WritableFile`, and
-implementing standard filesystem operations such as `FileExists`, `IsDirectory`,
-`GetMatchingPaths`, `DeleteFile`, and so on. An implementation of these
-interfaces will often involve translating the function's input arguments to
-delegate to an already-existing library function implementing the equivalent
-functionality in your custom filesystem.
+`FileSystem` 接口是一个定义在 [file_system.h](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/file_system.h) 中的抽象 C++ 接口。一个 `FileSystem` 接口的实现应该实现所有在接口中定义的方法。实现需要定义操作，如创建 `RandomAccessFile`、`WritableFile` 和实现标准文件系统操作，如 `FileExists`、`IsDirectory`、`GetMatchingPaths`、`DeleteFile` 等等。这些接口的实现通常包括将函数的入参委托给一个已经存在的实现同等功能的库函数。
 
-For example, the `PosixFileSystem` implementation implements `DeleteFile` using
-the POSIX `unlink()` function; `CreateDir` simply calls `mkdir()`; `GetFileSize`
-involves calling `stat()` on the file and then returns the filesize as reported
-by the return of the stat object. Similarly, for the `HDFSFileSystem`
-implementation, these calls simply delegate to the `libHDFS` implementation of
-similar functionality, such as `hdfsDelete` for
-[DeleteFile](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/hadoop/hadoop_file_system.cc#L386).
+例如，`PosixFileSystem` 使用 POSIX `unlink()` 函数实现了 `DeleteFile`；`CreateDir` 只是简单地调用 `mkdir()`；`GetFileSize` 对文件调用 `stat()` 然后返回文件大小。类似地，对于 `HDFSFileSystem` 实现，这些调用只是简单地委托给有着相似功能的 `libHDFS` 实现，例如用于 [DeleteFile](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/hadoop/hadoop_file_system.cc#L386) 的 `hdfsDelete`。
 
-We suggest looking through these code examples to get an idea of how different
-filesystem implementations call their existing libraries. Examples include:
+我们建议阅读这些代码示例，以了解不同文件系统实现如何调用已经存在的库。示例包括：
 
-*   [POSIX
-    plugin](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/posix/posix_file_system.h)
-*   [HDFS
-    plugin](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/hadoop/hadoop_file_system.h)
-*   [GCS
-    plugin](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/cloud/gcs_file_system.h)
-*   [S3
-    plugin](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/s3/s3_file_system.h)
+*   [POSIX 插件](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/posix/posix_file_system.h)
+*   [HDFS 插件](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/hadoop/hadoop_file_system.h)
+*   [GCS 插件](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/cloud/gcs_file_system.h)
 
-#### The File interfaces
+#### 文件接口
 
-Beyond operations that allow you to query and manipulate files and directories
-in a filesystem, the `FileSystem` interface requires you to implement factories
-that return implementations of abstract objects such as the
-[RandomAccessFile](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/file_system.h#L223),
-the `WritableFile`, so that TensorFlow code and read and write to files in that
-`FileSystem` implementation.
+在允许查询和操作一个文件系统中的文件和目录外，`FileSystem` 接口要求实现返回像 [RandomAccessFile](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/file_system.h#L223)、`WritableFile` 这样的抽象对象的工厂方法，从而 TensorFlow 可以编码、读取和写入 `FileSystem` 实现中的文件。
 
-To implement a `RandomAccessFile`, you must implement a single interface called
-`Read()`, in which the implementation must provide a way to read from an offset
-within a named file.
+为了实现一个 `RandomAccessFile`，你必须实现一个单独的 `Read()` 接口，其中实现必须提供一种从一个偏移开始读取某个特定文件的方法。
 
-For example, below is the implementation of RandomAccessFile for the POSIX
-filesystem, which uses the `pread()` random-access POSIX function to implement
-read. Notice that the particular implementation must know how to retry or
-propagate errors from the underlying filesystem.
+例如，下面是针对 POSIX 文件系统的 RandomAccessFile 实现，读取通过 `pread()` 随机访问 POSIX 函数实现。需要注意实现必须知道如何重试或传播来自底层文件系统的错误。
 
 ```C++
     class PosixRandomAccessFile : public RandomAccessFile {
@@ -137,12 +85,9 @@ propagate errors from the underlying filesystem.
     };
 ```
 
-To implement the WritableFile sequential-writing abstraction, one must implement
-a few interfaces, such as `Append()`, `Flush()`, `Sync()`, and `Close()`.
+为了实现 WritableFile 顺序写入抽象，实现者必须实现像 `Append()`、`Flush()`、`Sync()` 和 `Close()` 这些接口。
 
-For example, below is the implementation of WritableFile for the POSIX
-filesystem, which takes a `FILE` object in its constructor and uses standard
-posix functions on that object to implement the interface.
+例如，下面是对 POSIX 文件系统的 WritableFile 实现。构造函数内接受 `FILE` 对象，并在对象上使用标准的 POSIX 函数来实现接口。
 
 ```C++
     class PosixWritableFile : public WritableFile {
@@ -195,22 +140,17 @@ posix functions on that object to implement the interface.
 
 ```
 
-For more details, please see the documentations of those interfaces, and look at
-example implementations for inspiration.
+想要了解更多细节，可以查看接口文档或者实例。
 
-### Registering and loading the filesystem
+### 注册和加载文件系统
 
-Once you have implemented the `FileSystem` implementation for your custom
-filesystem, you need to register it under a "scheme" so that paths prefixed with
-that scheme are directed to your implementation. To do this, you call
-`REGISTER_FILE_SYSTEM`::
+一旦你已经为你定制的文件系统实现了 `FileSystem`，你需要在一个 scheme 下注册它，从而以那个 scheme 为前缀的路径会被导向你的实现。为了实现这个，调用 `REGISTER_FILE_SYSTEM`：
 
 ```
     REGISTER_FILE_SYSTEM("foobar", FooBarFileSystem);
 ```
 
-When TensorFlow tries to operate on a file whose path starts with `foobar://`,
-it will use the `FooBarFileSystem` implementation.
+当 TensorFlow 尝试操作一个路径以 `foobar://` 开始的文件，它将使用 `FooBarFileSystem` 实现。
 
 ```C++
     string filename = "foobar://path/to/file.txt";
@@ -222,33 +162,17 @@ it will use the `FooBarFileSystem` implementation.
     TF_RETURN_IF_ERROR(env->NewWritableFile(filename, &file));
 ```
 
-Next, you must build a shared object containing this implementation. An example
-of doing so using bazel's `cc_binary` rule can be found
-[here](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/BUILD#L244),
-but you may use any build system to do so. See the section on @{$adding_an_op#build-the-op-library$building the op library} for similar
-instructions.
+接下来，你必须构建一个包含这个实现的共享对象。[这里](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/BUILD#L244)是一个使用 bazel `cc_binary` 规则实现的实例。但是你可以使用任何构建系统实现。相似的指导可以查看 @{$adding_an_op#build-the-op-library$building the op library} 这节。
 
-The result of building this target is a `.so` shared object file.
+构建的结果是一个 `.so` 共享对象文件。
 
-Lastly, you must dynamically load this implementation in the process. In Python,
-you can call the `tf.load_file_system_library(file_system_library)` function,
-passing the path to the shared object. Calling this in your client program loads
-the shared object in the process, thus registering your implementation as
-available for any file operations going through the `FileSystem` interface. You
-can see
-[test_file_system.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/framework/file_system_test.py)
-for an example.
+最后，你必须在进程中动态加载这个实现。Python 中，你可以调用 `tf.load_file_system_library(file_system_library)` 函数，传入共享对象的路径。在客户端程序中调用这个方法加载进程中的共享对象并注册实现，以用于任意经过 `FileSystem` 接口的文件操作。示例可以查看 [test_file_system.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/framework/file_system_test.py)。
 
-## What goes through this interface?
+## 什么会经过接口？
 
-Almost all core C++ file operations within TensorFlow use the `FileSystem`
-interface, such as the `CheckpointWriter`, the `EventsWriter`, and many other
-utilities. This means implementing a `FileSystem` implementation allows most of
-your TensorFlow programs to write to your shared filesystem.
+TensorFlow 中几乎所有核心 C++ 文件操作都使用 `FileSystem` 接口，例如 `CheckpointWriter`、`EventsWriter` 以及许多其他功能。这意味着实现一个 `FileSystem` 实现可以让大多数 TensorFlow 程序写入你的共享文件系统。
 
-In Python, the `gfile` and `file_io` classes bind underneath to the `FileSystem
-implementation via SWIG, which means that once you have loaded this filesystem
-library, you can do:
+Python 中，`gfile` 和 `file_io` 类通过 SWIG 绑定到 `FileSystem` 实现下，这意味着一旦你加载了这个文件系统库，你可以执行：
 
 ```
 with gfile.Open("foobar://path/to/file.txt") as w:
@@ -256,5 +180,4 @@ with gfile.Open("foobar://path/to/file.txt") as w:
   w.write("hi")
 ```
 
-When you do this, a file containing "hi" will appear in the "/path/to/file.txt"
-of your shared filesystem.
+在执行这个之后，一个包含 ”hi“ 的文件会出现在共享文件系统的 ”/path/to/file.txt“。

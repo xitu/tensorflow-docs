@@ -1,30 +1,25 @@
-# Distributed TensorFlow
+# 分布式 TensorFlow
 
-This document shows how to create a cluster of TensorFlow servers, and how to
-distribute a computation graph across that cluster. We assume that you are
-familiar with the @{$programmers_guide/low_level_intro$basic concepts} of
-writing low level TensorFlow programs.
+本文演示了怎样创建一个 TensorFlow 集群(cluster)，以及怎样向集群提交计算图(graph)。我们假设你已经对 TensorFlow 编程所需要用到的 @{$get_started/get_started$basic concepts} 有所了解。
 
-## Hello distributed TensorFlow!
+## 你好，分布式 TensorFlow ！
 
-To see a simple TensorFlow cluster in action, execute the following:
+要查看一个简单的 TensorFlow 集群，请执行以下操作：
 
 ```shell
-# Start a TensorFlow server as a single-process "cluster".
+# 以单进程“集群”模式启动一个 TensorFlow 服务器
 $ python
 >>> import tensorflow as tf
 >>> c = tf.constant("Hello, distributed TensorFlow!")
 >>> server = tf.train.Server.create_local_server()
->>> sess = tf.Session(server.target)  # Create a session on the server.
+>>> sess = tf.Session(server.target)  # 在服务器上创建一个会话
 >>> sess.run(c)
 'Hello, distributed TensorFlow!'
 ```
 
-The
-@{tf.train.Server.create_local_server}
-method creates a single-process cluster, with an in-process server.
+@{tf.train.Server.create_local_server} 方法使用进程内服务器创建了一个单进程集群。
 
-## Create a cluster
+## 创建一个集群
 
 <div class="video-wrapper">
   <iframe class="devsite-embedded-youtube-video" data-video-id="la_M6bCV91M"
@@ -32,31 +27,18 @@ method creates a single-process cluster, with an in-process server.
   </iframe>
 </div>
 
-A TensorFlow "cluster" is a set of "tasks" that participate in the distributed
-execution of a TensorFlow graph. Each task is associated with a TensorFlow
-"server", which contains a "master" that can be used to create sessions, and a
-"worker" that executes operations in the graph.  A cluster can also be divided
-into one or more "jobs", where each job contains one or more tasks.
+TensorFlow “集群”是一组参与分布式执行 TensorFlow 计算图的“任务（Task）”集合。每个任务都与一个 TensorFlow 服务器（Server） 相关联，TensorFlow 服务器中包含一个可以用来创建会话（sessions）的`Master`，和一个在计算图中执行命令的`Worker`。一个集群同样可以被分为一个或多个“作业（Job）”，每个作业又包含一个或多个任务。（译者注：集群由任务组成，任务被包含在特定作业中）
 
-To create a cluster, you start one TensorFlow server per task in the cluster.
-Each task typically runs on a different machine, but you can run multiple tasks
-on the same machine (e.g. to control different GPU devices). In each task, do
-the following:
+要创建一个群集，我们在群集中为每个任务启动一个 TensorFlow 服务器。通常每个任务运行在不同的机器上，但是这里我们在一台机器上运行多个任务（例如，控制不同的GPU设备）。 我们在每个任务中都做如下操作：
 
-1.  **Create a `tf.train.ClusterSpec`** that describes all of the tasks
-    in the cluster. This should be the same for each task.
+1. 在集群中**创建一个描述所有任务的 `tf.train.ClusterSpec`**。它对每个任务而言都应该是相同的。
 
-2.  **Create a `tf.train.Server`**, passing the `tf.train.ClusterSpec` to
-    the constructor, and identifying the local task with a job name
-    and task index.
+2. **创建一个 `tf.train.Server`**，将 `tf.train.ClusterSpec` 传给构造函数，并用工作名称标识本地任务和任务索引。
 
 
-### Create a `tf.train.ClusterSpec` to describe the cluster
+###创建一个 `tf.train.ClusterSpec` 来描述集群
 
-The cluster specification dictionary maps job names to lists of network
-addresses. Pass this dictionary to
-the @{tf.train.ClusterSpec}
-constructor.  For example:
+群集规范（ClusterSpec）是一个将作业名称映射到网络地址列表地址的字典。把该字典传递给 @{tf.train.ClusterSpec} 构造函数。例如：
 
 <table>
   <tr><th><code>tf.train.ClusterSpec</code> construction</th><th>Available tasks</th>
@@ -82,43 +64,28 @@ tf.train.ClusterSpec({
   </tr>
 </table>
 
-### Create a `tf.train.Server` instance in each task
+### 在每个任务中创建一个 `tf.train.Server` 实例
 
-A @{tf.train.Server} object contains a
-set of local devices, a set of connections to other tasks in its
-`tf.train.ClusterSpec`, and a
-@{tf.Session} that can use these
-to perform a distributed computation. Each server is a member of a specific
-named job and has a task index within that job.  A server can communicate with
-any other server in the cluster.
+一个 @{tf.train.Server} 对象包含一套本地设备，一套与 `tf.train.ClusterSpec` 中其他任务相连的连接，以及一个可以用来执行分布式计算的 @{tf.Session}。 每个 TensorFlow 服务器都是特定命名作业的成员，并拥有一份该作业中的任务索引。TensorFlow 服务器可以与集群中其他服务器通信。
 
-For example, to launch a cluster with two servers running on `localhost:2222`
-and `localhost:2223`, run the following snippets in two different processes on
-the local machine:
+例如，启动一个运行在 `localhost：2222` 和 `localhost：2223` 两台服务器上的集群，在本地机器的两个不同进程上运行以下代码：
 
 ```python
-# In task 0:
+# 任务 0 中:
 cluster = tf.train.ClusterSpec({"local": ["localhost:2222", "localhost:2223"]})
 server = tf.train.Server(cluster, job_name="local", task_index=0)
 ```
 ```python
-# In task 1:
+# 任务 1 中:
 cluster = tf.train.ClusterSpec({"local": ["localhost:2222", "localhost:2223"]})
 server = tf.train.Server(cluster, job_name="local", task_index=1)
 ```
 
-**Note:** Manually specifying these cluster specifications can be tedious,
-especially for large clusters. We are working on tools for launching tasks
-programmatically, e.g. using a cluster manager like
-[Kubernetes](http://kubernetes.io). If there are particular cluster managers for
-which you'd like to see support, please raise a
-[GitHub issue](https://github.com/tensorflow/tensorflow/issues).
+**注意：** 手动指定这些集群规范可能很乏味，特别是对于大型集群。我们正在开发可编程的任务启动工具，例如类似 [Kubernetes](http://kubernetes.io) 的集群管理器。如果你希望 Tensorflow 支持某种特定的集群管理器，请提出一个 [GitHub issue](https://github.com/tensorflow/tensorflow/issues)。
 
-## Specifying distributed devices in your model
+## 指定模型中的分布式设备
 
-To place operations on a particular process, you can use the same
-@{tf.device}
-function that is used to specify whether ops run on the CPU or GPU. For example:
+要将操作放在特定的进程上，可以使用同一个 @{tf.device} 函数来指定，它同样被用来指定操作是在 CPU 还是 GPU 上执行。 例如
 
 ```python
 with tf.device("/job:ps/task:0"):
@@ -141,52 +108,25 @@ with tf.Session("grpc://worker7.example.com:2222") as sess:
     sess.run(train_op)
 ```
 
-In the above example, the variables are created on two tasks in the `ps` job,
-and the compute-intensive part of the model is created in the `worker`
-job. TensorFlow will insert the appropriate data transfers between the jobs
-(from `ps` to `worker` for the forward pass, and from `worker` to `ps` for
-applying gradients).
+在上面的例子中，变量是在 `ps` 作业中的两个任务上创建的，模型的计算密集部分是在 `worker` 作业中创建的。TensorFlow 将在作业之间插入适当的数据传输（正向传递时从 `ps` 到 `worker`，反向传递时从 `worker` 到 `ps`）。
 
-## Replicated training
+## 重复训练
 
-A common training configuration, called "data parallelism," involves multiple
-tasks in a `worker` job training the same model on different mini-batches of
-data, updating shared parameters hosted in one or more tasks in a `ps`
-job. All tasks typically run on different machines. There are many ways to
-specify this structure in TensorFlow, and we are building libraries that will
-simplify the work of specifying a replicated model. Possible approaches include:
+一种通用训练的配置，也被称为“并行数据”，包含了使用不同 mini-batch 来训练相同模型的 `Worker` 作业中的多个任务，更新 `ps` 作业中一个或多个任务里的共享参数。所有任务通常在不同的机器上运行。在 TensorFlow 中有很多方法可以指定任务分配的结构，我们正在开发简化指定复制模型工作的库。可能的方法包括：
 
-* **In-graph replication.** In this approach, the client builds a single
-  `tf.Graph` that contains one set of parameters (in `tf.Variable` nodes pinned
-  to `/job:ps`); and multiple copies of the compute-intensive part of the model,
-  each pinned to a different task in `/job:worker`.
+* **图内复制** 在这种方法中，客户端构建一个包含一组参数（在 `tf.Variable` 节点上固定
+   到 `/job:ps` ）的 `tf.Graph`; 以及模型的计算密集型部分的多个副本，
+   每个副本固定对应到 `/job:worker` 中不同的任务上。
 
-* **Between-graph replication.** In this approach, there is a separate client
-  for each `/job:worker` task, typically in the same process as the worker
-  task. Each client builds a similar graph containing the parameters (pinned to
-  `/job:ps` as before using
-  @{tf.train.replica_device_setter}
-  to map them deterministically to the same tasks); and a single copy of the
-  compute-intensive part of the model, pinned to the local task in
-  `/job:worker`.
+* **图间复制** 在这种方法中，每个 `/job:worker` 任务都对应一个独立的客户端，客户端通常与 worker 任务在同一进程中。每个客户端会构建一个相似的、带参数的图（这些参数像以往一样，通过 @{tf.train.replica_device_setter} 来映射到相同任务 `/job:ps`，）; 和一个模型中的计算密集型部分的单一副本，对应到 `/job:worker` 中的本地任务。
 
-* **Asynchronous training.** In this approach, each replica of the graph has an
-  independent training loop that executes without coordination. It is compatible
-  with both forms of replication above.
+* **异步训练** 在这种方法中，图的每个副本都有一个没有独立训练循环，不做协调就可以执行。它是兼容的以上两种形式的复制。
 
-* **Synchronous training.** In this approach, all of the replicas read the same
-  values for the current parameters, compute gradients in parallel, and then
-  apply them together. It is compatible with in-graph replication (e.g. using
-  gradient averaging as in the
-  [CIFAR-10 multi-GPU trainer](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10_multi_gpu_train.py)),
-  and between-graph replication (e.g. using the
-  @{tf.train.SyncReplicasOptimizer}).
+* **同步训练** 在这种方法中，所有的副本读取到相同的值赋给当前的参数，并行计算梯度，然后将它们一起应用。它与图内复制（例如：像[CIFAR-10 multi-GPU trainer](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10_multi_gpu_train.py)一样使用梯度平均和多 GPU 图间复制），图间复制（使用 @{tf.train.SyncReplicasOptimizer}）。
 
-### Putting it all together: example trainer program
+### 总结：示例训练程序
 
-The following code shows the skeleton of a distributed trainer program,
-implementing **between-graph replication** and **asynchronous training**. It
-includes the code for the parameter server and worker tasks.
+以下代码显示了分布式训练程序的框架，实现**图间复制**和**异步训练**。它包括参数服务器和 `Worker` 任务的代码。
 
 ```python
 import argparse
@@ -201,10 +141,10 @@ def main(_):
   ps_hosts = FLAGS.ps_hosts.split(",")
   worker_hosts = FLAGS.worker_hosts.split(",")
 
-  # Create a cluster from the parameter server and worker hosts.
+  # 从参数服务器和工作主机创建一个集群
   cluster = tf.train.ClusterSpec({"ps": ps_hosts, "worker": worker_hosts})
 
-  # Create and start a server for the local task.
+  # 创建并启动本地任务的服务器
   server = tf.train.Server(cluster,
                            job_name=FLAGS.job_name,
                            task_index=FLAGS.task_index)
@@ -213,40 +153,38 @@ def main(_):
     server.join()
   elif FLAGS.job_name == "worker":
 
-    # Assigns ops to the local worker by default.
+    # 默认情况下将操作分配给本地Worker
     with tf.device(tf.train.replica_device_setter(
         worker_device="/job:worker/task:%d" % FLAGS.task_index,
         cluster=cluster)):
 
-      # Build model...
+      # 建立模型...
       loss = ...
       global_step = tf.contrib.framework.get_or_create_global_step()
 
       train_op = tf.train.AdagradOptimizer(0.01).minimize(
           loss, global_step=global_step)
 
-    # The StopAtStepHook handles stopping after running given steps.
+    # StopAtStepHook 在运行给定步骤后处理停止
     hooks=[tf.train.StopAtStepHook(last_step=1000000)]
 
-    # The MonitoredTrainingSession takes care of session initialization,
-    # restoring from a checkpoint, saving to a checkpoint, and closing when done
-    # or an error occurs.
+    # MonitoredTrainingSession 负责会话初始化
+    # 从检查点恢复，保存到检查点，一旦完成或报错就关闭
     with tf.train.MonitoredTrainingSession(master=server.target,
                                            is_chief=(FLAGS.task_index == 0),
                                            checkpoint_dir="/tmp/train_logs",
                                            hooks=hooks) as mon_sess:
       while not mon_sess.should_stop():
-        # Run a training step asynchronously.
-        # See `tf.train.SyncReplicasOptimizer` for additional details on how to
-        # perform *synchronous* training.
-        # mon_sess.run handles AbortedError in case of preempted PS.
+        # 异步运行训练
+        # 有关如何执行同步训练的更多信息，请参见 `tf.train.SyncReplicasOptimizer`
+        # mon_sess.run 在被抢占 PS 的情况下处理 AbortedError
         mon_sess.run(train_op)
 
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.register("type", "bool", lambda v: v.lower() == "true")
-  # Flags for defining the tf.train.ClusterSpec
+  # 用于定义 tf.train.ClusterSpec 的标志
   parser.add_argument(
       "--ps_hosts",
       type=str,
@@ -276,8 +214,7 @@ if __name__ == "__main__":
   tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
 ```
 
-To start the trainer with two parameter servers and two workers, use the
-following command line (assuming the script is called `trainer.py`):
+要启动两个参数服务器和两个 `Worker` 的训练，请使用下面的命令行脚本（假设脚本被称为 `trainer.py`）
 
 ```shell
 # On ps0.example.com:
@@ -304,51 +241,33 @@ $ python trainer.py \
 
 ## Glossary
 
-**Client**
+**客户端**
 
-A client is typically a program that builds a TensorFlow graph and constructs a
-`tensorflow::Session` to interact with a cluster. Clients are typically written
-in Python or C++. A single client process can directly interact with multiple
-TensorFlow servers (see "Replicated training" above), and a single server can
-serve multiple clients.
+客户端通常是一个程序，用来构建 TensorFlow 计算图和创建用于与集群交互的会话 `tensorflow::Session`。通常用 Python 或 C++ 编写。一个客户端进程可以直接与多个 TensorFlow 服务器交互（参阅上面的“重复训练”），一台服务器可为多个客户端服务。
 
-**Cluster**
 
-A TensorFlow cluster comprises a one or more "jobs", each divided into lists of
-one or more "tasks". A cluster is typically dedicated to a particular high-level
-objective, such as training a neural network, using many machines in parallel. A
-cluster is defined by
-a @{tf.train.ClusterSpec} object.
+**集群**
 
-**Job**
+一个 TensorFlow 集群包含一个或多个“作业”，每个“作业”分为一个个列表，列表由一个或多个“任务”组成。集群通常专用于特定的高级用途，比如训练神经网络，并行使用多台机器。一个集群由 @{tf.train.ClusterSpec} 对象定义。
 
-A job comprises a list of "tasks", which typically serve a common purpose.
-For example, a job named `ps` (for "parameter server") typically hosts nodes
-that store and update variables; while a job named `worker` typically hosts
-stateless nodes that perform compute-intensive tasks. The tasks in a job
-typically run on different machines. The set of job roles is flexible:
-for example, a `worker` may maintain some state.
+**作业**
 
-**Master service**
+一份作业包括一份“任务”清单，通常用于一个共同的目的。例如，名为 `ps`（即 parameter server，参数服务器）的作业通常包括存储和更新变量的节点; 而名为 `worker` 的作业通常包括执行计算密集型任务的无状态节点。工作中的任务通常运行在不同的机器上。这套工作角色是灵活的：例如，`Worker` 可能会保持某种状态。
 
-An RPC service that provides remote access to a set of distributed devices,
-and acts as a session target. The master service implements the
-`tensorflow::Session` interface, and is responsible for coordinating work across
-one or more "worker services". All TensorFlow servers implement the master
-service.
+**主服务**
 
-**Task**
+提供远程调用控制一组分布式设备的 RPC 服务，并作为会话目标。 主服务实现了 `tensorflow::Session` 接口，负责协调一个或多个 `worker服务`。所有的 TensorFlow 服务器都实现了 Master 服务。
 
-A task corresponds to a specific TensorFlow server, and typically corresponds
-to a single process. A task belongs to a particular "job" and is identified by
-its index within that job's list of tasks.
+**任务**
 
-**TensorFlow server** A process running
-a @{tf.train.Server} instance, which is
-a member of a cluster, and exports a "master service" and "worker service".
+任务对应于特定的 TensorFlow 服务器，并且通常对应于到一个进程。一个任务属于一个特定的“作业”，并在该作业列表的索引中被唯一标识。
 
-**Worker service**
+** TensorFlow 服务器**
 
-An RPC service that executes parts of a TensorFlow graph using its local devices.
-A worker service implements [worker_service.proto](https://www.tensorflow.org/code/tensorflow/core/protobuf/worker_service.proto).
-All TensorFlow servers implement the worker service.
+运行着 @{tf.train.Server} 实例的进程，是集群的成员，并对外提供 `master 服务` 和 `worker 服务`。
+
+
+**Worker 服务**
+
+一个使用本地设备执行 TensorFlow 计算图中部分命令的 RPC 服务。Worker 服务实现了 [worker_service.proto](https://www.tensorflow.org/code/tensorflow/core/protobuf/worker_service.proto)。所有的 TensorFlow 服务器都实现了 Worker 服务。
+

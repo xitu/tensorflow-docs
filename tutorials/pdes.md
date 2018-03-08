@@ -1,15 +1,11 @@
-# Partial Differential Equations
+# 偏微分方程组
 
-TensorFlow isn't just for machine learning.  Here we give a (somewhat
-pedestrian) example of using TensorFlow for simulating the behavior of a
-[partial differential equation](
-https://en.wikipedia.org/wiki/Partial_differential_equation).
-We'll simulate the surface of square pond as a few raindrops land on it.
+TensorFlow 不仅限于机器学习使用。在此，我们提供了一个（很平凡的）实例，使用 TensorFlow 模拟[偏微分方程](https://en.wikipedia.org/wiki/Partial_differential_equation)的表现。我们将模拟一个池塘的水面在雨滴落入时的情形。
 
 
-## Basic Setup
+## 基本设置
 
-A few imports we'll need.
+我们需要导入一些库。
 
 ```python
 #Import libraries for simulation
@@ -22,7 +18,7 @@ from io import BytesIO
 from IPython.display import clear_output, Image, display
 ```
 
-A function for displaying the state of the pond's surface as an image.
+定义一个用于以图像形式展示池塘水面的函数。
 
 ```python
 def DisplayArray(a, fmt='jpeg', rng=[0,1]):
@@ -35,15 +31,13 @@ def DisplayArray(a, fmt='jpeg', rng=[0,1]):
   display(Image(data=f.getvalue()))
 ```
 
-Here we start an interactive TensorFlow session for convenience in playing
-around.  A regular session would work as well if we were doing this in an
-executable .py file.
+现在，我们启动一个 TensorFlow 交互式会话。如果我们是使用 .py 文件进行这些操作，使用一般的会话也能完成任务。
 
 ```python
 sess = tf.InteractiveSession()
 ```
 
-## Computational Convenience Functions
+## 便捷的计算函数
 
 
 ```python
@@ -67,16 +61,15 @@ def laplace(x):
   return simple_conv(x, laplace_k)
 ```
 
-## Define the PDE
+## 定义偏微分方程 PDE
 
-Our pond is a perfect 500 x 500 square, as is the case for most ponds found in
-nature.
+与自然界中的大多数池塘一样，我们的池塘的尺寸是完美的 500 x 500。
 
 ```python
 N = 500
 ```
 
-Here we create our pond and hit it with some rain drops.
+现在我们将创建我们的池塘，并落入一些雨滴。
 
 ```python
 # Initial Conditions -- some rain drops hit a pond
@@ -96,7 +89,7 @@ DisplayArray(u_init, rng=[-0.1, 0.1])
 ![jpeg](https://www.tensorflow.org/images/pde_output_1.jpg)
 
 
-Now let's specify the details of the differential equation.
+现在让我们定义微分方程的一些细节。
 
 
 ```python
@@ -120,9 +113,9 @@ step = tf.group(
   Ut.assign(Ut_))
 ```
 
-## Run The Simulation
+## 运行模型
 
-This is where it gets fun -- running time forward with a simple for loop.
+使用一个简单的循环来不断地运行它 —— 这就是此程序的乐趣所在。
 
 ```python
 # Initialize state to initial conditions
@@ -137,5 +130,5 @@ for i in range(1000):
 
 ![jpeg](../images/pde_output_2.jpg)
 
-Look! Ripples!
+看！波纹！
 

@@ -1,218 +1,139 @@
-# TensorFlow Architecture
+# TensorFlow 架构
 
-We designed TensorFlow for large-scale distributed training and inference, but
-it is also flexible enough to support experimentation with new machine
-learning models and system-level optimizations.
+为了针对大规模分布式训练和推理，我们设计了 TensorFlow，同时它也足够灵活，可以支持新的机器学习模型及系统级的优化。
 
-This document describes the system architecture that makes possible this
-combination of scale and flexibility. It assumes that you have basic familiarity
-with TensorFlow programming concepts such as the computation graph, operations,
-and sessions. See @{$programmers_guide/low_level_intro$this document}
-for an introduction to these topics. Some familiarity
-with @{$distributed$distributed TensorFlow}
-will also be helpful.
+本文介绍了实现其规模与灵活性并驾齐驱的系统架构。我们假设你在阅读本文时已经熟悉了使用 TensorFlow 的基本概念，例如计算图（computation graph）、操作（operation）以及会话（session）。请参考 @{$get_started/get_started$Getting Started} 来了解关于这些主题的介绍，熟悉 @{$distributed$distributed TensorFlow} 对理解本文会有帮助。
 
-This document is for developers who want to extend TensorFlow in some way not
-supported by current APIs, hardware engineers who want to optimize for
-TensorFlow, implementers of machine learning systems working on scaling and
-distribution, or anyone who wants to look under Tensorflow's hood. After
-reading it you should understand TensorFlow architecture well enough to read
-and modify the core TensorFlow code.
+本文适用于那些受到当前 API 制约从而希望以某种方式扩展 TensorFlow 的开发者、希望优化 TensorFlow 的硬件工程师、大规模分布式机器学习系统的实现人员以及任何希望了解 TensorFlow 底层机制的人。阅读本文之后，你应该能够理解 TensorFlow 的架构并能够阅读并修改 TensorFlow 的核心代码。
 
-## Overview
+## 概述
 
-The TensorFlow runtime is a cross-platform library. Figure 1 illustrates its
-general architecture. A C API separates user level code in different languages
-from the core runtime.
+TensorFlow 运行时是一个跨平台库。图 1 展示了其总体框架。通过一套 C API 将运行时与不同语言的用户级代码分离。
 
-![TensorFlow Layers](https://www.tensorflow.org/images/layers.png){: width="300"}
+![TensorFlow 架构层级](https://www.tensorflow.org/images/layers.png){: width="300"}
 
-**Figure 1**
+**图 1**
 
+本文只关注下面这些层级：
 
-This document focuses on the following layers:
+* **客户端（Client）**:
+  + 将计算过程定义为数据流图。
+  + 使用 [**`Session`**](https://www.tensorflow.org/code/tensorflow/python/client/session.py) 初始化数据流图的执行
+* **分布式主控端（Master）**
+  + 修剪图中的某些特殊子图，即 `Session.run()` 中所定义的参数。
+  + 将子图划分为在不同进程和设备中运行的多个部分。
+  + 将图分发给不同的工作进程。
+  + 由工作进程初始化子图的计算。
+* （每个任务的）**工作进程（Worker service）**
+  + 使用内核实现调度图操作并在合适的硬件（CPU、GPU等）执行。
+  + 向其他工作进程发送或从其接收操作的结果。
+* **内核实现**
+  + 执行一个独立的图操作计算。
 
-*  **Client**:
-   *  Defines the computation as a dataflow graph.
-   *  Initiates graph execution using a [**session**](
-      https://www.tensorflow.org/code/tensorflow/python/client/session.py)
-*  **Distributed Master**
-   *  Prunes a specific subgraph from the graph, as defined by the arguments
-      to Session.run().
-   *  Partitions the subgraph into multiple pieces that run in different
-      processes and devices.
-   *  Distributes the graph pieces to worker services.
-   *  Initiates graph piece execution by worker services.
-*  **Worker Services** (one for each task)
-   *  Schedule the execution of graph operations using kernel implementations
-      appropriate to the available hardware (CPUs, GPUs, etc).
-   *  Send and receive operation results to and from other worker services.
-*  **Kernel Implementations**
-   *  Perform the computation for individual graph operations.
+图 2 展示了这些组件之间的交互。`/job:worker/task:0` 和 `/job:ps/task:0` 均为具有任务的工作进程。`PS` 表示参数服务器：负责存储和更新模型参数的任务。其他任务则发送并更新这些参数的优化结果。任务之间的这种特定分工并不是必须的，但是这在分布式训练中很常用。
 
-Figure 2 illustrates the interaction of these components. "/job:worker/task:0" and
-"/job:ps/task:0" are both tasks with worker services. "PS" stands for "parameter
-server": a task responsible for storing and updating the model's parameters.
-Other tasks send updates to these parameters as they work on optimizing the
-parameters. This particular division of labor between tasks is not required, but
-it is common for distributed training.
+![TensorFlow 架构图示](https://www.tensorflow.org/images/diag1.svg){: width="500"}
 
-![TensorFlow Architecture Diagram](https://www.tensorflow.org/images/diag1.svg){: width="500"}
+**图 2**
 
-**Figure 2**
+注意，分布式主控端和工作进程仅存在于分布式 TensorFlow 中。单进程版的 TensorFlow 使用了一种特殊的 Session 实现，与分布式主控端的工作完全一样，不过它只需要完成的与本地进程中的设备通信。
 
-Note that the Distributed Master and Worker Service only exist in
-distributed TensorFlow. The single-process version of TensorFlow includes a
-special Session implementation that does everything the distributed master does
-but only communicates with devices in the local process.
+下面各小节详细描述 TensorFlow 核心层，并以一个示例图来展示其执行步骤。
 
-The following sections describe the core TensorFlow layers in greater detail and
-step through the processing of an example graph.
+## 客户端
 
-## Client
+用户负责编写用于构建计算图的 TensorFlow 客户端程序。这个程序可以直接组成独立的操作或者使用类似于 Estimator API 之类的库组建神经网络的各层与其他高层抽象。TensorFlow 支持多种客户端语言，并优先考虑支持 Python 与 C++，因为我们内部的用户最熟悉这些语言。
 
-Users write the client TensorFlow program that builds the computation graph.
-This program can either directly compose individual operations or use a
-convenience library like the Estimators API to compose neural network layers and
-other higher-level abstractions. TensorFlow supports multiple client
-languages, and we have prioritized Python and C++, because our internal users
-are most familiar with these languages. As features become more established,
-we typically port them to C++, so that users can access an optimized
-implementation from all client languages. Most of the training libraries are
-still Python-only, but C++ does have support for efficient inference.
+随着其特性的逐渐稳定与完善，我们首先将其开放为 C++，这样用户就能够从所有客户端语言中使用优化后的版本了。大部分训练库只有 Python 支持，但是 C++ 则是作为更高效率的接口来提供给模型部署后的推断。
 
-The client creates a session, which sends the graph definition to the
-distributed master as a @{tf.GraphDef}
-protocol buffer. When the client evaluates a node or nodes in the
-graph, the evaluation triggers a call to the distributed master to initiate
-computation.
+客户端创建一个 `Session`，这个 `Session` 会将数据流图的定义根据 @{tf.GraphDef} 的缓存协议发送给分布式主控端。当客户端对图中一个或多个节点求值时，会触发分布式主控端初始化计算。在图 3 中，客户端构建了一个图，其权值 (w) 与特征向量 (x) 相乘，然后将其与偏置 (b) 相加，并最后将结果保存在变量 (s) 中。
 
-In Figure 3, the client has built a graph that applies weights (w) to a
-feature vector (x), adds a bias term (b) and saves the result in a variable
-(s).
+![TensorFlow 架构图示：客户端](https://www.tensorflow.org/images/graph_client.svg){: width="700"}
 
-![TensorFlow Architecture Diagram: Client](https://www.tensorflow.org/images/graph_client.svg){: width="700"}
+**图 3**
 
-**Figure 3**
+### 代码
 
-### Code
+* @{tf.Session}
 
-*  @{tf.Session}
+## 分布式主控端
 
-## Distributed master
+分布式主控端的主要职能有:
 
-The distributed master:
+* 修剪数据流图，从而获得并发送客户端所需的子图节点；
+* 将数据流图为不同的参与设备分配不同的计算子图
+* 将计算子图缓存，以便后续复用
 
-*  prunes the graph to obtain the subgraph required to evaluate the nodes
-   requested by the client,
-*  partitions the graph to obtain graph pieces for
-   each participating device, and
-*  caches these pieces so that they may be re-used in subsequent steps.
+由于主控端了解在一步计算中的整个计算过程，它首先使用了诸如公共子表达式消除、常量拆叠等标准优化方法对计算子图进行优化，然后再负责协调优化后的子图去执行一系列任务。
 
-Since the master sees the overall computation for
-a step, it applies standard optimizations such as common subexpression
-elimination and constant folding. It then coordinates execution of the
-optimized subgraphs across a set of tasks.
+![TensorFlow 架构图示：Master](https://www.tensorflow.org/images/graph_master_cln.svg){: width="700"}
 
-![TensorFlow Architecture Diagram: Master](https://www.tensorflow.org/images/graph_master_cln.svg){: width="700"}
+**图 4**
 
-**Figure 4**
+图 5 展示了一个示例图可能的划分。分布式主控端已将模型的参数分组，以便于将它们存储在参数服务器上。
 
+![划分图](https://www.tensorflow.org/images/graph_split1.svg){: width="700"}
 
-Figure 5 shows a possible partition of our example graph. The distributed
-master has grouped the model parameters in order to place them together on the
-parameter server.
+**图 5**
 
-![Partitioned Graph](https://www.tensorflow.org/images/graph_split1.svg){: width="700"}
+当图的边被分区所切断时，分布式 Master 则会介入并在接受和发送节点间传递任务信息（如图 6）。
 
-**Figure 5**
+![划分图](https://www.tensorflow.org/images/graph_split2.svg){: width="700"}
 
+**图 6**
 
-Where graph edges are cut by the partition, the distributed master inserts
-send and receive nodes to pass information between the distributed tasks
-(Figure 6).
+然后，分布式 Master 会将子图分配给分布式任务。
 
-![Partitioned Graph](https://www.tensorflow.org/images/graph_split2.svg){: width="700"}
+![分区图](https://www.tensorflow.org/images/graph_workers_cln.svg){: width="700"}
 
-**Figure 6**
+**图 7**
 
+### 代码
 
-The distributed master then ships the graph pieces to the distributed tasks.
+* [MasterService API 定义](https://www.tensorflow.org/code/tensorflow/core/protobuf/master_service.proto)
+* [Master 的通信接口](https://www.tensorflow.org/code/tensorflow/core/distributed_runtime/master_interface.h)
 
-![Partitioned Graph](https://www.tensorflow.org/images/graph_workers_cln.svg){: width="700"}
+## 工作进程
 
-**Figure 7**
+每个任务中的工作进程负责：
 
-### Code
+* 处理来自主控端的请求
+* 调度由本地子图组成操作的内核的执行
+* 以及协调任务之间的直接通信
 
-*  [MasterService API definition](https://www.tensorflow.org/code/tensorflow/core/protobuf/master_service.proto)
-*  [Master interface](https://www.tensorflow.org/code/tensorflow/core/distributed_runtime/master_interface.h)
+我们优化工作进程来保证以最低的开销来运行大型计算图。我们目前的实现能够在每秒执行数万个子图，这使得大量的副本能够进行快速、细粒度的训练。工作进程将内核分配给本地设备并在可能的情况下并行执行，例如通过使用多个 CPU 核心或 GPU 流。
 
-## Worker Service
+我们为每对源和目的设备类型定制了 `Send` 和 `Recv` 操作：
 
-The worker service in each task:
+* 使用 `cudaMemcpyAsync()` 在本地 CPU 和 GPU 设备间传送数据，从而让计算与数据传输重叠。
+* 两个本地 GPU 间使用点对点 DMA 传输，避免昂贵的需要主机 CPU 的拷贝操作。
 
-*  handles requests from the master,
-*  schedules the execution of the kernels for the operations that comprise a
-   local subgraph, and
-*  mediates direct communication between tasks.
+对于任务之间的传输，TensorFlow 使用了多种协议，包括:
 
-We optimize the worker service for running large graphs with low overhead. Our
-current implementation can execute tens of thousands of subgraphs per second,
-which enables a large number of replicas to make rapid, fine-grained training
-steps. The worker service dispatches kernels to local devices and runs kernels
-in parallel when possible, for example by using multiple CPU cores or GPU
-streams.
+* TCP 上的 gRPC.
+* Converged Ethernet 上的 RDMA.
 
-We specialize Send and Recv operations for each pair of source and destination
-device types:
+我们也为用于多 GPU 通信的 Nvidia NCCL 库提供了初步支持 (见 [`tf.contrib.nccl`](
+https://www.tensorflow.org/code/tensorflow/contrib/nccl/python/ops/nccl_ops.py))。
 
-*  Transfers between local CPU and GPU devices use the
-   `cudaMemcpyAsync()` API to overlap computation and data transfer.
-*  Transfers between two local GPUs use peer-to-peer DMA, to avoid an expensive
-   copy via the host CPU.
+![分区图](https://www.tensorflow.org/images/graph_send_recv.svg){: width="700"}
 
-For transfers between tasks, TensorFlow uses multiple protocols, including:
+**图 8**
 
-*  gRPC over TCP.
-*  RDMA over Converged Ethernet.
+### 代码
 
-We also have preliminary support for NVIDIA's NCCL library for multi-GPU
-communication (see [`tf.contrib.nccl`](
-https://www.tensorflow.org/code/tensorflow/contrib/nccl/python/ops/nccl_ops.py)).
+* [WorkerService API 定义](https://www.tensorflow.org/code/tensorflow/core/protobuf/worker_service.proto)
+* [Worker 的通信接口](https://www.tensorflow.org/code/tensorflow/core/distributed_runtime/worker_interface.h)
+* [远程 rendezvous (Send 和 Recv 的实现)](https://www.tensorflow.org/code/tensorflow/core/distributed_runtime/rpc/rpc_rendezvous_mgr.h)
 
-![Partitioned Graph](https://www.tensorflow.org/images/graph_send_recv.svg){: width="700"}
+## 内核实现
 
-**Figure 8**
+运行时包含超过200个标准操作，包括数学、数组操作、控制流和状态管理等操作。每个操作均针对不同设备提供了内核级优化。许多的操作内核使用由 `Eigen::Tensor` 实现，它使用 C++ 模板的来为 CPU 和 GPU 生成高效的并行代码。而且，我们大量的使用了类似于 cuDNN 的库使得一个更加高效的内核实现成为可能。
 
-### Code
+我们还实现了 @{$quantization$quantization}，使得在移动设备或高吞吐数据中心这样的应用环境中实现快速推理成为可能，并且使用了 [gemmlowp](https://github.com/google/gemmlowp) 低精度矩阵库来加速量化计算。
 
-*   [WorkerService API definition](https://www.tensorflow.org/code/tensorflow/core/protobuf/worker_service.proto)
-*   [Worker interface](https://www.tensorflow.org/code/tensorflow/core/distributed_runtime/worker_interface.h)
-*   [Remote rendezvous (for Send and Recv implementations)](https://www.tensorflow.org/code/tensorflow/core/distributed_runtime/rpc/rpc_rendezvous_mgr.h)
+如果将一个子计算分解为一些操作比较困难或低效时，用户可以使用 C++ 来注册并提供一个更高效的内核实现。例如我们建议注册自己的内核来完成某些与性能直接挂钩的操作（如 ReLU 和 Sigmoid 激活函数及其对应梯度）。@{$xla$XLA Compiler} 提供了一个自动内核融合的实验性实现。
 
-## Kernel Implementations
+### 代码
 
-The runtime contains over 200 standard operations, including mathematical, array
-manipulation, control flow, and state management operations. Each of these
-operations can have kernel implementations optimized for a variety of devices.
-Many of the operation kernels are implemented using Eigen::Tensor, which uses
-C++ templates to generate efficient parallel code for multicore CPUs and GPUs;
-however, we liberally use libraries like cuDNN where a more efficient kernel
-implementation is possible. We have also implemented
-@{$quantization$quantization}, which enables
-faster inference in environments such as mobile devices and high-throughput
-datacenter applications, and use the
-[gemmlowp](https://github.com/google/gemmlowp) low-precision matrix library to
-accelerate quantized computation.
-
-If it is difficult or inefficient to represent a subcomputation as a composition
-of operations, users can register additional kernels that provide an efficient
-implementation written in C++. For example, we recommend registering your own
-fused kernels for some performance critical operations, such as the ReLU and
-Sigmoid activation functions and their corresponding gradients. The @{$xla$XLA Compiler} has an
-experimental implementation of automatic kernel fusion.
-
-### Code
-
-*   [`OpKernel` interface](https://www.tensorflow.org/code/tensorflow/core/framework/op_kernel.h)
+*   [`OpKernel` 接口](https://www.tensorflow.org/code/tensorflow/core/framework/op_kernel.h)
