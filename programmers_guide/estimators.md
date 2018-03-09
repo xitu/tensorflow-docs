@@ -91,7 +91,7 @@
 
 ## 自定义评估器
 
-预定义和自定义评估器的核心是**模型函数**， 它可以用来构建训练、评价和预测的图表。当你使用预定义评估器时，里面已经实现了模型函数了。但是当你要使用自定义评估器时，你就要自己编写模型函数。@{$extend/estimators$companion document} 描述了编写模型函数的方法。
+预定义和自定义评估器的核心是**模型函数**， 它可以用来构建训练、评价和预测的图表。当你使用预定义评估器时，里面已经实现了模型函数了。但是当你要使用自定义评估器时，你就要自己编写模型函数。@{$get_started/custom_estimators$companion document} 描述了编写模型函数的方法。
 
 ## 推荐的工作流
 
@@ -114,11 +114,25 @@ keras_inception_v3 = tf.keras.applications.inception_v3.InceptionV3(weights=None
 keras_inception_v3.compile(optimizer=tf.keras.optimizers.SGD(lr=0.0001, momentum=0.9),
                           loss='categorical_crossentropy',
                           metric='accuracy')
-# 从编译好的 Keras 模型创建一个评估器
+# Create an Estimator from the compiled Keras model. Note the initial model
+# state of the keras model is preserved in the created Estimator.
 est_inception_v3 = tf.keras.estimator.model_to_estimator(keras_model=keras_inception_v3)
-# 像使用其他评估器一样使用派生的评估器。
-# 以下例子中，派生的评估器调用了训练方法。
-est_inception_v3.train(input_fn=my_training_set, steps=2000)
+
+# Treat the derived Estimator as you would with any other Estimator.
+# First, recover the input name(s) of Keras model, so we can use them as the
+# feature column name(s) of the Estimator input function:
+keras_inception_v3.input_names  # print out: ['input_1']
+# Once we have the input name(s), we can create the input function, for example,
+# for input(s) in the format of numpy ndarray:
+train_input_fn = tf.estimator.inputs.numpy_input_fn(
+    x={"input_1": train_data},
+    y=train_labels,
+    num_epochs=1,
+    shuffle=False)
+# To train, we call Estimator's train function:
+est_inception_v3.train(input_fn=train_input_fn, steps=2000)
 ```
+
+Note that the names of feature columns and labels of a keras estimator come from the corresponding compiled keras model. For example, the input key names for `train_input_fn` above can be obtained from `keras_inception_v3.input_names`, and similarly, the predicted output names can be obtained from `keras_inception_v3.output_names`.
 
 想要了解更多的细节，请查阅 @{tf.keras.estimator.model_to_estimator} 。
