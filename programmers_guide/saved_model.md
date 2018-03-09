@@ -44,14 +44,12 @@ with tf.Session() as sess:
   dec_v2.op.run()
   # Save the variables to disk.
   save_path = saver.save(sess, "/tmp/model.ckpt")
-  print("Model saved in file: %s" % save_path)
+  print("Model saved in path: %s" % save_path)
 ```
-
-
 
 ### 恢复变量
 
-`tf.train.Saver` 对象不仅可以将变量保存到快照文件中，还可以恢复变量。需注意，从文件中恢复变量时，无需预先初始化变量。例如，如下代码演示了如何调用 `tf.train.Saver.restore` 方法从检查点文件中恢复变量:
+The `tf.train.Saver` object not only saves variables to checkpoint files, it also restores variables. Note that when you restore variables you do not have to initialize them beforehand. For example, the following snippet demonstrates how to call the `tf.train.Saver.restore` method to restore variables from the checkpoint files:
 
 ```python
 tf.reset_default_graph()
@@ -74,6 +72,9 @@ with tf.Session() as sess:
   print("v2 : %s" % v2.eval())
 ```
 
+Notes:
+
+*  There is not a physical file called "/tmp/model.ckpt". It is the **prefix** of filenames created for the checkpoint. Users only interact with the prefix instead of physical checkpoint files.
 
 ### 选择需要保存和恢复的变量
 
@@ -115,9 +116,7 @@ with tf.Session() as sess:
 
 *  如果您仅在会话开始时恢复部分模型变量，那么您必须为其他变量运行一个初始化操作。更多信息请查阅 @{tf.variables_initializer}。
 
-*  您可以使用
-   [`inspect_checkpoint`](https://www.tensorflow.org/code/tensorflow/python/tools/inspect_checkpoint.py)
-   库检查快照文件中的变量， `print_tensors_in_checkpoint_file` 函数尤为好用。
+*  您可以使用 [`inspect_checkpoint`](https://www.tensorflow.org/code/tensorflow/python/tools/inspect_checkpoint.py) 库检查快照文件中的变量，`print_tensors_in_checkpoint_file` 函数尤为好用。
 
 *  默认情况下，`Saver` 使用每个变量的 @{tf.Variable.name} 来保存变量。但是，你也可以在创建 `Saver` 对象时为快照文件中的每个变量指定名字。
 
@@ -182,7 +181,7 @@ chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='v2', all_t
 ```python
 export_dir = ...
 ...
-builder = tf.saved_model_builder.SavedModelBuilder(export_dir)
+builder = tf.saved_model.builder.SavedModelBuilder(export_dir)
 with tf.Session(graph=tf.Graph()) as sess:
   ...
   builder.add_meta_graph_and_variables(sess,
@@ -237,6 +236,30 @@ LoadSavedModel(session_options, run_options, export_dir, {kSavedModelTagTrain},
                &bundle);
 ```
 
+### Loading and Serving a SavedModel in TensorFlow Serving
+
+You can easily load and serve a SavedModel with the TensorFlow Serving Model
+Server binary. See [instructions](https://www.tensorflow.org/serving/setup#installing_using_apt-get)
+on how to install the server, or build it if you wish.
+
+Once you have the Model Server, run it with:
+```
+tensorflow_model_server --port=port-numbers --model_name=your-model-name --model_base_path=your_model_base_path
+```
+Set the port and model_name flags to values of your choosing. The
+model_base_path flag expects to be to a base directory, with each version of
+your model residing in a numerically named subdirectory. If you only have a
+single version of your model, simply place it in a subdirectory like so:
+* Place the model in /tmp/model/0001
+* Set model_base_path to /tmp/model
+
+Store different versions of your model in numerically named subdirectories of a
+common base directory. For example, suppose the base directory is `/tmp/model`.
+If you have only one version of your model, store it in `/tmp/model/0001`. If
+you have two versions of your model, store the second version in
+`/tmp/model/0002`, and so on.  Set the `--model-base_path` flag to the base
+directory (`/tmp/model`, in this example).  TensorFlow Model Server will serve
+the model in the highest numbered subdirectory of that base directory.
 
 ### 标准常量
 
@@ -273,7 +296,7 @@ SaveModel 为多种使用案例提供了创建和加载 TensorFlow 计算图的�
 
 ### 准备运行时的输入
 
-训练时，@{$input_fn$`input_fn()`} 获取并准备数据供模型使用。 在运行时，类似的，`serving_input_receiver_fn()` 接收推理请求并准备提供给模型。这一步旨在实现：
+During training, an @{$premade_estimators#input_fn$`input_fn()`} ingests data and prepares it for use by the model.  At serving time, similarly, a `serving_input_receiver_fn()` accepts inference requests and prepares them for the model. This function has the following purposes:
 
 *  为系统运行时的推理请求添加占位符。
 *  添加任意额外需要的操作，用于将输入数据转换成模型所需要的特征 `Tensor`。
@@ -344,9 +367,9 @@ estimator.export_savedmodel(export_dir_base, serving_input_receiver_fn)
 ### 在本地运行导出的模型
 
 对于本地部署，您可以使用
-[TensorFlow Serving](http://github.com/tensorflow/serving)（一个加载 SavedModel 并将其暴露为 [gRPC](http://www.grpc.io/) 服务的开源项目）来运行模型。
+[TensorFlow Serving](https://github.com/tensorflow/serving)（一个加载 SavedModel 并将其暴露为 [gRPC](https://www.grpc.io/) 服务的开源项目）来运行模型。
 
-首先， [安装 TensorFlow Serving](http://github.com/tensorflow/serving)。
+首先， [安装 TensorFlow Serving](https://github.com/tensorflow/serving)。
 
 然后创建并运行本地模型服务器，用以上导出的 SavedModel 路径替换 `$export_dir_base`：
 
@@ -554,6 +577,7 @@ usage: saved_model_cli run [-h] --dir DIR --tag_set TAG_SET --signature_def
 
 * `--inputs` 选项允许您在文件中传递 numpy ndarray。
 * `--input_exprs` 选项允许您传递 Python 表达式。
+* `--input_examples` option enables you to pass `tf.train.Example`.
 
 
 #### `--inputs`
@@ -589,17 +613,28 @@ usage: saved_model_cli run [-h] --dir DIR --tag_set TAG_SET --signature_def
 若通过 Python 表达式传递输入, 请指定 `--input_exprs` 选项。这在你没有任何数据文件但仍想通过一些符合 `SignatureDef` 类型、形状定义的输入数据来检查模型的连通性时会很有用。例如：
 
 ```bsh
-`input_key=[[1], [2], [3]]`
+`<input_key>=[[1],[2],[3]]`
 ```
 
 除了 Python 表达式外, 您还可以传递 numpy 函数。例如:
 
 ```bsh
-input_key=np.ones((32, 32, 3))
+`<input_key>=np.ones((32,32,3))`
 ```
 
 (请注意，`numpy` 模块已经可以作为 `np` 使用。)
 
+#### `--inputs_examples`
+
+To pass `tf.train.Example` as inputs, specify the `--input_examples` option.
+For each input key, it takes a list of dictionary, where each dictionary is an
+instance of `tf.train.Example`. The dictionary keys are the features and the
+values are the value lists for each feature.
+For example:
+
+```bsh
+`<input_key>=[{"age":[22,24],"education":["BS","MS"]}]`
+```
 
 #### 保存输出
 
