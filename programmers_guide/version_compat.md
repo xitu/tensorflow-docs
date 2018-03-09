@@ -40,7 +40,7 @@ TensorFlow 中只有公共 APIs 在副版本和补丁版本之间兼容。公共
     * [`tensor_shape`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/tensor_shape.proto)
     * [`types`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/types.proto)
 
-## 未涉及的内容
+## 未涉及的内容 {not_covered}
 
 某些 API 函数被显式标记为“实验性”，它们可以在不同副版本之间进行非兼容性改动，包括：
 
