@@ -21,14 +21,14 @@ my_variable = tf.get_variable("my_variable", [1, 2, 3])
 你也能可选地给 `tf.get_variable` 指定 `dtype` 和初始值。比如：
 
 ``` python
-my_int_variable = tf.get_variable("my_int_variable", [1, 2, 3], dtype=tf.int32, 
+my_int_variable = tf.get_variable("my_int_variable", [1, 2, 3], dtype=tf.int32,
   initializer=tf.zeros_initializer)
 ```
 
 TensorFlow 提供了很多便捷的初始化方式。方案之一，你可以指定 `tf.Variable` 的初始值为 `tf.Tensor`。比如：
 
 ``` python
-other_variable = tf.get_variable("other_variable", dtype=tf.int32, 
+other_variable = tf.get_variable("other_variable", dtype=tf.int32,
   initializer=tf.constant([23, 42]))
 ```
 
@@ -48,15 +48,15 @@ other_variable = tf.get_variable("other_variable", dtype=tf.int32,
 如果你不想让变量在训练中出现，你可以将它加入到 `tf.GraphKeys.LOCAL_VARIABLES` 集合中。比如，下面这个例子示范了如何将一个名为 `my_local` 的变量加入到这个集合中：
 
 ``` python
-my_local = tf.get_variable("my_local", shape=(), 
+my_local = tf.get_variable("my_local", shape=(),
 collections=[tf.GraphKeys.LOCAL_VARIABLES])
 ```
 
 或者，你可以指定 `trainable=False` 作为 `tf.get_variable` 的一个参数：
 
 ``` python
-my_non_trainable = tf.get_variable("my_non_trainable", 
-                                   shape=(), 
+my_non_trainable = tf.get_variable("my_non_trainable",
+                                   shape=(),
                                    trainable=False)
 ```
 
@@ -139,7 +139,7 @@ w = v + 1  # w 是基于 v 的值来计算的 tf.Tensor
 v = tf.get_variable("v", shape=(), initializer=tf.zeros_initializer())
 assignment = v.assign_add(1)
 tf.global_variables_initializer().run()
-assignment.run()
+sess.run(assignment)  # or assignment.op.run(), or assignment.eval()
 ```
 
 绝大部分的 TensorFlow 优化器都有特定的操作来依据某些梯度下降算法高效地更新变量的值。我们用 @{tf.train.Optimizer} 来解释如何使用优化器。
