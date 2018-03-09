@@ -63,12 +63,6 @@ Feeding 是 TensorFlow Session API 的一个机制，它允许你
 的字典，这个字典将会在执行步骤的时候作为 tensors 的数值
 被使用。
 
-通常情况下，你会有一些待赋值的输入张量 ( input tensors ) 。
-@{tf.placeholder} 对象允许你定义这些待赋值的张量并规定它们的形状。
-@{$beginners$beginners' MNIST tutorial} 这篇文档展示
-了 placeholders 和 feeding 是如何给一个
-神经网络提供训练数据的。
-
 #### `Session.run()` 和 `Tensor.eval()` 的区别是什么？
 
 如果 `t` 是一个 @{tf.Tensor} 对象，
@@ -289,7 +283,7 @@ TensorFlow Python API 的代码风格是遵循
 [Google Python style guide](https://google.github.io/styleguide/pyguide.html)。
 
 TensorFlow C++ 代码风格遵循 
-[Google C++ style guide](http://google.github.io/styleguide/cppguide.html) 的约定。
+[Google C++ style guide](https://google.github.io/styleguide/cppguide.html) 的约定。
 
 (<sup>*</sup>有一个例外是：我们使用 2 个空格进行缩进，而不是 4 个。)
 
