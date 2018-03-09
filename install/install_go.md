@@ -2,15 +2,15 @@
 
 TensorFlow 提供了 Go 程序中可以调用的 API。这些 API 非常适合加载 Python 创建的模型以及在 Go 应用中执行。本文将介绍如何安装和配置 [TensorFlow Go 包](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go)。
 
-**警告：** TensorFlow Go 语言 API 并不属于 TensorFlow [API 稳定性保障](https://www.tensorflow.org/programmers_guide/version_semantics)。
+警告： TensorFlow Go 语言 API 并不属于 TensorFlow [API 稳定性保障](https://www.tensorflow.org/programmers_guide/version_semantics)。
 
 
 ## 支持的平台
 
-你可以在下面的操作系统上安装 Go 版本 TensorFlow：
+This guide explains how to install TensorFlow for Go.  Although these instructions might also work on other variants, we have only tested (and we only support) these instructions on machines meeting the following requirements:
 
-  * Linux
-  * Mac OS X
+  * Linux, 64-bit, x86
+  * macOS X, 10.11 (El Capitan) or higher
 
 
 ## 安装
@@ -19,15 +19,15 @@ Go 版本 TensorFlow 依赖于 TensorFlow C 语言库。按照下面的步骤安
 
   1. 决定在运行 TensorFlow 时仅仅启用 CPU 还是和 GPU 一起启用。为了帮助你做这个决定，请阅读以下指南中的“决定安装哪个 TensorFlow ”部分：
 
-     * @{$install_linux#determine_which_tensorflow_to_install$在 Linux 中安装 TensorFlow}
-     * @{$install_mac#determine_which_tensorflow_to_install$在 macOS 中安装 TensorFlow}
+ * @{$install_linux#determine_which_tensorflow_to_install$Installing TensorFlow on Linux}
+ * @{$install_mac#determine_which_tensorflow_to_install$Installing TensorFlow on macOS}
 
   2. 通过执行以下命令下载并解压 TensorFlow C 语言库到 `/usr/local/lib` 目录:
 
          TF_TYPE="cpu" # Change to "gpu" for GPU support
          TARGET_DIRECTORY='/usr/local'
          curl -L \
-           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-$(go env GOOS)-x86_64-1.4.0-rc0.tar.gz" |
+           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-$(go env GOOS)-x86_64-1.6.0.tar.gz" |
          sudo tar -C $TARGET_DIRECTORY -xz
 
      `tar` 命令会解压 TensorFlow C 语言库到 `TARGET_DIRECTORY` 的子目录 `lib`。比如，指定 `/usr/local` 作为 `TARGET_DIRECTORY` 使得 `tar` 命令可以将 TensorFlow C 语言库解压到 `/usr/local/lib`。
@@ -39,9 +39,9 @@ Go 版本 TensorFlow 依赖于 TensorFlow C 语言库。按照下面的步骤安
 
      如果你指定的 `TARGET_DIRECTORY` 不是一个系统目录（比如 `~/mydir`），那么你必须要将这个解压目录（比如 `~/mydir/lib`）添加到下面这两个环境变量中：
 
-     <pre> <b>export LIBRARY_PATH=$LIBRARY_PATH:~/mydir/lib</b> # 用于 Linux 和 Mac OS X
+     <pre> <b>export LIBRARY_PATH=$LIBRARY_PATH:~/mydir/lib</b> # 用于 Linux 和 macOS X
      <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/mydir/lib</b> # 仅用于 Linux
-     <b>export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:~/mydir/lib</b> # 仅用于 Mac OS X</pre>
+     <b>export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:~/mydir/lib</b> # 仅用于 macOS</pre>
 
   4. 现在 TensorFlow C 语言库已经安装好了，执行 `go get` 来下载对应的包和相应的依赖：
 
