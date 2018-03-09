@@ -187,7 +187,7 @@ TensorBoard 提供了几种方法来改变图形的视觉布局。这不会改�
 
 ## 运行时间统计
 
-通常收集运行时的元数据是非常有用的，例如总内存使用量，总计算时间和节点的张量形状。下面的代码示例是修改自 `simple MNIST tutorial` 中的一个片段，其中我们记录了摘要法和运行时统计的信息。有关如何记录摘要的详细信息，请参阅 @{$summaries_and_tensorboard#serializing-the-data$Summaries Tutorial}。完整的源代码在[这里](https://www.tensorflow.org/code/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py)。
+通常收集运行时的元数据是非常有用的，例如总内存使用量，总计算时间和节点的张量形状。下面的代码示例是修改自 @{$layers$simple MNIST tutorial} 中的一个片段，其中我们记录了摘要法和运行时统计的信息。有关如何记录摘要的详细信息，请参阅 @{$summaries_and_tensorboard#serializing-the-data$Summaries Tutorial}。完整的源代码在[这里](https://www.tensorflow.org/code/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py)。
 
 ```python
   # Train the model, and also write summaries.
