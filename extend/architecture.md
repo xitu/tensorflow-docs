@@ -2,7 +2,7 @@
 
 为了针对大规模分布式训练和推理，我们设计了 TensorFlow，同时它也足够灵活，可以支持新的机器学习模型及系统级的优化。
 
-本文介绍了实现其规模与灵活性并驾齐驱的系统架构。我们假设你在阅读本文时已经熟悉了使用 TensorFlow 的基本概念，例如计算图（computation graph）、操作（operation）以及会话（session）。请参考 @{$get_started/get_started$Getting Started} 来了解关于这些主题的介绍，熟悉 @{$distributed$distributed TensorFlow} 对理解本文会有帮助。
+本文介绍了实现其规模与灵活性并驾齐驱的系统架构。我们假设你在阅读本文时已经熟悉了使用 TensorFlow 的基本概念，例如计算图（computation graph）、操作（operation）以及会话（session）。请参考 @{$programmers_guide/low_level_intro$this document} 来了解关于这些主题的介绍，熟悉 @{$distributed$distributed TensorFlow} 对理解本文会有帮助。
 
 本文适用于那些受到当前 API 制约从而希望以某种方式扩展 TensorFlow 的开发者、希望优化 TensorFlow 的硬件工程师、大规模分布式机器学习系统的实现人员以及任何希望了解 TensorFlow 底层机制的人。阅读本文之后，你应该能够理解 TensorFlow 的架构并能够阅读并修改 TensorFlow 的核心代码。
 
