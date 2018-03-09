@@ -299,7 +299,7 @@ with tf.Session() as sess:
 
 ![](../images/mnist_deep.png)
 
-要了解更多关于如何使用 TensorBoard 来可视化你的 TensorFlow 应用，请参阅 [TensorBoard 指南](TODO)。
+要了解更多关于如何使用 TensorBoard 来可视化你的 TensorFlow 应用，请参阅 [TensorBoard 指南](../get_started/summaries_and_tensorboard.md)。
 
 ## 使用多个流图编程
 
