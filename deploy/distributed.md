@@ -1,6 +1,6 @@
 # 分布式 TensorFlow
 
-本文演示了怎样创建一个 TensorFlow 集群(cluster)，以及怎样向集群提交计算图(graph)。我们假设你已经对 TensorFlow 编程所需要用到的 @{$get_started/get_started$basic concepts} 有所了解。
+本文演示了怎样创建一个 TensorFlow 集群(cluster)，以及怎样向集群提交计算图(graph)。我们假设你已经对基础的 TensorFlow 编程所需要用到的 @{$programmers_guide/low_level_intro$basic concepts} 有所了解。
 
 ## 你好，分布式 TensorFlow ！
 
