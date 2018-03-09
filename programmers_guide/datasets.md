@@ -1,8 +1,8 @@
 # 数据导入
 
-`Dataset` API 能够快速的从简单可重用的片段中搭建输入总线。例如,一个图像处理模型的输入总线需要完成的任务可能是，从一个分布式文件系统中聚合数据，对每一张图像添加一些数据扰动，并能够将随机选中的图像合并进一个训练批次中。又如，一个文本处理模型的输入总线可能要从未加工的文本数据中提取出标识，并将它们按照一个查询表转化为嵌入标识符，再集合成不同长度的序列。 `Dataset` API 能让处理大规模数据、不同数据格式兼容和复杂转换过程变得很简单。
+@{tf.data} API 能够快速的从简单可重用的片段中搭建输入总线。例如,一个图像处理模型的输入总线需要完成的任务可能是，从一个分布式文件系统中聚合数据，对每一张图像添加一些数据扰动，并能够将随机选中的图像合并进一个训练批次中。又如，一个文本处理模型的输入总线可能要从未加工的文本数据中提取出标识，并将它们按照一个查询表转化为嵌入标识符，再集合成不同长度的序列。`tf.data` API 能让处理大规模数据、不同数据格式兼容和复杂转换过程变得很简单。
 
-`Dataset` API 为 TensorFlow 引入了两种新的抽象：
+`tf.data` API 为 TensorFlow 引入了两种新的抽象：
 
 * `tf.data.Dataset` 是一个基本元素的序列，每一个基本元素中包含了一个或者多个 `Tensor` 对象。例如，在一个图像输入总线中，一个基本元素可能是一个单独的训练样本，它包含了一对 Tensor 对象，分别代表图像数据和一个标签。创建一个数据集有两种不同的方法：
 
@@ -65,7 +65,7 @@ dataset3 = dataset3.filter(lambda x, (y, z): ...)
 
 ### 创建 iterator
 
-一旦你创建了一个代表你输入数据的 `Dataset`，下一步就是创建一个 `Iterator` 来访问每个来自数据集中元素的。 `Dataset` API 当前支持下面几种迭代器，它们的复杂度依次递增：
+一旦你创建了一个代表你输入数据的 `Dataset`，下一步就是创建一个 `Iterator` 来访问每个来自数据集中元素的。`tf.data` API 当前支持下面几种迭代器，它们的复杂度依次递增：
 
 * **one-shot**,
 * **initializable**,
@@ -118,8 +118,8 @@ validation_dataset = tf.data.Dataset.range(50)
 # reinitializable 迭代器由它的结构定义。我们可以使用不论是在
 # `training_dataset` 或者还是在 `validation_dataset` 中的
 # `output_types` 和 `output_shapes`，因为它们是兼容的。
-iterator = Iterator.from_structure(training_dataset.output_types,
-                                   training_dataset.output_shapes)
+iterator = tf.data.Iterator.from_structure(training_dataset.output_types,
+                                           training_dataset.output_shapes)
 next_element = iterator.get_next()
 
 training_init_op = iterator.make_initializer(training_dataset)
@@ -275,7 +275,7 @@ sess.run(iterator.initializer, feed_dict={features_placeholder: features,
 
 ### 使用 TFRecord 数据
 
-`Dataset` API 支持很多种文件格式，所以你能够处理无法放入内存的大数据集。例如，TFRecord 文件格式是一种简单的面向记录的二进制格式，许多 TensorFlow 应用都用它来存储训练数据。`tf.data.TFRecordDataset` 类允许你将一个或者多个 TFRecord 格式文件串流化，并将它们当做一个输入总线的一部分。
+`tf.data` API 支持很多种文件格式，所以你能够处理无法放入内存的大数据集。例如，TFRecord 文件格式是一种简单的面向记录的二进制格式，许多 TensorFlow 应用都用它来存储训练数据。`tf.data.TFRecordDataset` 类允许你将一个或者多个 TFRecord 格式文件串流化，并将它们当做一个输入总线的一部分。
 
 ```python
 # 创建一个从两个文件中读取所有例子的数据集
@@ -331,9 +331,6 @@ dataset = dataset.flat_map(
         .skip(1)
         .filter(lambda line: tf.not_equal(tf.substr(line, 0, 1), "#"))))
 ```
-
- 如果你需要一个使用 `Dataset` API接解析 CSV 文件的完整样例，请查看 [`imports85.py`](https://www.tensorflow.org/code/tensorflow/examples/get_started/regression/imports85.py)
-中的 @{$get_started/linear_regression}。
 
 <!--
 TODO(mrry): Add these sections.
@@ -399,7 +396,7 @@ import cv2
 # 使用一个自定义的 OpenCV 函数读取图像，来替代标准的
 # TensorFlow 的 `tf.read_file()` 操作。
 def _read_py_function(filename, label):
-  image_decoded = cv2.imread(image_string, cv2.IMREAD_GRAYSCALE)
+  image_decoded = cv2.imread(filename.decode(), cv2.IMREAD_GRAYSCALE)
   return image_decoded, label
 
 # 使用一个标准的 TensorFlow 操作来重设图像到一个固定的大小。
@@ -475,7 +472,7 @@ TODO(mrry): Add this section.
 
 ### 多次循环处理
 
-`Dataset` API 提供了两种主要方法来处理同一数据多次循环。
+`tf.data` API 提供了两种主要方法来处理同一数据多次循环。
 
 最简单的多次循环迭代一个数据集的方法是使用 `Dataset.repeat()` 转换。例如，创建一个重复输入数据10次的数据集：
 
@@ -526,7 +523,7 @@ dataset = dataset.repeat()
 
 ### 使用高级 API
 
-@{tf.train.MonitoredTrainingSession} API 简化了分布式运行 TensorFlow 的许多设置。`MonitoredTrainingSession` 使用 @{tf.errors.OutOfRangeError} 来标识训练已经完成，所以我们推荐使用 `Dataset.make_one_shot_iterator()`，例如：
+@{tf.train.MonitoredTrainingSession} API 简化了分布式运行 TensorFlow 的许多设置。`MonitoredTrainingSession` 使用 @{tf.errors.OutOfRangeError} 来标识训练已经完成，所以我们推荐使用 `tf.data` API。例如：
 
 ```python
 filenames = ["/var/data/file1.tfrecord", "/var/data/file2.tfrecord"]
@@ -566,7 +563,7 @@ def dataset_input_fn():
     parsed = tf.parse_single_example(record, keys_to_features)
 
     # 完成在解析数据中的额外预处理
-    image = tf.decode_jpeg(parsed["image_data"])
+    image = tf.image.decode_jpeg(parsed["image_data"])
     image = tf.reshape(image, [299, 299, 1])
     label = tf.cast(parsed["label"], tf.int32)
 
