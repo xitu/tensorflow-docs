@@ -15,8 +15,8 @@
 有些张量的类型比较特殊，会在其他的开发者指南单元中有所说明，主要有以下几种：
 
   * `tf.Variable`
-  * `tf.Constant`
-  * `tf.Placeholder`
+  * `tf.constant`
+  * `tf.placeholder`
   * `tf.SparseTensor`
 
 除了 `tf.Variable` 以外，张量的值是不可变的，也就是说张量在单次执行的上下文中值是唯一的。但是，两次对同一个张量求值可能返回不同的值，比如，张量的值可能是从磁盘读取的数据，或者是一个随机数，那么每次产生的结果可能是不一样的。
@@ -34,7 +34,7 @@
 | n    | n 维张量 (你可以自行想象一下) |
 
 
-### 秩为 0 
+### 秩为 0
 
 下列代码片段展示了如何创建一些秩为 0 的变量：
 
@@ -42,7 +42,7 @@
 mammal = tf.Variable("Elephant", tf.string)
 ignition = tf.Variable(451, tf.int16)
 floating = tf.Variable(3.14159265359, tf.float64)
-its_complicated = tf.Variable((12.3, -4.85), tf.complex64)
+its_complicated = tf.Variable(12.3 - 4.85j, tf.complex64)
 ```
 
 注意：一个 string 对象在 Tensorflow 中作为一个单独的对象，而不是一个字符序列。字符串可以作为标量，也可以作为向量等类型出现。
@@ -55,7 +55,7 @@ its_complicated = tf.Variable((12.3, -4.85), tf.complex64)
 mystr = tf.Variable(["Hello"], tf.string)
 cool_numbers  = tf.Variable([3.14159, 2.71828], tf.float32)
 first_primes = tf.Variable([2, 3, 5, 7, 11], tf.int32)
-its_very_complicated = tf.Variable([(12.3, -4.85), (7.5, -6.23)], tf.complex64)
+its_very_complicated = tf.Variable([12.3 - 4.85j, 7.5 - 6.23j], tf.complex64)
 ```
 
 
@@ -80,15 +80,11 @@ my_image = tf.zeros([10, 299, 299, 3])  # batch 大小 x 高度 x 宽度 x 颜�
 
 ### 获取 `tf.Tensor` 对象的秩
 
-To determine the rank of a `tf.Tensor` object, call the `tf.rank` method.
-For example, the following method programmatically determines the rank 
-of the `tf.Tensor` defined in the previous section:
-
 我们可以通过调用 `tf.rank` 方法来获得一个 `tf.Tensor` 对象的秩。比如，下面的代码展示了如何获得先前定义的一个 `tf.Tensor` 对象的秩：
 
 ```python
-r = tf.rank(my3d)
-# 运行后，r 的值为 3
+r = tf.rank(my_image)
+# 运行后，r 的值为 4
 ```
 
 ### 引用 `tf.Tensor` 切片
@@ -148,7 +144,7 @@ TensorFlow 开发者指南中使用三种传统的表示方法来描述向量的
 下面的例子，展示了如何创建一个长度和已知矩阵的列数相同的零向量：
 
 ``` python
-zeros = tf.zeros(tf.shape(my_matrix)[1])
+zeros = tf.zeros(my_matrix.shape[1])
 ```
 
 ### 改变 `tf.Tensor` 对象的形状
@@ -209,7 +205,7 @@ print tensor.eval()
 
 `Tensor.eval` 方法会返回一个和张量内容相同的 numpy 数组。
 
-当 `tf.Tensor` 所需的动态信息不完全时，是无法对它求值的。比如，依赖 `Placeholder` 的张量在没有给 `Placeholder` 提供值之前是无法被评估的。
+当 `tf.Tensor` 所需的动态信息不完全时，是无法对它求值的。比如，依赖 `placeholder` 的张量在没有给 `placeholder` 提供值之前是无法被评估的。
 
 ``` python
 p = tf.placeholder(tf.float32)
