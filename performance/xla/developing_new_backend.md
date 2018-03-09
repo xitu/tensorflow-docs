@@ -44,9 +44,9 @@ Google 在 x64 和 ARM64 架构下测度了 XLA。
 如果没有可能利用 LLVM，则最好的选择是为你的硬件及 XLA 实现一个全新的后端。
 这是最难的选择，因为你要实现如下的类：
 
-*   [StreamExecutor](https://www.tensorflow.org/code/tensorflow/stream_executor/stream_executor.h):
+*   [`StreamExecutor`](https://www.tensorflow.org/code/tensorflow/stream_executor/stream_executor.h):
     对于许多设备而言，不是 `StreamExecutor` 中的所有方法都是必要的。更多细节，参见已有 `StreamExecutor` 的实现。
-*   [xla::Compiler](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/compiler.h):
+*   [`xla::Compiler`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/compiler.h):
     这个类封装了一个 HLO 计算到一个 `xla::Executable` 的编译。
 *   [`xla::Executable`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/executable.h):
     这个类用于在目标平台上启动一个编译后的计算过程。
