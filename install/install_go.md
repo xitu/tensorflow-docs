@@ -2,7 +2,7 @@
 
 TensorFlow 提供了 Go 程序中可以调用的 API。这些 API 非常适合加载 Python 创建的模型以及在 Go 应用中执行。本文将介绍如何安装和配置 [TensorFlow Go 包](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go)。
 
-警告： TensorFlow Go 语言 API 并不属于 TensorFlow [API 稳定性保障](https://www.tensorflow.org/programmers_guide/version_semantics)。
+警告： TensorFlow Go 语言 API **不**属于 TensorFlow [API 稳定性保障](https://www.tensorflow.org/programmers_guide/version_semantics)。
 
 
 ## 支持的平台
