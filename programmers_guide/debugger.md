@@ -1,8 +1,8 @@
-# 调试 TensorFlow 程序
+# TensorFlow 调试器
 
 TensorFlow 调试器（**tfdbg**）是 TensorFlow 的专用调试器。 它允许您在训练和推理期间查看运行 TensorFlow 图的内部结构和状态，由于 TensorFlow 采用计算图模式，通用调试器（如 Python 的 pdb）是很难调试的。
 
-> tfdbg 对 TensorFlow 支持的平台有如下系统要求。 在 Mac OS X 上，需要 ncurses 库。 它可以使用 brew install homebrew / dupes / ncurses进行安装。 在 Windows 上，需要 pyreadline。 如果你使用 Anaconda3，你可以使用诸如 `“C：\ Program Files \ Anaconda3 \ Scripts \ pip.exe” install pyreadline` 这样的命令来安装它。
+> NOTE: TensorFlow debugger uses a [curses](https://en.wikipedia.org/wiki/Curses_\(programming_library\))-based text user interface. On Mac OS X, the `ncurses` library is required and can be installed with `brew install homebrew/dupes/ncurses`. On Windows, curses isn't as well supported, so a [readline](https://en.wikipedia.org/wiki/GNU_Readline)-based interface can be used with tfdbg by installing `pyreadline` with pip. If you use Anaconda3, you can install it with a command such as `"C:\Program Files\Anaconda3\Scripts\pip.exe" install pyreadline`. Unofficial Windows curses packages can be downloaded [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses), then subsequently installed using `pip install <your_version>.whl`, however curses on Windows may not work as reliably as curses on Linux or Mac.
 
 本教程演示了如何使用 tfdbg 命令行界面（CLI）来调试 [`nan`s](https://en.wikipedia.org/wiki/NaN) 和 [`inf`s](https://en.wikipedia.org/wiki/Infinity) 错误，这是 TensorFlow 模型开发中经常遇到的错误类型。 以下示例适用于使用 TensorFlow 的底层 [`Session`](https://www.tensorflow.org/api_docs/python/tf/Session) API 的用户。 本文档的后续部分描述了如何在更高层次的 API（即 `tf-learn` 中的 `Estimator` 和 `Experiment`）中来使用 tfdbg。要**观察**这个问题，请运行以下命令而不使用调试器（源代码可以在[这里](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/debug/examples/debug_mnist.py)可找到）
 
@@ -94,7 +94,9 @@ tfdbg> run
 | | `pt <tensor>[slicing]` | 使用 [numpy](http://www.numpy.org/)-style数组切片来打印张量中的子数组。| `pt hidden/Relu:0[0:50,:]` |
 | | `-a` | 不截断打印结果很长的张量。（大的张量可能需要花很长的时间来打印）| `pt -a hidden/Relu:0[0:50,:]` |
 | | `-r <range>` | 筛选出指定数值区间内的元素。如果有多个区间可以结合使用。| `pt hidden/Relu:0 -a -r [[-inf,-1],[1,inf]]` |
+| | `-n <number>` | Print dump corresponding to specified 0-based dump number. Required for tensors with multiple dumps. | `pt -n 0 hidden/Relu:0` |
 | | `-s` | 打印数值张量的摘要（仅适用于布尔型和数字类型的非空张量，如 `int *` 和 `float *`） | `pt -s hidden/Relu:0[0:50,:]` |
+| | `-w` | Write the value of the tensor (possibly sliced) to a Numpy file using [`numpy.save()`](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.save.html) | `pt -s hidden/Relu:0 -w /tmp/relu.npy` |
 | **`@[coordinates]`** | | 根据坐标值导航到 `pt` 命令输出值的指定位置。| `@[10,0]` or `@10,0` |
 | **`/regex`** | | [less](https://linux.die.net/man/1/less) 风格的正则表达式搜索 | `/inf` |
 | **`/`** | | 滚动到下一个正则表达式匹配的结果（如果有）。| `/` |
@@ -103,6 +105,7 @@ tfdbg> run
 | **eval** | | **运行 Python 和 numpy 表达式。** | |
 | | `eval <expression>` | 运行 Python / numpy 表达式，用 np 来表示 numpy，调试的张量名需要加上到引号。| ``eval "np.matmul((`output/Identity:0` / `Softmax:0`).T, `Softmax:0`)"`` |
 | | `-a` | 打印表达式返回的结果，就算结果很长也不截断。| ``eval -a 'np.sum(`Softmax:0`, axis=1)'`` |
+| | `-w` | Write the result of the evaluation to a Numpy file using [`numpy.save()`](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.save.html) | ``eval -a 'np.sum(`Softmax:0`, axis=1)' -w /tmp/softmax_sum.npy`` |
 | **`ni`** | | **显示结点信息** | |
 | | `-a` | 在输出中包含结点属性。| `ni -a hidden/Relu` |
 | | `-d` | 列出结点可用的调试转储。| `ni -d hidden/Relu` |
@@ -111,10 +114,12 @@ tfdbg> run
 | | `-r` | 递归的列出结点的输入（输入树）。| `li -r hidden/Relu:0` |
 | | `-d <max_depth>` | 限制 -r 模式下的递归深度。| `li -r -d 3 hidden/Relu:0` |
 | | `-c` | 包含控制输入 | `li -c -r hidden/Relu:0` |
+| | `-t` | Show op types of input nodes. | `li -t -r hidden/Relu:0` |
 | **`lo`** | | **列出结点输出的接收者** | |
 | | `-r` | 递归地列出节点的输出接收者（输出树）。 | `lo -r hidden/Relu:0` |
 | | `-d <max_depth>` | 限制 `-r` 模式下的递归深度。 | `lo -r -d 3 hidden/Relu:0` |
 | | `-c` | 通过控制边缘列出多个接收者。 | `lo -c -r hidden/Relu:0` |
+| | `-t` | Show op types of recipient nodes. | `lo -t -r hidden/Relu:0` |
 | **`ls`** | | **列出创建结点时所涉及的 Python 源文件。** | |
 | | `-p <path_pattern>` | 输出匹配给定正则表达式路径的源文件。| `ls -p .*debug_mnist.*` |
 | | `-n` | 输出匹配给定正则表达式的节点名称。| `ls -n Softmax.*` |
@@ -231,10 +236,10 @@ tfdbg> ni cross_entropy/Log
 
 ![tfdbg run-end UI: infs and nans](https://www.tensorflow.org/images/tfdbg_screenshot_run_end_node_info.png)
 
-您可以看到该结点的操作类型为 `Log`，并且结点的输入是 softmax / Softmax。 运行以下命令，仔细观察输入张量：
+您可以看到该结点的操作类型为 `Log`，并且结点的输入是 Softmax。 运行以下命令，仔细观察输入张量：
 
 ```none
-tfdbg> pt softmax/Softmax:0
+tfdbg> pt Softmax:0
 ```
 
 检查输入张量中的值，搜索零：
@@ -272,7 +277,7 @@ diff = -(y_ * tf.log(y))
 修改为系统内建的 softmax 交叉熵函数：
 
 ```python
-diff = tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=logits)
+diff = tf.losses.sparse_softmax_cross_entropy(labels=y_, logits=logits)
 ```
 
 带上 `--debug` 标记，重新运行：
@@ -378,18 +383,40 @@ model.fit(...)  # 这里将会调试进入 TFDBG CLI。
 
 ## 使用 TFDBG 调试 tf-slim
 
-TFDBG 当前只支持 [tf-slim](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/slim) 训练下的调试。为了调试训练过程，我们为 `slim.learning.train()` 中的 `session_wrapper` 参数提供了 `LocalCLIDebugWrapperSession` 对象，例子如下：
+TFDBG supports debugging of training and evaluation with [tf-slim](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/slim)。As detailed below, training and evaluation require slightly different debugging workflows.
+
+### Debugging training in tf-slim
+
+为了调试训练过程，我们为 `slim.learning.train()` 中的 `session_wrapper` 参数提供了 `LocalCLIDebugWrapperSession` 对象，例子如下：
 
 ``` python
 import tensorflow as tf
 from tensorflow.python import debug as tf_debug
 
 # ... 创建图和训练操作的代码 ...
-tf.contrib.slim.learning_train(
+tf.contrib.slim.learning.train(
     train_op,
     logdir,
     number_of_steps=10,
     session_wrapper=tf_debug.LocalCLIDebugWrapperSession)
+```
+
+### Debugging evaluation in tf-slim
+To debug the evaluation process, provide `LocalCLIDebugHook` to the
+`hooks` argument of `slim.evaluation.evaluate_once()`. For example:
+
+``` python
+import tensorflow as tf
+from tensorflow.python import debug as tf_debug
+
+# ... Code that creates the graph and the eval and final ops ...
+tf.contrib.slim.evaluation.evaluate_once(
+    '',
+    checkpoint_path,
+    logdir,
+    eval_op=my_eval_op,
+    final_op=my_value_op,
+    hooks=[tf_debug.LocalCLIDebugHook()])
 ```
 
 ## 离线调试远程运行的 Session
