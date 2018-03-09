@@ -5,24 +5,24 @@ TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/
 
 ## 支持的平台
 
-你可能会在下面的操作系统上安装用于 C 的 TensorFlow：
+This guide explains how to install TensorFlow for C.  Although these instructions might also work on other variants, we have only tested (and we only support) these instructions on machines meeting the following requirements:
 
-  * Linux
-  * Mac OS X
+ * Linux, 64-bit, x86
+ * Mac OS X, Version 10.11 (El Capitan) or higher
 
 
 ## 安装
 采取下面几步来安装用于 C 的 TensorFlow 库，然后打开用于 C 的 TensorFlow：
   1.选择你将会仅仅运行用于 C 的 TensoFlow 在 CPU（S）上，还是有 GPU（S）的帮助。为了帮你做出选择，在以下指南中阅读这一节，标题为决定安装哪个TensorFlow”：
        * @{$install_linux#determine_which_tensorflow_to_install$Installing TensorFlow on Linux}
-       * @{$install_mac#determine_which_tensorflow_to_install$Installing TensorFlow on Mac OS}
+       * @{$install_mac#determine_which_tensorflow_to_install$Installing TensorFlow on macOS}
 
   2.通过调用下面的 shell 命令，下载并且解压 TensorFlow 的 C 库到 `/usr/local/lib`：
          TF_TYPE="cpu" # Change to "gpu" for GPU support
-         OS="linux" # Change to "darwin" for Mac OS
+         OS="linux" # Change to "darwin" for macOS
          TARGET_DIRECTORY="/usr/local"
          curl -L \
-           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.4.0-rc0.tar.gz" |
+           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.6.0.tar.gz" |
            sudo tar -C $TARGET_DIRECTORY -xz
 
 `tar` 命令会解压 TensorFlow C 库到 `TARGET_DIRECTORY` 的子目录 `lib`中。比如指定 `/usr/local` 作为 `TARGET_DIRECTORY`，那么 `tar` 就会解压TensorFlow C 库到 `/usr/local/lib`。
@@ -34,9 +34,9 @@ TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/
   <pre><b>sudo ldconfig</b></pre>
   如果你指定了一个 `TARGET_DIRECTORY` 而不是系统目录，（比如，`~/mydir`），那么你必须设定你的解压目录（比如，`~/mydir/lib`）到两个环境变量中。
   比如:
-  <pre> <b>export LIBRARY_PATH=$LIBRARY_PATH:~/mydir/lib</b> # For both Linux and Mac OS X
+  <pre> <b>export LIBRARY_PATH=$LIBRARY_PATH:~/mydir/lib</b> # For both Linux and macOS X
   <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/mydir/lib</b> # For Linux only
-  <b>export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:~/mydir/lib</b> # For Mac OS X only</pre>
+  <b>export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:~/mydir/lib</b> # For macOS X only</pre>
 
 ## 验证你的安装
 
