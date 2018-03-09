@@ -1,6 +1,6 @@
 # 添加一个新操作（Op）
 
-注意：默认情况下，[www.tensorflow.org](https://tensorflow.org) 显示的是最新稳定版的文档。
+注意：默认情况下 [www.tensorflow.org](https://tensorflow.org) 显示的是最新稳定版的文档。
 本文档中的用法说明针对的是从源码构建的 TensorFlow。你很可能希望从 TensorFlow 的 `master` 版本开始构建。
 那么，你就应该采纳[本文档的 `master` 版本](https://www.tensorflow.org/versions/master/extend/adding_an_op)
 中的用法，两种版本之间是有可能存在变动的。
