@@ -24,7 +24,7 @@ FileWriter 的构造函数需要包含 logdir，logdir 目录是非常重要的
 
 现在已经修改了你的图并且有一个 FileWriter，准备开始你的神经网络吧！如果您愿意，您可以单步运行合并汇总操作，并记录大量的训练数据。不过，这可能比你需要的数据更多。你可以每 n 步执行一次汇总。
 
-下面的代码示例是对 [简单 MNIST 指南](https://www.tensorflow.org/get_started/mnist/beginners)的更改，其中我们额外每十步执行一次总结。如果你运行这个然后启动 Tensorboard—logdir=/tmp/tensorflow/mnist，你将能够可视化统计数据，例如在训练过程中权重或精确度是如何变化的。下面的代码是一个摘录，完整的资料在 [这里](https://www.tensorflow.org/code/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py)。
+下面的代码示例是基于 @{$layers$simple MNIST tutorial} 更改的，其中我们额外每十步执行一次总结。如果你运行这个然后启动 Tensorboard—logdir=/tmp/tensorflow/mnist，你将能够可视化统计数据，例如在训练过程中权重或精确度是如何变化的。下面的代码是一个摘录，完整的资料在 [这里](https://www.tensorflow.org/code/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py)。
 
 ```python
 def variable_summaries(var):
@@ -78,12 +78,10 @@ with tf.name_scope('cross_entropy'):
   #
   # 可能在数值上不稳定。
   #
-  # 所以我们在 nn_layer 的原始输出上使用这个操作                       
-  # tf.nn.softmax_cross_entropy_with_logits，然后在批处理     
-  # 数据上进行平均。
-  diff = tf.nn.softmax_cross_entropy_with_logits(targets=y_, logits=y)
+  # So here we use tf.losses.sparse_softmax_cross_entropy on the
+  # raw logit outputs of the nn_layer above.
   with tf.name_scope('total'):
-    cross_entropy = tf.reduce_mean(diff)
+    cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=y_, logits=y)
 tf.summary.scalar('cross_entropy', cross_entropy)
 
 with tf.name_scope('train'):
