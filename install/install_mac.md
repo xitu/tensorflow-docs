@@ -1,6 +1,8 @@
 # 在 macOS 中安装 TensorFlow
 
-这篇指南说明如何在 macOS 上安装 TensorFlow。
+This guide explains how to install TensorFlow on macOS. Although these instructions might also work on other macOS variants, we have only tested (and we only support) these instructions on machines meeting the following requirements:
+
+  * macOS X 10.11 (El Capitan) or higher
 
 注意：从 v1.2 开始，TensorFlow 不再为 macOS 提供 GPU 支持。
 
@@ -8,17 +10,17 @@
 
 你必须选择使用哪种方式来安装 TensorFlow。有以下方式：
 
-  * virtualenv
+  * Virtualenv
   * 原生 pip
   * Docker
   * 通过源码进行安装，详见[这篇文档](https://www.tensorflow.org/install/install_sources)。
 
-**我们推荐使用 virtualenv 进行安装。**
+**我们推荐使用 Virtualenv 进行安装。**
 [Virtualenv](https://virtualenv.pypa.io/en/stable) 
 是与其他 Python 开发隔离的虚拟 Python 环境，使得在同一台机器上不受其他 Python 程序的干扰。
-在 virtualenv 安装过程中，你不仅要安装 TensorFlow，还需安装 TensorFlow 所需的软件包（其实很简单）。
+在 Virtualenv 安装过程中，你不仅要安装 TensorFlow，还需安装 TensorFlow 所需的软件包（其实很简单）。
 要开始使用 TensorFlow，只需要『激活』虚拟环境。
-总而言之，virtualenv 为安装和运行 TensorFlow 提供了一个安全可靠的机制。
+总而言之，Virtualenv 为安装和运行 TensorFlow 提供了一个安全可靠的机制。
 
 使用本地的 pip 会在系统里直接安装 TensorFlow，无需任何容器或虚拟环境系统。然而由于本地安装并不是完全封闭的，因此本地安装可能会受到系统上其他基于 Python 安装软件的干扰，或者影响到这类软件。
 此外，你可能还需要禁用系统完整性保护（SIP）才能进行本地安装。
@@ -34,46 +36,47 @@ Docker 容器包含 TensorFlow 及其所有依赖项。
 **注意：** conda 包由社区提供支持，而非正式支持。也就是说，TensorFlow 团队既不测试也不维护 conda 包。
 使用此包请自行承担相关风险。
 
-## 通过 virtualenv 安装
+## 通过 Virtualenv 安装
 
 通过执行下面的步骤来使用 Virtualenv 安装 TensorFlow：
 
   1. 启动终端。你需要在命令行中执行下面所有的步骤。
 
-  2. 通过下面的命令安装 pip 和 virtualenv：
+  2. 通过下面的命令安装 pip 和 Virtualenv：
 
      <pre> $ <b>sudo easy_install pip</b>
      $ <b>pip install --upgrade virtualenv</b> </pre>
 
-  3. 通过执行下面的命令来创建虚拟环境：
+  3. 通过执行下面的命令来创建 Virtualenv 环境：
 
      <pre> $ <b>virtualenv --system-site-packages</b> <i>targetDirectory</i> # 对应 Python 2.7
      $ <b>virtualenv --system-site-packages -p python3</b> <i>targetDirectory</i> # 对应 Python 3.n
      </pre>
 
-     其中 <i>targetDirectory</i> 表示 virtualenv 目录树所在的顶层路径。
+     其中 <i>targetDirectory</i> 表示 Virtualenv 目录树所在的顶层路径。
      我们假设 <i>targetDirectory</i>
      为 `~/tensorflow`，但你也可以选择任何你喜欢的路径。
 
-  4. 通过执行下面的命令来激活虚拟环境：
+  4. 通过执行下面的命令来激活 Virtualenv 环境：
 
-     <pre>$ <b>source ~/tensorflow/bin/activate</b>      # 如果使用 bash, sh, ksh 或 zsh
-    $ <b>source ~/tensorflow/bin/activate.csh</b>  # 如果使用 csh 或 tcsh </pre>
+      <pre>$ <b>cd <i>targetDirectory</i></b>
+     $ <b>source ./bin/activate</b>      # 如果是使用 bash、sh、ksh、或 zsh
+     $ <b>source ./bin/activate.csh</b>  # 如果是使用 csh 或 tcsh </pre>
 
      前面的 `source` 命令会将你的命令行提示更改为以下内容：
 
-     <pre> (tensorflow)$ </pre>
+     <pre> (<i>targetDirectory</i>)$ </pre>
 
   5. 确保安装的 pip 版本大于或等于 8.1：
 
-     <pre> (tensorflow)$ <b>easy_install -U pip</b></pre>
+     <pre> (<i>targetDirectory</i>)$ <b>easy_install -U pip</b></pre>
 
   6. 执行下面的命令会将 TensorFlow 及其全部依赖安装至 Virtualenv 环境中：
 
-     <pre> (tensorflow)$ <b>pip install --upgrade tensorflow</b>      # 对应 Python 2.7
-     (tensorflow)$ <b>pip3 install --upgrade tensorflow</b>     # 对应 Python 3.n
+     <pre> (<i>targetDirectory</i>)$ <b>pip install --upgrade tensorflow</b>      # 对应 Python 2.7
+     (<i>targetDirectory</i>)$ <b>pip3 install --upgrade tensorflow</b>     # 对应 Python 3.n
 
-  7. （可选）如果第 6 步失败了（通常可能是因为你使用的 pip 版本小于 8.1），你还可以通过下面的命令安装 TensorFlow：
+  7. （可选）如果第 6 步失败了（通常可能是因为你使用的 pip 版本小于 8.1），你还可以在激活的 Virtualenv 环境下，通过下面的命令安装 TensorFlow：
 
      <pre> $ <b>pip install --upgrade</b> <i>tfBinaryURL</i>   # Python 2.7
      $ <b>pip3 install --upgrade</b> <i>tfBinaryURL</i>  # Python 3.n </pre>
@@ -84,7 +87,7 @@ Docker 容器包含 TensorFlow 及其所有依赖项。
      例如，如果你要在安装了 Python 2.7 的 macOS 上安装 TensorFlow，那么可以执行下面的命令：
 
      <pre> $ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.4.0rc0-py2-none-any.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.6.0-py3-none-any.whl</b></pre>
 
 如果你遇到了任何安装问题，请查看
 [常见安装问题](#common-installation-problems).
@@ -96,21 +99,22 @@ Docker 容器包含 TensorFlow 及其所有依赖项。
 [验证安装](#ValidateYourInstallation)
 来确保 TensorFlow 能够正常工作。
 
-注意，每当你使用一个新的 Shell 来使用 TensorFlow 时，你必须激活 virtualenv 环境。
-如果 virtualenv 环境没有被激活（即命令行提示符中没有 `(tensorflow)`），使用下面的命令可以激活虚拟环境：
+注意，每当你使用一个新的 Shell 来使用 TensorFlow 时，你必须激活 Virtualenv 环境。
+如果 Virtualenv 环境没有被激活（即命令行提示符中没有 `(<i>targetDirectory</i>)`），使用下面的命令可以激活虚拟环境：
 
-<pre>$ <b>source ~/tensorflow/bin/activate</b>      # bash, sh, ksh 或 zsh
-$ <b>source ~/tensorflow/bin/activate.csh</b>  # csh 或 tcsh </pre>
+<pre>$ <b>cd <i>targetDirectory</i></b>
+$ <b>source ./bin/activate</b>      # bash、sh、ksh 或 zsh
+$ <b>source ./bin/activate.csh</b>  # csh 或 tcsh </pre>
 
 如果你的终端提示变成下面的样子，证明 TensorFlow 的环境已经激活：
 
-<pre> (tensorflow)$ </pre>
+<pre> (<i>targetDirectory</i>)$ </pre>
 
-当 virtualenv 环境激活后，你就可以在 Shell 里运行 TensorFlow 程序了。
+当 Virtualenv 环境激活后，你就可以在 Shell 里运行 TensorFlow 程序了。
 
 当你使用完 TensorFlow 后，你还可以解除虚拟环境：
 
-<pre> (tensorflow)$ <b>deactivate</b> </pre>
+<pre> (<i>targetDirectory</i>)$ <b>deactivate</b> </pre>
 
 这时命令行提示将会变回你激活虚拟环境之前的样子。
 
@@ -179,7 +183,7 @@ $ <b>sudo easy_install --upgrade six</b> </pre>
      例如，如果你要在安装了 Python 2.7 的 macOS 上安装 TensorFlow，那么可以执行下面的命令：
 
      <pre> $ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.4.0rc0-py2-none-any.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.6.0-py3-none-any.whl</b></pre>
 
 ### 下一步
 
@@ -253,16 +257,16 @@ Docker 会在第一次启动容器时下载对应的镜像。
   3. 使用如下命令来激活 conda 环境：
 
      <pre>$ <b>source activate tensorflow</b>
-     (tensorflow)$  # Your prompt should change</pre>
+     (<i>targetDirectory</i>)$  # Your prompt should change</pre>
 
   4. 运行如下格式的命令来在你的 conda 环境中安装 TensorFlow：
 
-     <pre>(tensorflow)<b>$ pip install --ignore-installed --upgrade</b> <i>TF_PYTHON_URL</i></pre>
+     <pre>(<i>targetDirectory</i>)<b>$ pip install --ignore-installed --upgrade</b> <i>TF_PYTHON_URL</i></pre>
 
      其中 <i>TF_PYTHON_URL</i>  是 [TensorFlow Python 包的 URL](#the_url_of_the_tensorflow_python_package)。例如，如下命令安装了仅支持 CPU 的 Python 2.7 版本下的 TensorFlow：
 
-     <pre> (tensorflow)$ <b>pip install --ignore-installed --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.4.0rc0-py2-none-any.whl</b></pre>
+     <pre> (<i>targetDirectory</i>)$ <b>pip install --ignore-installed --upgrade \
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.6.0-py2-none-any.whl</b></pre>
 
 
 <a name="ValidateYourInstallation"></a>
@@ -276,10 +280,10 @@ Docker 会在第一次启动容器时下载对应的镜像。
 
 ### 准备环境
 
-如果你已经安装了 pip、virtualenv 或者 Anaconda，那么：
+如果你已经安装了 pip、Virtualenv 或者 Anaconda，那么：
 
     1. 运行终端。
-    2. 如果你使用 virtualenv 或 Anaconda 进行的安装，请激活你的容器。
+    2. 如果你使用 Virtualenv 或 Anaconda 进行的安装，请激活你的容器。
     3. 如果你是使用 TensorFlow 源码进行的安装，请切换到除了包含 TensorFlow 源码的任意目录下。
 
 如果你使用 Docker 进行安装，启动一个运行 bash 的 Docker 容器，例如：
@@ -309,7 +313,7 @@ print(sess.run(hello))
 <pre>Hello, TensorFlow!</pre>
 
 如果你是 TensorFlow 新手，请参看
-@{$get_started/get_started$ 开始使用 TensorFlow}.
+@{$get_started/premade_estimators$$Getting Started with TensorFlow}.
 
 如果安装过程出现了错误，请看[常见安装问题](#common_installation_problems)
 
@@ -425,14 +429,14 @@ RuntimeError: Broken toolchain: cannot link a simple C program</pre>
 
 
 <pre>
-https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.4.0rc0-py2-none-any.whl
+https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.6.0-py2-none-any.whl
 </pre>
 
 ### Python 3.4、3.5 或 3.6
 
 
 <pre>
-https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.4.0rc0-py3-none-any.whl
+https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.6.0-py3-none-any.whl
 </pre>
 
 
