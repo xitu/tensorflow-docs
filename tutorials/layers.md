@@ -115,9 +115,7 @@ def cnn_model_fn(features, labels, mode):
     return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
 
   # 计算损失（可用于`训练`和`评价`中）
-  onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=10)
-  loss = tf.losses.softmax_cross_entropy(
-      onehot_labels=onehot_labels, logits=logits)
+  loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
 
   # Configure the Training Op (for TRAIN mode)
   # 配置训练操作（用于训练模式）
@@ -136,7 +134,7 @@ def cnn_model_fn(features, labels, mode):
       mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 ```
 
-接下来会分章节解释上述 `tf.layers` 的代码，内容包括每一层是如何创建的，损失值是如何计算出来的，训练操作是如何配置的，预测是如何生成的。如果你已经使用过 CNNs 和 @{$estimators$TensorFlow `Estimator`s}，觉得上述的代码已经很直观明了了，你可以跳过这些章节直接看["训练和评估 CNN MNIST 分类器"](#training-and-evaluating-the-cnn-mnist-classifier)。
+接下来会分章节解释上述 `tf.layers` 的代码，内容包括每一层是如何创建的，损失值是如何计算出来的，训练操作是如何配置的，预测是如何生成的。如果你已经使用过 CNNs 和 @{$get_started/custom_estimators$TensorFlow `Estimator`s}，觉得上述的代码已经很直观明了了，你可以跳过这些章节直接看["训练和评估 CNN MNIST 分类器"](#training-and-evaluating-the-cnn-mnist-classifier)。
 
 ### 输入层
 
@@ -358,7 +356,7 @@ if mode == tf.estimator.ModeKeys.TRAIN:
   return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 ```
 
-> 注意：为评估器模型函数配置训练操作的更多细节，请参考 @{$estimators$"Creating Estimations in tf.estimator"} 指南中的 @{$estimators#defining-the-training-op-for-the-model$"Defining the training op for the model"} 小节。
+> 注意：为评估器模型函数配置训练操作的更多细节，请参考 @{$get_started/custom_estimators$"Creating Estimations in tf.estimator"} 指南中的 @{$get_started/custom_estimators#defining-the-training-op-for-the-model$"Defining the training op for the model"} 小节。
 
 ### 添加评价指标
 
@@ -404,7 +402,7 @@ mnist_classifier = tf.estimator.Estimator(
 
 参数 `model_fn` 指定了用于训练，评价和预测的模型函数；我们传入的 `cnn_model_fn` 函数是在[构建 CNN MNIST 分类器](#building-the-cnn-mnist-classifier)中创建的。参数 `model_dir` 指定了模型数据（检查点）保存的目录（这里我们传入的目录是 `/tmp/mnist_convnet_model`，这个目录是可以更改的）。
 
-> 注意：如果要更深入的了解 TensorFlow 的 `Estimator` API，请查阅 @{$estimators$"使用 tf.estimator 创建评估器"}。
+> 注意：如果要更深入的了解 TensorFlow 的 `Estimator` API，请查阅 @{$get_started/custom_estimators$"Creating Estimators in tf.estimator"}。
 
 ### 建立一个日志钩子 {#set_up_a_logging_hook}
 
@@ -490,5 +488,5 @@ INFO:tensorflow:Saving evaluation summary for step 20000: accuracy = 0.9733, los
 
 如果你想了解更多有关于 TensorFlow 中评估器（Estimators）和 CNNs 的内容，请查阅下面的资料：
 
-*   @{$estimators$build-a-multilayer-convolutional-network$Deep MNIST for Experts: Building a Multilayer CNN}：介绍 TensorFlow 评估器 API 的文章，包含了如何配置评估器，编写模型函数，计算损失和定义训练操作。
-*   @{$pros#build-a-multilayer-convolutional-network$Deep MNIST for Experts: Building a Multilayer CNN}：文章内容是讲如何**不使用 layers 模块**而用底层 TensorFlow 操作来构建一个 MNIST CNN 分类器模型的。
+*   @{$get_started/custom_estimators$Creating Estimators in tf.estimator} provides an introduction to the TensorFlow Estimator API. It walks through configuring an Estimator, writing a model function, calculating loss, and defining a training op.
+*   @{$deep_cnn} walks through how to build a MNIST CNN classification model *without estimators* using lower-level TensorFlow operations.
