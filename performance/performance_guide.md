@@ -13,6 +13,7 @@
 *   [输入管线的优化](#输入管线的优化)
 *   [数据格式](#数据格式)
 *   [通用的融合操作](#通用的融合操作)
+*   [RNN Performance](#rnn-performance)
 *   [从源码构建和安装](#从源码构建和安装)
 
 ### 输入管线的优化
@@ -42,24 +43,68 @@ with tf.device('/cpu:0'):
 
 如果使用 `tf.estimator.Estimator`，输入函数会自动用 CPU 执行。
 
-#### 使用 Dataset API
+#### 使用 tf.data API
 
-在构建输入管线时，我们推荐使用 @{$datasets$Dataset API}，而不是原来的 `queue_runner`。
-这个 API 出现在 TensorFlow 1.2 的 contrib 模块中，未来会被加到核心代码中。
-[ResNet 示例](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10_estimator/cifar10_main.py)
-（来自于论文 [arXiv:1512.03385](https://arxiv.org/abs/1512.03385)）中训练 CIFAR-10 展示了如何结合 `tf.estimator.Estimator` 来使用 Dataset API。Dataset API 利用了 C++ 多线程，且比基于 Python 的 `queue_runner` 具有更小的开销，后者受 Python 的多线程性能所累。
+The @{$datasets$tf.data API} is replacing `queue_runner` as the recommended API
+for building input pipelines. This
+[ResNet example](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10_estimator/cifar10_main.py)
+([arXiv:1512.03385](https://arxiv.org/abs/1512.03385))
+training CIFAR-10 illustrates the use of the `tf.data` API along with
+`tf.estimator.Estimator`.
 
-虽然用一个 `feed_dict` 字典来输入数据非常灵活，但在大部分例子中，使用 `feed_dict` 并不能很好地扩展。
-不过，如果只用到了一个 GPU，这并没有什么影响。即便如此，我们也强烈推荐使用 Dataset API。下面的用法应尽量避免： 
+The `tf.data` API utilizes C++ multi-threading and has a much lower overhead
+than the Python-based `queue_runner` that is limited by Python's multi-threading
+performance. A detailed performance guide for the `tf.data` API can be found
+[here](#datasets_performance).
+
+While feeding data using a `feed_dict` offers a high level of flexibility, in
+general `feed_dict` does not provide a scalable solution. If only a single GPU
+is used, the difference between the `tf.data` API and `feed_dict` performance
+may be negligible. Our recommendation is to avoid using `feed_dict` for all but
+trivial examples. In particular, avoid using `feed_dict` with large inputs:
 
 ```python
-# 如果输入数据量大，feed_dict 通常导致次优的性能
+# feed_dict often results in suboptimal performance when using large inputs.
 sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
 ```
 
+#### Fused decode and crop
+
+If inputs are JPEG images that also require cropping, use fused
+@{tf.image.decode_and_crop_jpeg} to speed up preprocessing.
+`tf.image.decode_and_crop_jpeg` only decodes the part of
+the image within the crop window. This significantly speeds up the process if
+the crop window is much smaller than the full image. For imagenet data, this
+approach could speed up the input pipeline by up to 30%.
+
+Example Usage:
+
+```python
+def _image_preprocess_fn(image_buffer):
+    # image_buffer 1-D string Tensor representing the raw JPEG image buffer.
+
+    # Extract image shape from raw JPEG image buffer.
+    image_shape = tf.image.extract_jpeg_shape(image_buffer)
+
+    # Get a crop window with distorted bounding box.
+    sample_distorted_bounding_box = tf.image.sample_distorted_bounding_box(
+      image_shape, ...)
+    bbox_begin, bbox_size, distort_bbox = sample_distorted_bounding_box
+
+    # Decode and crop image.
+    offset_y, offset_x, _ = tf.unstack(bbox_begin)
+    target_height, target_width, _ = tf.unstack(bbox_size)
+    crop_window = tf.stack([offset_y, offset_x, target_height, target_width])
+    cropped_image = tf.image.decode_and_crop_jpeg(image, crop_window)
+```
+
+`tf.image.decode_and_crop_jpeg` is available on all platforms. There is no speed
+up on Windows due to the use of `libjpeg` vs. `libjpeg-turbo` on other
+platforms.
+
 #### 使用大文件
 加载大量的小文件会极大地影响 I/O 性能。一种获得最大的 I/O 吞吐量的方法是将输入数据预处理为更大的 `TFRecord` 文件（约 100MB 大小）。
-对于较小的数据集（200MB~1GB），最好的方法通常是将整个数据集加载到内存。资料 [下载和转换为 TFRecord 格式](https://github.com/tensorflow/models/tree/master/research/slim#Data) 中介绍了创建 `TFRecords` 的相关信息和脚本，
+对于较小的数据集（200MB~1GB），最好的方法通常是将整个数据集加载到内存。资料 [下载和转换为 TFRecord 格式](https://github.com/tensorflow/models/tree/master/research/slim#downloading-and-converting-to-tfrecord-format) 中介绍了创建 `TFRecords` 的相关信息和脚本，
 而 [脚本](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10_estimator/generate_cifar10_tfrecords.py)
 可用于将 CIFAR-10 数据集转化为 `TFRecords`。
 
@@ -110,8 +155,53 @@ bn = tf.layers.batch_normalization(
 bn = tf.contrib.layers.batch_norm(input_layer, fused=True, data_format='NCHW')
 ```
 
-### 从源码构建和安装
+### RNN Performance
 
+There are many ways to specify an RNN computation in TensorFlow and they have
+trade-offs with respect to model flexibility and performance. The
+@{tf.nn.rnn_cell.BasicLSTMCell} should be considered a reference implementation
+and used only as a last resort when no other options will work.
+
+When using one of the cells, rather than the fully fused RNN layers, you have a
+choice of whether to use @{tf.nn.static_rnn} or @{tf.nn.dynamic_rnn}.  There
+shouldn't generally be a performance difference at runtime, but large unroll
+amounts can increase the graph size of the @{tf.nn.static_rnn} and cause long
+compile times.  An additional advantage of @{tf.nn.dynamic_rnn} is that it can
+optionally swap memory from the GPU to the CPU to enable training of very long
+sequences.  Depending on the model and hardware configuration, this can come at
+a performance cost.  It is also possible to run multiple iterations of
+@{tf.nn.dynamic_rnn} and the underlying @{tf.while_loop} construct in parallel,
+although this is rarely useful with RNN models as they are inherently
+sequential.
+
+On NVIDIA GPUs, the use of @{tf.contrib.cudnn_rnn} should always be preferred
+unless you want layer normalization, which it doesn't support.  It is often at
+least an order of magnitude faster than @{tf.contrib.rnn.BasicLSTMCell} and
+@{tf.contrib.rnn.LSTMBlockCell} and uses 3-4x less memory than
+@{tf.contrib.rnn.BasicLSTMCell}.
+
+If you need to run one step of the RNN at a time, as might be the case in
+reinforcement learning with a recurrent policy, then you should use the
+@{tf.contrib.rnn.LSTMBlockCell} with your own environment interaction loop
+inside a @{tf.while_loop} construct. Running one step of the RNN at a time and
+returning to Python is possible, but it will be slower.
+
+On CPUs, mobile devices, and if @{tf.contrib.cudnn_rnn} is not available on
+your GPU, the fastest and most memory efficient option is
+@{tf.contrib.rnn.LSTMBlockFusedCell}.
+
+For all of the less common cell types like @{tf.contrib.rnn.NASCell},
+@{tf.contrib.rnn.PhasedLSTMCell}, @{tf.contrib.rnn.UGRNNCell},
+@{tf.contrib.rnn.GLSTMCell}, @{tf.contrib.rnn.Conv1DLSTMCell},
+@{tf.contrib.rnn.Conv2DLSTMCell}, @{tf.contrib.rnn.LayerNormBasicLSTMCell},
+etc., one should be aware that they are implemented in the graph like
+@{tf.contrib.rnn.BasicLSTMCell} and as such will suffer from the same poor
+performance and high memory usage.  One should consider whether or not those
+trade-offs are worth it before using these cells. For example, while layer
+normalization can speed up convergence, because cuDNN is 20x faster the fastest
+wall clock time to convergence is usually obtained without it.
+
+### 从源码构建和安装
 
 默认情况下，TensorFlow 二进制程序已经覆盖了非常广泛的硬件种类，从而让每个人都能使用 TensorFlow。
 如果用 CPU 来做训练或推理，建议编译 TensorFlow 时启用所有针对 CPU 的优化。对 CPU 上训练和推理的加速的文档参见[编译器优化的对比](#编译器优化的对比)。
@@ -284,7 +374,7 @@ TensorFlow 可用下面的命令来在编译中加入 MKL 优化，不同的 Ten
 ```bash
 ./configure
 # 选择所需的选项
-bazel build --config=mkl -c opt //tensorflow/tools/pip_package:build_pip_package
+bazel build --config=mkl --config=opt //tensorflow/tools/pip_package:build_pip_package
 
 ```
 
