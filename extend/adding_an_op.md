@@ -1,6 +1,6 @@
 # 添加一个新操作（Op）
 
-注意：默认情况下，[TensorFlow 官网](http://tensorflow.org) 显示的是最新稳定版的文档。
+注意：默认情况下，[www.tensorflow.org](https://tensorflow.org) 显示的是最新稳定版的文档。
 本文档中的用法说明针对的是从源码构建的 TensorFlow。你很可能希望从 TensorFlow 的 `master` 版本开始构建。
 那么，你就应该采纳[本文档的 `master` 版本](https://www.tensorflow.org/versions/master/extend/adding_an_op)
 中的用法，两种版本之间是有可能存在变动的。
@@ -385,17 +385,17 @@ $ python zero_out_op_test.py
 
 现在你已经知道如何实现和构建一个基本的操作（更恰当地说，是一个受限的操作），那么接下来，我们将介绍你在编写新操作时通常会用到的一些更复杂的功能，包括：
 
-*   [条件检查和验证](#conditional_checks_and_validation)
-*   [操作注册](#op_registration)
+*   [条件检查和验证](#conditional-checks-and-validation)
+*   [操作注册](#op-registration)
     *   [属性](#attrs)
-    *   [属性类型](#attr_types)
+    *   [属性类型](#attr-types)
     *   [多态](#polymorphism)
-    *   [输入输出](#inputs_and_outputs)
-    *   [后向兼容](#backwards_compatibility)
+    *   [输入输出](#inputs-and-outputs)
+    *   [后向兼容](#backwards-compatibility)
 *   [GPU 支持](#gpu_support)
-    *   [为 GPU 设备编译内核](#compiling_the_kernel_for_the_gpu_device)
-*   [在 Python 中实现梯度计算](#implement_the_gradient_in_python)
-*   [C++ 中的形状函数](#shape_functions_in_c)
+    *   [为 GPU 设备编译内核](#compiling-the-kernel-for-the-gpu-device)
+*   [在 Python 中实现梯度计算](#implement-the-gradient-in-python)
+*   [C++ 中的形状函数](#shape-functions-in-c)
 
 ### 条件检查和验证
 
@@ -1024,10 +1024,10 @@ REGISTER_OP("MultipleInsAndOuts")
 
 ```bash
 nvcc -std=c++11 -c -o cuda_op_kernel.cu.o cuda_op_kernel.cu.cc \
--I $TF_INC -I$TF_INC/external/nsync/public -D GOOGLE_CUDA=1 -x cu -Xcompiler -fPIC
+  ${TF_CFLAGS[@]} -D GOOGLE_CUDA=1 -x cu -Xcompiler -fPIC
 
 g++ -std=c++11 -shared -o cuda_op_kernel.so cuda_op_kernel.cc \
-cuda_op_kernel.cu.o -I $TF_INC -I$TF_INC/external/nsync/public -fPIC -lcudart -L$TF_LIB -ltensorflow_framework
+  cuda_op_kernel.cu.o ${TF_CFLAGS[@]} -fPIC -lcudart ${TF_LFLAGS[@]}
 ```
 
 通过 `tf.load_op_library` 函数，上述命令产生的 `cuda_op_kernel.so` 可以像通常的动态链接库一样在 Python 中加载。
