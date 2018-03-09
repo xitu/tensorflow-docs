@@ -1,22 +1,20 @@
 # TensorFlow 大规模线性模型
 
-tf.estimator 的 API (和其他工具一起）已经为在 TensorFlow 中使用线性模型
-提供了一系列丰富的工具。这个文档将是对这些工具的一个综述。
-它包括：
+@{tf.estimator$Estimators} 和其他内容一起，已经为在 TensorFlow 中使用线性模型
+提供了一系列丰富的工具。这个文档将是对这些工具的一个综述。包括：
 
    * 什么是线性模型。
    * 为什么要使用线性模型。
-   * 在 TensorFlow 中 tf.estimator 是如何使线性模型的构建更简单的。
-   * 怎样使用 tf.estimator 融合线性模型和深度学习，更好的发挥两者的优势
+   * 在 TensorFlow 中 Estimators 是如何使线性模型的构建更简单的。
+   * 怎样使用 Estimators 融合线性模型和深度学习，更好的发挥两者的优势。
 
 
 
-你可以通过这个综述知道 tf.estimator 的线性模型工具是否对你有帮助。
-而后你可以在 @{$wide$线性模型教程} 中尝试一下。
+你可以通过这个综述知道 Estimator's 的线性模型工具是否对你有帮助。
+而后你可以在 @{$wide$Linear Models tutorial} 中尝试一下。
 这个综述的代码用例就来自于那个教程，但是教程会对代码有更详细的说明。
 
-为了更好的理解这个综述，你应该首先对机器学习的基本概念
-和 @{$estimator$tf.estimator} 有所了解。
+为了更好的理解这个综述，你应该首先对机器学习的基本概念和 @{$get_started/premade_estimators$Estimators} 有所了解。
 
 [TOC]
 
@@ -24,13 +22,13 @@ tf.estimator 的 API (和其他工具一起）已经为在 TensorFlow 中使用�
 
 
 
-*线性模型*使用多个特征的加权和做出预测。
+**线性模型**使用多个特征的加权和做出预测。
 例如，如果你有一个人群的年龄，受教育年限，每周的工作时长的数据，
-你可以从这些数据中学习到每个特征的权重值，使得它们的加权和可以预测出一个人的薪水。
+模型可以从这些数据中学习到每个特征的权重值，使得它们的加权和可以预测出一个人的薪水。
 你同样可以用线性模型来做分类。
 
 一些线性模型把这个加权和转换成为一种更简便的形式。
-例如，逻辑回归将加权和导入一个逻辑函数中，获得一个在 0 和 1 之间的输出。
+例如，[**逻辑回归**](https://developers.google.com/machine-learning/glossary/#logistic_regression)将加权和导入一个逻辑函数中，获得一个在 0 和 1 之间的输出。
 但是对于每个输入的特征依然只有一个权重值。
 
 
@@ -51,11 +49,11 @@ tf.estimator 的 API (和其他工具一起）已经为在 TensorFlow 中使用�
    * 在工业中广泛使用。
 
 
-## tf.estimator 是如何帮助你构建线性模型的？
+## Estimators 是如何帮助你构建线性模型的？
 
 
 在 TensorFlow 中你可以不借助于任何特殊的 API 来从头创建一个线性模型。
-但是 tf.estimator 提供了一些工具使构建有效的大规模线性模型更容易。
+但是 Estimators 提供了一些工具使构建有效的大规模线性模型更容易。
 
 ### 特征列和转换
 
@@ -86,10 +84,7 @@ TensorFlow 使用 `特征列` 的抽象方式使这些转换成为可能。
 这些向量之所以叫 '稀疏' 是因为当可能的
 取值非常大的时候（例如所有的英文单词），向量就会非常长而且会有很多 0.
 
-
-虽然，你不一定为了处理分类特征数据列而使用 tf.estimator 线性模型，
-但线性模型的优势之一就是它们处理大型稀疏向量的能力。
-稀疏特征是 tf.estimator 线性特征模型工具的一个主要使用场景。
+While you don't need to use categorical columns to use the linear model tools provided by Estimators, one of the strengths of linear models is their ability to deal with large sparse vectors. Sparse features are a primary use case for the linear model tools provided by Estimators.
 
 ##### 编码稀疏列
 
@@ -174,9 +169,9 @@ age_buckets = tf.feature_column.bucketized_column(
 
 这个输入函数必须返还一个张量字典。其中的每一个键对应某个 `特征列` 的名字，
 键所对应的值是一个张量，包含所有数据实例在该特征下的值。
-想要更多地了解输入函数请看 @{$input_fn$ 使用 tf.estimator 构建输入函数}，
+想要更多地了解输入函数请看 @{$input_fn$Building Input Functions with tf.estimator}，
 一个输入函数的实现例子参见：
-[线性模型教程代码](https://www.tensorflow.org/code/tensorflow/examples/learn/wide_n_deep_tutorial.py)
+[线性模型教程代码](https://github.com/tensorflow/models/tree/master/official/wide_deep/wide_deep.py)
 
 输入函数在调用 `train()` 和 `evaluate()` 初始化训练和测试时被传进去，
 这将在下一部分说明。
@@ -221,7 +216,7 @@ for key in sorted(results):
 ### 宽深学习
 
 
-tf.estimator API 还提供了一个估算器类能让你同时训练一个线性模型和
+`tf.estimator` 模型还提供了一个估算器类能让你同时训练一个线性模型和
 一个深度神经网络。这个新颖的方法结合了线性模型对关键特征的记忆和神经网络的泛化能力。
 可以使用 `tf.estimator.DNNLinearCombinedClassifier`
 创建这种"宽深"模型：
