@@ -1,15 +1,10 @@
 # 如何再训练 Inception 的最后一层识别新分类
 
-原文链接：https://www.tensorflow.org/tutorials/image_retraining
-
-
 当前的对象识别模型拥有数百万计的参数，完整地训练整个模型需要花费数周的时间。
 迁移学习是一种能够大幅缩短这一过程的一种技术，
 它通过将一个已经完整训练过的模型如 ImageNet 重新训练来识别新的分类。
 在本例中我们将从零开始训练模型的最后一层并保留其他部分不变。
 想要获得此方法的更多信息请参考[ Decaf 的这篇论文](https://arxiv.org/pdf/1310.1531v1.pdf).
-
-
 
 尽管这种方式的效果没有比不上完整的训练，这种方法却对很多应用惊人的有效，
 而且能在笔记本上不要求 GPU的情况下 30 分钟内完成训练。
@@ -17,9 +12,9 @@
 而且会讲解一些你将会用到的，帮助控制训练过程的一些选项。
 
 
-注：此版本的教程主要使用 Bazel 构建工具。下面给出一个 codelab 上的一个免费版本
-(https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/#0).
+注：你还可以看[本教程的 codelab 版本](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/#0).
 
+Before you start, you must @{$install$install tensorflow}.
 
 [TOC]
 
@@ -41,28 +36,30 @@ curl -O http://download.tensorflow.org/example_images/flower_photos.tgz
 tar xzf flower_photos.tgz
 ```
 
-获得这些图片后，你可以在你的 TensorFlow 源码文件
-的根目录下构建这个再训练器:
+Once you have the images, you can clone the tensorflow repository using the following command (these examples are not included in the installation):
 
 ```sh
-bazel build tensorflow/examples/image_retraining:retrain
+git clone https://github.com/tensorflow/tensorflow
 ```
 
-如果你有一个支持
-[AVX 指令集](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
-(常见于最近几年中生产的 x86 CPU 中)的机器，你可以通过构建能充分利用那种架构优点的
-体系结构来提升再训练的执行速度，构建方式如下（在 `configure` 中选择合适的选项之后）:
+Then checkout the version of the tensorflow repository matching your installation and this tutorial as follows:
+
+``` sh
+cd tensorflow
+git checkout {version}
+```
+
+In the simplest cases the retrainer can then be run like this:
 
 ```sh
-bazel build --config opt tensorflow/examples/image_retraining:retrain
+python tensorflow/examples/image_retraining/retrain.py --image_dir ~/flower_photos
 ```
 
-之后再训练器可以按照如下方式运行：
+The script has many other options. You can get a full listing with:
 
 ```sh
-bazel-bin/tensorflow/examples/image_retraining/retrain --image_dir ~/flower_photos
+python tensorflow/examples/image_retraining/retrain.py -h
 ```
-
 
 这段代码加载了先前训练的 Inception v3 模型，移去最顶层，
 并在你下载的花朵图片上训练生成新的最顶层。
@@ -152,26 +149,21 @@ TensorBoard 运行之后，打开浏览器进到 `localhost:6006` 地址去看 T
 所以你需要在脚本中指定一个新名字，例如如果你正在使用 label_image 的话，
 你可以使用 `--output_layer=final_result` 标志进行改变。
 
-
-下面的例子将展示如何使用你已经训练过的图来构建和运行 label_image 示例。
+下面的例子将展示如何使用你已经训练过的图来运行 label_image 示例。
 
 ```sh
-bazel build tensorflow/examples/image_retraining:label_image && \
-bazel-bin/tensorflow/examples/image_retraining/label_image \
+python tensorflow/examples/label_image/label_image.py \
 --graph=/tmp/output_graph.pb --labels=/tmp/output_labels.txt \
---output_layer=final_result:0 \
+--input_layer=Mul \
+--output_layer=final_result \
+--input_mean=128 --input_std=128 \
 --image=$HOME/flower_photos/daisy/21652746_cc379e0eea_m.jpg
 ```
 
-
 你将看到一组花名标签，大多数情况下以雏菊开头（尽管每个在训练模型可能有稍有区别）。
-你可以将`--image` 的参数指定为你自己的图片来把之前的替换掉，
-并使用 C++ 代码作为模板来创建你自己的应用。
+`--image` parameter with your own images to try those out.
 
-
-如果你要在自己的 Python 程序中使用再训练模型，上面的
-[`label_image` 脚本](https://www.tensorflow.org/code/tensorflow/examples/image_retraining/label_image.py)
-会是一个很好的开始模板。
+If you'd like to use the retrained model in your own Python program, then the above [`label_image` script](https://www.tensorflow.org/code/tensorflow/examples/label_image/label_image.py) is a reasonable starting point. The `label_image` directory also contains C++ code which you can use as a template to integrate tensorflow with your own applications.
 
 如果你觉得标准的 Inception v3 模型太大或者会使你你的程序变慢，
 你可以在[其他的模型结构](/tutorials/image_retraining#other_model_architectures)
@@ -376,3 +368,14 @@ python tensorflow/examples/image_retraining/retrain.py \
 典型的 24 位图片的范围是 [0, 255]，你必须把他们通过公式 `(image - 128.)/128.`
 转换到模型期望的 [-1, 1] 浮点数区间内。
 
+The default arguments for the `label_image` script are set for Inception V3. To use it with a MobileNet, specify the above normalization parameters as `input_mean` and `input_std` on the command line. You also must specify the image size that your model expects, as follows:
+
+```sh
+python tensorflow/examples/label_image/label_image.py \
+--graph=/tmp/output_graph.pb --labels=/tmp/output_labels.txt \
+--input_layer=input \
+--output_layer=final_result \
+--input_height=224 --input_width=224 \
+--input_mean=128 --input_std=128 \
+--image=$HOME/flower_photos/daisy/21652746_cc379e0eea_m.jpg
+```
