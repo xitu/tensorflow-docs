@@ -23,9 +23,7 @@
 
 ## 广播的原则
 
-XLA 是一个使用 XLA 语言的底层基础设施，它要求语法尽可能地严格和显式声明，避免隐式变换和某些 "神奇" 的功能，即使它们会让一些计算稍微容易定义，但带来代价是，在代码中引入了过多的假设，长远来看是难于改变的。如果确有必要，可以在客户层封装代码中加入这些隐式的和神奇的功能。
-
-对于广播而言，当操作不同秩的数组时，我们要求采用显式地指定广播。这一点和 Numpy 不同，后者会尽可能地推断出广播规范。
+The XLA language is as strict and explicit as possible, avoiding implicit and "magical" features. Such features may make some computations slightly easier to define, at the cost of more assumptions baked into user code that will be difficult to change in the long term. If necessary, implicit and magical features can be added in client-level wrappers.
 
 ## 将低阶数组广播为高阶数组
 
