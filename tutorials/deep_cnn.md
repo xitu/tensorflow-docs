@@ -117,7 +117,7 @@ Layer 名称 | 描述
 
 ### 模型训练
 
-训练一个可以进行 N 类分类网络常用方法是使用[多项逻辑回归](https://en.wikipedia.org/wiki/Multinomial_logistic_regression)方法，又可以叫做 **softmax 回归**。softmax 回归在网络的输出层上附加了一个 @{tf.nn.softmax$softmax} 非线性层，并且计算归一化后的预测值和特征 @{tf.nn.softmax_cross_entropy_with_logits$cross-entropy} 的 @{tf.sparse_to_dense$1-hot encoding}。在正则化过程中，我们会对所有学习的变量应用常用的 @{tf.nn.l2_loss$weight decay} 损失方法。模型的目标函数是求交叉熵损失和所有权重衰减项的和，`loss()` 函数的返回值就是这个值。
+训练一个可以进行 N 类分类网络常用方法是使用[多项逻辑回归](https://en.wikipedia.org/wiki/Multinomial_logistic_regression)方法，又可以叫做 **softmax 回归**。Softmax regression applies a @{tf.nn.softmax$softmax} nonlinearity to the output of the network and calculates the @{tf.nn.sparse_softmax_cross_entropy_with_logits$cross-entropy} between the normalized predictions and the label index. 在正则化过程中，我们会对所有学习的变量应用常用的 @{tf.nn.l2_loss$weight decay} 损失方法。模型的目标函数是求交叉熵损失和所有权重衰减项的和，`loss()` 函数的返回值就是这个值。
 
 我们可以使用 @{tf.summary.scalar} 在 TensorBoard 中查看该值得变化情况：
 
