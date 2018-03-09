@@ -1,6 +1,6 @@
 # 使用特定的内核方法改善线性模型
 
-原文链接：https://www.tensorflow.org/tutorials/kernel_methods
+Note: This document uses a deprecated version of ${tf.estimator}, which has a ${tf.contrib.learn.estimator$different interface}. It also uses other `contrib` methods whose ${$version_compat#not_covered$API may not be stable}.
 
 在这篇教程里，我们将示范如何把特定内核方法和线性模型结合起来在不明显增加训练
 和推理时间的情况下大幅度提升预测质量。
@@ -45,17 +45,7 @@ data = tf.contrib.learn.datasets.mnist.load_mnist()
 在本教程中，我们仅使用训练和验证集来分别训练和验证我们的模型。
 
 
-
-
-给 tf.contrib.learn 估测器输入数据时，把数据转换成张量会更方便。
-为了做到这一点，我们使用一个`input function` 的方法，它会给 TensorFlow
-计算图添加选项，执行时会创建下游使用的小批次张量。更多关于 `input function`
-的背景消息请参考@{$get_started/input_fn$Building Input Functions with tf.contrib.learn}.
-在本例中，我们将使用 `tf.train.shuffle_batch` 选项，这个选项除了可以将 numpy
-数组转换张量之外，还允许我们指定每次 `input_fn` 选项运行时批次的大小以及是否将输入随机化
-(随机化通常会加快训练过程中的收敛)。下载和准备数据的完整代码在下面的代码片段里。
-例中，我们将训练中的子批次大小设置为 256，并使用整个的评估样本（5K）进行评估。
-你也可以对其他的批次大小进行试验。
+In order to feed data to a `tf.contrib.learn Estimator`, it is helpful to convert it to Tensors. For this, we will use an `input function` which adds Ops to the TensorFlow graph that, when executed, create mini-batches of Tensors to be used downstream. For more background on input functions, check @{$get_started/premade_estimators#input_fn$this section on input functions}. In this example, we will use the `tf.train.shuffle_batch` Op which, besides converting numpy arrays to Tensors, allows us to specify the batch_size and whether to randomize the input every time the input_fn Ops are executed (randomization typically expedites convergence during training). The full code for loading and preparing the data is shown in the snippet below. In this example, we use mini-batches of size 256 for training and the entire sample (5K entries) for evaluation. Feel free to experiment with different batch sizes.
 
 ```python
 import numpy as np
