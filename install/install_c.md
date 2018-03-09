@@ -14,8 +14,9 @@ This guide explains how to install TensorFlow for C.  Although these instruction
 ## 安装
 采取下面几步来安装用于 C 的 TensorFlow 库，然后打开用于 C 的 TensorFlow：
   1.选择你将会仅仅运行用于 C 的 TensoFlow 在 CPU（S）上，还是有 GPU（S）的帮助。为了帮你做出选择，在以下指南中阅读这一节，标题为决定安装哪个TensorFlow”：
-       * @{$install_linux#determine_which_tensorflow_to_install$Installing TensorFlow on Linux}
-       * @{$install_mac#determine_which_tensorflow_to_install$Installing TensorFlow on macOS}
+
+ * @{$install_linux#determine_which_tensorflow_to_install$Installing TensorFlow on Linux}
+ * @{$install_mac#determine_which_tensorflow_to_install$Installing TensorFlow on macOS}
 
   2.通过调用下面的 shell 命令，下载并且解压 TensorFlow 的 C 库到 `/usr/local/lib`：
          TF_TYPE="cpu" # Change to "gpu" for GPU support
