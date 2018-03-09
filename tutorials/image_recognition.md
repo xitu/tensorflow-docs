@@ -10,7 +10,7 @@
 计算机视觉的研究人员将他们的成果和 [ImageNet](http://www.image-net.org)（一个计算机视觉的理论基准测试程序）
 进行校验和对抗，结果表明他们已经取得了稳定的进步。
 这些有继承关系的模型持续的展示着它们的进步，并且每次都会产生新的成果：
-[QuocNet], [AlexNet], [Inception (GoogLeNet)], [BN-Inception-v2]。
+[QuocNet]，[AlexNet]，[Inception (GoogLeNet)]，[BN-Inception-v2]。
 Google 内部和外部的研究人员也都发表了一些论文来描述所有的这些模型，但是成果仍然很难再现。
 我们接下来要做的就是运行我们最新的图像识别模型--[Inception-v3]。
 
@@ -413,10 +413,5 @@ Michael Nielsen 的书中也有一章
 也包含了这部分内容。
 
 
-更多的关于实现卷积神经网络的资源，你可以去 
-TensorFlow @{$deep_cnn$deep convolutional networks tutorial} 查看，
-或者跟随我们的 @{$beginners$ML beginner} 或 @{$pros$ML expert} MNIST 入门指南来
-慢慢来学习。最后，如果你想快速提升在这个领域的研究，
-可以
-阅读本篇指南引用的所有论文以及他们近期的工作。
+更多的关于实现卷积神经网络的资源，你可以去 TensorFlow @{$deep_cnn$deep convolutional networks tutorial} 查看，或者跟随我们的 @{$layers$MNIST starter tutorial} 入门指南来来学习。最后，如果你想快速提升在这个领域的研究，可以阅读本篇指南引用的所有论文以及他们近期的工作。
 
