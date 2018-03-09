@@ -1,6 +1,6 @@
 # Embeddings
 
-本文档介绍了 embeddings 的概念，给出了如何在 TensorFlow 中对 embedding 进行训练的简单示例，并解释了如何使用 TensorBoard Embedding Projector 查看 embeddings。前两部分是针对机器学习和 TensorFlow 的新手，而 Embedding Projector 则是针对所有水平的用户。
+本文档介绍了 embeddings 的概念，给出了如何在 TensorFlow 中对 embedding 进行训练的简单示例，并解释了如何使用 TensorBoard Embedding Projector ([live example](http://projector.tensorflow.org)) 查看 embeddings。前两部分是针对机器学习和 TensorFlow 的新手，而 Embedding Projector 则是针对所有水平的用户。
 
 [TOC]
 
@@ -61,7 +61,7 @@ Embedding Projector 为数据集降维提供了三种方法。
 
 - **Custom**：使用数据中的标签，得到一条在你指定的水平和垂直轴上的线性映射。例如，你通过给定的文本模式“ Left ”与“ Right ”指定水平轴，Embedding Projector 找出所有被“ Left ”模式匹配到的点，并计算该组的质心；“ Right ”也是类似。通过这两点的直线定义为水平轴。对于“ UP ”和“ DOWN ”文本模式，垂直轴也是类似的计算出两个点集的质心得出。
 
-获取其他有价值文章可以查看 [How to Use t-SNE Effectively](distill.pub/2016/misread-tsne/) 和 [Principal Component Analysis Explained Visually](http://setosa.io/ev/principal-component-analysis/)。
+获取其他有价值文章可以查看 [How to Use t-SNE Effectively](https://distill.pub/2016/misread-tsne/) 和 [Principal Component Analysis Explained Visually](http://setosa.io/ev/principal-component-analysis/)。
 
 ### 探索
 
