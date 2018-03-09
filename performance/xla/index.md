@@ -43,12 +43,9 @@ XLA 接收 HLO 中定义的计算图，然后将它们编译成不同架构的�
   <img src="https://www.tensorflow.org/images/how-does-xla-work.png">
 </div>
 
-XLA 提供了多个与目标后端无关的优化和分析技术，比如 [CSE](https://en.wikipedia.org/wiki/Common_subexpression_elimination)，
-目标无关的操作融合，以及计算中分配运行时内存的缓存分析。
+XLA comes with several optimizations and analysis passes that are target-independent, such as [CSE](https://en.wikipedia.org/wiki/Common_subexpression_elimination), target-independent operation fusion, and buffer analysis for allocating runtime memory for the computation.
 
-在目标无关的步骤之后，XLA 将 HLO 计算发送到一个后端。这个后端可进一步执行 HLO 层次的分析和优化。
-注意，这时就需要目标相关的信息了。比如，XLA GPU 后端可能会为 GPU 编程模型专门执行操作融合，然后相应地决定如何将计算划分为流。
-在这个阶段，后端可能也会模式匹配某些操作或操作的组合，从而优化库函数调用。
+After the target-independent step, XLA sends the HLO computation to a backend. The backend can perform further HLO-level optimizations, this time with target specific information and needs in mind. For example, the XLA GPU backend may perform operation fusion beneficial specifically for the GPU programming model and determine how to partition the computation into streams. At this stage, backends may also pattern-match certain operations or combinations thereof to optimized library calls.
 
 再下一步就是针对特定目标的代码生成了。结合了 XLA的 CPU 和 GPU 后端使用 [LLVM](http://llvm.org) 来处理底层 IR、优化和代码生成。
 这些后端产生必要的 LLVM IR，用一种高效的方式来表示 XLA HLO 计算，然后调用 LLVM 从这个 LLVM IR 生成本地代码。
