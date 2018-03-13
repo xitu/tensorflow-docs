@@ -7,6 +7,8 @@
 > - 现已完成 [TensorFlow V1.4 官方中文文档](https://github.com/xitu/tensorflow-docs/tree/v1.4-zh-hans)
 > - 译者团队正在向 [TensorFlow V1.6 官方中文文档](https://github.com/xitu/tensorflow-docs)更新
 > - 掘金翻译计划欢迎大家的加入，详见 👉 [加入我们](https://github.com/xitu/gold-miner)
+> - 文档维护说明：[Wiki](https://github.com/xitu/tensorflow-docs/wiki#%E6%96%87%E6%A1%A3%E7%BB%B4%E6%8A%A4%E8%A7%84%E8%8C%83)
+> - 人工智能术语表：[术语表](https://github.com/xitu/tensorflow-docs/wiki#%E6%9C%AF%E8%AF%AD%E8%A1%A8)
 
 ---
 
