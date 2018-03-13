@@ -83,9 +83,6 @@ $ python
 
 你可以在 [tensorflow.org 社区页](https://www.tensorflow.org/community) 了解更多关于参与 TensorFlow 社区的方法。
 
-## 许可
-
-[Apache 许可 2.0](LICENSE)
 ## 文档管理团队
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -95,4 +92,8 @@ $ python
 
 ## Co-Translators
 
-[所有译者](https://github.com/xitu/tensorflow-docs/graphs/contributors)
+[所有译者详细信息](https://github.com/xitu/tensorflow-docs/graphs/contributors)
+
+## 许可
+
+[Apache 许可 2.0](LICENSE)
