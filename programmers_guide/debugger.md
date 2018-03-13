@@ -383,9 +383,9 @@ model.fit(...)  # 这里将会调试进入 TFDBG CLI。
 
 ## 使用 TFDBG 调试 tf-slim
 
-TFDBG supports debugging of training and evaluation with [tf-slim](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/slim)。As detailed below, training and evaluation require slightly different debugging workflows.
+TFDBG 支持使用 [tf-slim](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/slim) 调试训练和评估。详述如下，训练和评估需要稍微有点不同的调试工作流
 
-### Debugging training in tf-slim
+### 在 tf-slim 中调试训练
 
 为了调试训练过程，我们为 `slim.learning.train()` 中的 `session_wrapper` 参数提供了 `LocalCLIDebugWrapperSession` 对象，例子如下：
 
@@ -401,15 +401,15 @@ tf.contrib.slim.learning.train(
     session_wrapper=tf_debug.LocalCLIDebugWrapperSession)
 ```
 
-### Debugging evaluation in tf-slim
-To debug the evaluation process, provide `LocalCLIDebugHook` to the
-`hooks` argument of `slim.evaluation.evaluate_once()`. For example:
+### 在 tf-slim 中调试评估
+
+为了调试评估过程，TensorFlow 提供了 `LocalCLIDebugHook` 填入 `slim.evaluation.evaluate_once()` 的 `hooks` 参数。比如：
 
 ``` python
 import tensorflow as tf
 from tensorflow.python import debug as tf_debug
 
-# ... Code that creates the graph and the eval and final ops ...
+# ... 用来创建流图，验证和最终的操作....
 tf.contrib.slim.evaluation.evaluate_once(
     '',
     checkpoint_path,
