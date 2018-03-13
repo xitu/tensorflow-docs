@@ -86,7 +86,13 @@ $ python
 ## 许可
 
 [Apache 许可 2.0](LICENSE)
+## 文档管理团队
 
-## 贡献者
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+| [<img src="https://avatars0.githubusercontent.com/u/26959437?s=460&v=4" width="100px;"/><br /><sub>LeviDing</sub>](https://github.com/leviding)<br />[👀](#review-leviding "Reviewed Pull Requests") [📋](#eventOrganizing-leviding "Event Organizing") | [<img src="https://avatars0.githubusercontent.com/u/4813445?s=460&v=4" width="100px;"/><br /><sub>pkuwwt</sub>](https://github.com/pkuwwt)<br />[👀](#review-pkuwwt "Reviewed Pull Requests") [🌍](#translation-pkuwwt "Translation") | [<img src="https://avatars1.githubusercontent.com/u/6165782?s=460&v=4" width="100px;"/><br /><sub>John Jiang</sub>](https://github.com/JohnJiangLA)<br />[👀](#review-JohnJiangLA "Reviewed Pull Requests") [🌍](#translation-JohnJiangLA "Translation") | [<img src="https://avatars2.githubusercontent.com/u/5164225?s=460&v=4" width="100px;"/><br /><sub>lsvih</sub>](https://github.com/lsvih)<br />[👀](#review-lsvih "Reviewed Pull Requests") [🌍](#translation-lsvih "Translation") | [<img src="https://avatars3.githubusercontent.com/u/9419075?s=460&v=4" width="100px;"/><br /><sub>foxxnuaa</sub>](https://github.com/foxxnuaa)<br />[👀](#review-foxxnuaa "Reviewed Pull Requests") [🌍](#translation-foxxnuaa "Translation") |
+|:-:|:-:|:-:|:-:|:-:|
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
-待补充...
+## Co-Translators
+
+[所有译者](https://github.com/xitu/tensorflow-docs/graphs/contributors)
