@@ -1,128 +1,29 @@
-Skip to content
-This repository
-Search
-Pull requests
-Issues
-Marketplace
-Explore
- @leviding
- Sign out
-14
-32 1 xitu/tensorflow-docs
- Code  Issues 1  Pull requests 0  Projects 0  Wiki  Insights  Settings
-tensorflow-docs/programmers_guide/ 
-using_tpu.md
-  or cancel
-    
- 
-1
-# Using TPUs
-2
-​
-3
-This document walks through the principal TensorFlow APIs necessary to make
-4
-effective use of a [Cloud TPU](https://cloud.google.com/tpu/), and highlights
-5
-the differences between regular TensorFlow usage, and usage on a TPU.
-6
-​
-7
-This doc is aimed at users who:
-8
-​
-9
-* Are familiar with TensorFlow's `Estimator` and `Dataset` APIs
-10
-* Have maybe [tried out a Cloud TPU](https://cloud.google.com/tpu/docs/quickstart)
-11
-  using an existing model.
-12
-* Have, perhaps, skimmed the code of an example TPU model
-13
-  [[1]](https://github.com/tensorflow/models/blob/master/official/mnist/mnist_tpu.py)
-14
-  [[2]](https://github.com/tensorflow/tpu-demos/tree/master/cloud_tpu/models).
-15
-* Are interested in porting an existing `Estimator` model to
-16
-  run on Cloud TPUs
-17
-​
-18
+# 使用 TPU
+
+这份文档说明了有效使用 [Cloud TPU](https://cloud.google.com/tpu/) 时必需使用的关键 TensorFlow APIs，并强调了常规的 TensorFlow 和在 TPU 上使用区别。
+
+这份文档针对以下用户：
+
+* 熟悉 TensorFlow 的 `Estimator` 和 `Dataset` APIs
+* 使用一个已有模型[尝试使用过 Cloud TPU](https://cloud.google.com/tpu/docs/quickstart)
+* 浏览过 TPU 模型的样例代码 [[1]](https://github.com/tensorflow/models/blob/master/official/mnist/mnist_tpu.py) [[2]](https://github.com/tensorflow/tpu-demos/tree/master/cloud_tpu/models)
+* 对将一个现有的 `Estimator` 模型移植到 Cloud TPU 上运行感兴趣
+
 ## TPUEstimator
-19
-​
-20
-@{tf.estimator.Estimator$Estimators} are TensorFlow's model-level abstraction.
-21
-Standard `Estimators` can drive models on CPU and GPUs. You must use
-22
-@{tf.contrib.tpu.TPUEstimator} to drive a model on TPUs.
-23
-​
-24
-Refer to TensorFlow's Getting Started section for an introduction to the basics
-25
-of using a @{$get_started/premade_estimators$pre-made `Estimator`}, and
-26
-@{$get_started/custom_estimators$custom `Estimator`s}.
-27
-​
-28
-The `TPUEstimator` class differs somewhat from the `Estimator` class.
-29
-​
-30
-The simplest way to maintain a model that can be run both on CPU/GPU or on a
-31
-Cloud TPU is to define the model's inference phase (from inputs to predictions)
-32
-outside of the `model_fn`. Then maintain separate implementations of the
-33
-`Estimator` setup and `model_fn`, both wrapping this inference step. For an
-34
-example of this pattern compare the `mnist.py` and `mnist_tpu.py` implementation in
-35
-[tensorflow/models](https://github.com/tensorflow/models/tree/master/official/mnist).
-36
-​
-37
-### Running a `TPUEstimator` locally
-38
-​
-39
-To create a standard `Estimator` you call the constructor, and pass it a
-40
-`model_fn`, for example:
-41
-​
-42
+
+@{tf.estimator.Estimator$Estimators} 是 TensorFlow 的模型级抽象。标准的 `Estimators` 可以在 CPU 或者 GPU 上驱动模型。 你必须使用 @{tf.contrib.tpu.TPUEstimator} 在 TPU 上驱动模型。
+
+使用 @{$get_started/premade_estimators$pre-made `Estimator`} 和 @{$get_started/custom_estimators$custom `Estimator`s} 的基础介绍可以参考 TensorFlow 的入门指南（Getting Started ）部分，
+
+`TPUEstimator` 类和 `Estimator` 之间多少有些不一样。
+
+要使一个模型可以在 CPU/GPU 或 Cloud TPU 上运行的最简单方法是在 `model_fn` 外定义模型的推理过程（从输入到预测）。然后继续分离 `Estimator` 设置和 `model_fn`，都包含这个推理步骤。这种模式的一个样例是 [tensorflow/models](https://github.com/tensorflow/models/tree/master/official/mnist) 中比较 `mnist.py` 和 `mnist_tpu.py` 的实现。
+
+### 本地运行 `TPUEstimator`
+
+要创建一个标准的 `Estimator` 你可以调用构造函数，并将它传递给 `model_fn`，例如：
+
 ```
-43
 my_estimator = tf.estimator.Estimator(
-44
   model_fn=my_model_fn)
-45
 ```
-@leviding
-Commit changes
-
-Update using_tpu.md
-
-Add an optional extended description…
-  Commit directly to the v1.6 branch.
-  Create a new branch for this commit and start a pull request. Learn more about pull requests.
- 
-© 2018 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-API
-Training
-Shop
-Blog
-About
