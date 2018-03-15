@@ -181,4 +181,4 @@ with gfile.Open("foobar://path/to/file.txt") as w:
   w.write("hi")
 ```
 
-在执行这个之后，一个包含 ”hi“ 的文件会出现在共享文件系统的 ”/path/to/file.txt“中。
+在执行这个之后，一个包含 "hi" 的文件会出现在共享文件系统的 "/path/to/file.txt" 中。
