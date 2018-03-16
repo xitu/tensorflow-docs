@@ -2,7 +2,7 @@
 
 ## 概述
 
-TensorFlow 社区创建了一系列用于多平台测试的图像分类模型参考点。在 [方法](#methodology) 章节中会详细说明如何执行测试，并给出使用的脚本链接。
+在多个平台上对图像分类模型进行测试，为 TensorFlow 社区创建了一个参考点。在 [方法](#methodology) 章节中会详细说明如何执行测试，并给出使用的脚本链接。
 
 ## 图像分类模型的结果
 
@@ -10,9 +10,7 @@ InceptionV3 ([arXiv:1512.00567](https://arxiv.org/abs/1512.00567)), ResNet-50
 ([arXiv:1512.03385](https://arxiv.org/abs/1512.03385)), ResNet-152
 ([arXiv:1512.03385](https://arxiv.org/abs/1512.03385)), VGG16
 ([arXiv:1409.1556](https://arxiv.org/abs/1409.1556)), 和
-[AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 使用 [ImageNet](http://www.image-net.org/) 数据集测试。这些测试运行在 Google 计算云引擎，亚马逊计算云 (Amazon EC2) 和 NVIDIA® DGX-1™ 。大部分测试使用合成和真实的数据。
-
-对合成数据的测试是通过使用一个 `tf.Variable` 设置相同的 shape，除了每个 ImageNet 模型。我们认为，当评估一个平台的基准时包含真实数据是很重要的。底层硬件和框架的加载测试是为了训练实际数据。我们开始合成数据用来移除磁盘 I/O 作为一个变量，并设置一个基准。然后使用真实的数据来验证 TensorFlow 的输入和底层磁盘 I/O 的计算单元。
+[AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 使用 [ImageNet](http://www.image-net.org/) 数据集测试。这些测试运行在 Google 计算云引擎，亚马逊计算云 (Amazon EC2) 和 NVIDIA® DGX-1™ 。大部分测试都使用了合成和真实的数据。使用 `tf.Variable` 对合成数据进行测试，数据集设置为 ImageNet 中每个模型所需的数据的同一形状。我们认为，对平台进行基准测试时，包含真实数据是很重要的。在底层硬件和框架上对准备数据加载测试是为了进行实际训练。为了将磁盘 I/O 作为变量移除，我们从合成数据开始，并设置一个基线。然后使用真实的数据来验证 TensorFlow 的输入管道和底层磁盘 I/O 是否使计算单元饱和。
 
 ### 使用 NVIDIA® DGX-1™ (NVIDIA® Tesla® P100) 训练
 
@@ -20,8 +18,8 @@ InceptionV3 ([arXiv:1512.00567](https://arxiv.org/abs/1512.00567)), ResNet-50
   <img style="width:80%" src="https://www.tensorflow.org/images/perf_summary_p100_single_server.png">
 </div>
 
-细节和附加结果在 [NVIDIA® DGX-1™ (NVIDIA®
-Tesla® P100) 的细节](#details_for_nvidia_dgx-1tm_nvidia_tesla_p100) 章节中。
+细节和其他结果参见 [Details for NVIDIA® DGX-1™ (NVIDIA®
+Tesla® P100)](#details_for_nvidia_dgx-1tm_nvidia_tesla_p100)。
 
 ### 使用 NVIDIA® Tesla® K80 训练
 
@@ -29,10 +27,10 @@ Tesla® P100) 的细节](#details_for_nvidia_dgx-1tm_nvidia_tesla_p100) 章节�
   <img style="width:80%" src="https://www.tensorflow.org/images/perf_summary_k80_single_server.png">
 </div>
 
-细节和附加结果在 [Google 计算引擎
-(NVIDIA® Tesla® K80) 的细节](#details_for_google_compute_engine_nvidia_tesla_k80) 和
-[Amazon EC2 (NVIDIA® Tesla®
-K80) 的细节](#details_for_amazon_ec2_nvidia_tesla_k80) 章节中。
+细节和其他结果参见 [Details for Google Compute Engine
+(NVIDIA® Tesla® K80)](#details_for_google_compute_engine_nvidia_tesla_k80) 和
+[Details for Amazon EC2 (NVIDIA® Tesla®
+K80)](#details_for_amazon_ec2_nvidia_tesla_k80)。
 
 ### 使用 NVIDIA® Tesla® K80 分布式训练
 
@@ -40,11 +38,10 @@ K80) 的细节](#details_for_amazon_ec2_nvidia_tesla_k80) 章节中。
   <img style="width:80%" src="https://www.tensorflow.org/images/perf_summary_k80_aws_distributed.png">
 </div>
 
-细节和附加结果在 [分布式 Amazon EC2
-(NVIDIA® Tesla® K80) 的细节](#details_for_amazon_ec2_distributed_nvidia_tesla_k80)
-章节中。
+细节和其他结果参见 [Details for Amazon EC2 Distributed
+(NVIDIA® Tesla® K80)](#details_for_amazon_ec2_distributed_nvidia_tesla_k80)。
 
-### 比较合成和真实训练数据
+### 合成和真实数据训练比较
 
 **NVIDIA® Tesla® P100**
 
@@ -60,7 +57,7 @@ K80) 的细节](#details_for_amazon_ec2_nvidia_tesla_k80) 章节中。
   <img style="width:35%" src="https://www.tensorflow.org/images/perf_summary_k80_data_compare_resnet50.png">
 </div>
 
-## NVIDIA® DGX-1™ (NVIDIA® Tesla® P100) 的细节
+## NVIDIA® DGX-1™ (NVIDIA® Tesla® P100) 的详细资料
 
 ### 环境配置
 
@@ -76,7 +73,7 @@ K80) 的细节](#details_for_amazon_ec2_nvidia_tesla_k80) 章节中。
 *   **DataSet:** ImageNet
 *   **Test Date:** May 2017
 
-每个模型的批处理大小和优化器如下表所示。除了下表所示的批处理大小，InceptionV3、ResNet-50、ResNet-152 和 VGG16 也用批处理大小为 32 进行测试。这些结果在 *其他结果* 章节。
+下表列出了每个模型的批处理大小和优化器。除了表中列出的批处理大小之外，InceptionV3、ResNet-50、ResNet-152 和 VGG16 测试的批次大小为 32。这些结果在 *其他结果* 章节。
 
 Options            | InceptionV3 | ResNet-50 | ResNet-152 | AlexNet | VGG16
 ------------------ | ----------- | --------- | ---------- | ------- | -----
@@ -146,7 +143,7 @@ GPUs | InceptionV3 | ResNet-50 | ResNet-152 | VGG16
 4    | 507         | 760       | 317        | 457
 8    | 966         | 1410      | 609        | 690
 
-## Google Compute Engine (NVIDIA® Tesla® K80) 的细节
+## Google Compute Engine (NVIDIA® Tesla® K80) 的详细资料
 
 ### 环境配置
 
@@ -162,7 +159,7 @@ GPUs | InceptionV3 | ResNet-50 | ResNet-152 | VGG16
 *   **DataSet:** ImageNet
 *   **Test Date:** May 2017
 
-每个模型的批处理大小和优化器如下表所示。除了下表所示的批处理大小，InceptionV3 和 ResNet-50 也用批处理大小为 32 进行测试。这些结果在 *其他结果* 章节。
+下表列出了每个模型的批处理大小和优化器。除了表中列出的批处理大小之外，InceptionV3 和 ResNet-50 测试的批次大小为 32。这些结果在 *其他结果* 章节。
 
 Options            | InceptionV3 | ResNet-50 | ResNet-152 | AlexNet | VGG16
 ------------------ | ----------- | --------- | ---------- | ------- | -----
@@ -216,7 +213,7 @@ GPUs | InceptionV3 (batch size 32) | ResNet-50 (batch size 32)
 4    | 110                         | 186
 8    | 216                         | 359
 
-## Amazon EC2 (NVIDIA® Tesla® K80) 的细节
+## Amazon EC2 (NVIDIA® Tesla® K80) 的详细资料
 
 ### 环境配置
 
@@ -233,7 +230,7 @@ GPUs | InceptionV3 (batch size 32) | ResNet-50 (batch size 32)
 *   **DataSet:** ImageNet
 *   **Test Date:** May 2017
 
-每个模型的批处理大小和优化器如下表所示。除了下表所示的批处理大小，InceptionV3 和 ResNet-50 也用批处理大小为 32 进行测试。这些结果在 *其他结果* 章节。
+下表列出了每个模型的批处理大小和优化器。除了表中列出的批处理大小之外，InceptionV3 和 ResNet-50 测试的批次大小为 32。这些结果在 *其他结果* 章节。
 
 Options            | InceptionV3 | ResNet-50 | ResNet-152 | AlexNet | VGG16
 ------------------ | ----------- | --------- | ---------- | ------- | -----
@@ -275,7 +272,7 @@ GPUs | InceptionV3 | ResNet-50 | ResNet-152 | AlexNet | VGG16
 4    | 118         | 188       | 75.2       | 2201    | 136
 8    | 228         | 373       | 149        | N/A     | 242
 
-由于我们的 EFS 没有提供足够的吞吐量，上面的图表中我们排出了使用 8 个 GPU 来训练 AlexNet 模型的统计。
+由于我们的 EFS 没有提供足够的吞吐量，在上面的图表中我们排除了使用 8 个 GPU 来训练 AlexNet 模型的统计。
 
 ### 其他结果
 
@@ -297,7 +294,7 @@ GPUs | InceptionV3 (batch size 32) | ResNet-50 (batch size 32)
 4    | 113                         | 185
 8    | 212                         | 353
 
-## Amazon EC2 Distributed (NVIDIA® Tesla® K80) 的细节
+## Amazon EC2 Distributed (NVIDIA® Tesla® K80) 的详细资料
 
 ### 环境配置
 
@@ -313,7 +310,7 @@ GPUs | InceptionV3 (batch size 32) | ResNet-50 (batch size 32)
 *   **DataSet:** ImageNet
 *   **Test Date:** May 2017
 
-每个模型的批处理大小和优化器如下表所示。除了下表所示的批处理大小，InceptionV3 和 ResNet-50 也用批处理大小为 32 进行测试。这些结果在 *其他结果* 章节。
+下表列出了每个模型的批处理大小和优化器。除了表中列出的批处理大小之外，InceptionV3 和 ResNet-50 测试的批次大小为 32。这些结果在 *其他结果* 章节。
 
 Options            | InceptionV3 | ResNet-50 | ResNet-152
 ------------------ | ----------- | --------- | ----------
@@ -328,7 +325,7 @@ InceptionV3 | distributed_replicated | n/a                    | True
 ResNet-50   | distributed_replicated | n/a                    | True
 ResNet-152  | distributed_replicated | n/a                    | True
 
-为了简化服务器设置，EC2 实例（p2.8xlarge）运行了 worker 服务器和 parameter 服务器。相同数量的 worker 服务器和 parameter 服务器使用了下述的配置：
+为了简化服务器安装，EC2 实例（p2.8xlarge）运行了 worker 服务器和 parameter 服务器。使用的 worker 服务器和 parameter 服务器数量相等，但有如下例外：
 
 *   InceptionV3: 8 instances / 6 parameter servers
 *   ResNet-50: (batch size 32) 8 instances / 4 parameter servers
@@ -372,9 +369,7 @@ GPUs | InceptionV3 (batch size 32) | ResNet-50 (batch size 32)
 
 ## 方法
 
-上述结果是使用该 [脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks) 运行在各种平台上而生成。@{$performance_models$High-Performance Models} 详细描述了脚本中的技术，以及如何执行脚本的示例。
+该 [脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks) 在各种平台上运行，以生成上述结果。@{$performance_models$High-Performance Models} 详细描述了脚本中的技术，以及如何执行脚本的示例。
 
-为了创建尽可能重复的结果，每个测试运行 5 次，然后取平均值。在给定的平台上，GPU 是在默认状态下运行的。对于 NVIDIA® Tesla® K80 来说这意味着不使用 [GPU
-Boost](https://devblogs.nvidia.com/parallelforall/increase-performance-gpu-boost-k80-autoboost/)。
-
-对于每个测试，需要完成 10 次预热，然后再平均完成 100 次测试。
+为了创建尽可能重复的结果，每个测试运行 5 次，然后将时间取平均值。在给定的平台上，GPU 是在默认状态下运行的。对于 NVIDIA® Tesla® K80 来说这意味着不使用 [GPU
+Boost](https://devblogs.nvidia.com/parallelforall/increase-performance-gpu-boost-k80-autoboost/)。对于每个测试，需要完成 10 次预热，然后再平均完成 100 次测试。
