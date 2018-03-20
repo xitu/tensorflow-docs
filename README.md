@@ -94,6 +94,12 @@ $ python
 
 [所有译者详细信息](https://github.com/xitu/tensorflow-docs/graphs/contributors)
 
+## 文档维护支持方
+
+[<img src="https://user-images.githubusercontent.com/26959437/37653530-37bd3cde-2c7a-11e8-98d0-749a59194c22.png" width="200px;"/>](https://juejin.im)
+
+本文档维护由[掘金](https://juejin.im)提供支持，阅读更多文章或与更多开发者交流请到[掘金](https://juejin.im)，关注[感兴趣的标签](https://juejin.im/subscribe/all)，订阅相关领域实时动态。
+
 ## 许可
 
 [Apache 许可 2.0](LICENSE)
