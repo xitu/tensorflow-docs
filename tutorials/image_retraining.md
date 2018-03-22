@@ -1,20 +1,20 @@
-# 如何再训练 Inception 的最后一层识别新分类
+# 如何重新训练 Inception 的最后一层以识别新的分类
 
 当前的对象识别模型拥有数百万计的参数，完整地训练整个模型需要花费数周的时间。
 迁移学习是一种能够大幅缩短这一过程的一种技术，
-它通过将一个已经完整训练过的模型如 ImageNet 重新训练来识别新的分类。
+它通过将一个已经完整训练过的模型（比如 ImageNet）重新训练来识别新的分类。
 在本例中我们将从零开始训练模型的最后一层并保留其他部分不变。
 想要获得此方法的更多信息请参考[ Decaf 的这篇论文](https://arxiv.org/pdf/1310.1531v1.pdf).
 
-尽管这种方式的效果没有比不上完整的训练，这种方法却对很多应用惊人的有效，
-而且能在笔记本上不要求 GPU的情况下 30 分钟内完成训练。
+尽管这种方式的效果比不上完整的训练，但却对很多应用惊人地有效，
+能在笔记本上不使用 GPU 而在 30 分钟内完成训练。
 这篇教程将展示如何在你自己的图片库上执行示例脚本，
-而且会讲解一些你将会用到的，帮助控制训练过程的一些选项。
+而且会讲解一些你将会用到的、有助于控制训练过程的一些选项。
 
 
 注：你还可以看[本教程的 codelab 版本](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/#0).
 
-Before you start, you must @{$install$install tensorflow}.
+当然，在开始之前你必须先@{$install$安装 TensorFlow}。
 
 [TOC]
 
@@ -25,9 +25,8 @@ Before you start, you must @{$install$install tensorflow}.
 [Kelly Sikkema 提供](https://www.flickr.com/photos/95072945@N05/9922116524/)
 
 
-在开始任何的训练之前，你需要一组图片，用于教网络认识你想让网络识别的那些新分类。
-具体如何准备你自己的图片库我们将在后面的部分讲解，为了便于讲解我们创建了一个
-包含知识共享授权花的图片的文件夹用于我们的初始化。
+在开始任何的训练之前，你需要一组图片，用于教神经网络认识你想让它识别的那些新分类。
+具体如何准备你自己的图片库我们将在后面的部分讲解，为了便于讲解我们创建了一个图片文件夹（包含一些已经获得知识共享授权的花朵图片），用于我们的初始化。
 获取这些花朵图片，可以执行下面的命令：
 
 ```sh
@@ -42,20 +41,20 @@ Once you have the images, you can clone the tensorflow repository using the foll
 git clone https://github.com/tensorflow/tensorflow
 ```
 
-Then checkout the version of the tensorflow repository matching your installation and this tutorial as follows:
+然后，检出（checkout）与你安装的版本一致的 tensorflow 仓库，命令如下：
 
 ``` sh
 cd tensorflow
 git checkout {version}
 ```
 
-In the simplest cases the retrainer can then be run like this:
+下面是重新训练器的最简单的使用方法：
 
 ```sh
 python tensorflow/examples/image_retraining/retrain.py --image_dir ~/flower_photos
 ```
 
-The script has many other options. You can get a full listing with:
+此脚本还有很多其它选项，完整的帮助可以通过下列命令查看：
 
 ```sh
 python tensorflow/examples/image_retraining/retrain.py -h
@@ -163,7 +162,7 @@ python tensorflow/examples/label_image/label_image.py \
 你将看到一组花名标签，大多数情况下以雏菊开头（尽管每个在训练模型可能有稍有区别）。
 `--image` parameter with your own images to try those out.
 
-If you'd like to use the retrained model in your own Python program, then the above [`label_image` script](https://www.tensorflow.org/code/tensorflow/examples/label_image/label_image.py) is a reasonable starting point. The `label_image` directory also contains C++ code which you can use as a template to integrate tensorflow with your own applications.
+如果你想在你自己的 Python 程序中使用这个重新训练过的模型，则上述 [`label_image` 脚本](https://www.tensorflow.org/code/tensorflow/examples/label_image/label_image.py) 是一个合理的初始参考。 `label_image` 目录中也包含了 C++ 代码，你可以在你自己的应用中将其当成一个整合 tensorflow 的模板。
 
 如果你觉得标准的 Inception v3 模型太大或者会使你你的程序变慢，
 你可以在[其他的模型结构](/tutorials/image_retraining#other_model_architectures)
@@ -368,7 +367,7 @@ python tensorflow/examples/image_retraining/retrain.py \
 典型的 24 位图片的范围是 [0, 255]，你必须把他们通过公式 `(image - 128.)/128.`
 转换到模型期望的 [-1, 1] 浮点数区间内。
 
-The default arguments for the `label_image` script are set for Inception V3. To use it with a MobileNet, specify the above normalization parameters as `input_mean` and `input_std` on the command line. You also must specify the image size that your model expects, as follows:
+`label_image` 脚本的默认参数是针对 Inception V3 的。为了用于 MobileNet 模型，在命令行中使用用 `input_mean` 和 `input_std` 这两个归一化参数。你还要指定模型的输入图片的大小。命令如下：
 
 ```sh
 python tensorflow/examples/label_image/label_image.py \
