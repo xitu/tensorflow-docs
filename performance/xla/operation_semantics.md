@@ -1115,7 +1115,7 @@ Reshape(5, {}, {1,1}) == f32[1x1] {{5}};
 
 另请参阅 [`ComputationBuilder::RngNormal`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-RngNormal 构造一个符合 $$(\mu, \sigma)$$ 正态随机分布的指定形状的随机数组。参数 `mu` 和 `sigma` 为 F32 类型的标量值，而输出形状为 U32 的数组。
+RngNormal 构造一个符合 $$(\mu, \sigma)$$ 正态随机分布的指定形状的随机数组。参数 `mu` 和 `sigma` 为 F32 类型的标量值，而输出形状为 F32 的数组。
 
 <b>`RngNormal(mean, sigma, shape)`</b>
 
@@ -1123,7 +1123,7 @@ RngNormal 构造一个符合 $$(\mu, \sigma)$$ 正态随机分布的指定形状
 | --------- | ----------------------- | -------------------------------------- |
 | `mu`      | `ComputationDataHandle` | 类型为 F32 的标量，指定生成的数的均值  |
 | `sigma`   | `ComputationDataHandle` | 类型为 F32 的标量，指定生成的数的标准差  |
-| `shape`   | `Shape`                 | 类型为 U32 的输出的形状 |
+| `shape`   | `Shape`                 | 类型为 F32 的输出的形状 |
 
 ## RngUniform
 
@@ -1141,32 +1141,24 @@ RngNormal 构造一个符合区间 $$[a,b)$$ 上的均匀分布的指定形状�
 
 ## Select
 
-See also
+另请参阅
 [`ComputationBuilder::Select`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
 
-Constructs an output array from elements of two input arrays, based on the
-values of a predicate array.
+基于 predicate 数组的值，从两个输入数组构造输出数组。
 
 <b> `Select(pred, on_true, on_false)` </b>
 
-Arguments  | Type                    | Semantics
+参数  | 类型                    | 语义
 ---------- | ----------------------- | ------------------
-`pred`     | `ComputationDataHandle` | array of type PRED
-`on_true`  | `ComputationDataHandle` | array of type T
-`on_false` | `ComputationDataHandle` | array of type T
+`pred`     | `ComputationDataHandle` | 类型为 PRED 的数组
+`on_true`  | `ComputationDataHandle` | 类型为 T 的数组
+`on_false` | `ComputationDataHandle` | 类型为 T 的数组
 
-The arrays `on_true` and `on_false` must have the same shape. This is also the
-shape of the output array. The array `pred` must have the same dimensionality as
-`on_true` and `on_false`, with the `PRED` element type.
+数组 `on_true` 和 `on_false` 的形状必须相同。这也是输出数组的形状。数组 `pred` 必须与 `on_true`、 `on_false`具有相同的维度，且值为 `PRED` 类型。
 
-For each element `P` of `pred`, the corresponding element of the output array is
-taken from `on_true` if the value of `P` is `true`, and from `on_false` if the
-value of `P` is `false`. As a restricted form of [broadcasting]
-(broadcasting.md), `pred` can be a scalar of type `PRED`. In this case, the
-output array is taken wholly from `on_true` if `pred` is `true`, and from
-`on_false` if `pred` is `false`.
+对于 `pred` 的每个元素 `P`，当 `P` 值为 `true` 时，相应的输出值从 `on_true` 中获取，否则从 `on_false` 中获取。由于 [broadcasting](broadcasting.md) 限制，`pred` 可以是类型为 `PRED` 的标量。此时，当 `pred ` 值为 `true` 时，输出数组为 `on_true`，否则为 `on_false`。
 
-Example with non-scalar `pred`:
+非标量 `pred` 的示例如下：
 
 ```
 let pred: PRED[4] = {true, false, false, true};
@@ -1176,7 +1168,7 @@ let v2: s32[4] = {100, 200, 300, 400};
 Select(pred, v1, v2) = s32[4]{1, 200, 300, 4};
 ```
 
-Example with scalar `pred`:
+标量 `pred` 的示例如下：
 
 ```
 let pred: PRED = true;
@@ -1186,15 +1178,13 @@ let v2: s32[4] = {100, 200, 300, 400};
 Select(pred, v1, v2) = s32[4]{1, 2, 3, 4};
 ```
 
-Selections between tuples are supported. Tuples are considered to be scalar
-types for this purpose. If `on_true` and `on_false` are tuples (which must have
-the same shape!) then `pred` has to be a scalar of type `PRED`.
+支持元组之间的 Selections 操作。因此元组认为是标量类型。如果 `on_true` 和  `on_false` 为元组（必须形状相同），则 `pred` 必须是类型为 `PRED` 的标量。
 
 ## SelectAndScatter
 
 另请参阅 [`ComputationBuilder::SelectAndScatter`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-这个操作可视为一个复合操作，它先在 `operand` 数组上计算 `ReduceWindow`，以从每个窗口中选择一个数，然后将 `source` 数组散布到选定元素的指标位置上，从而构造出一个与 `operand` 数组形状一样的输出数组。二元函数 `select` 用于从每个窗口中选出一个元素，当调用此函数时，第一个参数的指标矢量的字典序小于第二个参数的指标矢量。如果第一个参数被选中，则 `select` 返回 `true`，如果第二个参数被选中，则返回 `false`。而且该函数必须满足传递性，即如果 `select(a, b)` 和 `select(b, c)` 都为 `true`，则 `select(a, c)` 也为 `true`。这样，被选中的元素不依赖于指定窗口中元素访问的顺序。
+这个操作可视为一个复合操作，它先在 `operand` 数组上计算 `ReduceWindow`，以便从每个窗口中选择一个数，然后将 `source` 数组散布到选定元素的指标位置上，从而构造出一个与 `operand` 数组形状一样的输出数组。二元函数 `select` 用于从每个窗口中选出一个元素，当调用此函数时，第一个参数的指标矢量的字典序小于第二个参数的指标矢量。如果第一个参数被选中，则 `select` 返回 `true`，如果第二个参数被选中，则返回 `false`。而且该函数必须满足传递性，即如果 `select(a, b)` 和 `select(b, c)` 都为 `true`，则 `select(a, c)` 也为 `true`。这样，被选中的元素不依赖于指定窗口中元素访问的顺序。
 
 `scatter` 函数作用在输出数组的每个选中的指标上。它有两个标量参数：
 
@@ -1234,34 +1224,27 @@ padding, source, init_value, scatter)`</b>
 
 <b> `Send(operand, channel_handle)` </b>
 
-| Arguments        | Type                    | Semantics                        |
+| 参数        | 类型                    | 语义                        |
 | ---------------- | ----------------------- | -------------------------------- |
-| `operand`        | `ComputationDataHandle` | data to send (array of type T)   |
-| `channel_handle` | `ChannelHandle`         | unique identifier for each send/recv pair |
+| `operand`        | `ComputationDataHandle` | 待发送的数据（类型为 T 的数组）   |
+| `channel_handle` | `ChannelHandle`         | 发送/接收 对的唯一标识符         |
 
-Sends the given operand data to a `Recv` instruction in another computation
-that shares the same channel handle. Does not return any data.
+将给定的 operand 数据发送到另一台计算机上共享相同通道句柄的 `Recv` 中。不返回任何数据。
 
-Similar to the `Recv` operation, the client API of `Send` operation represents
-synchronous communication, and is internally decomposed into 2 HLO instructions
-(`Send` and `SendDone`) to enable asynchronous data transfers. See also
-[`HloInstruction::CreateSend` and `HloInstruction::CreateSendDone`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/hlo_instruction.h).
+与 `Recv` 操纵类似，`Send` 操作的客户端 API 为同步通信，并在内部分解为 2 个 HLO 指令（`Send` 和 `SendDone`）以使用异步数据传输。另请参阅 [`HloInstruction::CreateSend` 和 `HloInstruction::CreateSendDone`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/hlo_instruction.h)。
 
 <b>`Send(HloInstruction operand, int64 channel_id)`</b>
 
-Initiates an asynchronous transfer of the operand to the resources allocated by
-the `Recv` instruction with the same channel id. Returns a context, which is
-used by a following `SendDone` instruction to wait for the completion of the
-data transfer. The context is a tuple of {operand (shape), request identifier
-(U32)} and it can only be used by a `SendDone` instruction.
+发起 operand 的异步传输过程，将数据传输到具有相同通道 id 的 `Recv` 指令分配的资源中。返回一个上下文，随后使用 `SendDone` 指令等待数据传输完成。上下文是 {operand (shape), request identifier
+(U32)} 的二元组，且只能用于 `SendDone` 指令。
 
 <b> `SendDone(HloInstruction context)` </b>
 
-Given a context created by a `Send` instruction, waits for the data transfer to complete.  The instruction does not return any data.
+根据 `Send` 指令创建的上下文，等待数据传输完成。指令不返回任何数据。
 
 <b> Scheduling of channel instructions </b>
 
-The execution order of the 4 instructions for each channel (`Recv`, `RecvDone`, `Send`, `SendDone`) is as below.
+每个通道的 4 个指令 (`Recv`, `RecvDone`, `Send`, `SendDone`) 的执行顺序如下。
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:70%" src="../../images/send_recv_order.png">
@@ -1272,7 +1255,7 @@ The execution order of the 4 instructions for each channel (`Recv`, `RecvDone`, 
 * `Recv` happens before `RecvDone`
 * `Send` happens before `SendDone`
 
-When the backend compilers generate a linear schedule for each computation that communicates via channel instructions, there must not be cycles across the computations. For example, below schedules lead to deadlocks.
+当后端编译器为通过通道指令进行通信的每一个计算生成一个线性调度时，在计算过程中不能有循环。例如，下面的调度会产生死循环。
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="../../images/send_recv_schedule.png">
