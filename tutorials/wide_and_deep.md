@@ -1,17 +1,17 @@
-# TensorFlow Wide & Deep Learning 教程
+# TensorFlow 广度&深度学习教程
 
 在之前的 @{$wide$TensorFlow Linear Model Tutorial} 中, 我们使用 [Census Income 数据集](https://archive.ics.uci.edu/ml/datasets/Census+Income)训练了一个逻辑回归模型来预测个人年收入超过5万美元的概率。
 TensorFlow 也非常适合训练深度神经网络，您可能会考虑选择哪一个 -- 呃，为什么不是两个？是否有可能在一个模型中结合两者的优势？
 
-在本教程中，我们将介绍如何使用 tf.estimator API 来联合训练广度线性模型和深度前馈神经网络。这种方法结合了记忆和泛化的优势。 它对于具有稀疏输入特征的一般大规模回归和分类问题（例如，具有大量可能特征值的类别型特征）很有用。如果您有兴趣详细了解 Wide＆Deep Learning 的工作原理，请参阅我们的[研究论文](https://arxiv.org/abs/1606.07792)。
+在本教程中，我们将介绍如何使用 tf.estimator API 来联合训练广度线性模型和深度前馈神经网络。这种方法结合了记忆和泛化的优势。 它对于具有稀疏输入特征的一般大规模回归和分类问题（例如，具有大量可能特征值的类别型特征）很有用。如果您有兴趣详细了解广度&深度学习的工作原理，请参阅我们的[研究论文](https://arxiv.org/abs/1606.07792)。
 
-![Wide & Deep Spectrum of Models](https://www.tensorflow.org/images/wide_n_deep.svg "Wide & Deep")
+![广度&深度学习模型示意图](https://www.tensorflow.org/images/wide_n_deep.svg "Wide & Deep")
 
-上图展示了一个广度模型（具有稀疏特征和变换的逻辑回归），深度模型（具有嵌入层和多个隐藏层的前馈神经网络）和 Wide＆Deep 模型（两者的联合训练））。在较高的层面上，只需 3 个步骤即可使用 tf.estimator API 配置广度，深度或 Wide&Deep 模型：
+上图展示了一个广度模型（具有稀疏特征和变换的逻辑回归），深度模型（具有嵌入层和多个隐藏层的前馈神经网络）和广度&深度模型（两者的联合训练））。在较高的层面上，只需 3 个步骤即可使用 tf.estimator API 配置广度，深度或广度&深度模型：
 
 1.  为广度部分选择特征：选择你想用的基本的稀疏特征列和交叉列。
 1.  为深度部分选择特征：选择连续列，每个类别列的嵌入维度以及隐藏层大小。
-1.  将他们放进一个 Wide&Deep 模型（`DNNLinearCombinedClassifier`）。
+1.  将他们放进一个广度&深度模型（`DNNLinearCombinedClassifier`）。
 
 就是这样！我们来看一个简单的例子。
 
@@ -27,7 +27,7 @@ TensorFlow 也非常适合训练深度神经网络，您可能会考虑选择哪
 
         $ python data_download.py
 
-4. 使用如下命令执行本教程的代码，训练一个教程中描述的 Wide&Deep 模型：
+4. 使用如下命令执行本教程的代码，训练一个教程中描述的广度&深度模型：
 
         $ python wide_deep.py
 
@@ -167,4 +167,4 @@ for n in range(FLAGS.train_epochs // FLAGS.epochs_per_eval):
 
 最终的输出精度应该在 85.5% 左右。 如果您希望看到一个可用的端到端示例，则可以下载我们的[样例代码](https://github.com/tensorflow/models/tree/master/official/wide_deep/wide_deep.py).
 
-请注意，本教程只是一个小数据集的简单示例，可帮助你熟悉 API。如果你在具有大量可能特征值的稀疏特征列的大型数据集上进行试验，Wide&Deep Learning 功能将更加强大。再次说明，请随时查看我们的[研究论文](https://arxiv.org/abs/1606.07792)，了解如何将 Wide＆Deep Learning 应用于实际的大型机器学习问题。
+请注意，本教程只是一个小数据集的简单示例，可帮助你熟悉 API。如果你在具有大量可能特征值的稀疏特征列的大型数据集上进行试验，广度&深度学习功能将更加强大。再次说明，请随时查看我们的[研究论文](https://arxiv.org/abs/1606.07792)，了解如何将广度&深度学习应用于实际的大型机器学习问题。
