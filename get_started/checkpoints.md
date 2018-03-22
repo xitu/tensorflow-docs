@@ -1,46 +1,33 @@
-# Checkpoints
+# 检查点
 
-This document examines how to save and restore TensorFlow models built with
-Estimators. TensorFlow provides two model formats:
+本文介绍如何保存和恢复编译有 Estimator 的 TensorFlow 模型。TensorFlow 提供两种模型格式：
 
-*   checkpoints, which is a format dependent on the code that created
-    the model.
-*   SavedModel, which is a format independent of the code that created
-    the model.
+*   检查点（checkpoints）：这是一种依赖于创建模型代码的格式。
+*   SavedModel：这是一种与创建模型代码无关的格式。
 
-This document focuses on checkpoints. For details on SavedModel, see the
-@{$saved_model$Saving and Restoring} chapter of the
-*TensorFlow Programmer's Guide*.
+本文关心的是检查点格式。对于 SavedModel 的细节内容，请参见 __TensorFlow 程序员指南__ 中的 @{$saved_model$保存和恢复} 章节。
 
 
-## Sample code
+## 示例代码
 
-This document relies on the same
-[Iris classification example](https://github.com/tensorflow/models/blob/master/samples/core/get_started/premade_estimator.py) detailed in @{$premade_estimators$Getting Started with TensorFlow}.
-To download and access the example, invoke the following two commands:
+本文档同样依赖于 [Iris 数据分类示例](https://github.com/tensorflow/models/blob/master/samples/core/get_started/premade_estimator.py)，更多细节参见 @{$premade_estimators$TensorFlow 入门}。为下载和访问这个示例，可执行如下命令：
 
 ```shell
 git clone https://github.com/tensorflow/models/
 cd models/samples/core/get_started
 ```
 
-Most of the code snippets in this document are minor variations
-on `premade_estimator.py`.
+本文中大部分代码片断都是在 `premade_estimator.py` 基础上少量修改的版本。
 
 
-## Saving partially-trained models
+## 保存未训练完的模型
 
-Estimators automatically write the following to disk:
+Estimators 自动将下列内容写到磁盘上：
 
-*   **checkpoints**, which are versions of the model created during training.
-*   **event files**, which contain information that
-    [TensorBoard](https://developers.google.com/machine-learning/glossary/#TensorBoard)
-    uses to create visualizations.
+*   **检查点**：训练过程中生成的不同版本的模型。
+*   **事件文件**：包含一些用于 [TensorBoard](https://developers.google.com/machine-learning/glossary/#TensorBoard) 可视化的信息
 
-To specify the top-level directory in which the Estimator stores its
-information, assign a value to the optional `model_dir` argument of any
-Estimator's constructor.  For example, the following code sets the `model_dir`
-argument to the `models/iris` directory:
+为指定 Estimator 存储信息的顶层目录，将其赋值给任何一个 Estimator 的构造器的可选参数 `model_dir`。比如  ，下列代码将 `model_dir` 参数设置为 `models/iris` 目录：
 
 ```python
 classifier = tf.estimator.DNNClassifier(
@@ -50,8 +37,7 @@ classifier = tf.estimator.DNNClassifier(
     model_dir='models/iris')
 ```
 
-Suppose you call the Estimator's `train` method. For example:
-
+假定你调用 Estimator 的 `train` 方法。比如：
 
 ```python
 classifier.train(
@@ -59,19 +45,17 @@ classifier.train(
                 steps=200)
 ```
 
-As suggested by the following diagrams, the first call to `train`
-adds checkpoints and other files to the `model_dir` directory:
+如下列图表所示，第一次调用 `train` 将检查点和其它文件添加到 `model_dir` 目录中：
 
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/first_train_calls.png">
 </div>
 <div style="text-align: center">
-The first call to train().
+第一次调用 train()。
 </div>
 
 
-To see the objects in the created `model_dir` directory on a
-UNIX-based system, just call `ls` as follows:
+在一个类 UNIX 系统中，可用命令 `ls` 来查看 `model_dir` 目录中的对象：
 
 ```none
 $ ls -1 models/iris
@@ -86,11 +70,9 @@ model.ckpt-200.index
 model.ckpt-200.meta
 ```
 
-The preceding `ls` command shows that the Estimator created checkpoints
-at steps 1 (the start of training) and 200 (the end of training).
+上面的 `ls` 命令显示，此 Estimator 在第 1 步（训练开始时）和第 200 步（训练结束时）生成了检查点。
 
-
-### Default checkpoint directory
+### 默认检查点目录
 
 If you don't specify `model_dir` in an Estimator's constructor, the Estimator
 writes checkpoint files to a temporary directory chosen by Python's
