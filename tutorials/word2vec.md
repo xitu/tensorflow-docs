@@ -1,37 +1,27 @@
-# 用向量代表单词
+# 单词的向量表示
 
-本文让我们来通过 
-[Mikolov et al.](https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf) 
-来看看 word2vec 这个模型，它被用来训练叫做『词向量』的功能，
-这个功能可以用向量来代表单词。
+本文中，我们来通过论文 [Mikolov et al.](https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf) 
+来看看 word2vec 这个模型。此模型被用来训练单词的向量表示，此方法又称为『词嵌入』。
 
-## 亮点
+## 要点
 
-本文收录了用 TensorFlow 构建一个 word2vec 模型的部分有趣且真实的细节。
+本文主要目是要摘要出 TensorFlow 中构建一个 word2vec 模型时的那些有趣而关键性的内容。
 
-* 首先我们需要知道为什么想要
-  用向量来代表单词。
-* 其次我们需要看到模型背后的逻辑以及它是如何被训练的
-  （使用数学的奇技淫巧来进行测量）。
-* 同时我们也会使用 TensorFlow 实现一个简单的模型。
-* 最后，我们会看到让本地版本的更好拓展的一些方法。
+* 首先，我们需要知道为什么要用向量来代表单词。
+* 其次，我们需要看看模型背后的逻辑，以及它是如何训练的（使用一些数学技巧来获得好的训练效果）。
+* 同时，我们要用 TensorFlow 实现一个简单的模型。
+* 最后，我们会介绍能让原生版本更好地拓展的一些方法。
 
-本文只会粗略的过一遍代码，如果你想深入了解的话，
-可以去 [tensorflow/examples/tutorials/word2vec/word2vec_basic.py](https://www.tensorflow.org/code/tensorflow/examples/tutorials/word2vec/word2vec_basic.py) 
-看到一个极简的实现。
-这个基础的示例包含需要下载的数据的代码，稍微训练一下这些数据
-然后把结果可视化出来。一旦你可以轻松的阅读并运行这个基础的版本，
-你就可以去看 
-[models/tutorials/embedding/word2vec.py](https://www.tensorflow.org/code/tensorflow_models/tutorials/embedding/word2vec.py) 了，
-这是一个更严谨的实现，它展示了一些更高级的 TensorFlow 原则，
-例如如何高效的使用线程
-来将数据移动到一个文本模型中，以及如何在训练中设置检查点等。
+本文只会粗略地过一遍代码，如果你想深入了解的话，
+可以看看示例 [tensorflow/examples/tutorials/word2vec/word2vec_basic.py](https://www.tensorflow.org/code/tensorflow/examples/tutorials/word2vec/word2vec_basic.py) 
+中的一个极简的实现。
+这个简单示例包含下载数据的代码，只需稍微训练一下这些数据，就可以把结果可视化出来了。一旦你可以轻松的阅读并运行这个版本之后，
+你就可以去看一个更严谨的实现代码了： 
+[models/tutorials/embedding/word2vec.py](https://www.tensorflow.org/code/tensorflow_models/tutorials/embedding/word2vec.py) 。它展示了一些更高级的 TensorFlow 原则，你可从中学到如何高效的使用线程来将数据移动到一个文本模型中，如何在训练中设置检查点，等等。
 
-首先，让我们来看一看为什么我们想要学习词向量。
-如果你是一个词嵌入专家的话，可以直接跳过本节，不然
-看到这些细节你会觉得很无聊。
+首先，让我们来看一看为什么我们想要学习词嵌入。如果你已经是一个词嵌入专家了，可以跳过本节，直接深入细节。
 
-## 动机：为什么要学习词向量？
+## 动机：为什么要学习词嵌入？
 
 图像和音频处理系统在处理丰富，高维度的数据集时会将
 图像的单个像素信号量或
