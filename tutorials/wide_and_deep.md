@@ -1,4 +1,4 @@
-# TensorFlow 广度&深度学习教程
+# TensorFlow 广度 & 深度学习教程
 
 在之前的 @{$wide$TensorFlow Linear Model Tutorial} 中, 我们使用 [Census Income 数据集](https://archive.ics.uci.edu/ml/datasets/Census+Income)训练了一个逻辑回归模型来预测个人年收入超过5万美元的概率。
 TensorFlow 也非常适合训练深度神经网络，您可能会考虑选择哪一个 -- 呃，为什么不是两个？是否有可能在一个模型中结合两者的优势？
