@@ -1,13 +1,10 @@
-# High-Performance Models
+# 高性能模型
 
-This document and accompanying
-[scripts](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)
-detail how to build highly scalable models that target a variety of system types
-and network topologies. The techniques in this document utilize some low-level
-TensorFlow Python primitives. In the future, many of these techniques will be
-incorporated into high-level APIs.
+本文及相关
+[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)
+说明了如何构建能应对多种系统类型及网络拓扑的高可用模型。本文的技术利用了一些 TensorFlow Python 的底层组件。其中的大部分技术将来将被整合进高层次的 API 里。
 
-## Input Pipeline
+## 输入管道
 
 The @{$performance_guide$Performance Guide} explains how to identify possible
 input pipeline issues and best practices. We found that using @{tf.FIFOQueue}
