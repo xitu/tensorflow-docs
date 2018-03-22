@@ -27,7 +27,7 @@ Estimators 自动将下列内容写到磁盘上：
 *   **检查点**：训练过程中生成的不同版本的模型。
 *   **事件文件**：包含一些用于 [TensorBoard](https://developers.google.com/machine-learning/glossary/#TensorBoard) 可视化的信息
 
-为指定 Estimator 存储信息的顶层目录，将其赋值给任何一个 Estimator 的构造器的可选参数 `model_dir`。比如  ，下列代码将 `model_dir` 参数设置为 `models/iris` 目录：
+为指定 Estimator 存储信息的顶层目录，将其赋值给任何一个 Estimator 的构造函数的可选参数 `model_dir`。比如  ，下列代码将 `model_dir` 参数设置为 `models/iris` 目录：
 
 ```python
 classifier = tf.estimator.DNNClassifier(
@@ -74,11 +74,7 @@ model.ckpt-200.meta
 
 ### 默认检查点目录
 
-If you don't specify `model_dir` in an Estimator's constructor, the Estimator
-writes checkpoint files to a temporary directory chosen by Python's
-[tempfile.mkdtemp](https://docs.python.org/3/library/tempfile.html#tempfile.mkdtemp)
-function. For example, the following Estimator constructor does *not* specify
-the `model_dir` argument:
+如果你在一个 Estimator 构造函数中指定 `model_dir` 参数，此 Estimator 将检查点文件写到一个临时目录中，此目录由 Python 的 [tempfile.mkdtemp](https://docs.python.org/3/library/tempfile.html#tempfile.mkdtemp) 函数指定。比如，下面的 Estimator 构造函数并没有指定 `model_dir` 参数：
 
 ```python
 classifier = tf.estimator.DNNClassifier(
