@@ -1,101 +1,48 @@
-# Introduction to TensorFlow Mobile
+# TensorFlow Mobile 简介
 
-TensorFlow was designed from the ground up to be a good deep learning solution
-for mobile platforms like Android and iOS. This mobile guide should help you
-understand how machine learning can work on mobile platforms and how to
-integrate TensorFlow into your mobile apps effectively and efficiently.
+TensorFlow 设计之初就考虑了移动平台并针对 Android 和 iOS 等移动平台提供了良好的深度学习解决方案。此教程将帮助你了解如何在移动端使用机器学习，以及如何将 TensorFlow 有效且高效的集成到移动应用中。
 
-## About this Guide
+## 关于此教程
 
-This guide is aimed at developers who have a TensorFlow model that’s
-successfully working in a desktop environment, who want to integrate it into
-a mobile application, and cannot use TensorFlow Lite. Here are the
-main challenges you’ll face during that process:
+此教程面向已经具备一个能够在桌面环境成功运行的 TensorFlow 模型、希望将其集成到移动应用而无法使用 TensorFlow Lite 的开发者。你将面临以下挑战：
 
-- Understanding how to use Tensorflow for mobile.
-- Building TensorFlow for your platform.
-- Integrating the TensorFlow library into your application.
-- Preparing your model file for mobile deployment.
-- Optimizing for latency, RAM usage, model file size, and binary size.
+- 理解如何在移动端使用 TensorFlow
+- 为你所在的平台构建 TensorFlow
+- 将 TensorFlow 集成到你的应用中
+- 为移动端部署准备模型文件
+- 优化访问延迟、内存使用、模型文件的大小及二进制文件的大小。
 
-## Common use cases for mobile machine learning
+## 移动端机器学习的常见用例
 
-**Why run TensorFlow on mobile?**
+**为什么要在移动端运行 TensorFlow**
 
-Traditionally, deep learning has been associated with data centers and giant
-clusters of high-powered GPU machines. However, it can be very expensive and
-time-consuming to send all of the data a device has access to across a network
-connection. Running on mobile makes it possible to deliver very interactive
-applications in a way that’s not possible when you have to wait for a network
-round trip.
+传统意义上来说，深度学习被认为是数据中心和大规模 GPU 集群的产物。但是通过网络连接来发送设备能够访问的全部数据的成本极高且相当耗时。在移动平台上运行机器学习可以在无需等待网络回传交付的情况下让交互性极高的应用成为可能。
 
-Here are some common use cases for on-device deep learning:
+下面是一些常见的设备上的深度学习常见用例：
 
-### Speech Recognition
+### 语音识别
 
-There are a lot of interesting applications that can be built with a
-speech-driven interface, and many of these require on-device processing. Most of
-the time a user isn’t giving commands, and so streaming audio continuously to a
-remote server would be a waste of bandwidth, since it would mostly be silence or
-background noises. To solve this problem it’s common to have a small neural
-network running on-device @{$tutorials/audio_recognition$listening out for a particular keyword}.
-Once that keyword has been spotted, the rest of the
-conversation can be transmitted over to the server for further processing if
-more computing power is needed.
+很多有意思的应用可以使用语音界面来构建，其中很多应用需要在移动平台上进行处理。大部分时间里，用户是不会发出任何指令的，因为大部分内容都是白噪声，所以始终将音频连续的传输到远程服务器则会严重浪费我们的带宽。为了解决这个问题，通常会训练一个小型神经网络运行在设备上@{$tutorials/audio_recognition$listening out for a particular keyword}。
 
-### Image Recognition
+### 图像识别
 
-It can be very useful for a mobile app to be able to make sense of a camera
-image. If your users are taking photos, recognizing what’s in them can help your
-camera apps apply appropriate filters, or label the photos so they’re easily
-findable. It’s important for embedded applications too, since you can use image
-sensors to detect all sorts of interesting conditions, whether it’s spotting
-endangered animals in the wild
-or
-[reporting how late your train is running](https://svds.com/tensorflow-image-recognition-raspberry-pi/).
+能够理解相机图像的移动端应用是非常有用的。如果你的用户正在拍照，那么识别他们的拍摄内容可以帮助你的相机应用对照片进行适当的过滤，或者将照片标记起来方便查找。对于嵌入式应用而言，由于你还可以使用图像传感器来检测各种有趣的状况，比如在野外发现濒临灭绝的动物和[报告火车的晚点时间](https://svds.com/tensorflow-image-recognition-raspberry-pi/)
 
-TensorFlow comes with several examples of recognizing the types of objects
-inside images along with a variety of different pre-trained models, and they can
-all be run on mobile devices. You can try out
-our
-[Tensorflow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/index.html#0) and
-[Tensorflow for Poets 2: Optimize for Mobile](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets-2/index.html#0) codelabs to
-see how to take a pretrained model and run some very fast and lightweight
-training to teach it to recognize specific objects, and then optimize it to
-run on mobile.
+TensorFlow 内置了几个用于图像物体类型识别的预训练的模型代码，他们都可以在移动平台上运行。你可以尝试一下我们的 [TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/index.html#0) 和 [Tensorflow for Poets 2: 移动端优化版](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets-2/index.html#0) 来了解如何使用预训练模型从而运行一些高效且轻量的模型，从而先教会它识别特定物体，再在移动端进行优化。
 
-### Object Localization
+### 目标定位
 
-Sometimes it’s important to know where objects are in an image as well as what
-they are. There are lots of augmented reality use cases that could benefit a
-mobile app, such as guiding users to the right component when offering them
-help fixing their wireless network or providing informative overlays on top of
-landscape features. Embedded applications often need to count objects that are
-passing by them, whether it’s pests in a field of crops, or people, cars and
-bikes going past a street lamp.
+有时，知道一个物体是什么以及它们在图像中的位置是相当重要的。很多增强现实的应用都是它们的产物。例如，引导用户修复其无线网络或提供一些信息覆盖的增强现实功能。嵌入式应用经常需要对经过它们的物体进行统计，无论是农作物中的害虫、还是经过路灯的行人亦或者汽车和自行车。
 
-TensorFlow offers a pretrained model for drawing bounding boxes around people
-detected in images, together with tracking code to follow them over time. The
-tracking is especially important for applications where you’re trying to count
-how many objects are present over time, since it gives you a good idea when a
-new object enters or leaves the scene. We have some sample code for this
-available for Android [on
-Github](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android),
-and also a [more general object detection
-model](https://github.com/tensorflow/models/tree/master/research/object_detection/README.md)
-available as well.
+TensorFlow 提供了一种预训练模型，用于在图像中检测物体周围绘制边框，并能根据时间的推移来持续追踪目标。追踪目标其实对于那些需要持续计算图中出现的对象的个数相当重要，因为它为你提供了新目标出现或离开场景时的信息。我们在 [Github](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android) 上提供了一些可以用于 Android 的代码，还有一些更加[一般的目标检测模型](https://github.com/tensorflow/models/tree/master/research/object_detection/README.md)。
 
-### Gesture Recognition
+### 手势识别
 
-It can be useful to be able to control applications with hand or other
-gestures, either recognized from images or through analyzing accelerometer
-sensor data. Creating those models is beyond the scope of this guide, but
-TensorFlow is an effective way of deploying them.
+通过手或其他手势来控制应用是非常有用的，我们可以进行图像中识别或分析加速度传感器数据。创建这些模型已经超出了本教程的范围，但 TensorFlow 是部署他们的有效方式。
 
-### Optical Character Recognition
+### 光学字符识别
 
-Google Translate’s live camera view is a great example of how effective
-interactive on-device detection of text can be.
+谷歌翻译移动端软件的实时相机翻译就是一个非常好的展示如何高效的在移动设备上进行交互式文本检测的例子。
 
 <div class="video-wrapper">
   <iframe class="devsite-embedded-youtube-video" data-video-id="06olHmcJjS0"
@@ -103,145 +50,62 @@ interactive on-device detection of text can be.
   </iframe>
 </div>
 
-There are multiple steps involved in recognizing text in images. You first have
-to identify the areas where the text is present, which is a variation on the
-object localization problem, and can be solved with similar techniques. Once you
-have an area of text, you then need to interpret it as letters, and then use a
-language model to help guess what words they represent. The simplest way to
-estimate what letters are present is to segment the line of text into individual
-letters, and then apply a simple neural network to the bounding box of each. You
-can get good results with the kind of models used for MNIST, which you can find
-in TensorFlow’s tutorials, though you may want a higher-resolution input.  A
-more advanced alternative is to use an LSTM model to process a whole line of
-text at once, with the model itself handling the segmentation into different
-characters.
+识别图像中的文字包含多个步骤。首先我们需要确定文本所在区域，这是目标定位问题的一种形式，我们可以用类似的技术来解决。一旦你找到了文本所在的区域，你就需要将其解释并转换为为字母，然后通过语言模型来辅助猜测它们所代表的单词。估计出现什么字母的最简单的方法就是讲文本分割成一个个单一的字母，然后简单的将神经网络应用在每个字母的边界框上。尽管你可能希望高分辨率的输入，但其实有些 MNIST 的模型就能获得相当好的结果，你可以在 TensorFlow 的教程中找到它们。一个更好的方案是选择使用一个 LSTM 模型来处理一整行的文字，模型本身就能够将片段分隔成不同的字符。
 
-### Translation
+### 翻译
 
-Translating from one language to another quickly and accurately, even if you
-don’t have a network connection, is an important use case. Deep networks are
-very effective at this sort of task, and you can find descriptions of a lot of
-different models in the literature. Often these are sequence-to-sequence
-recurrent models where you’re able to run a single graph to do the whole
-translation, without needing to run separate parsing stages.
+一个非常重要的场景就是在没有网络连接的情况下，你依然希望能准确的将一种语言翻译成另一种语言。深度神经网络在这类任务中相当高效，你可以在不同的文献中找到很多不同类型的模型。通常它们都是序列到序列的循环模型，你可以运行单个计算图来完成整个序列的转换，而无需分阶段进行语法分析。
 
-### Text Classification
+### 文本分类
 
-If you want to suggest relevant prompts to users based on what they’re typing or
-reading, it can be very useful to understand the meaning of the text. This is
-where text classification comes in. Text classification is an umbrella term
-that covers everything from sentiment analysis to topic discovery. You’re likely
-to have your own categories or labels that you want to apply, so the best place
-to start is with an example
-like
-[Skip-Thoughts](https://github.com/tensorflow/models/tree/master/research/skip_thoughts/),
-and then train on your own examples.
+如果你想要根据用户输入或阅读的内容向用户推荐相关提示，那么文本理解对这种任务来说相当重要。这就是分本分类的动机。文本分类是涵盖了从情感分析到主题发现的全部内容的统称。你可能会有自己想要使用的类别标签，因此最好的方式是看看 [Skip-Thoughts](https://github.com/tensorflow/models/tree/master/research/skip_thoughts/) 的例子再开始用自己的样本来进行训练。
 
-### Voice Synthesis
+### 语音合成
 
-A synthesized voice can be a great way of giving users feedback or aiding
-accessibility, and recent advances such as
-[WaveNet](https://deepmind.com/blog/wavenet-generative-model-raw-audio/) show
-that deep learning can offer very natural-sounding speech.
+合成后的语音是给与用户反馈与辅助的最好方式之一，[WaveNet](https://deepmind.com/blog/wavenet-generative-model-raw-audio/) 等最新研究进展表明，深度学习也可以提供非常自然的合成语音。
 
-## Mobile machine learning and the cloud
+## 移动端机器学习与云服务
 
-These examples of use cases give an idea of how on-device networks can
-complement cloud services. Cloud has a great deal of computing power in a
-controlled environment, but running on devices can offer higher interactivity.
-In situations where the cloud is unavailable, or your cloud capacity is limited,
-you can provide an offline experience, or reduce cloud workload by processing
-easy cases on device.
+上面这些用例给出了设备上的网络可以作为云服务的想法。云服务在受控的环境下具备相当大的计算能力，但设备上运行则更加致力于提供更高的交互性。在云服务不可用或云容量有限的情况下，你可以提供离线应用的体验或者通过处理少量的云服务负载来处理设备上出现的一些简单的情况。
 
-Doing on-device computation can also signal when it's time to switch to working
-on the cloud. A good example of this is hotword detection in speech. Since
-devices are able to constantly listen out for the keywords, this then triggers a
-lot of traffic to cloud-based speech recognition once one is recognized. Without
-the on-device component, the whole application wouldn’t be feasible, and this
-pattern exists across several other applications as well. Recognizing that some
-sensor input is interesting enough for further processing makes a lot of
-interesting products possible.
+在设备上进行计算当然也意味着可以指明何时能够切换到云服务上。语音中的触发词检测就是一个相当好的例子。由于设备能够不断监听关键字，因此一旦识别出这些关键字，就会触发大量基于云服务的语音识别流量。如果没有设备上的这种组件，这种应用是不可能的。而且，这种模式还能跨多个应用进行部署。识别传感器的输入对进一步处理能促使一些有趣的产品成为可能。
 
-## What hardware and software should you have?
+## 所需的软件与硬件
 
-TensorFlow runs on Ubuntu Linux, Windows 10, and OS X. For a list of all
-supported operating systems and instructions to install TensorFlow, see
+TensorFlow 可以在 Ubuntu Linux、Windows 10 和 OS X 上运行。关于如何在支持的操作系统上安装 TensorFlow，请参考
 @{$install$Installing Tensorflow}.
 
-Note that some of the sample code we provide for mobile TensorFlow requires you
-to compile TensorFlow from source, so you’ll need more than just `pip install`
-to work through all the sample code.
+注意，我们为移动端 TensorFlow 提供的一些演示代码要求你对 TensorFlow 源码进行编译，因此你还需要使用除了 `pip install` 之外的方法来处理全部示例代码。
 
-To try out the mobile examples, you’ll need a device set up for development,
-using
-either [Android Studio](https://developer.android.com/studio/install.html),
-or [XCode](https://developer.apple.com/xcode/) if you're developing for iOS.
+要尝试移动端代码，你需要一个设备来搭建 [Android Studio](https://developer.android.com/studio/install.html) 或 [XCode](https://developer.apple.com/xcode/) 开发环境。
 
-## What should you do before you get started?
+## 开始前的准备工作
 
-Before thinking about how to get your solution on mobile:
+在获得移动端解决方案之前你需要思考下面这些问题：
 
-1. Determine whether your problem is solvable by mobile machine learning
-2. Create a labelled dataset to define your problem
-3. Pick an effective model for the problem
+1. 判断移动端机器学习能够解决你的问题
+2. 创建监督式数据集来定义你的问题
+3. 为问题选择一个高效的模型
 
-We'll discuss these in more detail below.
+我们将在下面的篇幅中详细讨论。
 
-### Is your problem solvable by mobile machine learning?
+### 判断移动端机器学习能否解决你的问题
 
-Once you have an idea of the problem you want to solve, you need to make a plan
-of how to build your solution. The most important first step is making sure that
-your problem is actually solvable, and the best way to do that is to mock it up
-using humans in the loop.
+一旦你想出了你想要解决的问题的解决方法，那你就需要制定一个如何构建解决方案的计划。最重要的第一步是确保你的问题是技术上可行的，最好的方法就是让用户参与其中从而模拟这个问题。
 
-For example, if you want to drive a robot toy car using voice commands, try
-recording some audio from the device and listen back to it to see if you can
-make sense of what’s being said. Often you’ll find there are problems in the
-capture process, such as the motor drowning out speech or not being able to hear
-at a distance, and you should tackle these problems before investing in the
-modeling process.
+举个例子，如果你想要使用语音指令来控制智能汽车，可以试着在设备上录制一些音频然后再反复听到底说了什么，看看你是否能够理解所说的内容。通常情况下，你就会发现一些在录制过程中存在的问题，比如由于发动机的声音太吵了亦或者说话人与录制设备的距离太远导致语音没有办法听清等，你应该在建模之前解决这些问题。
 
-Another example would be giving photos taken from your app to people see if they
-can classify what’s in them, in the way you’re looking for. If they can’t do
-that (for example, trying to estimate calories in food from photos may be
-impossible because all white soups look the same), then you’ll need to redesign
-your experience to cope with that. A good rule of thumb is that if a human can’t
-handle the task then it will be difficult to train a computer to do better.
+再举个例子，你把拍摄的照片发给别人看看他们能否对这个照片的内容进行分类。如果他们做不到这件事情（例如，尝试从照片中的食物估算出卡路里是不可能的，因为白色的汤汁看起来都一样），那么你就需要重新设计你的用户体验来处理这个问题。一个比较好的实践原则是：如果人都不能处理这个任务，那么很难训练一个比人做得更好的机器出来。
 
-### Create a labelled dataset
+### 创建监督式数据集
+在解决了使用场景的基本问题后，你需要创建一个带有标签的监督式数据集来定义你的问题。这个步骤非常重要，甚至比你选择哪种模型更加重要。由于模型只有在你监督训练良好的情况下才能表现的高效，所以你会希望这个数据集能够尽可能的表示你实际问题的场景。
 
-After you’ve solved any fundamental issues with your use case, you need to
-create a labeled dataset to define what problem you’re trying to solve. This
-step is extremely important, moreso than picking which model to use. You want it
-to be as representative as possible of your actual use case, since the model
-will only be effective at the task you teach it. It’s also worth investing in
-tools to make labeling the data as efficient and accurate as possible. For
-example, if you’re able to switch from having to click a button on a web
-interface to simple keyboard shortcuts, you may be able to speed up the
-generation process a lot. You should also start by doing the initial labeling
-yourself, so you can learn about the difficulties and likely errors, and
-possibly change your labeling or data capture process to avoid them. Once you
-and your team are able to consistently label examples (that is once you
-generally agree on the same labels for most examples), you can then try and
-capture your knowledge in a manual and teach external raters how to run the same
-process.
+同样地，花时间优化你标记数据的工具的效率和精确度也很重要。举个例子，如果你能够将一个网页界面上一个按钮替换成简单的键盘快捷键，你就能获得更高的工作效率。最初的时候你应该自己对数据集进行标记，这样便能了解到相关的困难和可能出现的错误，这样就能在修改标签或者处理数据的时候避免错误出现。一旦你和你的团队开始持续的对样本进行标注（即你基本上统一大部分的样本标签时），就可以尝试总结你的知识，并将它们交给其他外部的评估人员从而执行相同的过程。
 
-### Pick an effective model
+### 选择一个高效的模型
 
-The next step is to pick an effective model to use. You might be able to avoid
-training a model from scratch if someone else has already implemented a model
-similar to what you need; we have a repository of models implemented in
-TensorFlow [on Github](https://github.com/tensorflow/models) that you can look
-through. Lean towards the simplest model you can find, and try to get started as
-soon as you have even a small amount of labelled data, since you’ll get the best
-results when you’re able to iterate quickly. The shorter the time it takes to
-try training a model and running it in its real application, the better overall
-results you’ll see. It’s common for an algorithm to get great training accuracy
-numbers but then fail to be useful within a real application because there’s a
-mismatch between the dataset and real usage. Prototype end-to-end usage as soon
-as possible to create a consistent user experience.
+下一步是选择一个高效的模型进行使用。如果别人已经实现了类似的你所需要的模型，那么你可以避免从零开始训练一个新的模型；我们在 [Github 仓库](https://github.com/tensorflow/models)上保存了一些 TensorFlow 所实现的模型库，你可以先阅读是否有你所需要的模型。尽量从简单的模型入手，并竟可能早的开始使用，哪怕你搜集到的监督数据还很少，因为以后你能够在快速迭代的过程中获得更好的结果。对于一个算法而言，在数据集上获得相当好的效果却在实际情况下表现一般是相当常见的，这就是所谓的数据偏置导致的。以最快的速度搭建一个端到端的原型，从而才能构建一致的用户体验。
 
-## Next Steps
+## 下一步
 
-We suggest you get started by building one of our demos for
-@{$mobile/android_build$Android} or @{$mobile/ios_build$iOS}.
+我们推荐你从构建一个我们的 @{$mobile/android_build$Android} 或 @{$mobile/ios_build$iOS} 示例开始。
