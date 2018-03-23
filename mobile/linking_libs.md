@@ -1,105 +1,58 @@
-# Integrating TensorFlow libraries
+# 集成 TensorFlow 库
 
-Once you have made some progress on a model that addresses the problem you’re
-trying to solve, it’s important to test it out inside your application
-immediately. There are often unexpected differences between your training data
-and what users actually encounter in the real world, and getting a clear picture
-of the gap as soon as possible improves the product experience.
+一旦你在解决你所需问题的模型上取得了进展，那么在立即在应用中进行测试就变得非常重要了。通常情况下，你的训练数据与实际世界中面临的数据是存在意想不到的差异，尽快清晰的了解这些差距，才能更快的改进你的产品体验。这个页面讨论了如何在你的应用中集成 TensorFlow 库，只要你能够将 TensorFlow 移动端的演示程序成功部署，就能成功的构建你自己的应用。
 
-This page talks about how to integrate the TensorFlow libraries into your own
-mobile applications, once you have already successfully built and deployed the
-TensorFlow mobile demo apps.
+## 库链接
 
-## Linking the library
-
-After you've managed to build the examples, you'll probably want to call
-TensorFlow from one of your existing applications. The very easiest way to do
-this is to use the Pod installation steps described
-@{$mobile/ios_build#using_cocoapods$here}, but if you want to build TensorFlow
-from source (for example to customize which operators are included) you'll need
-to break out TensorFlow as a framework, include the right header files, and link
-against the built libraries and dependencies.
+在你尝试构建这些例子之前，你将需要从一个现有的应用程序中调用 TensorFlow。最简单的方法就是使用 @{$mobile/ios_build#using_cocoapods$here} 描述的使用 Pod 的安装步骤。但是，如果你想要使用源码来安装 TensorFlow（例如包含一些自定义的运算符），那么你需要将 Tensorflow 以框架的形式引入，包含正确的头文件，链接到构建所需的库文件和依赖项。
 
 ### Android
 
-For Android, you just need to link in a Java library contained in a JAR file
-called `libandroid_tensorflow_inference_java.jar`. There are three ways to
-include this functionality in your program:
+对 Android 而言，你只需要链接一个叫做 `libandroid_tensorflow_inference_java.jar` 的 JAR 文件即可。有三种方式：
 
-1. Include the jcenter AAR which contains it, as in this
- [example app](https://github.com/googlecodelabs/tensorflow-for-poets-2/blob/master/android/build.gradle#L59-L65)
+1. 在 jcenter AAR 中引入，例如
+ [这个应用](https://github.com/googlecodelabs/tensorflow-for-poets-2/blob/master/android/build.gradle#L59-L65)
 
-2. Download the nightly precompiled version from
-[ci.tensorflow.org](http://ci.tensorflow.org/view/Nightly/job/nightly-android/lastSuccessfulBuild/artifact/out/).
+2. 从 [ci.tensorflow.org](http://ci.tensorflow.org/view/Nightly/job/nightly-android/lastSuccessfulBuild/artifact/out/) 中下载编译好的开发版本。
 
-3. Build the JAR file yourself using the instructions [in our Android Github repo](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/android)
+3. 根据我们 [Android Github 仓库](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/android)的指示自行构建 JAR 文件。
 
 ### iOS
 
-Pulling in the TensorFlow libraries on iOS is a little more complicated. Here is
-a checklist of what you’ll need to do to your iOS app:
+在 iOS 上集成 TensorFlow 库稍微复杂一些。这是一份你需要在 iOS 应用上执行的步骤清单：
 
-- Link against tensorflow/contrib/makefile/gen/lib/libtensorflow-core.a, usually
-  by adding `-L/your/path/tensorflow/contrib/makefile/gen/lib/` and
-  `-ltensorflow-core` to your linker flags.
+- 链接 `tensorflow/contrib/makefile/gen/lib/libtensorflow-core.a`：通常情况下，将 `-L/your/path/tensorflow/contrib/makefile/gen/lib/` 和
+  `-ltensorflow-core` 添加到你的链接器标志中。
 
-- Link against the generated protobuf libraries by adding
+- 链接并生成 protobuf 库：将
   `-L/your/path/tensorflow/contrib/makefile/gen/protobuf_ios/lib` and
-  `-lprotobuf` and `-lprotobuf-lite` to your command line.
+  `-lprotobuf` 和 `-lprotobuf-lite` 添加到你的编译命令中。
 
-- For the include paths, you need the root of your TensorFlow source folder as
-  the first entry, followed by
-  `tensorflow/contrib/makefile/downloads/protobuf/src`,
-  `tensorflow/contrib/makefile/downloads`,
-  `tensorflow/contrib/makefile/downloads/eigen`, and
-  `tensorflow/contrib/makefile/gen/proto`.
+- 包含路径：你需要将 `tensorflow/contrib/makefile/downloads/protobuf/src`、
+  `tensorflow/contrib/makefile/downloads`、
+  `tensorflow/contrib/makefile/downloads/eigen` 和
+  `tensorflow/contrib/makefile/gen/proto` 这些 TensorFlow 的源文件夹路径添加作为第一入口。
 
-- Make sure your binary is built with `-force_load` (or the equivalent on your
-  platform), aimed at the TensorFlow library to ensure that it’s linked
-  correctly. More detail on why this is necessary can be found in the next
-  section, [Global constructor magic](#global_constructor_magic). On Linux-like
-  platforms, you’ll need different flags, more like
-  `-Wl,--allow-multiple-definition -Wl,--whole-archive`.
+- 确保针对 TensorFlow 的库二进制文件是通过 `-force_load` 参数编译而成（或视平台而定），从而保证正确链接。关于这个操作必要性的更多细节你可以在下一个小节，[全局构造的黑魔法](#global_constructor_magic)中了解到。在类 Linux 平台下，你需要使用诸如 `-Wl,--allow-multiple-definition -Wl,--whole-archive` 等不同链接标志。
 
-You’ll also need to link in the Accelerator framework, since this is used to
-speed up some of the operations.
+此外，你还需要将其链接到 Accelerator 框架中，因为它能够对某些计算操作进行加速。
 
-## Global constructor magic
+## 全局构造的黑魔法
 
-One of the subtlest problems you may run up against is the “No session factory
-registered for the given session options” error when trying to call TensorFlow
-from your own application. To understand why this is happening and how to fix
-it, you need to know a bit about the architecture of TensorFlow.
+当你运行程序尝试调用 TensorFlow 时候，你可能会遇到 `No session factory registered for the given session options` 的错误，同时它也是几个相当微妙的错误之一。要理解为什么会发生这种情况以及如何解决这个问题，你需要了解一下 TensorFlow 的架构。
 
-The framework is designed to be very modular, with a thin core and a large
-number of specific objects that are independent and can be mixed and matched as
-needed. To enable this, the coding pattern in C++ had to let modules easily
-notify the framework about the services they offer, without requiring a central
-list that has to be updated separately from each implementation. It also had to
-allow separate libraries to add their own implementations without needing a
-recompile of the core.
+TensorFlow 整个框架被设计得相当模块化，其中包含了大量的独立的特定对象以及一个轻薄的内核，并且可以根据需要进行混合与匹配。为了实现这一点，C++ 中的编码模式必须让模块在没有一个汇总列表的情况下（且每个列表与实现必须分开更新），能够轻松地同时框架它们所提供的服务。同时，它还必须允许单独的库能够在不重新编译内核的情况下添加它们自己的实现。
 
-To achieve this capability, TensorFlow uses a registration pattern in a lot of
-places. In the code, it looks like this:
+为了获得这种级别的兼容性，Tensorf 在相当多的地方使用了如下的注册模式：
 
     class MulKernel : OpKernel {
       Status Compute(OpKernelContext* context) { … }
     };
     REGISTER_KERNEL(MulKernel, “Mul”);
 
-This would be in a standalone `.cc` file linked into your application, either
-as part of the main set of kernels or as a separate custom library. The magic
-part is that the `REGISTER_KERNEL()` macro is able to inform the core of
-TensorFlow that it has an implementation of the Mul operation, so that it can be
-called in any graphs that require it.
+这将作为主要内核集的一部分或是作为单独的自定义库，在一个独立的 `.cc` 文件链接到你的应用中去。黑魔法就在于，`REGISTER_KERNEL()`  这个宏能能够通知 TensorFlow 内核它具有一个关于 Mul 操作的实现，从而在任何需要它的计算图中调用。
 
-From a programming point of view, this setup is very convenient. The
-implementation and registration code live in the same file, and adding new
-implementations is as simple as compiling and linking it in. The difficult part
-comes from the way that the `REGISTER_KERNEL()` macro is implemented. C++
-doesn’t offer a good mechanism for doing this sort of registration, so we have
-to resort to some tricky code. Under the hood, the macro is implemented so that
-it produces something like this:
+从编程的角度来看，这个设置是相当便利的。实现和注册代码位于同一个文件，同时添加新的实现与编译和链接它一样简单。但是，最难的地方就在于 `REGISTER_KERNEL()` 的实现方式。C++ 并没有提供这种良好的注册机制，因此我们必须使用一些具有技巧的代码。在 TensorFlow 内部，这个宏被实现为类似于下面代码的东西：
 
     class RegisterMul {
      public:
@@ -111,133 +64,88 @@ it produces something like this:
     };
     RegisterMul g_register_mul;
 
-This sets up a class `RegisterMul` with a constructor that tells the global
-kernel registry what function to call when somebody asks it how to create a
-“Mul” kernel. Then there’s a global object of that class, and so the constructor
-should be called at the start of any program.
+这个宏设置了一个具有构造函数的 `RegisterMul` 类，其构造函数会在有人希望全局内核入口创建一个 `Mul` 内核的时候告诉这个入口。从而，内核入口类就具有一个全局对象，并且其构造函数需要在任何程序启动前调用它。
 
-While this may sound sensible, the unfortunate part is that the global object
-that’s defined is not used by any other code, so linkers not designed with this
-in mind will decide that it can be deleted. As a result, the constructor is
-never called, and the class is never registered. All sorts of modules use this
-pattern in TensorFlow, and it happens that `Session` implementations are the
-first to be looked for when the code is run, which is why it shows up as the
-characteristic error when this problem occurs.
+虽然听起来很合理，但可惜的是自定义的全局对象没有被任何其他代码使用，而链接器又被设计成在没有使用时就会将其代码删除的形式，从而导致的结果就是：构造函数从未被调用，并且该类也没有被注册。在 TensorFlow 中，所有模块都使用了这种模式，而在代码运行时， `Session` 的实现中就首次检查了这个构造，这也是为什么这个问题会发生的原因。
 
-The solution is to force the linker to not strip any code from the library, even
-if it believes it’s unused. On iOS, this step can be accomplished with the
-`-force_load` flag, specifying a library path, and on Linux you need
-`--whole-archive`. These persuade the linker to not be as aggressive about
-stripping, and should retain the globals.
+解决方法就是强制链接器在即使代码没有使用的情况下，也不忽略库中的任何代码。在 iOS 中，可以中 `-force_load` 标志并制定库的路径，而在 Linux 中，你需要使用 `--whole-archive` 。它们指导了链接器不要积极的对编译作出精简，而是保留使用 TensorFlow 时所需的全局变量。
 
-The actual implementation of the various `REGISTER_*` macros is a bit more
-complicated in practice, but they all suffer the same underlying problem. If
-you’re interested in how they work, [op_kernel.h](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/op_kernel.h#L1091)
-is a good place to start investigating.
+不同形式 `REGISTER_*` 宏的实际实现在实践中相当复杂，但它们都有着相同的底层问题。如果你对它们的工作方式感兴趣，[op_kernel.h](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/op_kernel.h#L1091) 是一个研究的起点。
 
-## Protobuf problems
+## Protobuf 问题
 
-TensorFlow relies on
-the [Protocol Buffer](https://developers.google.com/protocol-buffers/) library,
-commonly known as protobuf. This library takes definitions of data structures
-and produces serialization and access code for them in a variety of
-languages. The tricky part is that this generated code needs to be linked
-against shared libraries for the exact same version of the framework that was
-used for the generator. This can be an issue when `protoc`, the tool used to
-generate the code, is from a different version of protobuf than the libraries in
-the standard linking and include paths. For example, you might be using a copy
-of `protoc` that was built locally in `~/projects/protobuf-3.0.1.a`, but you have
-libraries installed at `/usr/local/lib` and `/usr/local/include` that are from
-3.0.0.
+TensorFlow 依赖 [Protocol Buffer](https://developers.google.com/protocol-buffers/)，通常称为 protobuf。这个库利用了数据结构的定义，从而为各种语言生成可访问的代码。比较棘手的问题在于，生成的代码需要链接到与框架完全相同版本共享的库中，才能作为生成器使用。当 `protoc` 来自于标准链接库中不同版本的 protobuf 库路径时候，会触发一些问题。例如，你可能正在使用一个本地编译在 `~/projects/protobuf-3.0.1.a` 中的 `protoc` 的副本，但是你又有在系统中安装在 `/user/local/lib` 和 `/usr/local/include` 下的 3.0.0 版本的 `protoc`。
 
-The symptoms of this issue are errors during the compilation or linking phases
-with protobufs. Usually, the build tools take care of this, but if you’re using
-the makefile, make sure you’re building the protobuf library locally and using
-it, as shown in [this Makefile](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/makefile/Makefile#L18).
+在使用 protobuf 进行编译或链接时，这个问题就会导致出错。通常，构建工具会照顾到这一点，但是如果你使用的是 makefile，那么请确保你构建时使用的是局部构建的 protobuf 库，可以参考[这个 Makefile](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/makefile/Makefile#L18)。
 
-Another situation that can cause problems is when protobuf headers and source
-files need to be generated as part of the build process. This process makes
-building more complex, since the first phase has to be a pass over the protobuf
-definitions to create all the needed code files, and only after that can you go
-ahead and do a build of the library code.
+另一个可能出现问题的情况是在需要生产 protobuf 头文件和源文件时出现的。这个过程使得构建过程更加复杂，这是因为第一阶段必须通过 protobuf 的定义来创建所有需要的代码文件，只有在此之后才能继续编译库的代码。
 
-### Multiple versions of protobufs in the same app
+### 同应用下的不同 protobuf 版本
 
-Protobufs generate headers that are needed as part of the C++ interface to the
-overall TensorFlow library. This complicates using the library as a standalone
-framework.
+Protobufs 生成了整个 TensorFlow C++ 接口头文件的一部分。这使得使用这个库作为一个独立框架变得相对复杂。
 
-If your application is already using version 1 of the protocol buffers library,
-you may have trouble integrating TensorFlow because it requires version 2. If
-you just try to link both versions into the same binary, you’ll see linking
-errors because some of the symbols clash. To solve this particular problem, we
-have an experimental script at [rename_protobuf.sh](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/makefile/rename_protobuf.sh).
+如果你的应用已经使用了某个版本的 protobuf，那么在集成 TensorFlow 可能会会遇到一些麻烦，因为 TensorFlow 可能要求使用另一个版本的 protobuf。如果你尝试将两个版本链接到一个相同的库时，你将看到大堆的符号错误。为了解决这个特定的问题，我们有一个实验性的脚本 [rename_protobuf.sh](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/makefile/rename_protobuf.sh) 来帮你解决这个问题。
 
-You need to run this as part of the makefile build, after you’ve downloaded all
-the dependencies:
+在下载完全部依赖后，你需要将其作为 Makefile 构建的一部分：
 
     tensorflow/contrib/makefile/download_dependencies.sh
     tensorflow/contrib/makefile/rename_protobuf.sh
 
-## Calling the TensorFlow API
+## 调用 TensorFlow API
 
-Once you have the framework available, you then need to call into it. The usual
-pattern is that you first load your model, which represents a preset set of
-numeric computations, and then you run inputs through that model (for example,
-images from a camera) and receive outputs (for example, predicted labels).
+一旦你的框架可用后，你就得调用它了。通常的模式是先加载代表预先设置加载你的模型，它表示了一个数值计算的模型，然后通过输入（例如相机的图像）、运行该模型从而接收输出（例如预测标签）。
 
-On Android, we provide the Java Inference Library that is focused on just this
-use case, while on iOS and Raspberry Pi you call directly into the C++ API.
+在 Android 上，我们提供了专用于 Java 的 Inference 库，而在 iOS 和 Raspberry Pi 上你可以直接调用 C++ 的 API。
 
 ### Android
 
-Here’s what a typical Inference Library sequence looks like on Android:
+Android 上的一个典型的 Inference 库的用法如下：
 
-    // Load the model from disk.
-    TensorFlowInferenceInterface inferenceInterface =
-    new TensorFlowInferenceInterface(assetManager, modelFilename);
+```Java
+// 从磁盘加载模型
+TensorFlowInferenceInterface inferenceInterface =
+new TensorFlowInferenceInterface(assetManager, modelFilename);
 
-    // Copy the input data into TensorFlow.
-    inferenceInterface.feed(inputName, floatValues, 1, inputSize, inputSize, 3);
+// 将输入数据复制给 TensorFlow
+inferenceInterface.feed(inputName, floatValues, 1, inputSize, inputSize, 3);
 
-    // Run the inference call.
-    inferenceInterface.run(outputNames, logStats);
+// 调用运行 Inference 程序
+inferenceInterface.run(outputNames, logStats);
 
-    // Copy the output Tensor back into the output array.
-    inferenceInterface.fetch(outputName, outputs);
+// 将输出的 Tensor 复制回输出 outputs 数组
+inferenceInterface.fetch(outputName, outputs);
+```
 
-You can find the source of this code in the [Android examples](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/android/src/org/tensorflow/demo/TensorFlowImageClassifier.java#L107).
+你可以在这个 [Android 示例](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/android/src/org/tensorflow/demo/TensorFlowImageClassifier.java#L107)中找到相关源码。
 
-### iOS and Raspberry Pi
+### iOS 与 Raspberry Pi
 
-Here’s the equivalent code for iOS and Raspberry Pi:
+在 iOS 和 Raspberry Pi 中也有类似的代码：
 
-    // Load the model.
-    PortableReadFileToProto(file_path, &tensorflow_graph);
+```c++
+// 加载模型
+PortableReadFileToProto(file_path, &tensorflow_graph);
 
-    // Create a session from the model.
-    tensorflow::Status s = session->Create(tensorflow_graph);
-    if (!s.ok()) {
-      LOG(FATAL) << "Could not create TensorFlow Graph: " << s;
-    }
+// 从模型中创建 session 会话
+tensorflow::Status s = session->Create(tensorflow_graph);
+if (!s.ok()) {
+  LOG(FATAL) << "Could not create TensorFlow Graph: " << s;
+}
 
-    // Run the model.
-    std::string input_layer = "input";
-    std::string output_layer = "output";
-    std::vector<tensorflow::Tensor> outputs;
-    tensorflow::Status run_status = session->Run({{input_layer, image_tensor}},
-                               {output_layer}, {}, &outputs);
-    if (!run_status.ok()) {
-      LOG(FATAL) << "Running model failed: " << run_status;
-    }
+// 运行模型
+std::string input_layer = "input";
+std::string output_layer = "output";
+std::vector<tensorflow::Tensor> outputs;
+tensorflow::Status run_status = session->Run({{input_layer, image_tensor}},
+                           {output_layer}, {}, &outputs);
+if (!run_status.ok()) {
+  LOG(FATAL) << "Running model failed: " << run_status;
+}
 
-    // Access the output data.
-    tensorflow::Tensor* output = &outputs[0];
+// 访问输出数据
+tensorflow::Tensor* output = &outputs[0];
+```
 
-This is all based on the
-[iOS sample code](https://www.tensorflow.org/code/tensorflow/examples/ios/simple/RunModelViewController.mm),
-but there’s nothing iOS-specific; the same code should be usable on any platform
-that supports C++.
+上面的代码基于 [iOS 示例代码](https://www.tensorflow.org/code/tensorflow/examples/ios/simple/RunModelViewController.mm)，但是其实与 iOS 并没有关系；相同的代码同样可以在任何支持 C++ 的平台上运行。
 
-You can also find specific examples for Raspberry Pi
-[here](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/pi_examples/label_image/label_image.cc).
+你可以在[这里](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/pi_examples/label_image/label_image.cc)找到与 Raspberry Pi 相关的例子。
