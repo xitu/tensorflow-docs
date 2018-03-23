@@ -30,18 +30,11 @@
 
 256 条记录被独立并行地读取和处理。它起始于图中 256 个独立的 `RecordInput` 读操作。每个读操作之后是独立并行执行的一系列相同的图像前置处理操作。图像前置处理操作包括对于图像的解码、变形、大小缩放等操作。
 
-图像经过预处理之后，他们被连结成 8 个张量，每个张量有 32 位大小。Rather than using @{tf.concat} for this
-purpose, which is implemented as a single op that waits for all the inputs to be
-ready before concatenating them together, @{tf.parallel_stack} is used.
-@{tf.parallel_stack} allocates an uninitialized tensor as an output, and each
-input tensor is written to its designated portion of the output tensor as soon
-as the input is available.
+经过预处理之后，图像被连结成 8 个张量，每个张量有 32 位大小。完成这一操作使用的是 @{tf.parallel_stack} ，不使用 @{tf.concat} 则是因为它被实现成了单一操作需要等待所有输入就绪才能完成连接。@{tf.parallel_stack} 分配了一个未初始化的张量作为输出， 每个输入张量就绪时就写入到输出张量的置顶部分。
 
-When all the input tensors are finished, the output tensor is passed along in
-the graph. This effectively hides all the memory latency with the long tail of
-producing all the input tensors.
+当所有输入张量完成后，输出张量被传递给图。这样有效地降低了生成所有输入张量带来的长尾内存延时。
 
-### Parallelize CPU-to-GPU Data Transfer
+### CPU 到 GPU 数据转移的并行处理
 
 Continuing with the assumption that the target is 8 GPUs with a batch size of
 256 (32 per GPU). Once the input images are processed and concatenated together
@@ -58,7 +51,7 @@ In this implementation, `data_flow_ops.StagingArea` is used to explicitly
 schedule the copy in parallel. The end result is that when computation starts on
 the GPU, all the tensors are already available.
 
-### Software Pipelining
+### 软件管道
 
 With all the stages capable of being driven by different processors,
 `data_flow_ops.StagingArea` is used between them so they run in parallel.
@@ -74,14 +67,14 @@ For example: if there are three stages: A, B and C. There are two staging areas
 in between: S1 and S2. During the warm up, we run:
 
 ```
-Warm up:
-Step 1: A0
-Step 2: A1  B0
+初始化:
+步骤 1: A0
+步骤 2: A1  B0
 
-Actual execution:
-Step 3: A2  B1  C0
-Step 4: A3  B2  C1
-Step 5: A4  B3  C2
+真实执行:
+步骤 3: A2  B1  C0
+步骤 4: A3  B2  C1
+步骤 5: A4  B3  C2
 ```
 
 After the warm up, S1 and S2 each have one set of data in them. For each step of
