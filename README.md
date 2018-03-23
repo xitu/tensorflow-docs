@@ -10,9 +10,9 @@
 
 ---
 
-| **`Linux CPU`**                          | **`Linux GPU`**                          | **`Mac OS CPU`**                         | **`Windows CPU`**                        | **`Android`**                            |
-| ---------------------------------------- | ---------------------------------------- | ---------------------------------------- | ---------------------------------------- | ---------------------------------------- |
-| [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-cpu)](https://ci.tensorflow.org/job/tensorflow-master-cpu) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-linux-gpu)](https://ci.tensorflow.org/job/tensorflow-master-linux-gpu) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-mac)](https://ci.tensorflow.org/job/tensorflow-master-mac) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-win-cmake-py)](https://ci.tensorflow.org/job/tensorflow-master-win-cmake-py) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-android)](https://ci.tensorflow.org/job/tensorflow-master-android) [ ![Download](https://api.bintray.com/packages/google/tensorflow/tensorflow/images/download.svg) ](https://bintray.com/google/tensorflow/tensorflow/_latestVersion) |
+| **`Documentation`** | **`Linux CPU`** | **`Linux GPU`** | **`Mac OS CPU`** | **`Windows CPU`** | **`Android`** |
+|-----------------|---------------------|------------------|-------------------|---------------|---------------|
+| [![Documentation](https://img.shields.io/badge/api-reference-blue.svg)](https://www.tensorflow.org/api_docs/) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-cpu)](https://ci.tensorflow.org/job/tensorflow-master-cpu) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-linux-gpu)](https://ci.tensorflow.org/job/tensorflow-master-linux-gpu) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-mac)](https://ci.tensorflow.org/job/tensorflow-master-mac) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-win-cmake-py)](https://ci.tensorflow.org/job/tensorflow-master-win-cmake-py) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-android)](https://ci.tensorflow.org/job/tensorflow-master-android) [ ![Download](https://api.bintray.com/packages/google/tensorflow/tensorflow/images/download.svg) ](https://bintray.com/google/tensorflow/tensorflow/_latestVersion)
 
 **TensorFlow** 是一个使用数据流图进行数值计算开源软件库。
 图的节点表示数学运算，节点之间的边表示流动的多维数据数组（张量）。
@@ -22,16 +22,6 @@ TensorFlow 还包含 TensorBoard，它是一个数据可视化工具包。
 TensorFlow 最初由 Google 机器智能研究机构内的 
 Google Brain 团队的研究人员和工程师开发，用于进行机器学习和深度神经网络研究。
 此系统一般足以适用于各种其他领域。
-
-**如果你想参与贡献 TensorFlow，请先查看我们的 [贡献指南](CONTRIBUTING.md)。此项目遵循 TensorFlow
-[项目规范](CODE_OF_CONDUCT.md)。我们期望你能遵循此规范。**
-
-**我们还使用 [GitHub issues](https://github.com/tensorflow/tensorflow/issues) 来跟进 requests 和 bugs。对于一般性问题和讨论请查看 
-[TensorFlow 讨论](https://groups.google.com/a/tensorflow.org/forum/#!forum/discuss)，或直接在 [Stack Overflow](https://stackoverflow.com/questions/tagged/tensorflow) 提问。**
-
-TensorFlow 项目致力于遵守开源软件开发中普遍接受的最佳实践：
-
-[![CII 最佳实践](https://bestpractices.coreinfrastructure.org/projects/1486/badge)](https://bestpractices.coreinfrastructure.org/projects/1486)
 
 ## 安装
 
@@ -70,6 +60,18 @@ $ python
 42
 >>> sess.close()
 ```
+
+## 贡献指南
+
+**如果你想参与贡献 TensorFlow，请先查看我们的 [贡献指南](CONTRIBUTING.md)。此项目遵循 TensorFlow
+[项目规范](CODE_OF_CONDUCT.md)。我们期望你能遵循此规范。**
+
+**我们还使用 [GitHub issues](https://github.com/tensorflow/tensorflow/issues) 来跟进 requests 和 bugs。对于一般性问题和讨论请查看 
+[TensorFlow 讨论](https://groups.google.com/a/tensorflow.org/forum/#!forum/discuss)，或直接在 [Stack Overflow](https://stackoverflow.com/questions/tagged/tensorflow) 提问。**
+
+TensorFlow 项目致力于遵守开源软件开发中普遍接受的最佳实践：
+
+[![CII 最佳实践](https://bestpractices.coreinfrastructure.org/projects/1486/badge)](https://bestpractices.coreinfrastructure.org/projects/1486)
 
 ## 更多信息
 
