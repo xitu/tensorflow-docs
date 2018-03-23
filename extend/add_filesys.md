@@ -42,7 +42,7 @@ TensorFlow 框架经常用于多进程和多机环境，比如谷歌数据中心
 *   [POSIX 插件](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/posix/posix_file_system.h)
 *   [HDFS 插件](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/hadoop/hadoop_file_system.h)
 *   [GCS 插件](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/cloud/gcs_file_system.h)
-*   [S3 插件](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/s3/s3_file_system.h))
+*   [S3 插件](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/platform/s3/s3_file_system.h)
 
 #### 文件接口
 
