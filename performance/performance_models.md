@@ -12,9 +12,9 @@
 我们在
 [脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks) 中采用的另一种方式是采用 TensorFlow 原生的并行机制来构建的输入管道。我们的实现由3个阶段构成：
 
-*   I/O 读取： 从硬盘选择并读取镜像文。
-*   镜像处理： 将镜像记录解码成镜像，预处理并组织成 mini-batch 。
-*   CPU-to-GPU 数据转移：将镜像从 CPU 转移到 GPU。 Transfer images from CPU to GPU.
+*   I/O 读取： 从硬盘选择并读取图像。
+*   图像处理： 将图像记录解码成图像，预处理并组织成 mini-batch 。
+*   CPU-to-GPU 数据转移：将图像从 CPU 转移到 GPU。
 
 每个阶段的关键步骤可以采用 `data_flow_ops.StagingArea` 和其他阶段并行执行。 `StagingArea` 是类似于 @{tf.FIFOQueue} 的队列操作。不同之处在于 `StagingArea` 不保证先进先出的顺序，但提供了能在 CPU 和 GPU 上并行执行其他阶段的简单功能。将输入管道拆分为能并行执行的3个阶段是可扩展的，能充分发挥大量多核环境的优势。本章节后续将详细阐述这三个阶段以及使用 `data_flow_ops.StagingArea` 的细节。
 
@@ -22,25 +22,15 @@
 
 `data_flow_ops.RecordInput` 用于处理并行从磁盘读取。对于包含 TFRecords 记录的一系列输入文件，`RecordInput` 将持续使用后台进程去读取记录。这些记录将被放入它自身的内部空间；当载入超过它一半能力的数据量后，它将产生输出张量。
 
-This op has its own internal threads that are dominated by I/O time that consume
-minimal CPU, which allows it to run smoothly in parallel with the rest of the
-model.
+这个操作有它自己的由 I/O 时间控制且消耗最少 CPU 的内部进程，这使它能平缓地与模型的其他部分并行执行。
 
-### Parallelize Image Processing
+### 并行镜像处理
 
-After images are read from `RecordInput` they are passed as tensors to the image
-processing pipeline. To make the image processing pipeline easier to explain,
-assume that the input pipeline is targeting 8 GPUs with a batch size of 256 (32
-per GPU).
+从 `RecordInput` 读取图像后，它们被当做张量传递给图像处理管道。为了更容易解释图像处理管道，假设输入管道是面向 256 个批处理大小的 8 核GPU（每个 GPU 32个批处理大小）。
 
-256 records are read and processed individually in parallel. This starts with
-256 independent `RecordInput` read ops in the graph. Each read op is followed by
-an identical set of ops for image preprocessing that are considered independent
-and executed in parallel. The image preprocessing ops include operations such as
-image decoding, distortion, and resizing.
+256 条记录被独立并行地读取和处理。它起始于图中 256 个独立的 `RecordInput` 读操作。每个读操作之后是独立并行执行的一系列相同的图像前置处理操作。图像前置处理操作包括对于图像的解码、变形、大小缩放等操作。
 
-Once the images are through preprocessing, they are concatenated together into 8
-tensors each with a batch-size of 32. Rather than using @{tf.concat} for this
+图像经过预处理之后，他们被连结成 8 个张量，每个张量有 32 位大小。Rather than using @{tf.concat} for this
 purpose, which is implemented as a single op that waits for all the inputs to be
 ready before concatenating them together, @{tf.parallel_stack} is used.
 @{tf.parallel_stack} allocates an uninitialized tensor as an output, and each
