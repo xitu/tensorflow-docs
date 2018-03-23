@@ -6,40 +6,21 @@
 
 ## 输入管道
 
-The @{$performance_guide$Performance Guide} explains how to identify possible
-input pipeline issues and best practices. We found that using @{tf.FIFOQueue}
-and @{tf.train.queue_runner} could not saturate multiple current generation GPUs
-when using large inputs and processing with higher samples per second, such
-as training ImageNet with [AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf).
-This is due to the use of Python threads as its underlying implementation. The
-overhead of Python threads is too large.
+@{$performance_guide$Performance Guide} 解释了如何识别可能的输入管道问题和最佳实践。我们发现像类似采用 [AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 训练 ImageNet 这种使用大量输入并每秒处理大量采样的场景下，采用 @{tf.FIFOQueue} 和 @{tf.train.queue_runner} 不能充分利用目前的 GPU 计算资源。
+这是因为底层实现采用的 Python 进程引入的额外开销太大导致的。
 
-Another approach, which we have implemented in the
-[scripts](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks),
-is to build an input pipeline using the native parallelism in TensorFlow. Our
-implementation is made up of 3 stages:
+我们在
+[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks) 中采用的另一种方式是采用 TensorFlow 原生的并行机制来构建的输入管道。我们的实现由3个阶段构成：
 
-*   I/O reads: Choose and read image files from disk.
-*   Image Processing: Decode image records into images, preprocess, and organize
-    into mini-batches.
-*   CPU-to-GPU Data Transfer: Transfer images from CPU to GPU.
+*   I/O 读取： 从硬盘选择并读取镜像文。
+*   镜像处理： 将镜像记录解码成镜像，预处理并组织成 mini-batch 。
+*   CPU-to-GPU 数据转移：将镜像从 CPU 转移到 GPU。 Transfer images from CPU to GPU.
 
-The dominant part of each stage is executed in parallel with the other stages
-using `data_flow_ops.StagingArea`. `StagingArea` is a queue-like operator
-similar to @{tf.FIFOQueue}. The difference is that `StagingArea`  does not
-guarantee FIFO ordering, but offers simpler functionality and can be executed
-on both CPU and GPU in parallel with other stages. Breaking the input pipeline
-into 3 stages that operate independently in parallel is scalable and takes full
-advantage of large multi-core environments. The rest of this section details
-the stages followed by details about using `data_flow_ops.StagingArea`.
+每个阶段的关键步骤可以采用 `data_flow_ops.StagingArea` 和其他阶段并行执行。 `StagingArea` 是类似于 @{tf.FIFOQueue} 的队列操作。不同之处在于 `StagingArea` 不保证先进先出的顺序，但提供了能在 CPU 和 GPU 上并行执行其他阶段的简单功能。将输入管道拆分为能并行执行的3个阶段是可扩展的，能充分发挥大量多核环境的优势。本章节后续将详细阐述这三个阶段以及使用 `data_flow_ops.StagingArea` 的细节。
 
-### Parallelize I/O Reads
+### 并行 I/O 读取
 
-`data_flow_ops.RecordInput` is used to parallelize reading from disk. Given a
-list of input files representing TFRecords, `RecordInput` continuously reads
-records using background threads. The records are placed into its own large
-internal pool and when it has loaded at least half of its capacity, it produces
-output tensors.
+`data_flow_ops.RecordInput` 用于处理并行从磁盘读取。对于包含 TFRecords 记录的一系列输入文件，`RecordInput` 将持续使用后台进程去读取记录。这些记录将被放入它自身的内部空间；当载入超过它一半能力的数据量后，它将产生输出张量。
 
 This op has its own internal threads that are dominated by I/O time that consume
 minimal CPU, which allows it to run smoothly in parallel with the rest of the
