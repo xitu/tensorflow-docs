@@ -10,7 +10,7 @@
 *   文件格式：我们使用 **读取** 操作从一个文档中读取 **记录**(可以是任意字符串)。
 *   记录格式：我们使用解码器或解析操作将字符串记录转换成 TensorFlow 可用的 tensor 。
 
-例如，要读取 [CSV 文件](https://en.wikipedia.org/wiki/Comma-separated_values),我们使用 @{tf.TextLineReader$a 读取文本文件}，然后再使用 @{tf.decode_csv$a 操作逐行解析 CSV 数据}。
+例如，要读取 [CSV 文件](https://en.wikipedia.org/wiki/Comma-separated_values),我们使用 @{tf.TextLineReader$a Reader for text files}，然后再使用 @{tf.decode_csv$an Op that parses CSV data from a line of text}。
 
 [TOC]
 
