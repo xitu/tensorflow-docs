@@ -46,8 +46,7 @@
 
 ### iOS 示例细节
 
-有三个 iOS 示例程，均在 Xcode 项目中定义：
-[tensorflow/examples/ios](https://www.tensorflow.org/code/tensorflow/examples/ios/).
+有三个 iOS 示例程，均在 Xcode 项目中定义：[tensorflow/examples/ios](https://www.tensorflow.org/code/tensorflow/examples/ios/).
 
 - **Simple**：这是一个展示了如何在尽可能少的代码下加载和运行 TensorFlow 模型的简单例子。它值包含一个单一视图，并包含一个按钮，用户点击时执行模型的加载和推断。
 
