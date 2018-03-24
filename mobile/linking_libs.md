@@ -22,12 +22,9 @@
 在 iOS 上集成 TensorFlow 库稍微复杂一些。这是一份你需要在 iOS 应用上执行的步骤清单：
 
 - 链接 `tensorflow/contrib/makefile/gen/lib/libtensorflow-core.a`：通常情况下，将 `-L/your/path/tensorflow/contrib/makefile/gen/lib/` 和 `-ltensorflow-core` 添加到你的链接器标志中。
-
 - 链接并生成 protobuf 库：将 `-L/your/path/tensorflow/contrib/makefile/gen/protobuf_ios/lib`、`-lprotobuf` 和 `-lprotobuf-lite` 添加到你的编译命令中。
-
 - 包含路径：你需要将 `tensorflow/contrib/makefile/downloads/protobuf/src`、 `tensorflow/contrib/makefile/downloads`、`tensorflow/contrib/makefile/downloads/eigen` 和 `tensorflow/contrib/makefile/gen/proto` 这些 TensorFlow 的源文件夹路径添加作为第一入口。
-
-- 确保针对 TensorFlow 的库二进制文件是通过 `-force_load` 参数编译而成（或视平台而定），从而保证正确链接。关于这个操作必要性的更多细节你可以在下一个小节，[全局构造的黑魔法](#global_constructor_magic)中了解到。在类 Linux 平台下，你需要使用诸如 `-Wl,--allow-multiple-definition -Wl,--whole-archive` 等不同链接标志。
+- 确保针对 TensorFlow 的库二进制文件是通过 `-force_load` 参数编译而成（或视平台而定），从而保证正确链接。关于这个操作必要性的更多细节你可以在下一个小节，[全局构造的黑魔法](#全局构造的黑魔法)中了解到。在类 Linux 平台下，你需要使用诸如 `-Wl,--allow-multiple-definition -Wl,--whole-archive` 等不同链接标志。
 
 此外，你还需要将其链接到 Accelerator 框架中，因为它能够对某些计算操作进行加速。
 
