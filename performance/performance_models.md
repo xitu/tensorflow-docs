@@ -314,33 +314,29 @@ executing the main script
 *   **`local_parameter_device`**: Device to use as parameter server: `cpu` or
     `gpu`.
 
-#### Single instance examples
+#### 单一实例示例
 
 ```bash
-# VGG16 training ImageNet with 8 GPUs using arguments that optimize for
-# Google Compute Engine.
+# VGG16 使用 8 核 GPU 来训练 ImageNet，参数针对 Google 计算引擎进行了优化
 python tf_cnn_benchmarks.py --local_parameter_device=cpu --num_gpus=8 \
 --batch_size=32 --model=vgg16 --data_dir=/home/ubuntu/imagenet/train \
 --variable_update=parameter_server --nodistortions
 
-# VGG16 training synthetic ImageNet data with 8 GPUs using arguments that
-# optimize for the NVIDIA DGX-1.
+# VGG16 使用 8 核 GPU 来训练合成 ImageNet 数据，参数针对 NVIDIA DGX-1 进行了优化
 python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 --batch_size=64 --model=vgg16 --variable_update=replicated --use_nccl=True
 
-# VGG16 training ImageNet data with 8 GPUs using arguments that optimize for
-# Amazon EC2.
+# VGG16 使用 8 核 GPU 来训练合成 ImageNet 数据，参数针对 Amazon EC2 进行了优化
 python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 --batch_size=64 --model=vgg16 --variable_update=parameter_server
 
-# ResNet-50 training ImageNet data with 8 GPUs using arguments that optimize for
-# Amazon EC2.
+# ResNet-50 使用 8 核 GPU 来训练 ImageNet，参数针对 Amazon EC2 进行了优化
 python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 --batch_size=64 --model=resnet50 --variable_update=replicated --use_nccl=False
 
 ```
 
-#### Distributed command line arguments
+#### 分布式命令行参数
 
 *   **`ps_hosts`**: Comma separated list of hosts to use as parameter servers
     in the format of ```<host>:port```, e.g. ```10.0.0.2:50000```.
