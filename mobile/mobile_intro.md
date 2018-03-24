@@ -72,8 +72,7 @@ TensorFlow 提供了一种预训练模型，用于在图像中检测物体周围
 
 ## 所需的软件与硬件
 
-TensorFlow 可以在 Ubuntu Linux、Windows 10 和 OS X 上运行。关于如何在支持的操作系统上安装 TensorFlow，请参考
-@{$install$Installing Tensorflow}.
+TensorFlow 可以在 Ubuntu Linux、Windows 10 和 OS X 上运行。关于如何在支持的操作系统上安装 TensorFlow，请参考 @{$install$Installing Tensorflow}。
 
 注意，我们为移动端 TensorFlow 提供的一些演示代码要求你对 TensorFlow 源码进行编译，因此你还需要使用除了 `pip install` 之外的方法来处理全部示例代码。
 
