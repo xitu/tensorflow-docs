@@ -1,44 +1,24 @@
-# Optimizing for mobile
+# 移动端优化
 
-There are some special issues that you have to deal with when you’re trying to
-ship on mobile or embedded devices, and you’ll need to think about these as
-you’re developing your model.
+在移动或嵌入式设备中存在一些你需要去处理的问题，同时你还需要在开发模型时就思考这些问题
 
-These issues are:
+这些问题包括：
 
-- Model and Binary Size
-- App speed and model loading speed
-- Performance and threading
+- 模型及其二进制文件的大小
+- 应用的运行速度以及模型的加载速度
+- 性能与线程管理
 
-We'll discuss a few of these below.
+我们会在下面简单讨论这些问题。
 
-## What are the minimum device requirements for TensorFlow?
+## TensorFlow 的最低要求
 
-You need at least one megabyte of program memory and several megabytes of RAM to
-run the base TensorFlow runtime, so it’s not suitable for DSPs or
-microcontrollers. Other than those, the biggest constraint is usually the
-calculation speed of the device, and whether you can run the model you need for
-your application with a low enough latency. You can use the benchmarking tools
-in [How to Profile your Model](#how_to_profile_your_model) to get an idea of how
-many FLOPs are required for a model, and then use that to make rule-of-thumb
-estimates of how fast they will run on different devices. For example, a modern
-smartphone might be able to run 10 GFLOPs per second, so the best you could hope
-for from a 5 GFLOP model is two frames per second, though you may do worse
-depending on what the exact computation patterns are.
+运行包含基本功能的 TensorFlow 需要牺牲 1MB 的程序以及几兆的内存大小，因此 TensorFlow 不能运行在 DSP 或微控制器上。除此之外，限制 TensorFlow 的最大因素通常是设备的计算速度，以及你能否在足够低的计算延迟内运行你所需的模型。你可以在 [模型的分析](#模型的分析)中使用性能基准测试工具来了解至少需要多少 FLOP 才能运行模型。然后使用该工具对运行速度在不同设备上对计算消耗进行经验估计。例如，当今的智能手机可以美妙运行 10 GFLOP，所以对于 5 GFLOP 模型而言，可以得到的最佳效果是每秒两帧，根据设备实际的计算模式，你可能需要降低帧率。
 
-This model dependence means that it’s possible to run TensorFlow even on very
-old or constrained phones, as long as you optimize your network to fit within
-the latency budget and possibly within limited RAM too. For memory usage, you
-mostly need to make sure that the intermediate buffers that TensorFlow creates
-aren’t too large, which you can examine in the benchmark output too.
+这种模型的要求使得只要你能在有限的内存中将神经网络优化得足够好以适应计算延迟， TensorFlow 就可以运行在非常古老或受到限制的智能手机上。考虑到内存的限制，你需要保证 TensorFlow 创建的中间缓存不能太大，这样你才能在性能基准输出中检查这些缓存的输出结果。
 
-## Speed
+## 速度
 
-One of the highest priorities of most model deployments is figuring out how to
-run the inference fast enough to give a good user experience. The first place to
-start is by looking at the total number of floating point operations that are
-required to execute the graph. You can get a very rough estimate of this by
-using the `benchmark_model` tool:
+在大部分模型部署任务中，最高优先级之一的任务是如何快速运行推断程序来提供良好的用户体验。首先我们需要查看执行运算图所需的 FLOP 数。你可以使用 `benchmark_model` 工具来进行粗略估计：
 
     bazel build -c opt tensorflow/tools/benchmark:benchmark_model && \
     bazel-bin/tensorflow/tools/benchmark/benchmark_model \
@@ -47,46 +27,23 @@ using the `benchmark_model` tool:
     --output_layer="softmax:0" --show_run_order=false --show_time=false \
     --show_memory=false --show_summary=true --show_flops=true --logtostderr
 
-This should show you an estimate of how many operations are needed to run the
-graph. You can then use that information to figure out how feasible your model
-is to run on the devices you’re targeting. For an example, a high-end phone from
-2016 might be able to do 20 billion FLOPs per second, so the best speed you
-could hope for from a model that requires 10 billion FLOPs is around 500ms. On a
-device like the Raspberry Pi 3 that can do about 5 billion FLOPs, you may only
-get one inference every two seconds.
+上面的代码会为你输出运行此计算图所需要的计算性能的估计。然后你就可以使用这些信息来确定你的模型在你的目标设备上运行的可行性。举个例子，2016 年的高端智能手机能够在每秒处理 200 亿个 FLOP，因此从需要 100 亿 FLOP 的模型中，期望的最佳速度大约为 500ms。在类似于 Raspberry Pi 3 这种每秒只能处理 50 亿个 FLOP 的设备上，你可能只能消耗两秒的时间才能从推断程序中获得一个结果。
 
-Having this estimate helps you plan for what you’ll be able to realistically
-achieve on a device. If the model is using too many ops, then there are a lot of
-opportunities to optimize the architecture to reduce that number.
+当有了计算操作消耗的估计之后，它就对你计划的目标设备上有所帮助。如果模型的计算操作太多，那么你可以有很多方式来优化模型的架构并减少这个数量。
 
-Advanced techniques include [SqueezeNet](https://arxiv.org/abs/1602.07360)
-and [MobileNet](https://arxiv.org/abs/1704.04861), which are architectures
-designed to produce models for mobile -- lean and fast but with a small accuracy
-cost.  You can also just look at alternative models, even older ones, which may
-be smaller. For example, Inception v1 only has around 7 million parameters,
-compared to Inception v3’s 24 million, and requires only 3 billion FLOPs rather
-than 9 billion for v3.
+一些比较新的技术有 [SqueezeNet](https://arxiv.org/abs/1602.07360) 和 [MobileNet](https://arxiv.org/abs/1704.04861) 等，这些架构专门为移动设备的生产环境下进行优化与精简，其运行速度快、精度低且计算成本很低。你也可以使用这些模型的一些更小更老的替代模型。比如，与 Inception v3 的 2400 万参数量且消耗 90 亿 FLOP 相比，Inception v1 只有 700 万个参数且仅需 30 亿 FLOP。
 
-## Model Size
+## 模型大小
 
-Models that run on a device need to be stored somewhere on the device, and very
-large neural networks can be hundreds of megabytes. Most users are reluctant to
-download very large app bundles from app stores, so you want to make your model
-as small as possible. Furthermore, smaller neural networks can persist in and
-out of a mobile device's memory faster.
+运行在移动设备上的模型需要存储在模型的某个地方，巨大的神经网络可能消耗上百兆的存储空间。大部分用户不愿意从应用商店中下载相当大的程序包，因此你必须尽可能的压缩模型的体积。更何况，更小的神经网络能够更快的在移动设备的内存中进行存取。
 
-To understand how large your network will be on disk, start by looking at the
-size on disk of your `GraphDef` file after you’ve run `freeze_graph` and
-`strip_unused_nodes` on it (see @{$mobile/prepare_models$Preparing models} for
-more details on these tools), since then it should only contain
-inference-related nodes. To double-check that your results are as expected, run
-the `summarize_graph` tool to see how many parameters are in constants:
+为了了解你的模型在设备上消耗的磁盘大小，首先你需要在模型上运行 `freeze_graph` 和 `strip_unused_nodes` 后查看 `GraphDef` 文件的磁盘大小（参考 @{$mobile/prepare_models$Preparing models} 一节中关于这个工具的更多细节），因为这样你才能使计算图程序仅包含推断相关的计算节点。为了验证你的结果是否符合预期，你可以运行 `summarize_graph` 工具中查看内建常量中包含的参数个数：
 
     bazel build tensorflow/tools/graph_transforms:summarize_graph && \
     bazel-bin/tensorflow/tools/graph_transforms/summarize_graph \
     --in_graph=/tmp/tensorflow_inception_graph.pb
 
-That command should give you output that looks something like this:
+上面的命令会输出类似下面的结果：
 
     No inputs spotted.
     Found 1 possible outputs: (name=softmax, op=Softmax)
@@ -97,13 +54,7 @@ That command should give you output that looks something like this:
     5 MaxPool, 1 Sub, 1 Softmax, 1 ResizeBilinear, 1 Reshape, 1 Mul, 1 MatMul,
     1 ExpandDims, 1 DecodeJpeg, 1 Cast, 1 BiasAdd
 
-The important part for our current purposes is the number of const
-parameters. In most models these will be stored as 32-bit floats to start, so if
-you multiply the number of const parameters by four, you should get something
-that’s close to the size of the file on disk. You can often get away with only
-eight-bits per parameter with very little loss of accuracy in the final result,
-so if your file size is too large you can try using
-@{$performance/quantization$quantize_weights} to transform the parameters down.
+我们当前目标最重要的部分是确定一共有多少个参数。在大部分模型中，这些数据会被存储为 32 位浮点数，如果将常量参数的数量乘以四，就差不多是磁盘上文件大小的近似值。在最后的结果中，每个参数通常只有八位 bit，所以如果你的文件大小太大，可以尝试使用 @{$performance/quantization$quantize_weights} 一节中的方法来将这些参数做向下的权重量化处理。
 
     bazel build tensorflow/tools/graph_transforms:transform_graph && \
     bazel-bin/tensorflow/tools/graph_transforms/transform_graph \
@@ -111,63 +62,29 @@ so if your file size is too large you can try using
     --out_graph=/tmp/tensorflow_inception_quantized.pb \
     --inputs='Mul:0' --outputs='softmax:0' --transforms='quantize_weights'
 
-If you look at the resulting file size, you should see that it’s about a quarter
-of the original at 23MB.
+如果你检查一下文件的大小，那么这个文件大约是 23MB，即源文件大小的四分之一。
 
-Another transform is `round_weights`, which doesn't make the file smaller, but it
-makes the file compressible to about the same size as when `quantize_weights` is
-used. This is particularly useful for mobile development, taking advantage of
-the fact that app bundles are compressed before they’re downloaded by consumers.
+另一种转换是方式是 `round_weights`，它并不会让整个文件变小，但是当对其进行压缩时可以让整个文件大小跟使用 `quantized_weights` 时土塘。由于用户在下载应用时本质上是下载应用的一个压缩版本，所以这对于移动开发来说相当有用。
 
-The original file does not compress well with standard algorithms, because the
-bit patterns of even very similar numbers can be very different. The
-`round_weights` transform keeps the weight parameters stored as floats, but
-rounds them to a set number of step values. This means there are a lot more
-repeated byte patterns in the stored model, and so compression can often bring
-the size down dramatically, in many cases to near the size it would be if they
-were stored as eight bit.
+模型的原始文件不能被标准压缩算法压缩得当，这是由于相同数字的位模式可能会完全不同所导致的。`round_weights` 变换会将权重参数四舍五入的结果保存为浮点数。这就意味着如果存储模型中存在相当多的重复字节，压缩效率就会大大增加。大多数情况下会接近八位二进制数的存储大小。
 
-Another advantage of `round_weights` is that the framework doesn’t have to
-allocate a temporary buffer to unpack the parameters into, as we have to when
-we just use `quantize_weights`. This saves a little bit of latency (though the
-results should be cached so it’s only costly on the first run) and makes it
-possible to use memory mapping, as described later.
+`round_weights` 相对于 `quantize_weights` 的另一个优点是可以使框架在解压参数时不需要分配一个临时缓冲区。这种操作可以节省一些延迟（由于结果仍然需要缓存，所以这个操作只发生在第一次运行），并且使内存映射成为可能，我们会在下面的内容中讨论。
 
-## Binary Size
+## 二进制文件大小
 
-One of the biggest differences between mobile and server development is the
-importance of binary size. On desktop machines it’s not unusual to have
-executables that are hundreds of megabytes on disk, but for mobile and embedded
-apps it’s vital to keep the binary as small as possible so that user downloads
-are easy. As mentioned above, TensorFlow only includes a subset of op
-implementations by default, but this still results in a 12 MB final
-executable. To reduce this, you can set up the library to only include the
-implementations of the ops that you actually need, based on automatically
-analyzing your model. To use it:
+移动开发和服务器开发之间的最大区别之一就是二进制文件大小的重要性。在桌面计算机中，磁盘上安装数百兆字节的可执行文件已经不再罕见，但对于移动或嵌入式应用来说，保持二进制文件尽可能小，是使用户更容易下载应用的关键因素之一。如上所述，默认情况下， TensorFlow 仅包含了运算符实现的一个子集，但这仍然会产生 12 MB 大小的最终文件。为了减少这种情况的发生，你可以基于自动分析模型，手动将库设置成只包含所需要的实际运算符的实现，为此：
 
-- Run `tools/print_required_ops/print_selective_registration_header.py` on your
-  model to produce a header file that only enables the ops it uses.
+- 运行 `tools/print_required_ops/print_selective_registration_header.py` 来生成只包含所需运算符的头文件。
 
-- Place the `ops_to_register.h` file somewhere that the compiler can find
-  it. This can be in the root of your TensorFlow source folder.
+- 将 `ops_to_register.h` 头文件放在编译器能够找到的地方，使其成为你的 TensorFlow 源码的入口。
 
-- Build TensorFlow with `SELECTIVE_REGISTRATION` defined, for example by passing
-  in `--copts=”-DSELECTIVE_REGISTRATION”` to your Bazel build command.
+- 通过定义 `SELECTIVE_REGISTRATION` 构建 TensorFlow。例如，将 `--copts="-DSELECTIVE_REGISTRATION"` 船体给你的 Bazel 命令。
 
-This process recompiles the library so that only the needed ops and types are
-included, which can dramatically reduce the executable size. For example, with
-Inception v3, the new size is only 1.5MB.
+这个进程重新编译了整个库并且仅包含所需的操作和类型，从而显著减少可执行文件的大小。例如，在 Inception v3 中，新模型的大小仅为 1.5MB。
 
-## How to Profile your Model
+## 模型的分析
 
-Once you have an idea of what your device's peak performance range is, it’s
-worth looking at its actual current performance. Using a standalone TensorFlow
-benchmark, rather than running it inside a larger app, helps isolate just the
-Tensorflow contribution to the
-latency. The
-[tensorflow/tools/benchmark](https://www.tensorflow.org/code/tensorflow/tools/benchmark/) tool
-is designed to help you do this. To run it on Inception v3 on your desktop
-machine, build this benchmark model:
+一旦你对设备的性能峰值范围有所了解之后，检查一下它目前的实际性能是很有必要的。使用独立的 TensorFlow 性能基准测试程序而非在应用中直接运行，有助于隔离 TensorFlow 对计算延迟的影响。[tensorflow/tools/benchmark](https://www.tensorflow.org/code/tensorflow/tools/benchmark/) 中的工具能够帮助你做到这一点。要将其用在桌面系统的 Inception v3 上，可以使用如下命令：
 
     bazel build -c opt tensorflow/tools/benchmark:benchmark_model && \
     bazel-bin/tensorflow/tools/benchmark/benchmark_model \
@@ -176,7 +93,7 @@ machine, build this benchmark model:
     --output_layer="softmax:0" --show_run_order=false --show_time=false \
     --show_memory=false --show_summary=true --show_flops=true --logtostderr
 
-You should see output that looks something like this:
+你的输出结果与下方的结果类似：
 
 <pre>
 ============================== Top by Computation Time ==============================
@@ -212,71 +129,31 @@ Memory (bytes): count=50 curr=128366400(all same)
 514 nodes defined 504 nodes observed
 </pre>
 
-This is the summary view, which is enabled by the show_summary flag. To
-interpret it, the first table is a list of the nodes that took the most time, in
-order by how long they took. From left to right, the columns are:
+这是用于设置了 `show_summary` 标志而产生的摘要视图。在这个输出中，第一个表格表示了花费时间最多的节点的列表。由左至右，每列分别表示：
 
-- Node type, what kind of operation this was.
+- node type：进行操作的节点类型
+- start：运算符的启动时间，展示了其在操作顺序中的位置
+- first: 以毫秒为单位。默认情况下 TensorFlow 会执行 20 次运行结果来获得统计数据，这个字段则表示第一次运行基准测试所需的操作时间。
+- avg ms：以毫秒为单位。表示整个运行的平均操作时间。
+- %：一次运行占总运行时间的百分比。这对理解密集计算区域非常有用。
+- cdf%：整个过程中表格中当前运算符及上方全部运算符的累积计算时间。这对理解神经网络不同层之间的性能分布非常重要，有助于查看是否只有少数节点占用大部分时间。
+- mem KB：当前层消耗的内存大小
+- Name：节点名称
 
-- Start time of the op, showing where it falls in the sequence of operations.
+第二个表格类似，但并非以特定命名节点划分时间，而是按照运算符类型对他们进行分组。如果你想要从计算图中优化某个单一的操作符，那么这将非常有用。这个表在开始时以计算成本最昂贵的操作符开始，并且仅显示前十个操作符，并具有其他节点的占位符。从左到右依次为：
 
-- First time in milliseconds. This is how long the operation took on the first
-  run of the benchmark, since by default 20 runs are executed to get more
-  reliable statistics. The first time is useful to spot which ops are doing
-  expensive calculations on the first run, and then caching the results.
 
-- Average time for the operation across all runs, in milliseconds.
+- Node type：分析节点的类型
+- avg ms：所有此类型节点所耗时间的平均值，以毫秒为单位。
+- avg %：此类型操作占总操作的比例。
+- cdf%：整个过程中表格中当前运算符及上方全部运算符的累积计算时间。有助于理解神经网络不同运算符之间的性能分布。
+-  mem KB：当前运算符消耗的内存大小
 
-- What percentage of the total time for one run the op took. This is useful to
-  understand where the hotspots are.
+这两个表格均已设置完毕，因此你可以轻松的将结果复制并粘贴到表格文档中，因为他们与制表符一起作为列与列之间的分隔符而输出。在寻找优化点时，这份节点类型的摘要将非常有用。在这个例子中，你可以看到 Conv2D 算符消耗了 90% 的执行时间。这表明你的计算图已经优化得相当好了，因为卷积与矩阵的惩罚是整个神经网络中最具分量的操作。
 
-- The cumulative total time of this and the previous ops in the table. This is
-  handy for understanding what the distribution of work is across the layers, to
-  see if just a few of the nodes are taking up most of the time.
+就经验而言，如果你看到其他运算符占用的时间更多，那么你就要仔细考虑这个问题了。对于神经网络来说，不需要涉及矩阵乘法的运算符是不值得一提的，因此如果你看到这些运算符消耗了较多的时间，那么说明你的网络结构很可能并非最优结构，或者说是我们实现的运算符代码并没有做到最优。如果你遇到了这种情况，欢迎你给我们提[性能 Bug](https://github.com/tensorflow/tensorflow/issues)，同时也请提交你的模型以及造成这种行为的复现命令。
 
-- Name of the node.
-
-The second table is similar, but instead of breaking down the timings by
-particular named nodes, it groups them by the kind of op. This is very useful to
-understand which op implementations you might want to optimize or eliminate from
-your graph. The table is arranged with the most costly operations at the start,
-and only shows the top ten entries, with a placeholder for other nodes. The
-columns from left to right are:
-
-- Type of the nodes being analyzed.
-
-- Accumulated average time taken by all nodes of this type, in milliseconds.
-
-- What percentage of the total time was taken by this type of operation.
-
-- Cumulative time taken by this and op types higher in the table, so you can
-  understand the distribution of the workload.
-
--  How much memory the outputs of this op type took up.
-
-Both of these tables are set up so that you can easily copy and paste their
-results into spreadsheet documents, since they are output with tabs as
-separators between the columns. The summary by node type can be the most useful
-when looking for optimization opportunities, since it’s a pointer to the code
-that’s taking the most time. In this case, you can see that the Conv2D ops are
-almost 90% of the execution time. This is a sign that the graph is pretty
-optimal, since convolutions and matrix multiplies are expected to be the bulk of
-a neural network’s computing workload.
-
-As a rule of thumb, it’s more worrying if you see a lot of other operations
-taking up more than a small fraction of the time. For neural networks, the ops
-that don’t involve large matrix multiplications should usually be dwarfed by the
-ones that do, so if you see a lot of time going into those it’s a sign that
-either your network is non-optimally constructed, or the code implementing those
-ops is not as optimized as it could
-be. [Performance bugs](https://github.com/tensorflow/tensorflow/issues) or
-patches are always welcome if you do encounter this situation, especially if
-they include an attached model exhibiting this behavior and the command line
-used to run the benchmark tool on it.
-
-The run above was on your desktop, but the tool also works on Android, which is
-where it’s most useful for mobile development. Here’s an example command line to
-run it on a 64-bit ARM device:
+上面的提到的内容是运行在你的桌面系统上的，但是这个工具也适用于 Android，因此也对移动开发相当有用。一下是一个示例代码，可以在一个 64 位 ARM 设备上运行：
 
     bazel build -c opt --config=android_arm64 \
     tensorflow/tools/benchmark:benchmark_model
@@ -288,134 +165,71 @@ run it on a 64-bit ARM device:
     --output_layer="softmax:0" --show_run_order=false --show_time=false \
     --show_memory=false --show_summary=true'
 
-You can interpret the results in exactly the same way as the desktop version
-above. If you have any trouble figuring out what the right input and output
-names and types are, take a look at the @{$mobile/prepare_models$Preparing models}
-page for details about detecting these for your model, and look at the
-`summarize_graph` tool which may give you
-helpful information.
+你可以用与上方完全相同的方式来获得这些结果。如果你在确定正确的输入和输出名称时候遇到困难，请查看@{$mobile/prepare_models$Preparing models}一节中了解如何确定你模型的这些细节，并查看 `summarize_graph` 这个工具的说明，你会发现有用的信息。
 
-There isn’t good support for command line tools on iOS, so instead there’s a
-separate example
-at
-[tensorflow/examples/ios/benchmark](https://www.tensorflow.org/code/tensorflow/examples/ios/benchmark) that
-packages the same functionality inside a standalone app. This outputs the
-statistics to both the screen of the device and the debug log. If you want
-on-screen statistics for the Android example apps, you can turn them on by
-pressing the volume-up button.
+在 iOS 上并没有较好的命令行工具的支持，相反 [tensorflow/examples/ios/benchmark](https://www.tensorflow.org/code/tensorflow/examples/ios/benchmark) 中有一个单独的例子在独立的应用中封装了这些功能。它会将统计信息输出到屏幕设备和调试日志中。对于 Android 的示例应用来说，你可以通过音量按钮来开启屏幕上的统计信息。
 
-## Profiling within your own app
+## 在移动应用中进行分析
 
-The output you see from the benchmark tool is generated from modules that are
-included as part of the standard TensorFlow runtime, which means you have access
-to them within your own applications too. You can see an example of how to do
-that [here](https://www.tensorflow.org/code/tensorflow/examples/ios/benchmark/BenchmarkViewController.mm?l=139).
+性能基准工具生成的结果其实是 TensorFlow 运行时一部分模块生成的，这也就意味着你可以在自己的应用中访问这些结果。你可以在[这里](https://www.tensorflow.org/code/tensorflow/examples/ios/benchmark/BenchmarkViewController.mm?l=139)找到一个例子。
 
-The basic steps are:
+基本步骤为：
 
-1. Create a StatSummarizer object:
+1. 创建一个 StatSummarizer 对象：
 
         tensorflow::StatSummarizer stat_summarizer(tensorflow_graph);
 
-2. Set up the options:
+2. 设置运行选项：
 
         tensorflow::RunOptions run_options;
         run_options.set_trace_level(tensorflow::RunOptions::FULL_TRACE);
         tensorflow::RunMetadata run_metadata;
 
-3. Run the graph:
+3. 运行计算图：
 
         run_status = session->Run(run_options, inputs, output_layer_names, {},
                                   output_layers, &run_metadata);
 
-4. Calculate the results and print them out:
+4. 计算结果并输出：
 
         assert(run_metadata.has_step_stats());
         const tensorflow::StepStats& step_stats = run_metadata.step_stats();
         stat_summarizer->ProcessStepStats(step_stats);
         stat_summarizer->PrintStepStats();
 
-## Visualizing Models
+## 模型可视化
 
-The most effective way to speed up your code is by altering your model so it
-does less work. To do that, you need to understand what your model is doing, and
-visualizing it is a good first step. To get a high-level overview of your graph,
-use [TensorBoard](https://github.com/tensorflow/tensorboard).
+加快你编码速度的最高效的手段就是修改你的模型，从而减少大量的无用工。为此，你需要了解你的模型正在执行什么样的任务，并将其视为最重要的第一步。为浏览你计算图的整体工作，请使用 [TensorBoard](https://github.com/tensorflow/tensorboard)。
 
-## Threading
+## 线程
 
-The desktop version of TensorFlow has a sophisticated threading model, and will
-try to run multiple operations in parallel if it can. In our terminology this is
-called “inter-op parallelism” (though to avoid confusion with “intra-op”, you
-could think of it as “between-op” instead), and can be set by specifying
-`inter_op_parallelism_threads` in the session options.
+桌面版的 TensorFlow 具有相当复杂的线程模型，在允许的情况下，它会自动尝试以多个线程进行运行。在我们的术语中，这叫做『运算符间的并行性（inter-op parallelism）』，并通过在 session 选项中制定 `inter_op_parallelism_threads` 来开启。
 
-By default, mobile devices run operations serially; that is,
-`inter_op_parallelism_threads` is set to 1. Mobile processors usually have few
-cores and a small cache, so running multiple operations accessing disjoint parts
-of memory usually doesn’t help performance. “Intra-op parallelism” (or
-“within-op”) can be very helpful though, especially for computation-bound
-operations like convolutions where different threads can feed off the same small
-set of memory.
+在默认情况下，移动设备会串行执行运算符，即 `inter_op_parallelism_threads` 设为 1。移动处理器通常具有很小的内核和一个小缓存，从而访问多个彼此不重叠的内存区域通常不会对性能提升有所帮助。『运算符内的并行性（intra-op parallelism）』对于这种情况则非常有用，尤其是当运算操作受限时，不同的线程可以传递相同大小的内存作为输入。
 
-On mobile, how many threads an op will use is set to the number of cores by
-default, or 2 when the number of cores can't be determined. You can override the
-default number of threads that ops are using by setting
-`intra_op_parallelism_threads` in the session options.  It’s a good idea to
-reduce the default if your app has its own threads doing heavy processing, so
-that they don’t interfere with each other.
+在移动设备中，操作系统会将默认使用的线程数设为 CPU 的核心数，如果无法确定处理器的核心数，则会设置为 2.你可以在 `intra_op_parallelism_threads` 来覆盖运算符使用的默认线程数。如果你的应用本身就有很多线程在执行复杂任务，那么减少这个默认值的好处在于这能够帮助线程之间不会互相干扰。
 
-To see more details on session options, look at [ConfigProto](https://www.tensorflow.org/code/tensorflow/core/protobuf/config.proto).
+关于更多关于 session 选项的细节，请查看 [ConfigProto](https://www.tensorflow.org/code/tensorflow/core/protobuf/config.proto)。
 
-## Retrain with mobile data
+## 使用移动端数据重新训练
 
-The biggest cause of accuracy problems when running models on mobile apps is
-unrepresentative training data. For example, most of the Imagenet photos are
-well-framed so that the object is in the center of the picture, well-lit, and
-shot with a normal lens. Photos from mobile devices are often poorly framed,
-badly lit, and can have fisheye distortions, especially selfies.
+在移动应用上运行模型时，导致准确率不理想最可能的原因就是训练数据无法代表真实情况。例如，大多数 ImageNet 的图片都标注得相当好，并且对象位于图片中心、光线充足并且是由相机镜头产生而成。但移动端的照片可能就比较不理想了，通常它们的构图不一、补光不够，甚至还有图像边缘产生的鱼眼失真问题，尤其是自拍。
 
-The solution is to expand your training set with data actually captured from
-your application. This step can involve extra work, since you’ll have to label
-the examples yourself, but even if you just use it to expand your original
-training data, it can help the training set dramatically. Improving the training
-set by doing this, and by fixing other quality issues like duplicates or badly
-labeled examples is the single best way to improve accuracy. It’s usually a
-bigger help than altering your model architecture or using different techniques.
+解决方法就是：用你的移动应用来捕获实际的数据来作为你的训练数据集。这可能需要引入一些额外的工作量，因为你还需要自己为样本添加标签。即便是你将搜集到的数据作为原始数据集的扩展，它依然可以大大优化你的训练。通过这样的方式来修改训练集，并通过修复其他的样本质量问题（例如重复或错误标记的样本）是提高精确性的最佳实践。这比修改你的模型架构或使用其他不同的技术更加有用。
 
-## Reducing model loading time and/or memory footprint
+## 优化模型的加载时间与内存占用
 
-Most operating systems allow you to load a file using memory mapping, rather
-than going through the usual I/O APIs. Instead of allocating an area of memory
-on the heap and then copying bytes from disk into it, you simply tell the
-operating system to make the entire contents of a file appear directly in
-memory. This has several advantages:
+大多数操作系统允许使用内存映射加载文件，而非通过 I/O API 来读取。除了在堆上分配内存区域然后从磁盘中读取二进制文件外，你只需要告诉简单的告诉操作系统直接将整个文件加载到内存中就可以了。这样做有一些好处：
 
-* Speeds loading
-* Reduces paging (increases performance)
-* Does not count towards RAM budget for your app
+* 加速加载时间
+* 减少内存的分页调度（增加性能）
+* 应用不需要考虑读取时的内存因素
 
-TensorFlow has support for memory mapping the weights that form the bulk of most
-model files. Because of limitations in the `ProtoBuf` serialization format, we
-have to make a few changes to our model loading and processing code. The
-way memory mapping works is that we have a single file where the first part is a
-normal `GraphDef` serialized into the protocol buffer wire format, but then the
-weights are appended in a form that can be directly mapped.
+TensorFlow 支持由内存映射的方式来将你模型文件的大部分内容（如权重）一口气加载到内存中区。由于 `Protobuf` 序列化格式的限制，我们必须对模型的加载和处理代码进行一些修改。内存映射的工作原理是，我们有一个单独的文件，其中第一个部分是将一个普通的 `GraphDef`  序列化为 protobuf 格式，然后所有的权重就可以直接添加映射其后。
 
-To create this file, run the
-`tensorflow/contrib/util:convert_graphdef_memmapped_format` tool. This takes in
-a `GraphDef` file that’s been run through `freeze_graph` and converts it to the
-format that has the weights appended at the end. Since that file’s no longer a
-standard `GraphDef` protobuf, you then need to make some changes to the loading
-code. You can see an example of this in
-the
-[iOS Camera demo app](https://www.tensorflow.org/code/tensorflow/examples/ios/camera/tensorflow_utils.mm?l=147),
-in the `LoadMemoryMappedModel()` function.
+为了创建这个文件，请运行 `tensorflow/contrib/util:convert_graphdef_memmapped_format` 工具。这需要一个已经通过 `freeze_graph` 运行的 `Graphdef` 文件，并将其转换为最后附带了权重的格式。由于文件不再是标准的 `GraphDef` protobuf，所以你还需要对模型的加载代码进行一些修改。你可以在 [iOS Camera 示例程序](https://www.tensorflow.org/code/tensorflow/examples/ios/camera/tensorflow_utils.mm?l=147)中看到相关例子，请仔细阅读 `LoadMemoryMappedModel()` 函数的实现。
 
-The same code (with the Objective C calls for getting the filenames substituted)
-can be used on other platforms too. Because we’re using memory mapping, we need
-to start by creating a special TensorFlow environment object that’s set up with
-the file we’ll be using:
+相同的代码（Objective-C 需要修改文件名）也可以用在其他平台上使用。因为我们需要使用内存映射，所以首要任务是创建一个 TensorFlow 环境对象，并使用我们希望的文件设置：
 
     std::unique_ptr<tensorflow::MemmappedEnv> memmapped_env;
     memmapped_env->reset(
@@ -423,8 +237,7 @@ the file we’ll be using:
     tensorflow::Status mmap_status =
           (memmapped_env->get())->InitializeFromFile(file_path);
 
-You then need to pass in this environment to subsequent calls, like this one for
-loading the graph:
+然后将这个环境传递给后续调用，与加载计算图类似：
 
     tensorflow::GraphDef tensorflow_graph;
     tensorflow::Status load_graph_status = ReadBinaryProto(
@@ -432,51 +245,35 @@ loading the graph:
         tensorflow::MemmappedFileSystem::kMemmappedPackageDefaultGraphDef,
         &tensorflow_graph);
 
-You also need to create the session with a pointer to the environment you’ve
-created:
+另外，你还需要创建一个会话的指针来指向你当前创建的环境：
 
     tensorflow::SessionOptions options;
     options.config.mutable_graph_options()
         ->mutable_optimizer_options()
         ->set_opt_level(::tensorflow::OptimizerOptions::L0);
     options.env = memmapped_env->get();
-
+    
     tensorflow::Session* session_pointer = nullptr;
     tensorflow::Status session_status =
         tensorflow::NewSession(options, &session_pointer);
 
-One thing to notice here is that we’re also disabling automatic optimizations,
-since in some cases these will fold constant sub-trees, and so create copies of
-tensor values that we don’t want and use up more RAM.
+值得注意的是，我们还禁用了自动优化，因为在某些情况下，这回折叠常量子树，从而创建我们不希望出现的张量的拷贝导致的额外内存占用。
 
-Once you’ve gone through these steps, you can use the session and graph as
-normal, and you should see a reduction in loading time and memory usage.
+一旦你完成这些步骤后，就可以想往常一样使用 session 和 graph，同时你还能够看到在模型加载时的加载时间和内存使用量。
 
-## Protecting model files from easy copying
+## 保护模型文件的安全
 
-By default, your models will be stored in the standard serialized protobuf
-format on disk. In theory this means that anybody can copy your model, which you
-may not want. However, in practice, most models are so application-specific and
-obfuscated by optimizations that the risk is similar to that of competitors
-disassembling and reusing your code, but if you do want to make it tougher for
-casual users to access your files it is possible to take some basic steps.
+默认情况下，你的模型会在磁盘上以序列化后标准的 protobuf 格式存储。理论上来说，任何人都可以复制你的模型，但你可能并不希望别人这么做。然而，实际上大多数模型都是应用特定的，并且已经通过编译优化进行了混淆处理，其难度与反编译并服用你应用的代码一样难。但是，如果你确实希望让用户难以访问你的模型文件，可以采取下面这些基本步骤。
 
-Most of our examples use
-the
-[ReadBinaryProto()](https://www.tensorflow.org/code/tensorflow/core/platform/env.cc?q=core/platform/env.cc&l=409) convenience
-call to load a `GraphDef` from disk. This does require an unencrypted protobuf on
-disk. Luckily though, the implementation of the call is pretty straightforward
-and it should be easy to write an equivalent that can decrypt in memory. Here's
-some code that shows how you can read and decrypt a protobuf using your own
-decryption routine:
+我们的大部分示例程序都使用 [ReadBinaryProto()](https://www.tensorflow.org/code/tensorflow/core/platform/env.cc?q=core/platform/env.cc&l=409) 从磁盘上加载一个 `GraphDef`。这的确需要使用一个未加密的 protobuf 文件。辛运的是，调用的实现非常简单，你可以编写一个在内存中进行解密的中间件来达到你的目的。下面的代码展示了如何使用自己的解密函数来读取和解密 protobuf：
 
     Status ReadEncryptedProto(Env* env, const string& fname,
                               ::tensorflow::protobuf::MessageLite* proto) {
       string data;
       TF_RETURN_IF_ERROR(ReadFileToString(env, fname, &data));
-
-      DecryptData(&data);  // Your own function here.
-
+    
+      DecryptData(&data);  // 自行编写的解密方法
+    
       if (!proto->ParseFromString(&data)) {
         TF_RETURN_IF_ERROR(stream->status());
         return errors::DataLoss("Can't parse ", fname, " as binary proto");
@@ -484,8 +281,7 @@ decryption routine:
       return Status::OK();
     }
 
-To use this you’d need to define the DecryptData() function yourself. It could
-be as simple as something like:
+要使用这个函数，你需要自己编写 `DecryptData()` 方法。他可以简单到类似于下面这种形式：
 
     void DecryptData(string* data) {
       for (int i = 0; i < data.size(); ++i) {
@@ -493,5 +289,4 @@ be as simple as something like:
       }
     }
 
-You may want something more complex, but exactly what you’ll need is outside the
-current scope here.
+你也可以做一些更加复杂的加密行为，但这已经超出了本文所讨论的范围。
