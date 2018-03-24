@@ -21,17 +21,11 @@
 
 在 iOS 上集成 TensorFlow 库稍微复杂一些。这是一份你需要在 iOS 应用上执行的步骤清单：
 
-- 链接 `tensorflow/contrib/makefile/gen/lib/libtensorflow-core.a`：通常情况下，将 `-L/your/path/tensorflow/contrib/makefile/gen/lib/` 和
-  `-ltensorflow-core` 添加到你的链接器标志中。
+- 链接 `tensorflow/contrib/makefile/gen/lib/libtensorflow-core.a`：通常情况下，将 `-L/your/path/tensorflow/contrib/makefile/gen/lib/` 和 `-ltensorflow-core` 添加到你的链接器标志中。
 
-- 链接并生成 protobuf 库：将
-  `-L/your/path/tensorflow/contrib/makefile/gen/protobuf_ios/lib` and
-  `-lprotobuf` 和 `-lprotobuf-lite` 添加到你的编译命令中。
+- 链接并生成 protobuf 库：将 `-L/your/path/tensorflow/contrib/makefile/gen/protobuf_ios/lib`、`-lprotobuf` 和 `-lprotobuf-lite` 添加到你的编译命令中。
 
-- 包含路径：你需要将 `tensorflow/contrib/makefile/downloads/protobuf/src`、
-  `tensorflow/contrib/makefile/downloads`、
-  `tensorflow/contrib/makefile/downloads/eigen` 和
-  `tensorflow/contrib/makefile/gen/proto` 这些 TensorFlow 的源文件夹路径添加作为第一入口。
+- 包含路径：你需要将 `tensorflow/contrib/makefile/downloads/protobuf/src`、 `tensorflow/contrib/makefile/downloads`、`tensorflow/contrib/makefile/downloads/eigen` 和 `tensorflow/contrib/makefile/gen/proto` 这些 TensorFlow 的源文件夹路径添加作为第一入口。
 
 - 确保针对 TensorFlow 的库二进制文件是通过 `-force_load` 参数编译而成（或视平台而定），从而保证正确链接。关于这个操作必要性的更多细节你可以在下一个小节，[全局构造的黑魔法](#global_constructor_magic)中了解到。在类 Linux 平台下，你需要使用诸如 `-Wl,--allow-multiple-definition -Wl,--whole-archive` 等不同链接标志。
 
@@ -41,7 +35,7 @@
 
 当你运行程序尝试调用 TensorFlow 时候，你可能会遇到 `No session factory registered for the given session options` 的错误，同时它也是几个相当微妙的错误之一。要理解为什么会发生这种情况以及如何解决这个问题，你需要了解一下 TensorFlow 的架构。
 
-TensorFlow 整个框架被设计得相当模块化，其中包含了大量的独立的特定对象以及一个轻薄的内核，并且可以根据需要进行混合与匹配。为了实现这一点，C++ 中的编码模式必须让模块在没有一个汇总列表的情况下（且每个列表与实现必须分开更新），能够轻松地同时框架它们所提供的服务。同时，它还必须允许单独的库能够在不重新编译内核的情况下添加它们自己的实现。
+TensorFlow 整个框架被设计得相当模块化，其中包含了大量的独立的特定对象以及一个轻薄的内核，并且可以根据需要进行混合与匹配。为了实现这一点，C++ 中的编码模式必须让模块在没有一个汇总列表的情况下（且每个列表与实现必须分开更新），能够简单的通知框架它们所提供的服务。同时，它还必须允许单独的库能够在不重新编译内核的情况下添加它们自己的实现。
 
 为了获得这种级别的兼容性，Tensorf 在相当多的地方使用了如下的注册模式：
 
@@ -66,7 +60,7 @@ TensorFlow 整个框架被设计得相当模块化，其中包含了大量的独
 
 这个宏设置了一个具有构造函数的 `RegisterMul` 类，其构造函数会在有人希望全局内核入口创建一个 `Mul` 内核的时候告诉这个入口。从而，内核入口类就具有一个全局对象，并且其构造函数需要在任何程序启动前调用它。
 
-虽然听起来很合理，但可惜的是自定义的全局对象没有被任何其他代码使用，而链接器又被设计成在没有使用时就会将其代码删除的形式，从而导致的结果就是：构造函数从未被调用，并且该类也没有被注册。在 TensorFlow 中，所有模块都使用了这种模式，而在代码运行时， `Session` 的实现中就首次检查了这个构造，这也是为什么这个问题会发生的原因。
+虽然听起来很合理，但可惜的是自定义的全局对象没有被任何其他代码使用，而链接器又被设计成在没有使用时就会将其代码删除的形式，从而导致的结果就是：构造函数从未被调用，并且该类也没有被注册。在 TensorFlow 中，所有模块都使用了这种模式，而在代码运行时，`Session` 的实现中就首次检查了这个构造，这也是为什么这个问题会发生的原因。
 
 解决方法就是强制链接器在即使代码没有使用的情况下，也不忽略库中的任何代码。在 iOS 中，可以中 `-force_load` 标志并制定库的路径，而在 Linux 中，你需要使用 `--whole-archive` 。它们指导了链接器不要积极的对编译作出精简，而是保留使用 TensorFlow 时所需的全局变量。
 
