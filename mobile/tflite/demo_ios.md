@@ -39,7 +39,7 @@ TensorFlow Lite 示例程序是一款相机应用，通过量子化的 MobileNet
 
         pod update
 
-   在这个步骤之后，你会具有一个名叫  `tflite_camera_example.xcworkspace `的文件。
+   在这个步骤之后，你会具有一个名叫 `tflite_camera_example.xcworkspace ` 的文件。
 
 4. 使用下面的命令在 Xcode 中打开项目：
 
@@ -49,6 +49,6 @@ TensorFlow Lite 示例程序是一款相机应用，通过量子化的 MobileNet
 
 5. 在 Xcode 中编译运行程序。
 
-    注意，正如前面，如前文所述，你必须将你的设备链接到一个开发者账户上才能完成设备的部署。
+    注意，如前文所述，你必须将你的设备链接到一个开发者账户上才能完成设备的部署。
 
 你还需要授权应用具有使用相机的权限。然后你就可以将设备对准各种物体，来欣赏模型如何对物体进行分类了！

@@ -6,7 +6,7 @@
 
 ## 创建应用
 
-If you'd like to add TensorFlow capabilities to your own app, do the following:
+你若你想在自己的应用中增加 TensorFlow 的能力，那么：
 
 - 在 Xcode 中创建或加载你的应用。
 
@@ -35,7 +35,7 @@ If you'd like to add TensorFlow capabilities to your own app, do the following:
     cp ~/graphs/inception5h/* tensorflow/examples/ios/camera/data/
     cp ~/graphs/inception5h/* tensorflow/examples/ios/simple/data/
 
-切换到其中一个示例的目录，下载 [Tensorflow-experimental](https://cocoapods.org/pods/TensorFlow-experimental) pod，并打开 Xcode workspace。注意，安装 pod 的时间可能会很长（大约 450 MB）。如果你想运行 Simple 示例，那么：
+切换到其中一个示例的目录，下载 [Tensorflow-experimental](https://cocoapods.org/pods/TensorFlow-experimental) pod，并打开 Xcode workspace。注意，安装 pod 的时间可能会很长（大约 450MB）。如果你想运行 Simple 示例，那么：
 
     cd tensorflow/examples/ios/simple
     pod install
@@ -49,11 +49,11 @@ If you'd like to add TensorFlow capabilities to your own app, do the following:
 有三个 iOS 示例程，均在 Xcode 项目中定义：
 [tensorflow/examples/ios](https://www.tensorflow.org/code/tensorflow/examples/ios/).
 
-- **Simple**: 这是一个展示了如何在尽可能少的代码下加载和运行 TensorFlow 模型的简单例子。它值包含一个单一视图，并包含一个按钮，用户点击时执行模型的加载和推断。
+- **Simple：**这是一个展示了如何在尽可能少的代码下加载和运行 TensorFlow 模型的简单例子。它值包含一个单一视图，并包含一个按钮，用户点击时执行模型的加载和推断。
 
-- **Camera**: 这个例子与 Android TF Classify 演示程序非常像。它加载了 Inception v3 并输出了估计出的最佳的标签，以显示实时相机图像中的内容。与 Android 版本一样，你可以使用 TensorFlow for Poets 来训练自定义的模型，并以最小的代码修改将其放入此示例中。
+- **Camera：** 这个例子与 Android TF Classify 演示程序非常像。它加载了 Inception v3 并输出了估计出的最佳的标签，以显示实时相机图像中的内容。与 Android 版本一样，你可以使用 TensorFlow for Poets 来训练自定义的模型，并以最小的代码修改将其放入此示例中。
 
-- **Benchmark**: 它与 Simple 很接近，但它会重复运行计算图并将类似的统计信息输出到 Android 上的基准测试工具中。
+- **Benchmark：** 它与 Simple 很接近，但它会重复运行计算图并将类似的统计信息输出到 Android 上的基准测试工具中。
 
 
 ### 排错
