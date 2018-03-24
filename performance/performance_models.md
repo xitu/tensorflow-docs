@@ -289,21 +289,16 @@ The downside is that all the weights read are from the previous training step.
 So it is a different algorithm from SGD. But it is possible to improve its
 convergence by adjusting learning rate and other hyperparameters.
 
-## Executing the script
+## 执行脚本
 
-This section lists the core command line arguments and a few basic examples for
-executing the main script
-([tf_cnn_benchmarks.py](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks/tf_cnn_benchmarks.py)).
+这一部分将列出核心的命令行参数和主要脚本([tf_cnn_benchmarks.py](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks/tf_cnn_benchmarks.py))的一些基本用法示例。
+> 说明： `tf_cnn_benchmarks.py` 采用 TensorFlow 1.1 后引入的 `force_gpu_compatible` 配置。直到 TensorFlow 1.2 之后，才建议从源码进行编译。
 
-> Note: `tf_cnn_benchmarks.py` uses the config `force_gpu_compatible`,
-> which was introduced after TensorFlow 1.1. Until TensorFlow 1.2 is released
-> building from source is advised.
+#### 基本命令行参数
 
-#### Base command line arguments
-
-*   **`model`**: Model to use, e.g. `resnet50`, `inception3`, `vgg16`, and
-    `alexnet`.
-*   **`num_gpus`**: Number of GPUs to use.
+*   **`model`**: 使用的模型，比如 `resnet50`, `inception3`, `vgg16`, 或
+    `alexnet`
+*   **`num_gpus`**: 使用的 GPU 数量。
 *   **`data_dir`**: Path to data to process. If not set, synthetic data is used.
     To use ImageNet data use these
     [instructions](https://github.com/tensorflow/models/tree/master/research/inception#getting-started)
