@@ -1,44 +1,31 @@
-# Building TensorFlow on iOS
+# 在 iOS 中构建 TensorFlow
 
-## Using CocoaPods
+## 使用 CocoaPods
 
-The simplest way to get started with TensorFlow on iOS is using the CocoaPods
-package management system. You can add the `TensorFlow-experimental` pod to your
-Podfile, which installs a universal binary framework. This makes it easy to get
-started but has the disadvantage of being hard to customize, which is important
-in case you want to shrink your binary size. If you do need the ability to
-customize your libraries, see later sections on how to do that.
+在 iOS 上开始使用 TensorFlow 最简单的方法是使用 CocoaPods 包管理器。你可以将 `TensroFlow-experimental` 这个 pod 添加到你的 Podfile 中，进而安装通用的二进制框架。它上手简单，但却有一些难以定制的缺点。定制对缩小二进制大小非常重要。如果你确实需要具备自定义库的能力，请查看后面的小节来了解相关方法。
 
-## Creating your own app
+## 创建应用
 
-If you'd like to add TensorFlow capabilities to your own app, do the following:
+你若你想在自己的应用中增加 TensorFlow 的能力，那么：
 
-- Create your own app or load your already-created app in XCode.
+- 在 Xcode 中创建或加载你的应用。
 
-- Add a file named Podfile at the project root directory with the following content:
+- 将下面的内容添加一个命名为 Podfile 的文件到根目录下：
 
         target 'YourProjectName'
         pod 'TensorFlow-experimental'
 
-- Run `pod install` to download and install the `TensorFlow-experimental` pod.
+- 运行 `pod install` 来下载并安装 `TensorFlow-experimental` pod。
 
-- Open `YourProjectName.xcworkspace` and add your code.
+- 打开 `YourProjectName.xcworkspace` 并添加你自己的代码。
 
-- In your app's **Build Settings**, make sure to add `$(inherited)` to the
-  **Other Linker Flags**, and **Header Search Paths** sections.
+- 在应用的 **Build Settings** 选项中，确保在 **Other Linker Flags** 和 **Header Search Paths**中添加 `$(inherited)` 。
 
-## Running the Samples
+## 运行示例
 
-You'll need Xcode 7.3 or later to run our iOS samples.
+你需要使用 Xcode 7.3 或更新的版本来运行我们的 iOS 示例程序。
 
-There are currently three examples: simple, benchmark, and camera. For now, you
-can download the sample code by cloning the main tensorflow repository (we are
-planning to make the samples available as a separate repository later).
-
-From the root of the tensorflow folder, download [Inception
-v1](https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip),
-and extract the label and graph files into the data folders inside both the
-simple and camera examples using these steps:
+目前有三个例子，分别叫做：simple、benchmark 和 camera。现在你可以通过克隆 TensorFlow 仓库来下载示例代码（我们计划在日后将例子在单独的仓库进行提供）从 TensorFlow 文件夹根目录下载 [Inception v1](https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip)，然后将标签和图形文件提取到 data 文件夹中（simple 和 camera 示例步骤一致）：
 
     mkdir -p ~/graphs
     curl -o ~/graphs/inception5h.zip \
@@ -48,60 +35,32 @@ simple and camera examples using these steps:
     cp ~/graphs/inception5h/* tensorflow/examples/ios/camera/data/
     cp ~/graphs/inception5h/* tensorflow/examples/ios/simple/data/
 
-Change into one of the sample directories, download the
-[Tensorflow-experimental](https://cocoapods.org/pods/TensorFlow-experimental)
-pod, and open the Xcode workspace. Note that installing the pod can take a long
-time since it is big (~450MB). If you want to run the simple example, then:
+切换到其中一个示例的目录，下载 [Tensorflow-experimental](https://cocoapods.org/pods/TensorFlow-experimental) pod，并打开 Xcode workspace。注意，安装 pod 的时间可能会很长（大约 450MB）。如果你想运行 Simple 示例，那么：
 
     cd tensorflow/examples/ios/simple
     pod install
     open tf_simple_example.xcworkspace   # note .xcworkspace, not .xcodeproj
                                          # this is created by pod install
 
-Run the simple app in the XCode simulator. You should see a single-screen app
-with a **Run Model** button. Tap that, and you should see some debug output
-appear below indicating that the example Grace Hopper image in directory data
-has been analyzed, with a military uniform recognized.
+在 Xcode 模拟器中运行 Simple 示例程序。你可以看到一个有着 **Run Model** 按钮的单屏应用。点击它，你会在下方的日志框中看到一些调试信息，这表明已经分析了目录数据中的 Grace Hopper 图像，并识别出了军装。使用相同的过程可以运行其他的样本。相机示例则需要连接一个真实的 iOS 设备。一旦构建并运行它，就能得到一个实时的相机视图，你便能够将相机对准任何对象从而获得识别的结果。
 
-Run the other samples using the same process. The camera example requires a real
-device connected. Once you build and run that, you should get a live camera view
-that you can point at objects to get real-time recognition results.
+### iOS 示例细节
 
-### iOS Example details
+有三个 iOS 示例程，均在 Xcode 项目中定义：[tensorflow/examples/ios](https://www.tensorflow.org/code/tensorflow/examples/ios/)。
 
-There are three demo applications for iOS, all defined in Xcode projects inside
-[tensorflow/examples/ios](https://www.tensorflow.org/code/tensorflow/examples/ios/).
+- **Simple**：这是一个展示了如何在尽可能少的代码下加载和运行 TensorFlow 模型的简单例子。它值包含一个单一视图，并包含一个按钮，用户点击时执行模型的加载和推断。
 
-- **Simple**: This is a minimal example showing how to load and run a TensorFlow
-  model in as few lines as possible. It just consists of a single view with a
-  button that executes the model loading and inference when its pressed.
+- **Camera**：这个例子与 Android TF Classify 演示程序非常像。它加载了 Inception v3 并输出了估计出的最佳的标签，以显示实时相机图像中的内容。与 Android 版本一样，你可以使用 TensorFlow for Poets 来训练自定义的模型，并以最小的代码修改将其放入此示例中。
 
-- **Camera**: This is very similar to the Android TF Classify demo. It loads
-  Inception v3 and outputs its best label estimate for what’s in the live camera
-  view. As with the Android version, you can train your own custom model using
-  TensorFlow for Poets and drop it into this example with minimal code changes.
-
-- **Benchmark**: is quite close to Simple, but it runs the graph repeatedly and
-  outputs similar statistics to the benchmark tool on Android.
+- **Benchmark**：它与 Simple 很接近，但它会重复运行计算图并将类似的统计信息输出到 Android 上的基准测试工具中。
 
 
-### Troubleshooting
+### 排错
 
-- Make sure you use the TensorFlow-experimental pod (and not TensorFlow).
+- 确保你使用的是 TensorFlow-experimental pod（而不是 TensorFlow）。
 
-- The TensorFlow-experimental pod is current about ~450MB. The reason it is so
-  big is because we are bundling multiple platforms, and the pod includes all
-  TensorFlow functionality (e.g. operations). The final app size after build is
-  substantially smaller though (~25MB). Working with the complete pod is
-  convenient during development, but see below section on how you can build your
-  own custom TensorFlow library to reduce the size.
+- TensorFlow-experimental pod 大约有 450MB。原因在于我们绑定了多个平台，而 pod 包含了所有平台的 TensorFlow 功能（例如：运算）。最终应用的大小很小（约为 25 MB）。使用完整的 pod 在自己的开发过程中非常方便，但请阅读下一节内容来交接如何通过构建自己定制的 TensorFlow 库来缩减大小。
 
-## Building the TensorFlow iOS libraries from source
+## 从源码构建 TensorFlow iOS 库
 
-While Cocoapods is the quickest and easiest way of getting started, you sometimes
-need more flexibility to determine which parts of TensorFlow your app should be
-shipped with. For such cases, you can build the iOS libraries from the
-sources. [This
-guide](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/ios#building-the-tensorflow-ios-libraries-from-source)
-contains detailed instructions on how to do that.
-
+尽管 Cocoapods 是最简单快捷的入门方式，但你有时候需要更加灵活的确定你的应用程序需要附带那些 TensorFlow 组件。对于这种情况，你可以从源码构建 iOS 库，请参考[这篇教程](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/ios#building-the-tensorflow-ios-libraries-from-source)来了解相关操作的详细说明。

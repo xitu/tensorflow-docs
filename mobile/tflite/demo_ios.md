@@ -1,68 +1,54 @@
-# TensorFlow Lite Demo for iOS
+# TensorFlow Lite 演示（iOS）
 
-The TensorFlow Lite demo is a camera app that continuously classifies whatever
-it sees from your device's back camera, using a quantized MobileNet model. These
-instructions walk you through building and running the demo on an iOS device.
+TensorFlow Lite 示例程序是一款相机应用，通过量子化的 MobileNet 模型来对摄像头后置摄像头所看到的内容进行分类。下面的说明想你展示了如何在 iOS 上构建和运行这个程序。
 
-## Prerequisites
+## 准备
 
-* You must have [Xcode](https://developer.apple.com/xcode/) installed and have a
-  valid Apple Developer ID, and have an iOS device set up and linked to your
-  developer account with all of the appropriate certificates. For these
-  instructions, we assume that you have already been able to build and deploy an
-  app to an iOS device with your current developer environment.
+* 你必须安装 [Xcode](https://developer.apple.com/xcode/) 并且具有一个有效的 Apple 开发者 ID，同时还需要一个链接了你开发者账号的 iOS 设备及全部正确的证书。对于这些步骤，我们假设你已经能够载你当前开发环境中编译并将应用部署在一个 iOS 设备上。
 
-* The demo app requires a camera and must be executed on a real iOS device. You
-  can build it and run with the iPhone Simulator but it won't have any camera
-  information to classify.
+* 演示程序需要使用相机，因此必须在一台真实的 iOS 设备上运行。你当然可以构建并使用 iPhone 模拟器运行此程序，但它不会为分类问题提供任何相机画面。
 
-* You don't need to build the entire TensorFlow library to run the demo, but you
-  will need to clone the TensorFlow repository if you haven't already:
+* 你不需要构建整个 TensorFlow 库来运行示例程序，但你需要克隆整个 TensorFlow 仓库：
 
         git clone https://github.com/tensorflow/tensorflow
 
-* You'll also need the Xcode command-line tools:
+* 你还需要安装 Xcode 提供的命令行工具：
 
         xcode-select --install
 
-    If this is a new install, you will need to run the Xcode application once to
-    agree to the license before continuing.
+    如果你是第一次安装，那么需要先运行一次 Xcode 进行许可，才能继续。
 
-## Building the iOS Demo App
+## 构建 iOS 示例应用
 
-1. Install CocoaPods if you don't have it:
+1. 如果你没有 CocoaPods 则可以使用下面的命令进行安装:
 
-        sudo gem install cocoapods
+   ```bash
+    sudo gem install cocoapods
+   ```
 
-2. Download the model files used by the demo app (this is done from inside the
-   cloned directory):
+2. 下载示例应用的模型文件（可以通过克隆的目录来完成）：
 
         sh tensorflow/contrib/lite/examples/ios/download_models.sh
 
-3. Install the pod to generate the workspace file:
+3. 下载 pod 生成的 workspace 文件：
 
         cd tensorflow/contrib/lite/examples/ios/camera
         pod install
 
-    If you have installed this pod before and that command doesn't work, try
+   如果你已经安装了这个 pod 并且上线的命令无效，请尝试
 
         pod update
 
-    At the end of this step you should have a file called 
-    `tflite_camera_example.xcworkspace`.
+   在这个步骤之后，你会具有一个名叫 `tflite_camera_example.xcworkspace ` 的文件。
 
-4. Open the project in Xcode by typing this on the command line:
+4. 使用下面的命令在 Xcode 中打开项目：
 
         open tflite_camera_example.xcworkspace
 
-    This launches Xcode if it isn't open already and opens the
-    `tflite_camera_example` project.
+    如果 `tflite_camera_example` 项目尚未打开则会启动 Xcode。
 
-5. Build and run the app in Xcode.
+5. 在 Xcode 中编译运行程序。
 
-    Note that as mentioned earlier, you must already have a device set up and
-    linked to your Apple Developer account in order to deploy the app on a
-    device.
+    注意，如前文所述，你必须将你的设备链接到一个开发者账户上才能完成设备的部署。
 
-You'll have to grant permissions for the app to use the device's camera. Point
-the camera at various objects and enjoy seeing how the model classifies things!
+你还需要授权应用具有使用相机的权限。然后你就可以将设备对准各种物体，来欣赏模型如何对物体进行分类了！
