@@ -4,8 +4,8 @@
 
   * 管理你的 TensorFlow 程序（一张 TensorFlow 计算图，`tf.Graph`）以及 TensorFlow 运行时（一个 TensorFlow 会话，`tf.Session`），而不是依赖 Estimators 来管理它们
   * 使用 `tf.Session` 运行 TensorFlow 操作
-  * 在底层环境中使用高级的组件（[datasets](#datasets), [layers](#layers), 以及 [feature_column](#feature_columns)）。
-  * 创建你自己的训练循环，而不是使用@{$get_started/premade_estimators$ provided by Estimator}
+  * 在底层环境中使用高级的组件（[datasets](#datasets), [layers](#layers), 以及 [feature_column](#feature_columns)）
+  * 创建你自己的训练循环，而不是使用 @{$get_started/premade_estimators$ provided by Estimator}
 
 我们推荐尽量使用更高层次的 API 来构建模型，但了解 TensorFlow Core 有以下几个优点：
 
@@ -18,7 +18,7 @@
 
 理解本指南的大部分内容需要你有以下知识储备：
 
-*   使用 Python 进行编程
+*   会使用 Python 进行编程
 *   关于数组的一些知识
 *   最好了解一些机器学习的内容
 
@@ -52,8 +52,8 @@ TensorFlow 使用 numpy 数组来表示张量的**值**。
 
 使用 TensorFlow Core 编程由以下两部分组成：
 
-1.  构建计算图 (一张 @{tf.Graph}).
-2.  运行计算图 (使用 @{tf.Session}).
+1.  构建计算图 (一张 @{tf.Graph})。
+2.  运行计算图 (使用 @{tf.Session})。
 
 ### 计算图
 
@@ -85,8 +85,7 @@ Tensor("Const_1:0", shape=(), dtype=float32)
 Tensor("add:0", shape=(), dtype=float32)
 ```
 
-注意，张量的打印结果并不是如你所想的 `3.0`， `4.0` 和
-`7.0` 。上述语句只是构建了计算图，这些 `tf.Tesor` 对象只代表了将要进行的操作的结果。
+注意，张量的打印结果并不是如你所想的 `3.0`，`4.0` 和 `7.0`。上述语句只是构建了计算图，这些 `tf.Tesor` 对象只代表了将要进行的操作的结果。
 
 计算图中的每个操作都会被赋予一个唯一的名称，这个名称和 Python 对象的名称无关。张量的命名规则是`"操作名 + 输出序号"`，如上面的 `"add:0"`。
 
@@ -205,7 +204,7 @@ print(sess.run(z, feed_dict={x: [1, 3], y: [2, 4]}))
 
 从 Dataset 中获取一个能够运行的 `tf.Tensor` 对象，你需要先将其转换为 @{tf.data.Iterator} 类型，然后调用迭代器的 @{tf.data.Iterator.get_next$`get_next`} 方法。
 
-最简单的办法就是使用 @{tf.data.Dataset.make_one_shot_iterator$`make_one_shot_iterator`}  创建一个迭代器。比如下列的代码中，每次调用 `run`，`next_item` 会返回 `my_data` 数组中的一行。
+最简单的办法就是使用 @{tf.data.Dataset.make_one_shot_iterator$`make_one_shot_iterator`} 创建一个迭代器。比如下列的代码中，每次调用 `run`，`next_item` 会返回 `my_data` 数组中的一行。
 
 ``` python
 my_data = [
@@ -218,7 +217,7 @@ slices = tf.data.Dataset.from_tensor_slices(my_data)
 next_item = slices.make_one_shot_iterator().get_next()
 ```
 
-当数据流到达末尾时，`Dataset` 会抛出@{tf.errors.OutOfRangeError$`OutOfRangeError`}。下面的例子就展示了如何读取数据直到所有数据都被获取。
+当数据流到达末尾时，`Dataset` 会抛出 @{tf.errors.OutOfRangeError$`OutOfRangeError`}。下面的例子就展示了如何读取数据直到所有数据都被获取。
 
 ``` python
 while True:
@@ -228,13 +227,13 @@ while True:
     break
 ```
 
-更多关于数据集和迭代器的内容请参考: @{$programmers_guide/datasets}.
+更多关于数据集和迭代器的内容请参考: @{$programmers_guide/datasets}。
 
 ## 网络层
 
-可训练的模型会不断地修改其参数值，从而对于相同的输入得到新的输出。向计算图中添加可训练的参数，使用@{tf.layers$Layers} 是我们推荐的方式。
+可训练的模型会不断地修改其参数值，从而对于相同的输入得到新的输出。向计算图中添加可训练的参数，使用 @{tf.layers$Layers} 是我们推荐的方式。
 
-网络层封装了变量和作用其上的操作。比如，[全连接层]((https://developers.google.com/machine-learning/glossary/#fully_connected_layer))对输入进行一个加权求和的操作，并且可以作用一个可选择的[激活函数](https://developers.google.com/machine-learning/glossary/#activation_function)。连接的权重和偏置都由网络层对象来管理。
+网络层封装了变量和作用其上的操作。比如，[全连接层](https://developers.google.com/machine-learning/glossary/#fully_connected_layer))对输入进行一个加权求和的操作，并且可以作用一个可选择的[激活函数](https://developers.google.com/machine-learning/glossary/#activation_function)。连接的权重和偏置都由网络层对象来管理。
 
 ### 创建网络层
 
