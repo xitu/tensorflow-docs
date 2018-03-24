@@ -49,11 +49,11 @@
 有三个 iOS 示例程，均在 Xcode 项目中定义：
 [tensorflow/examples/ios](https://www.tensorflow.org/code/tensorflow/examples/ios/).
 
-- **Simple：**这是一个展示了如何在尽可能少的代码下加载和运行 TensorFlow 模型的简单例子。它值包含一个单一视图，并包含一个按钮，用户点击时执行模型的加载和推断。
+- **Simple**：这是一个展示了如何在尽可能少的代码下加载和运行 TensorFlow 模型的简单例子。它值包含一个单一视图，并包含一个按钮，用户点击时执行模型的加载和推断。
 
-- **Camera：** 这个例子与 Android TF Classify 演示程序非常像。它加载了 Inception v3 并输出了估计出的最佳的标签，以显示实时相机图像中的内容。与 Android 版本一样，你可以使用 TensorFlow for Poets 来训练自定义的模型，并以最小的代码修改将其放入此示例中。
+- **Camera**：这个例子与 Android TF Classify 演示程序非常像。它加载了 Inception v3 并输出了估计出的最佳的标签，以显示实时相机图像中的内容。与 Android 版本一样，你可以使用 TensorFlow for Poets 来训练自定义的模型，并以最小的代码修改将其放入此示例中。
 
-- **Benchmark：** 它与 Simple 很接近，但它会重复运行计算图并将类似的统计信息输出到 Android 上的基准测试工具中。
+- **Benchmark**：它与 Simple 很接近，但它会重复运行计算图并将类似的统计信息输出到 Android 上的基准测试工具中。
 
 
 ### 排错
