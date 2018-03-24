@@ -464,7 +464,7 @@ print(sess.run(y_pred))
 
 想要学习更多关于使用 TensorFlow 构建模型的内容，你可以参考一下内容：
 
-* @{$get_started/custom_estimators$Custom Estimators}, 学习如何构建定制化的模型。你对 TensorFlow Core 的了解能够帮助你更好的理解和 debug 你的模型
+* @{$get_started/custom_estimators$Custom Estimators}，学习如何构建定制化的模型。你对 TensorFlow Core 的了解能够帮助你更好的理解和 debug 你的模型
 
 如果你想要学习更多 TensorFlow 内部的工作原理，你可以参考下列文档，其中对我们涉及的话题有更深入的介绍：
 
