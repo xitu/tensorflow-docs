@@ -85,34 +85,26 @@ classifier = tf.estimator.DNNClassifier(
 print(classifier.model_dir)
 ```
 
-The `tempfile.mkdtemp` function picks a secure, temporary directory
-appropriate for your operating system. For example, a typical temporary
-directory on macOS might be something like the following:
+`tempfile.mkdtemp` 函数会为你在操作系统中选择一个安全的临时目录。比如，在 macOS 操作系统中，一个典型的临时目录为：
 
 ```None
 /var/folders/0s/5q9kfzfj3gx2knj0vj8p68yc00dhcr/T/tmpYm1Rwa
 ```
 
-### Checkpointing Frequency
+### 检查点的保存频率
 
-By default, the Estimator saves
-[checkpoints](https://developers.google.com/machine-learning/glossary/#checkpoint)
-in the `model_dir` according to the following schedule:
+默认情况下， Estimator 会在 `model_dir` 目录中保存 [检查点](https://developers.google.com/machine-learning/glossary/#checkpoint)，并且采用如下策略：
 
-*   Writes a checkpoint every 10 minutes (600 seconds).
-*   Writes a checkpoint when the `train` method starts (first iteration)
-    and completes (final iteration).
-*   Retains only the 5 most recent checkpoints in the directory.
+*   每隔 10 分钟保存一个检查点（即 600 秒）。
+*   当 `train` 方法开始执行（即第一次循环）和执行结束（最后一次循环）时，会各保存一个检查点。
+*   保留目录中最近 5 个检查点。
 
-You may alter the default schedule by taking the following steps:
+你可以用如下步骤改变上述默认策略：
 
-1.  Create a @{tf.estimator.RunConfig$`RunConfig`} object that defines the
-    desired schedule.
-2.  When instantiating the Estimator, pass that `RunConfig` object to the
-    Estimator's `config` argument.
+1.  创建一个 @{tf.estimator.RunConfig$`RunConfig`} 对象，用于定义所需的保存策略。
+2.  当实例化 Estimator 时，将此 `RunConfig` 对象传递给 Estimator 的 `config` 参数。
 
-For example, the following code changes the checkpointing schedule to every
-20 minutes and retains the 10 most recent checkpoints:
+比如，下面的代码将检查点保存策略修改为每隔 20 分钟保存一次，且保留最近 10 个检查点：
 
 ```python
 my_checkpointing_config = tf.estimator.RunConfig(
@@ -128,22 +120,14 @@ classifier = tf.estimator.DNNClassifier(
     config=my_checkpointing_config)
 ```
 
-## Restoring your model
+## 恢复你的模型
 
-The first time you call an Estimator's `train` method, TensorFlow saves a
-checkpoint to the `model_dir`. Each subsequent call to the Estimator's
-`train`, `eval`, or `predict` method causes the following:
+当第一次调用一个 Estimator 的 `train` 方法时，TensorFlow 会在 `model_dir` 目录中保存一个检查点。后续每调用一次 Estimator 的 `train` 、 `eval` 或 `predict` 方法，都会发生如下的行为：
 
-1.  The Estimator builds the model's
-    [graph](https://developers.google.com/machine-learning/glossary/#graph)
-    by running the `model_fn()`.  (For details on the `model_fn()`, see
-    @{$custom_estimators$Creating Custom Estimators.})
-2.  The Estimator initializes the weights of the new model from the data
-    stored in the most recent checkpoint.
+1.  这个 Estimator 会用过运行 `model_fn()` 函数来构建模型的[计算图](https://developers.google.com/machine-learning/glossary/#graph)。 (`model_fn()` 的细节参见 @{$custom_estimators$生成定制的 Estimator})
+2.  这个 Estimator 从最近的检查点中恢复出数据，用于初始化新模型的权重值。
 
-In other words, as the following illustration suggests, once checkpoints
-exist, TensorFlow rebuilds the model each time you call `train()`,
-`evaluate()`, or `predict()`.
+换句话说，如下图所示，一旦检查点文件存在，TensorFlow 总会在你调用 `train()` 、 `evaluation()` 或 `predict()` 时重建模型。
 
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/subsequent_calls.png">
