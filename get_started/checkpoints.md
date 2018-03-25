@@ -133,16 +133,13 @@ classifier = tf.estimator.DNNClassifier(
 <img style="width:100%" src="../images/subsequent_calls.png">
 </div>
 <div style="text-align: center">
-Subsequent calls to train(), evaluate(), or predict()
+后续对 train()、evaluate() 或 predict() 的调用
 </div>
 
 
-### Avoiding a bad restoration
+### 避免不好的恢复
 
-Restoring a model's state from a checkpoint only works if the model
-and checkpoint are compatible.  For example, suppose you trained a
-`DNNClassifier` Estimator containing two hidden layers,
-each having 10 nodes:
+只有当模型与检查点兼容时，我们才可以从这个检查点中恢复出模型的状态。比如，假设你训练了一个称为 `DNNClassifier` 的 Estimator，它包含两个隐藏层，每个有 10 个结点：
 
 ```python
 classifier = tf.estimator.DNNClassifier(
@@ -156,14 +153,12 @@ classifier.train(
         steps=200)
 ```
 
-After training (and, therefore, after creating checkpoints in `models/iris`),
-imagine that you changed the number of neurons in each hidden layer from 10 to
-20 and then attempted to retrain the model:
+经过训练之后（当然，也会同时在 `models/iris` 目录中创建检查点），假如你将每个隐藏层中的 10 个结点改成 20 个，然后再尝试恢复模型：
 
 ``` python
 classifier2 = tf.estimator.DNNClassifier(
     feature_columns=my_feature_columns,
-    hidden_units=[20, 20],  # Change the number of neurons in the model.
+    hidden_units=[20, 20],  # 修改模型中的神经元个数
     n_classes=3,
     model_dir='models/iris')
 
@@ -172,8 +167,7 @@ classifier.train(
         steps=200)
 ```
 
-Since the state in the checkpoint is incompatible with the model described
-in `classifier2`, retraining fails with the following error:
+因为检查点的状态与 `classifier2` 所描述的模型的状态不兼容，恢复模型会失败，错误信息如下：
 
 ```None
 ...
@@ -182,19 +176,13 @@ dnn/hiddenlayer_1/bias/t_0/Adagrad; shape in shape_and_slice spec [10]
 does not match the shape stored in checkpoint: [20]
 ```
 
-To run experiments in which you train and compare slightly different
-versions of a model, save a copy of the code that created each
-`model-dir`, possibly by creating a separate git branch for each version.
-This separation will keep your checkpoints recoverable.
+当你在做实验时训练并比较版本稍有不同的模型时，记得保存创建每个 `model_dir` 的代码。比如，你可以为每个版本创建一个独立的 git 分支。这种分隔的做法可以保证你的检查点是可恢复的。
 
-## Summary
+## 总结
 
-Checkpoints provide an easy automatic mechanism for saving and restoring
-models created by Estimators.
+检查点提供了一种容易的保存和恢复由 Estimator 生成的模型的自动化机制。
 
-See the @{$saved_model$Saving and Restoring}
-chapter of the *TensorFlow Programmer's Guide* for details on:
+参见 **TensorFlow 程序员指南**的 @{$saved_model$保存和恢复} 章节，你可以找到如下内容的更多细节：
 
-*   Saving and restoring models using low-level TensorFlow APIs.
-*   Exporting and importing models in the SavedModel format, which is a
-    language-neutral, recoverable, serialization format.
+*   使用底层 TensorFlow API 来保存和恢复模型。
+*   在 SavedModel 模式中导出和导入模型，这是一种语言无关、可恢复、可序列化格式。
