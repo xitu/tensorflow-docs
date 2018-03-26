@@ -1,23 +1,23 @@
 index.md
 
-### Images
+### 图像
 layers.md: MNIST
 image_recognition.md: Image Recognition
 image_retraining.md: Image Retraining
 deep_cnn.md
 
-### Sequences
+### 序列
 recurrent.md
 seq2seq.md: Neural Machine Translation
 recurrent_quickdraw.md: Drawing Classification
 audio_recognition.md
 
-### Data Representation
+### 数据表示
 wide.md: Linear Models
 wide_and_deep.md: Wide & Deep Learning
 word2vec.md
 kernel_methods.md: Kernel Methods
 
-### Non-ML
+### 非机器学习
 mandelbrot.md
 pdes.md
