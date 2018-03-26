@@ -13,27 +13,24 @@
 *   [输入管线的优化](#输入管线的优化)
 *   [数据格式](#数据格式)
 *   [通用的融合操作](#通用的融合操作)
-*   [RNN Performance](#rnn-performance)
+*   [RNN 性能](#rnn-performance)
 *   [从源码构建和安装](#从源码构建和安装)
 
 ### 输入管线的优化
 
-典型的模型会从磁盘加载数据，然后处理并通过网络发送出去。比如，模型按照下列数据流过程来处理 JPEG 图像：
-从磁盘加载图像，将 JPEG 解码加载到一个张量中，裁剪和边缘垫值，以及可能的翻转和变形操作，然后按批次投入训练。
-这个数据流被称为输入管线。随着 GPU 和其它加速硬件运行得越来越快，数据预处理就成了性能的瓶颈。
+典型的模型会从磁盘加载数据，然后处理并通过网络发送出去。比如，模型按照下列数据流过程来处理 JPEG 图像：从磁盘加载图像，将 JPEG 解码到一个张量中，裁剪和边缘垫值，以及可能的翻转和变形操作，然后按批次投入训练。这个数据流被称为输入管线。随着 GPU 和其它加速硬件运行得越来越快，数据预处理就成了性能的瓶颈。
 
-确定输入管线是否为瓶颈可能会比较复杂。一种最直接的方法是让输入管线后的那个模型只包含单个操作（得到一个平凡模型），然后测量其每秒处理的样例数。
-如果整个模型和平凡模型之间的效率差异极小，则输入管线很有可能是一个瓶颈。下面是发现瓶颈问题的其它一些方法：
+确定输入管线是否为瓶颈可能会比较复杂。一种最简单的方法是在输入管线之后将模型简化为单个操作（平凡模型），并测量其每秒处理的样例数。如果整个模型和平凡模型之间的效率差异极小，则输入管线很有可能是瓶颈。以下是确定瓶颈问题的其它一些方法：
 
-*   通过运行 `nvidia-smi -l 2` 来检查一个 GPU 是否已经被充分利用。如果 GPU 利用率没有接近 80-100%，则此输入管线可能是个瓶颈。
-*   生成一个时间线，并检查它是否有大块的空白时间段（等待时间）。生成时间线的示例参见教程 @{$jit$XLA JIT}。
-*   检查 CPU 使用情况。有可能出现的情况是：管线已经优化，却仍然没有足够的 CPU 时钟来处理这个管线。
-*   估计所需的吞吐量，确认磁盘可以应付这样规模的吞吐量。因为一些云服务网络提供的磁盘速度甚至低到 50 MB/秒，这比机械磁盘（150 MB/秒）、SATA SSD （500 MB/秒）、以及 PCIe SSD （2000+ MB/秒）都要慢。
+*   通过运行 `nvidia-smi -l 2` 来检查 GPU 是否已经被充分利用。如果 GPU 利用率没有接近 80-100%，则此输入管线可能是个瓶颈。
+*   生成时间线，并检查它是否有大块的空白时间段（等待时间）。生成时间线的示例参见教程 @{$jit$XLA JIT}。
+*   检查 CPU 使用情况。有可能出现的情况是：管线已经优化，却仍然没有足够的 CPU 周期来处理这个管线。
+*   估计所需的吞吐量，并验证所使用的磁盘能够达到吞吐量的水平。因为一些云解决方案提供的磁盘速度甚至低至 50 MB/秒，这比机械磁盘（150 MB/秒）、SATA SSD （500 MB/秒）、以及 PCIe SSD （2000+ MB/秒）都要慢。
 
 
 #### CPU 上的预处理
 
-将输入管线的操作放在 CPU 上可以显著提高性能。让 CPU 处理输入管线，可以解放 GPU，让它专注于训练。为了确保预处理是在 CPU 上进行，可将预处理操作按如下方式包装一下：
+将输入管线的操作放在 CPU 上可以显著提高性能。让 CPU 处理输入管线，可以使 GPU 专注于训练。为了确保预处理是在 CPU 上进行，可将预处理操作按如下方式包装一下：
 
 ```python
 with tf.device('/cpu:0'):
@@ -41,43 +38,27 @@ with tf.device('/cpu:0'):
   distorted_inputs = load_and_distort_images()
 ```
 
-如果使用 `tf.estimator.Estimator`，输入函数会自动用 CPU 执行。
+如果使用 `tf.estimator.Estimator`，输入函数会自动在 CPU 上执行。
 
 #### 使用 tf.data API
 
-The @{$datasets$tf.data API} is replacing `queue_runner` as the recommended API
-for building input pipelines. This
-[ResNet example](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10_estimator/cifar10_main.py)
-([arXiv:1512.03385](https://arxiv.org/abs/1512.03385))
-training CIFAR-10 illustrates the use of the `tf.data` API along with
-`tf.estimator.Estimator`.
+@{$datasets$tf.data API} 正在取代 `queue_runner` 作为构建输入管道的推荐 API。训练示例[ResNet example](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10_estimator/cifar10_main.py)
+([arXiv:1512.03385](https://arxiv.org/abs/1512.03385)) 说明了使用 `tf.estimator.Estimator` 时 `tf.data` 的 API 调用。
 
-The `tf.data` API utilizes C++ multi-threading and has a much lower overhead
-than the Python-based `queue_runner` that is limited by Python's multi-threading
-performance. A detailed performance guide for the `tf.data` API can be found
-[here](#datasets_performance).
+`tf.data` API 使用 C++ 多线程，相比于 Python 的 `queue_runner`，由于 `queue_runner` 受限于 Python 的多性能，所以 `tf.data` API 具有较低的开销。
 
-While feeding data using a `feed_dict` offers a high level of flexibility, in
-general `feed_dict` does not provide a scalable solution. If only a single GPU
-is used, the difference between the `tf.data` API and `feed_dict` performance
-may be negligible. Our recommendation is to avoid using `feed_dict` for all but
-trivial examples. In particular, avoid using `feed_dict` with large inputs:
+虽然使用 `feed_dict` 的流数据提供了很高的灵活性，但是通常 `feed_dict` 并没有提供可伸缩的解决方案。如果只使用单个 GPU，则 `tf.data` API 和 `feed_dict` 之间的性能差异可以忽略不计。我们建议避免使用 `feed_dict` 来处理琐碎的示例。特别是，避免使用大量输入的 `feed_dict`：
 
 ```python
 # feed_dict often results in suboptimal performance when using large inputs.
 sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
 ```
 
-#### Fused decode and crop
+#### 融合解码和裁剪
 
-If inputs are JPEG images that also require cropping, use fused
-@{tf.image.decode_and_crop_jpeg} to speed up preprocessing.
-`tf.image.decode_and_crop_jpeg` only decodes the part of
-the image within the crop window. This significantly speeds up the process if
-the crop window is much smaller than the full image. For imagenet data, this
-approach could speed up the input pipeline by up to 30%.
+如果输入为 JPEG 图像，且需要裁剪，则使用 @{tf.image.decode_and_crop_jpeg} 加速预处理。`tf.image.decode_and_crop_jpeg` 只在裁剪窗口内解码图像数据。如果裁剪窗口比整个图像小得多，则会大大加快处理速度。对于 imagenet 数据，这种方法会将输入管线处理速度提升 30%。
 
-Example Usage:
+使用示例：
 
 ```python
 def _image_preprocess_fn(image_buffer):
@@ -98,9 +79,7 @@ def _image_preprocess_fn(image_buffer):
     cropped_image = tf.image.decode_and_crop_jpeg(image, crop_window)
 ```
 
-`tf.image.decode_and_crop_jpeg` is available on all platforms. There is no speed
-up on Windows due to the use of `libjpeg` vs. `libjpeg-turbo` on other
-platforms.
+`tf.image.decode_and_crop_jpeg` 可运行在所有平台上。在其他平台上，由于使用了 `libjpeg` 和 `libjpeg-turbo`，所以在 Windows 上无法加速。
 
 #### 使用大文件
 加载大量的小文件会极大地影响 I/O 性能。一种获得最大的 I/O 吞吐量的方法是将输入数据预处理为更大的 `TFRecord` 文件（约 100MB 大小）。
@@ -110,13 +89,13 @@ platforms.
 
 ### 数据格式
 
-数据格式指的是传递给指定操作的张量结构。下面的讨论专门针对表示图像的四维张量。在 TensorFlow 中，
+数据格式是指传递给指定操作的张量结构。下面的讨论专门针对表示图像的四维张量。在 TensorFlow 中，
 四维张量中的部分成员常用如下一些字母来表示：
 
-*   N 表示一个训练批次中的图像数目
-*   H 表示垂直维度（高度方向）中的像元数目
-*   W 表示水平维度（宽度方向）中的像元数目
-*   C 表示通道数。比如，1 表示黑白或灰度图像，而 3 表示 RGB 图像。
+*   N 表示一个训练批次中的图像数目。
+*   H 表示垂直维度（高度方向）中的像素数。
+*   W 表示水平维度（宽度方向）中的像素数。
+*   C 表示通道数。比如，黑白或灰度图像为 1，RGB 图像为 3。
 
 在 TensorFlow 中，有两种命名规范分别表示最常用的两种数据格式：
 
@@ -126,12 +105,9 @@ platforms.
 
 TensorFlow 默认采用 `NHWC`，而在 NVIDIA GPU 上使用 [cuDNN](https://developer.nvidia.com/cudnn) 时，`NCHW` 格式是最优选择。
 
-实践中最好的方式是让你的模型同时支持这两种数据格式。这可以让你在 GPU 上训练完了之后直接将模型用于 CPU 上的推理。
-如果 TensorFlow 编译时用了 [Intel MKL](#tensorflow_with_intel_mkl-dnn) 优化，那么很多操作会被优化并支持 `NCHW`，特别是基于 CNN 的模型相关的操作。如果你没有使用 MKL，有些操作在使用 `NCHW` 时无法在 CPU 上运行。
+最佳实践是构建同时支持两种数据格式的模型。这简化了 GPU 上的训练，并在 CPU 上运行推理。如果 TensorFlow 是通过 [Intel MKL](#tensorflow_with_intel_mkl-dnn) 优化编译的，许多操作，特别是与基于 CNN 的模型相关的操作，将会得到优化并支持 `NCHW`。如果不使用 MKL，有些操作在使用 `NCHW` 时无法在 CPU 上运行。
 
-这里我们简要介绍一下这两种格式的历史。TensorFlow 最开始使用 `NHWC` 是因为它在 CPU 上稍微快一点。
-但长期以来，我们一直在编写工具，让计算图可以自动重写，从而让两种格式的切换变得透明化，来实现一些优化。
-我们发现，尽管 `NCHW` 在一般情况下效率是最高的，但有些 GPU 操作在使用 `NHWC` 时确实更快一些。
+这里我们简要介绍一下这两种格式的历史。TensorFlow 最开始使用 `NHWC` 是因为它在 CPU 上稍微快一点。但长期以来，我们一直在编写工具，让计算图可以自动重写，从而让两种格式的切换变得透明化，来实现一些优化。我们发现，尽管 `NCHW` 在一般情况下效率是最高的，但有些 GPU 操作在使用 `NHWC` 时确实更快一些。
 
 ### 通用的融合操作
 
@@ -155,40 +131,17 @@ bn = tf.layers.batch_normalization(
 bn = tf.contrib.layers.batch_norm(input_layer, fused=True, data_format='NCHW')
 ```
 
-### RNN Performance
+### RNN 性能
 
-There are many ways to specify an RNN computation in TensorFlow and they have
-trade-offs with respect to model flexibility and performance. The
-@{tf.nn.rnn_cell.BasicLSTMCell} should be considered a reference implementation
-and used only as a last resort when no other options will work.
+有许多方法来指定 TensorFlow 中的 RNN 计算，同时需要在模型的灵活性和性能之间做出权衡。@{tf.nn.rnn_cell.BasicLSTMCell} 是一个参考实现，在没有其他选择的情况下，作为最后的手段。
 
-When using one of the cells, rather than the fully fused RNN layers, you have a
-choice of whether to use @{tf.nn.static_rnn} or @{tf.nn.dynamic_rnn}.  There
-shouldn't generally be a performance difference at runtime, but large unroll
-amounts can increase the graph size of the @{tf.nn.static_rnn} and cause long
-compile times.  An additional advantage of @{tf.nn.dynamic_rnn} is that it can
-optionally swap memory from the GPU to the CPU to enable training of very long
-sequences.  Depending on the model and hardware configuration, this can come at
-a performance cost.  It is also possible to run multiple iterations of
-@{tf.nn.dynamic_rnn} and the underlying @{tf.while_loop} construct in parallel,
-although this is rarely useful with RNN models as they are inherently
-sequential.
+当使用一个单元，而不是完全融合的 RNN 层，可以选择使用 @{tf.nn.static_rnn} 或 @{tf.nn.dynamic_rnn}。在运行时通常不应该有性能差异，但是大量的 unroll 数量会增加 @{tf.nn.static_rnn} 的图形大小，并导致更长的编译时间。@{tf.nn.dynamic_rnn} 的另一个优点是，它可以选择性地将内存从 GPU 切换到 CPU，以支持非常长的序列的训练。根据模型和硬件配置，这可能会带来性能成本。也可以并行运行 @{tf.nn.dynamic_rnn} 和底层 @{tf.while_loop} 的多个迭代。尽管这在 RNN 模型中很少有用，因为它们本质上是顺序的。
 
-On NVIDIA GPUs, the use of @{tf.contrib.cudnn_rnn} should always be preferred
-unless you want layer normalization, which it doesn't support.  It is often at
-least an order of magnitude faster than @{tf.contrib.rnn.BasicLSTMCell} and
-@{tf.contrib.rnn.LSTMBlockCell} and uses 3-4x less memory than
-@{tf.contrib.rnn.BasicLSTMCell}.
+在 NVIDIA GPU 上，除非需要层归一化，否则应首选 @{tf.contrib.cudnn_rnn}。它与 @{tf.contrib.rnn.BasicLSTMCell} 和 @{tf.contrib.rnn.LSTMBlockCell} 至少在一个数量级，并比 @{tf.contrib.rnn.BasicLSTMCell} 少用 3-4 倍的内存。
 
-If you need to run one step of the RNN at a time, as might be the case in
-reinforcement learning with a recurrent policy, then you should use the
-@{tf.contrib.rnn.LSTMBlockCell} with your own environment interaction loop
-inside a @{tf.while_loop} construct. Running one step of the RNN at a time and
-returning to Python is possible, but it will be slower.
+如果你需要一次运行 RNN 的一个步骤，就像在增强学习中经常使用的策略一样，在 @{tf.while_loop} 构造函数内，应该使用 @{tf.contrib.rnn.LSTMBlockCell} 与您自己的环境交互循环。一次运行 RNN 的一个步骤并返回 Python 是可能的，但它会慢一些。
 
-On CPUs, mobile devices, and if @{tf.contrib.cudnn_rnn} is not available on
-your GPU, the fastest and most memory efficient option is
-@{tf.contrib.rnn.LSTMBlockFusedCell}.
+在 CPU，移动端设备，以及 GPU 上不支持 @{tf.contrib.cudnn_rnn} 时，最快和最高效的内存选项是 @{tf.contrib.rnn.LSTMBlockFusedCell}。
 
 For all of the less common cell types like @{tf.contrib.rnn.NASCell},
 @{tf.contrib.rnn.PhasedLSTMCell}, @{tf.contrib.rnn.UGRNNCell},
