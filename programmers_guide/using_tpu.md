@@ -1,53 +1,35 @@
-# Using TPUs
+# 使用 TPU
 
-This document walks through the principal TensorFlow APIs necessary to make
-effective use of a [Cloud TPU](https://cloud.google.com/tpu/), and highlights
-the differences between regular TensorFlow usage, and usage on a TPU.
+这份文档说明了有效使用 [Cloud TPU](https://cloud.google.com/tpu/) 时必需使用的关键 TensorFlow APIs，并强调了常规的 TensorFlow 和在 TPU 上使用区别。
 
-This doc is aimed at users who:
+这份文档针对以下用户：
 
-* Are familiar with TensorFlow's `Estimator` and `Dataset` APIs
-* Have maybe [tried out a Cloud TPU](https://cloud.google.com/tpu/docs/quickstart)
-  using an existing model.
-* Have, perhaps, skimmed the code of an example TPU model
-  [[1]](https://github.com/tensorflow/models/blob/master/official/mnist/mnist_tpu.py)
-  [[2]](https://github.com/tensorflow/tpu-demos/tree/master/cloud_tpu/models).
-* Are interested in porting an existing `Estimator` model to
-  run on Cloud TPUs
+* 熟悉 TensorFlow 的 `Estimator` 和 `Dataset` APIs
+* 使用一个已有模型[尝试使用过 Cloud TPU](https://cloud.google.com/tpu/docs/quickstart)
+* 浏览过 TPU 模型的样例代码 [[1]](https://github.com/tensorflow/models/blob/master/official/mnist/mnist_tpu.py) [[2]](https://github.com/tensorflow/tpu-demos/tree/master/cloud_tpu/models)
+* 对将一个现有的 `Estimator` 模型移植到 Cloud TPU 上运行感兴趣
 
 ## TPUEstimator
 
-@{tf.estimator.Estimator$Estimators} are TensorFlow's model-level abstraction.
-Standard `Estimators` can drive models on CPU and GPUs. You must use
-@{tf.contrib.tpu.TPUEstimator} to drive a model on TPUs.
+@{tf.estimator.Estimator$Estimators} 是 TensorFlow 的模型级抽象。标准的 `Estimators` 可以在 CPU 或者 GPU 上驱动模型。 你必须使用 @{tf.contrib.tpu.TPUEstimator} 在 TPU 上驱动模型。
 
-Refer to TensorFlow's Getting Started section for an introduction to the basics
-of using a @{$get_started/premade_estimators$pre-made `Estimator`}, and
-@{$get_started/custom_estimators$custom `Estimator`s}.
+使用 @{$get_started/premade_estimators$pre-made `Estimator`} 和 @{$get_started/custom_estimators$custom `Estimator`s} 的基础介绍可以参考 TensorFlow 的入门指南（Getting Started ）部分，
 
-The `TPUEstimator` class differs somewhat from the `Estimator` class.
+`TPUEstimator` 类和 `Estimator` 之间多少有些不一样。
 
-The simplest way to maintain a model that can be run both on CPU/GPU or on a
-Cloud TPU is to define the model's inference phase (from inputs to predictions)
-outside of the `model_fn`. Then maintain separate implementations of the
-`Estimator` setup and `model_fn`, both wrapping this inference step. For an
-example of this pattern compare the `mnist.py` and `mnist_tpu.py` implementation in
-[tensorflow/models](https://github.com/tensorflow/models/tree/master/official/mnist).
+要使一个模型可以在 CPU/GPU 或 Cloud TPU 上运行的最简单方法是在 `model_fn` 外定义模型的推理过程（从输入到预测）。然后继续分离 `Estimator` 设置和 `model_fn`，都包含这个推理步骤。这种模式的一个样例是 [tensorflow/models](https://github.com/tensorflow/models/tree/master/official/mnist) 中比较 `mnist.py` 和 `mnist_tpu.py` 的实现。
 
-### Running a `TPUEstimator` locally
+### 本地运行 `TPUEstimator`
 
-To create a standard `Estimator` you call the constructor, and pass it a
-`model_fn`, for example:
+要创建一个标准的 `Estimator` 你可以调用构造函数，并将它传递给 `model_fn`，例如：
 
 ```
 my_estimator = tf.estimator.Estimator(
   model_fn=my_model_fn)
 ```
 
-The changes required to use a @{tf.contrib.tpu.TPUEstimator} on your local
-machine are relatively minor. The constructor requires two additional arguments.
-You should set the `use_tpu` argument to `False`, and pass a
-@{tf.contrib.tpu.RunConfig} as the `config` argument, as shown below:
+在本地计算机上使用 @{tf.contrib.tpu.TPUEstimator} 所需的更改相对较小。构造函数还需要另外两个参数。您应该将 `use_tpu` 参数设置为 `False` ，并将 @{tf.contrib.tpu.RunConfig} 作为 `config` 参数传入，如下所示：
+
 
 ``` python
 my_tpu_estimator = tf.contrib.tpu.TPUEstimator(
@@ -56,28 +38,20 @@ my_tpu_estimator = tf.contrib.tpu.TPUEstimator(
     use_tpu=False)
 ```
 
-Just this simple change will allow you to run a `TPUEstimator` locally.
-The majority of example TPU models can be run in this local mode,
-by setting the command line flags as follows:
+这样简单的更改就能在本地运行 `TPUEstimator` 。大多数 TPU 模型示例都可以以下面这种命令行设置标志参数，来在本地模式下运行：
 
 
 ```
 $> python mnist_tpu.py --use_tpu=false --master=''
 ```
 
-Note: This `use_tpu=False` argument is useful for trying out the `TPUEstimator`
-API. It is not meant to be a complete TPU compatibility test. Successfully
-running a model locally in a `TPUEstimator` does not guarantee that it will
-work on a TPU.
+注意：`use_tpu=False` 参数对于尝试 `TPUEstimator` API 很有用。这也就意味着它不是个完整的 TPU 兼容测试。在 `TPUEstimator` 中成功地本地运行一个模型并不代表它能在 TPU 上运行。
 
+### 构建一个 `tpu.RunConfig`
 
-### Building a `tpu.RunConfig`
+虽然默认的 `RunConfig` 足以进行本地训练，但在实际使用并不能忽略这些设置。
 
-While the default `RunConfig` is sufficient  for local training, these settings
-cannot be ignored in real usage.
-
-A more typical setup for a `RunConfig`, that can be switched to use a Cloud
-TPU, might be as follows:
+一种可以切换到 Cloud TPU 的更典型 `RunConfig` 设置，会如下所示：
 
 ``` python
 import tempfile
@@ -86,11 +60,11 @@ import subprocess
 class FLAGS(object):
   use_tpu=False
   tpu_name=None
-  # Use a local temporary path for the `model_dir`
+  # 为 `model_dir` 设定本地临时路径
   model_dir = tempfile.mkdtemp()
-  # Number of training steps to run on the Cloud TPU before returning control.
+  # 在返回控制之前在 Cloud TPU 上运行的训练步数
   iterations = 50
-  # A single Cloud TPU has 8 shards.
+  # 一个包含 8 个分片的 Cloud TPU
   num_shards = 8
 
 if FLAGS.use_tpu:
@@ -117,7 +91,7 @@ my_tpu_run_config = tf.contrib.tpu.RunConfig(
 )
 ```
 
-Then you must pass the @{tf.contrib.tpu.RunConfig} to the constructor:
+然后你必须将 @{tf.contrib.tpu.RunConfig} 传入构造函数：
 
 ``` python
 my_tpu_estimator = tf.contrib.tpu.TPUEstimator(
@@ -126,23 +100,18 @@ my_tpu_estimator = tf.contrib.tpu.TPUEstimator(
     use_tpu=FLAGS.use_tpu)
 ```
 
-Typically the `FLAGS` would be set by command line arguments. To switch from
-training locally to training on a cloud TPU you would need to:
+通常，`FLAGS` 将由命令行参数设置。要从本地训练转换为 Cloud TPU 训练，你需要：
 
-  1) Set `FLAGS.use_tpu` to `True`
-  1) Set `FLAGS.tpu_name` so the
-     `tf.contrib.cluster_resolver.TPUClusterResolver` can find it
-  1) Set `FLAGS.model_dir` to a Google Cloud Storage bucket url (`gs://`).
+  1) 设置 `FLAGS.use_tpu` 为 `True`
+  1) 设置 `FLAGS.tpu_name`，以便 `tf.contrib.cluster_resolver.TPUClusterResolver` 可以找到它
+  1) 设置 `FLAGS.model_dir` 为一个 Google Cloud Storage 容器地址（`gs://`）。
 
 
-## Optimizer
+## 优化器
 
-When training on a cloud TPU you **must** wrap the optimizer in a
-@{tf.contrib.tpu.CrossShardOptimizer}, which uses an `allreduce` to aggregate
-gradients and broadcast the result to each shard (each TPU core).
+在 Cloud TPU 上进行训练时，**必须**将优化器装饰在 @{tf.contrib.tpu.CrossShardOptimizer} 中，该优化器使用 `allreduce` 聚合斜率结果并将结果广播到每个分片（每个 TPU 核心）。
 
-The `CrossShardOptimizer` is not compatible with local training. So, to have
-the same code run both locally and on a Cloud TPU, add lines like the following:
+`CrossShardOptimizer` 不兼容本地训练。因此，如果要在本地和 Cloud TPU 上运行相同的代码，请添加如下代码：
 
 ``` python
 optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
@@ -150,9 +119,7 @@ if FLAGS.use_tpu:
   optimizer = tf.contrib.tpu.CrossShardOptimizer(optimizer)
 ```
 
-If you prefer to avoid a global `FLAGS` variable in your model code, one
-approach is to set the optimizer as one of the `Estimator`'s params,
-as follows:
+如果想在模型代码中避免使用全局 `FLAGS` ，一种方法就是将优化器设置为 `Estimator` 的参数之一，如下所示：
 
 ``` python
 my_tpu_estimator = tf.contrib.tpu.TPUEstimator(
@@ -162,55 +129,37 @@ my_tpu_estimator = tf.contrib.tpu.TPUEstimator(
     params={'optimizer':optimizer})
 ```
 
-## Model Function
+## 模型函数
 
-This section details the changes you must make to the model function
-(`model_fn()`) to make it `TPUEstimator` compatible.
+本节详细介绍了使模型函数（`model_fn()`）能与 `TPUEstimator` 兼容所要做的必要更改。
 
-### Static shapes
+### 静态形状
 
-During regular usage TensorFlow attempts to determine the shapes of each
-`tf.Tensor` during graph construction. During execution any unknown shape
-dimensions are determined dynamically,
-see @{$programmers_guide/tensors#shape$Tensor Shapes} for more details.
+在常规使用过程中，TensorFlow 试图在流图构造过程中确定每个 `tf.Tensor` 的形状。在执行过程中，任何未知的形状维度都会被动态确定，更多内容请参看 @{$programmers_guide/tensors#shape$Tensor Shapes}。
 
-To run on Cloud TPUs TensorFlow models are compiled using @{$xla$XLA}.
-XLA uses a similar system for determining shapes at compile time. XLA requires
-that all tensor dimensions be statically defined at compile time. All shapes
-must evaluate to a constant, and not depend on external data, or stateful
-operations like variables or a random number generator.
+要在 Cloud TPU 上运行，TensorFlow 模型需要是由 @{$xla$XLA} 编译的。XLA 在编译时使用类似的系统确定形状。XLA 要求在编译时所有张量维都被静态定义了。所有形状都必须转换为一个常量，且并不依赖外部数据或有状态操作（如变量或随机器数生成器）。
 
+### 摘要
 
-### Summaries
+将模型中所有的 `tf.summary` 都删除。
 
-Remove any use of `tf.summary` from your model.
+@{$summaries_and_tensorboard$TensorBoard summaries} 是查看模型内部的一个好办法。`TPUEstimator` 会将一个基础摘要的最小摘要记录到 `model_dir` 的 `event` 文件中。然而，在 Cloud TPU 上进行训练时，目前不支持自定义摘要。因此，虽然 `TPUEstimator` 仍然可以包含摘要在本地运行，但在 TPU 上会运行失败。
 
-@{$summaries_and_tensorboard$TensorBoard summaries} are a great way see inside
-your model. A minimal set of basic summaries are automatically recorded by the
-`TPUEstimator`, to `event` files in the `model_dir`. Custom summaries, however,
-are currently unsupported when training on a Cloud TPU. So while the
-`TPUEstimator` will still run locally with summaries, it will fail if used on a
-TPU.
+### 评估标准
 
-### Metrics
-
-Build your evaluation metrics dictionary in a stand-alone `metric_fn`.
+在一个独立的 `metric_fn` 中构建评估指标字典。
 
 <!-- TODO(markdaoust) link to programmers_guide/metrics when it exists -->
 
-Evaluation metrics are an essential part of training a model. These are fully
-supported on Cloud TPUs, but with a slightly different syntax.
+评估指标是训练的重要部分。Cloud TPU完全支持这些功能，但语法略有不同。
 
-A standard @{tf.metrics} returns two tensors. The first returns the running
-average of the metric value, while the second updates the running average and
-returns the value for this batch:
+一个标准的 @{tf.metrics} 返回两个张量。第一个返回公制值的运行平均值，而第二个更新运行平均值并返回此批次的值：
 
 ```
 running_average, current_batch = tf.metrics.accuracy(labels, predictions)
 ```
 
-In a standard `Estimator` you create a dictionary of these pairs, and return it
-as part of the `EstimatorSpec`.
+在标准的 `Estimator` 中，创建这些张量对的字典，并将其作为 `Estimator` 的一部分返回。
 
 ```python
 my_metrics = {'accuracy': tf.metrics.accuracy(labels, predictions)}
@@ -221,8 +170,8 @@ return tf.estimator.EstimatorSpec(
 )
 ```
 
-In a `TPUEstimator` you instead pass a function (which returns a metrics
-dictionary) and a list of argument tensors, as shown below:
+相反，在 `TPUEstimator` 中，传递一个函数（返回一个度量词典）和一个参数张量列表，如下所示：
+
 
 ```python
 def my_metric_fn(labels, predictions):
@@ -234,62 +183,42 @@ return tf.contrib.tpu.TPUEstimatorSpec(
 )
 ```
 
-### Use `TPUEstimatorSpec`
+### 使用 `TPUEstimatorSpec`
 
-`TPUEstimatorSpec` do not support hooks, and require function wrappers for
-some fields.
+`TPUEstimatorSpec` 不支持钩子，并且某些字段需要函数装饰器。
 
-An `Estimator`'s `model_fn` must return an `EstimatorSpec`. An `EstimatorSpec`
-is a simple structure of named fields containing all the `tf.Tensors` of the
-model that the `Estimator` may need to interact with.
+`Estimator` 的 `model_fn` 必须返回 `EstimatorSpec`。`EstimatorSpec` 是一种简单结构的命名字段，它包含模型中可能需要与 `Estimator` 交互的所有 `tf.Tensors`。
 
-`TPUEstimators` use a @{tf.contrib.tpu.TPUEstimatorSpec}. There are a few
-differences between it and a standard @{tf.estimator.EstimatorSpec}:
+`TPUEstimators` 使用一个 @{tf.contrib.tpu.TPUEstimatorSpec}。它与标准的 @{tf.estimator.EstimatorSpec} 会有一定的区别：
 
+*  `eval_metric_ops` 必须被包装在 `metrics_fn` 中，这个字段会被重命名为 `eval_metrics` ([see above](#metrics))。
+*  @{tf.train.SessionRunHook$hooks} 不受支持，因此省略这些字段。
+*  如果使用 @{tf.train.Scaffold$`scaffold`}，必须被包装进一个函数中。这个字段会被重命名为 `scaffold_fn`。
 
-*  The `eval_metric_ops` must be wrapped into a `metrics_fn`, this field is
-   renamed `eval_metrics` ([see above](#metrics)).
-*  The @{tf.train.SessionRunHook$hooks} are unsupported, so these fields are
-   omitted.
-*  The @{tf.train.Scaffold$`scaffold`}, if used, must also be wrapped in a
-   function. This field is renamed to `scaffold_fn`.
+`Scaffold` and `Hooks` 是高级用法，通常被忽略。
 
-`Scaffold` and `Hooks` are for advanced usage, and can typically be omitted.
+## 输入函数
 
-## Input functions
+因为输入函数是运行在主机上而不是 Cloud TPU 上的，所以它的运行方式没太大变化。本节主要解释了两项必要的调整。
 
-Input functions work mainly unchanged as they run on the host computer, not the
-Cloud TPU itself. This section explains the two necessary adjustments.
-
-### Params argument
+### Params 参数
 
 <!-- TODO(markdaoust) link to input_fn doc when it exists -->
 
-The `input_fn` for a standard `Estimator` _can_ include a
-`params` argument; the `input_fn` for a `TPUEstimator` *must* include a
-`params` argument. This is necessary to allow the estimator to set the batch
-size for each replica of the input stream. So the minimum signature for an
-`input_fn` for a `TPUEstimator` is:
+标准 `Estimator` 的 `input_fn` **可以**包含一个 `params` 参数； `TPUEstimator` 的 `input_fn` **必须**包含一个 `params` 参数。这是允许估计器为输入流的每个副本设置批大小的必须参数。因此，`TPUEstimator` 的 `input_fn` 最简形式如下：
 
 ```
 def my_input_fn(params):
   pass
 ```
 
-Where `params['batch-size']` will contain the batch size.
+`params['batch-size']` 包含了批次大小
 
-### Static shapes and batch size
+### 静态形状和批次大小
 
-The input pipeline generated by your `input_fn` is run on CPU. So it is mostly
-free strict static shape requirements imposed by the XLA/TPU environment. The
-one requirement is that the batches of data fed from your input pipeline to
-the TPU have a static shape, as determined by the standard TensorFlow shape
-inference algorithm. Intermediate tensors are free to have a dynamic shapes.
-If shape inference has failed, but the shape is known it is possible to
-impose the correct shape using `tf.set_shape()`. 
+由 `input_fn` 生成的输入管道在 CPU 上运行。因此，它并不需要遵循 XLA/TPU 环境下严格的静态形状要求。只有一个要求是，从输入管道输送到 TPU 的成批数据具有静态形状，由标准 TensorFlow 形状推断算法确定。中间张量可以随意，能具有动态形状。如果形状推断失败，但已知形状，则可以使用 `tf.set_shape()` 强制施加正确的形状。
 
-In the example below the shape
-inference algorithm fails, but it is corrected using `set_shape`:
+在下面的示例中，形状推断算法失败，但使用了 `set_shape` 进行了更正：
 
 ```
 >>> x = tf.zeros(tf.constant([1,2,3])+1)
@@ -300,13 +229,9 @@ TensorShape([Dimension(None), Dimension(None), Dimension(None)])
 >>> x.set_shape([2,3,4])
 ```
 
-In many cases the batch size is the only unknown dimension.
+在许多情况下，批次大小是唯一未知的维度。
 
-A typical input pipeline, using `tf.data`, will usually produce batches of a
-fixed size. The last batch of a finite `Dataset`, however, is typically smaller,
-containing just the remaining elements. Since a `Dataset` does not know its own
-length or finiteness, the standard @{tf.data.Dataset.batch$`batch`} method
-cannot determine if all batches will have a fixed size batch on its own:
+使用 `tf.data` 的典型输入管道会产生固定大小的批次。不过，有限 `Dataset` 的最后一批次数据通常较小，只包含剩下的一些元素。由于 `Dataset` 不知道自己的长度或有限性，因此标准的 @{tf.data.Dataset.batch$`batch`} 方法自己无法确定所有批次都有一个固定的批次大小：
 
 ```
 >>> params = {'batch_size':32}
@@ -316,10 +241,7 @@ cannot determine if all batches will have a fixed size batch on its own:
 
 <BatchDataset shapes: (?, 3), types: tf.int32>
 ```
-
-The most straightforward fix is to
-@{tf.data.Dataset.apply$apply} @{tf.contrib.data.batch_and_drop_remainder}
-as follows:
+最直接的修复方法是按照以下方式使用 @{tf.data.Dataset.apply$apply} @{tf.contrib.data.batch_and_drop_remainder}：
 
 ```
 >>> params = {'batch_size':32}
@@ -331,65 +253,40 @@ as follows:
  <_RestructuredDataset shapes: (32, 3), types: tf.int32>
 ```
 
-The one downside to this approach is that, as the name implies, this batching
-method throws out any fractional batch at the end of the dataset. This is fine
-for an infinitely repeating dataset being used for training, but could be a
-problem if you want to train for an exact number of epochs.
+顾名思义,这种方法的一个缺点就是会在数据集的结尾丢弃任何的未满批次.对于用于训练的无限重复数据集,这是可以接收的,但是你如果想要按一个具体的循环数训练,则会出现问题。
 
-To do an exact 1-epoch of _evaluation_ you can work around this by manually
-padding the length of the batches, and setting the padding entries to have zero
-weight when creating your `tf.metrics`.
+要进行一轮准确的运算，你可以通过手动填充批次的长度，并在创建 `tf.metrics` 时将条目设置为零权重来解决这一问题。
 
-## Datasets
+## 数据集
 
-Efficient use of the `tf.data.Dataset` API is critical when using a Cloud
-TPU, as it is impossible to use the Cloud TPU's unless you can feed it data
-quickly enough. See @{$datasets_performance} for details on dataset performance.
+因为除非能够足够快地提供数据，否则不可能使用 Cloud TPU，所以在使用 Cloud TPU 时，如何高效使用 `tf.data.Dataset` API 是至关重要的。有关数据集性能的详细信息，请参见 @{$datasets_performance}。
 
-For all but the simplest experimentation (using
-@{tf.data.Dataset.from_tensor_slices} or other in-graph data) you will need to
-store all data files read by the `TPUEstimator`'s `Dataset` in Google Cloud
-Storage Buckets.
+对于最简单的实验（使用 @{tf.data.Dataset.from_tensor_slices 或其他图中数据），需要将 `TPUEstimator` 中的 `Dataset` 读取的所有数据文件存储在  Google Cloud Storage Buckets 上。
 
 <!--TODO(markdaoust): link to the `TFRecord` doc when it exists.-->
 
-For most use-cases, we recommend converting your data into `TFRecord`
-format and using a @{tf.data.TFRecordDataset} to read it. This, however, is not
-a hard requirement and you can use other dataset readers
-(`FixedLengthRecordDataset` or `TextLineDataset`) if you prefer.
+对于大多数使用情况，建议将数据转换为 `TFRecord` 格式，并使用 @{tf.data.TFRecordDataset} 读取。但是，这不是硬性要求，你也可以根据喜好使用其他数据集读取器(`FixedLengthRecordDataset` 或 `TextLineDataset`) 。
 
-Small datasets can be loaded entirely into memory using
-@{tf.data.Dataset.cache}.
+可以使用 @{tf.data.Dataset.cache} 将小数据集完全加载到内存中。
 
-Regardless of the data format used, it is strongly recommended that you
-@{$performance_guide#use_large_files$use large files}, on the order of
-100MB. This is especially important in this networked setting as the overhead
-of opening a file is significantly higher.
+不管使用何种数据格式，强烈建议使用 @{$performance_guide#use_large_files$use large files}，大小为 100MB。这在网络环境中尤为重要，因为打开文件的开销要大的多。
 
-It is also important, regardless of the type of reader used, to enable buffering
-using the `buffer_size` argument to the constructor. This argument is specified
-in bytes. A minimum of a few MB (`buffer_size=8*1024*1024`) is recommended so
-that data is available when needed.
+同样重要的是，无论使用哪种类型的读取器，都要使用构造函数的 `buffer_size` 参数启用缓冲。此参数以字节为单位指定。建议使用几 MB（`buffer_size=8*1024*1024`），以便在需要时提供数据。
 
-The TPU-demos repo includes
-[a script](https://github.com/tensorflow/tpu-demos/blob/master/cloud_tpu/datasets/imagenet_to_gcs.py)
-for downloading the imagenet dataset and converting it to an appropriate format.
-This together with the imagenet
-[models](https://github.com/tensorflow/tpu-demos/tree/master/cloud_tpu/models)
-included in the repo demonstrate all of these best-practices.
+TPU 示例仓库下包含一个用于下载 ImageNet 数据集并将其转换为适当格式的[脚本](https://github.com/tensorflow/tpu-demos/blob/master/cloud_tpu/datasets/imagenet_to_gcs.py)。
 
+这与仓库中包含的 ImageNet [模型](https://github.com/tensorflow/tpu-demos/tree/master/cloud_tpu/models)一起演示了所有的最佳实践。
 
-## What Next
+## 下一步
 
-For details on how to actually set up and run a Cloud TPU see:
+有关如何实际设置和运行 Cloud TPU 的详细信息，请参看：
 
- * [Google Cloud TPU Documentation](https://cloud.google.com/tpu/docs/)
+ * [Google Cloud TPU 文档](https://cloud.google.com/tpu/docs/)
 
-This document is by no means exhaustive. The best source of more detail on how
-to make a Cloud TPU compatible model are the example models published in:
+这篇文章也不能包含所有。关于如何使 Cloud TPU 兼容模型的更多细节的最佳来源是发布在以下文章中的实例模型：
 
- * The [TPU Demos Repository.](https://github.com/tensorflow/tpu-demos/)
+ * [TPU 示例仓库](https://github.com/tensorflow/tpu-demos/)
 
-For more information about tuning TensorFlow code for performance see:
+有关优化 TensorFlow 代码以提高性能的更多信息，请参看：
 
  * The @{$performance$Performance Section.}
