@@ -13,7 +13,7 @@
 
 ## 训练对花的识别
 
-![Kelly Sikkema 雏菊](https://www.tensorflow.org/images/daisies.jpg)
+![Kelly Sikkema 雏菊](../images/daisies.jpg)
 
 [Kelly Sikkema 提供](https://www.flickr.com/photos/95072945@N05/9922116524/)
 
@@ -122,7 +122,7 @@ python tensorflow/examples/label_image/label_image.py \
 
 为了说明脚本搜寻的文件目录结构是怎样的，下图是花朵文件夹的目录结构：
 
-![目录结构](https://www.tensorflow.org/images/folder_structure.png)
+![目录结构](../images/folder_structure.png)
 
 实际操作中为了得到想要的准确性可能要做很多工作。下面将通过一些你可能会遇到的常见问题进行讲解。
 

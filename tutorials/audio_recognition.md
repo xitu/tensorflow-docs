@@ -94,7 +94,7 @@ I0730 16:57:38.073667   55030 train.py:243] Confusion Matrix:
 然后在浏览器中访问 [http://localhost:6006](http://localhost:6006) ，你就可以看到展现你模型运行过程的表格和图形。
 
 <div style="width:50%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="https://storage.googleapis.com/download.tensorflow.org/example_images/speech_commands_tensorflow.png"/>
+<img style="width:100%" src="../images/speech_commands_tensorflow.png"/>
 </div>
 
 ## 训练完成
@@ -153,7 +153,7 @@ bazel run tensorflow/examples/wav_to_spectrogram:wav_to_spectrogram -- \
 如果你打开 `/tmp/spectrogram.png` 你能够看到这样的图像：
 
 <div style="width:50%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="https://storage.googleapis.com/download.tensorflow.org/example_images/spectrogram.png"/>
+<img style="width:100%" src="../images/spectrogram.png"/>
 </div>
 
 因为 TensorFlow 的存储次序，这个图像的时间方向是从上往下的，频率方向是从左往右的，而不像通常的声谱图中，时间方向是从左往右的。你应该能够看出图像中一些不同的部分，比如第一个音节 "Ha" 与 "ppy" 明显不同。
