@@ -82,6 +82,7 @@ def _image_preprocess_fn(image_buffer):
 `tf.image.decode_and_crop_jpeg` 可运行在所有平台上。在其他平台上，由于使用了 `libjpeg` 和 `libjpeg-turbo`，所以在 Windows 上无法加速。
 
 #### 使用大文件
+
 加载大量的小文件会极大地影响 I/O 性能。一种获得最大的 I/O 吞吐量的方法是将输入数据预处理为更大的 `TFRecord` 文件（约 100MB 大小）。
 对于较小的数据集（200MB~1GB），最好的方法通常是将整个数据集加载到内存。资料 [下载和转换为 TFRecord 格式](https://github.com/tensorflow/models/tree/master/research/slim#downloading-and-converting-to-tfrecord-format) 中介绍了创建 `TFRecords` 的相关信息和脚本，
 而 [脚本](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10_estimator/generate_cifar10_tfrecords.py)
@@ -143,16 +144,10 @@ bn = tf.contrib.layers.batch_norm(input_layer, fused=True, data_format='NCHW')
 
 在 CPU，移动端设备，以及 GPU 上不支持 @{tf.contrib.cudnn_rnn} 时，最快和最高效的内存选项是 @{tf.contrib.rnn.LSTMBlockFusedCell}。
 
-For all of the less common cell types like @{tf.contrib.rnn.NASCell},
-@{tf.contrib.rnn.PhasedLSTMCell}, @{tf.contrib.rnn.UGRNNCell},
-@{tf.contrib.rnn.GLSTMCell}, @{tf.contrib.rnn.Conv1DLSTMCell},
-@{tf.contrib.rnn.Conv2DLSTMCell}, @{tf.contrib.rnn.LayerNormBasicLSTMCell},
-etc., one should be aware that they are implemented in the graph like
-@{tf.contrib.rnn.BasicLSTMCell} and as such will suffer from the same poor
-performance and high memory usage.  One should consider whether or not those
-trade-offs are worth it before using these cells. For example, while layer
-normalization can speed up convergence, because cuDNN is 20x faster the fastest
-wall clock time to convergence is usually obtained without it.
+对于所有不太常见的单元类型，比如 @{tf.contrib.rnn.NASCell}，
+@{tf.contrib.rnn.PhasedLSTMCell}，@{tf.contrib.rnn.UGRNNCell}，
+@{tf.contrib.rnn.GLSTMCell}，@{tf.contrib.rnn.Conv1DLSTMCell}，
+@{tf.contrib.rnn.Conv2DLSTMCell}，@{tf.contrib.rnn.LayerNormBasicLSTMCell}，等等，我们应该意识到，它们是在类似于 @{tf.contrib.rnn.BasicLSTMCell} 的图形中实现的，且同样会遭受很差的性能和高内存使用。在使用这些单元之前，应该考虑这些权衡是否值得。例如，层标准化可以加速收敛速度，因为 cuDNN 比没有使用它时的最快收敛的 20 倍速度还快。
 
 ### 从源码构建和安装
 
@@ -178,8 +173,7 @@ bazel build -c opt --copt=-march="broadwell" --config=cuda //tensorflow/tools/pi
 
 本节介绍针对 GPU 的优化技巧，这和 [通用最佳实践](#通用最佳实践) 中的内容不同。如何在多 GPU 环境下获得
 最优的性能是一个有挑战性的任务。常用的方法是利用数据并行机制。基于数据并行的扩展需要将模型复制数份，它们被称之为“塔（tower）”，
-然后将每个“塔”置于一个 GPU 上。每个塔会对一个不同批次的数据进行操作，然后更新变量。这些变量即我们所说的参数，是需要由
-所有塔来共享的。那么每个塔是如何获得变量更新的？梯度计算又是如何影响模型的性能、扩展、以及收敛性的呢？
+然后将每个“塔”置于一个 GPU 上。每个塔会对一个不同批次的数据进行操作，然后更新变量。这些变量即我们所说的参数，是需要由所有塔来共享的。那么每个塔是如何获得变量更新的？梯度计算又是如何影响模型的性能、扩展、以及收敛性的呢？
 本节后面的部分将概述模型的塔在多个 GPU 上是如何处理那些变量的。@{$performance_models$High-Performance Models} 中则会更详细介绍一些更复杂的方法，用于在不同塔之间共享和更新变量。
 
 如何最好地处理变量的更新与模型、硬件、以及硬件的配置方法等因素有关。比如，两个系统都用 NVIDIA Tesla P100s，
@@ -189,13 +183,10 @@ bazel build -c opt --copt=-march="broadwell" --config=cuda //tensorflow/tools/pi
 
 *   **Tesla K80**： 如果多个 GPU 位于同一个 PCI Express 根联合体上，且相互之间能够使用 [NVIDIA GPUDirect](https://developer.nvidia.com/gpudirect) 技术相通信，则将变量均匀地分布在这些 GPU 上进行训练是最好的方法。如果不能使用 GPUDirect，则变量放在 CPU 上是最好的办法。
 
-*   **Titan X (Maxwell 和 Pascal)、 M40、P100、及类似型号**： 对于像 ResNet 和 InceptionV3 这样的模型，将变量
-    放在 CPU 上是最优选择，但是对于变量很多的模型，比如 AlexNet 和 VGG，结合 `NCCL` 使用 GPU 会更好一些。
+*   **Titan X (Maxwell 和 Pascal)、 M40、P100、及类似型号**： 对于像 ResNet 和 InceptionV3 这样的模型，将变量放在 CPU 上是最优选择，但是对于变量很多的模型，比如 AlexNet 和 VGG，结合 `NCCL` 使用 GPU 会更好一些。
 
 
-将变量放在哪个设备上有一个通用的方法，那就是编写一个方法来为每个操作
-确定放置的位置，然后在调用 `with tf.device():` 的时候用这个方法，而不要
-直接使用具体的设备名。考虑在两个 GPU 上训练一个模型的场景，假定其变量放
+将变量放在哪个设备上有一个通用的方法，那就是编写一个方法来为每个操作确定放置的位置，然后在调用 `with tf.device():` 的时候用这个方法，而不要直接使用具体的设备名。考虑在两个 GPU 上训练一个模型的场景，假定其变量放
 在 CPU 上。那么我们需要用一个循环来为这每个 GPU 来生成和放置一个“塔”。
 一种惯用的放置方法是查看每个操作的类型，如果类型为 `Variable`、`VariableV2` 
 或 `VarHandleOp`，则此方法判断它们应该被放在 CPU 上，而其它所有操作被判定应该放在 GPU 上。
@@ -314,7 +305,6 @@ def _resnet_model_fn():
 [在现代 Intel® 架构上的 TensorFlow* 优化](https://software.intel.com/en-us/articles/tensorflow-optimizations-on-modern-intel-architecture)，其中披露了实现的更多细节。
 
 > 注意：TensorFlow 从 1.2 版本开始加入了对 MKL 的支持，但是目前只支持 Linux 平台。
-for the consumer line of processors, e.g. i5 and i7 Intel processors. The Intel
 > 而且，即使使用了 `--config=cuda`，也是无法使用 MKL 的。
 
 除了显著地改善了基于 CNN 的模型的训练效率，用 MKL 编译的代码针对 AVX 和 AVX2 也进行了优化。
