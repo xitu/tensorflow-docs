@@ -1,4 +1,4 @@
-# TF Layers 教程：构建一个卷积神经网络
+# TF Layers 教程：构建卷积神经网络
 
 TensorFlow 的 @{tf.layers$`layers` 模块} 提供的高层 API 能让构建神经网络变得简单。它提供了一些便利的方法来创建全连接层和卷积层，添加激活函数，以及应用 dropout 正则化。在这篇教程中，你将会学习到如何使用 `layers` 来创建一个识别手写数字图片（来自于 MNIST 数据集）的卷积神经网络模型。
 
@@ -42,10 +42,9 @@ if __name__ == "__main__":
 
 一般来说，CNN 是通过多层卷积模块来提取特征的。每一个模块都包含一个卷积层，后面跟着一个池化层。最后一个卷积模块后面跟着一层或者多层的全连接层来获得分类结果。CNN 中的最后一个全连接层结点的数量等于预测任务所有可能类别的数量，而这些结点的值通过 softmax 激活函数后会产生一个 0~1 的值（该层所有的结点值之和为 1）。这些 softmax 值可以解释为输入图片最有可能是属于哪个类别的概率。
 
-> 注意：想要更深入了解 CNN 的架构，请看斯坦福大学的 <a href="https://cs231n.github.io/convolutional-networks/">
-> 卷积神经网络课程资料</a>
+> 注意：想要更深入了解 CNN 的架构，请看斯坦福大学的 <a href="https://cs231n.github.io/convolutional-networks/">卷积神经网络课程资料</a>
 
-## 构建基于卷积神经网络的 MNIST 分类器 {#building_the_cnn_mnist_classifier}
+## 构建基于卷积神经网络的 MNIST 分类器
 
 基于 CNN 架构，让我们构建一个模型来对 MNIST 数据集中的图像进行分类：
 
@@ -104,10 +103,9 @@ def cnn_model_fn(features, labels, mode):
   logits = tf.layers.dense(inputs=dropout, units=10)
 
   predictions = {
-      # Generate predictions (for PREDICT and EVAL mode)
+      # (为 PREDICT 和 EVAL 模式)生成预测值
       "classes": tf.argmax(input=logits, axis=1),
-      # Add `softmax_tensor` to the graph. It is used for PREDICT and by the
-      # `logging_hook`.
+      # 将 `softmax_tensor` 添加至计算图。用于 PREDICT 模式下的 `logging_hook`.
       "probabilities": tf.nn.softmax(logits, name="softmax_tensor")
   }
 
@@ -117,8 +115,7 @@ def cnn_model_fn(features, labels, mode):
   # 计算损失（可用于`训练`和`评价`中）
   loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
 
-  # Configure the Training Op (for TRAIN mode)
-  # 配置训练操作（用于训练模式）
+  # 配置训练操作（用于 TRAIN 模式）
   if mode == tf.estimator.ModeKeys.TRAIN:
     optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
     train_op = optimizer.minimize(
@@ -216,12 +213,6 @@ conv2 = tf.layers.conv2d(
 pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
 ```
 
-Note that convolutional layer #2 takes the output tensor of our first pooling
-layer (`pool1`) as input, and produces the tensor `conv2` as output. `conv2`
-has a shape of <code>[<em>batch_size</em>, 14, 14, 64]</code>, the same width
-and height as `pool1` (due to `padding="same"`), and 64 channels for the 64
-filters applied.
-
 注意第二个卷积层将第一个池化层的输出（`pool1`）作为输入，然后得到的输出张量为 `conv2`。张量 `conv2` 的形状为 `[batch_size, 14, 14, 62]`，宽和高与第一个池化层（`pool1`）相同，64 个通道表示应用的 64 个卷积核。
 
 第二个池化层拿 `conv2` 作为输入，然后得到的 `pool2` 作为输出。`pool2` 的形状为 `[batch_size, 7, 7, 64]`（将宽和高的长度分别减少了 50%）
@@ -269,7 +260,7 @@ logits = tf.layers.dense(inputs=dropout, units=10)
 
 CNN 最终张量由 `logits` 层输出，它的形状是 `[batch_size, 10]`
 
-### 生成预测 {#generate_predictions}
+### 生成预测
 
 我们的模型的 `logits` 层将我们的原始预测值作为一维张量返回，形状为 `[batch_size, 10]`。让我们将这些原始值转换成模型函数所支持的两种不同格式：
 
@@ -303,7 +294,7 @@ if mode == tf.estimator.ModeKeys.PREDICT:
   return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
 ```
 
-### 计算损失 {#calculating-loss}
+### 计算损失
 
 对于训练（`TRAIN`）和评价（`EVAL`）环节，我们需要定义[损失函数](https://en.wikipedia.org/wiki/Loss_function)来衡量预测类别和真实类别之间的差距。对于像 MNIST 这样的多分类问题，我们常用[交叉熵](https://en.wikipedia.org/wiki/Cross_entropy)作为损失的度量。下面的代码将会在训练或者验证模式下计算对应的交叉熵。
 
@@ -370,7 +361,7 @@ return tf.estimator.EstimatorSpec(
     mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 ```
 
-## 训练和评价 CNN MNIST 分类器 {#training_and_evaluating_the_cnn_mnist_classifier}
+## 训练和评价 CNN MNIST 分类器
 
 我们已经完成了 CNN 模型的代码工作；现在我们准备训练和评价它。
 
@@ -390,7 +381,7 @@ def main(unused_argv):
 
 我们将训练特征数据（55, 000 张手写数字图片数据的原始像素值）和标注数据（每张图片对应的 0~9 的值）分别存储为 `train_data` 和 `train_labels` 中，格式为 [numpy 数组](https://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html)。类似地，我们将用于评价的特征数据（10,000 张图片）和相应的标注数据分别存储在 `eval_data` 和 `eval_labels` 中。
 
-### 创建评估器（Estimator）{#create-the-estimator}
+### 创建评估器（Estimator）
 
 接下来，在 `main()` 函数添加下面的代码，它的作用是为我们的模型创建 `Estimator`（一个用于执行模型训练，评价和推断的 TensorFlow 类）：
 
@@ -404,12 +395,12 @@ mnist_classifier = tf.estimator.Estimator(
 
 > 注意：如果要更深入的了解 TensorFlow 的 `Estimator` API，请查阅 @{$get_started/custom_estimators$"Creating Estimators in tf.estimator"}。
 
-### 建立一个日志钩子 {#set_up_a_logging_hook}
+### 建立一个日志钩子
 
 训练 CNNs 需要耗费一定的时间，在这个过程中记录一些日志可以方便我们追踪在训练的进展。如果我们想在训练过程中输出 CNN 的 softmax 层的值，我们可以在 `main()` 函数中使用 TensorFlow's @{tf.train.SessionRunHook} 创建一个 @{tf.train.LoggingTensorHook}：
 
 ```python
-# Set up logging for predictions
+# 为预测过程设置日志
   tensors_to_log = {"probabilities": "softmax_tensor"}
   logging_hook = tf.train.LoggingTensorHook(
       tensors=tensors_to_log, every_n_iter=50)
@@ -426,7 +417,7 @@ mnist_classifier = tf.estimator.Estimator(
 准备完成后，在 `main()` 函数中调用 `train_input_fn` 中的 `train()` 方法就可以训练我们的模型了： 
 
 ```python
-# Train the model
+# 模型训练
 train_input_fn = tf.estimator.inputs.numpy_input_fn(
     x={"x": train_data},
     y=train_labels,
@@ -488,5 +479,5 @@ INFO:tensorflow:Saving evaluation summary for step 20000: accuracy = 0.9733, los
 
 如果你想了解更多有关于 TensorFlow 中评估器（Estimators）和 CNNs 的内容，请查阅下面的资料：
 
-*   @{$get_started/custom_estimators$Creating Estimators in tf.estimator} provides an introduction to the TensorFlow Estimator API. It walks through configuring an Estimator, writing a model function, calculating loss, and defining a training op.
-*   @{$deep_cnn} walks through how to build a MNIST CNN classification model *without estimators* using lower-level TensorFlow operations.
+*   @{$get_started/custom_estimators$Creating Estimators in tf.estimator} 提供了一个 TensorFlow 估计器 API 的介绍。这篇教程将向你介绍如何配置一个估计器，编写一个模型函数，估计损失以及定义训练运算符。
+*   @{$deep_cnn} 则介绍了如何构建一个使用底层 TensorFlow 运算符而**不使用估计器**的 MNIST CNN 分类模型。
