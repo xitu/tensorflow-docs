@@ -1,4 +1,4 @@
-# TensorFlow 线性模型教程
+# TensorFlow 线性模型
 
 在本教程中，我们将会使用 TensorFlow 中的 tf.estimator API 来解决一个二分类问题：给定人口普查数据，有关一个人的如年龄，教育程度，婚姻状况和职业等信息（特征），我们将尝试预测该人每年是否收入超过 5 万美元（目标标签）。我们将训练一个**逻辑回归**模型，给定一个个体的信息，我们的模型会输出一个0到1之间的数，这个数可以解释成此个体年收入超过 5 万美元的概率。
 
@@ -22,54 +22,38 @@
 
 ## 读取 Census 数据
 
-我们将要使用的数据集是 [Census Income 数据集](https://archive.ics.uci.edu/ml/datasets/Census+Income)。
-我们提供了 [data_download.py](https://github.com/tensorflow/models/tree/master/official/wide_deep/data_download.py) 来下载数据并进行一些清理。
+我们将要使用的数据集是 [Census Income 数据集](https://archive.ics.uci.edu/ml/datasets/Census+Income)。我们提供了 [data_download.py](https://github.com/tensorflow/models/tree/master/official/wide_deep/data_download.py) 来下载数据并进行一些清理。
 
 由于该任务是一个二元分类问题，我们将构造一个名为 “label” 的标签列，如果收入超过 5 万美元，那么它的值为 1，否则为 0。有关参考，请参阅 [wide_deep.py](https://github.com/tensorflow/models/tree/master/official/wide_deep/wide_deep.py)。
 
 接下来，让我们看看 Dataframe，看看我们可以使用哪些列来预测目标标签。这些列可以分为两类：类别列和连续列：
 
-*   如果某列的值只能是有限集合中的某个类别，则称该列为**类别列**。例如，一个人的关系状况（妻子，丈夫，未婚等）或教育水平（高中，大学等）都是类别列。
-*   如果某个列的值可以是连续范围内的任何数值，则称该列为**连续列**。例如，一个人的资本收入（例如 $14,084）是一个连续列。
+- 如果某列的值只能是有限集合中的某个类别，则称该列为**类别列**。例如，一个人的关系状况（妻子，丈夫，未婚等）或教育水平（高中，大学等）都是类别列。
+- 如果某个列的值可以是连续范围内的任何数值，则称该列为**连续列**。例如，一个人的资本收入（例如 $14,084）是一个连续列。
 
 以下是 Census Income 数据集中可用列的列表：
 
-| Column Name    | Type        | Description                       |
-| -------------- | ----------- | --------------------------------- |
-| age            | Continuous  | The age of the individual         |
-| workclass      | Categorical | The type of employer the          |
-:                :             : individual has (government,       :
-:                :             : military, private, etc.).         :
-| fnlwgt         | Continuous  | The number of people the census   |
-:                :             : takers believe that observation   :
-:                :             : represents (sample weight). Final :
-:                :             : weight will not be used.          :
-| education      | Categorical | The highest level of education    |
-:                :             : achieved for that individual.     :
-| education_num  | Continuous  | The highest level of education in |
-:                :             : numerical form.                   :
+| Column Name | Type        | Description                                                  |
+| ----------- | ----------- | ------------------------------------------------------------ |
+| age         | Continuous  | The age of the individual                                    |
+| workclass   | Categorical | The type of employer the individual has (government, military, private, etc.). |
+| fnlwgt         | Continuous  | The number of people the census takers believe that observation represents (sample weight). Final weight will not be used.   |
+| education      | Categorical | The highest level of education achieved for that individual.    |
+| education_num  | Continuous  | The highest level of education in numerical form. |
 | marital_status | Categorical | Marital status of the individual. |
 | occupation     | Categorical | The occupation of the individual. |
-| relationship   | Categorical | Wife, Own-child, Husband,         |
-:                :             : Not-in-family, Other-relative,    :
-:                :             : Unmarried.                        :
-| race           | Categorical | White, Asian-Pac-Islander,        |
-:                :             : Amer-Indian-Eskimo, Other, Black. :
+| relationship   | Categorical | Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried.         |
+| race           | Categorical | White, Asian-Pac-Islander, Amer-Indian-Eskimo, Other, Black.        |
 | gender         | Categorical | Female, Male.                     |
 | capital_gain   | Continuous  | Capital gains recorded.           |
 | capital_loss   | Continuous  | Capital Losses recorded.          |
 | hours_per_week | Continuous  | Hours worked per week.            |
-| native_country | Categorical | Country of origin of the          |
-:                :             : individual.                       :
-| income         | Categorical | ">50K" or "<=50K", meaning        |
-:                :             : whether the person makes more     :
-:                :             : than $50,000 annually.            :
+| native_country | Categorical | Country of origin of the individual.          |
+| income_bracket | Categorical | ">50K" or "<=50K", meaning whether the person makes more than $50,000 annually.        |
 
 ## 将数据转化为张量
 
-在构建 tf.estimator 模型时，输入数据通过 Input Builder 函数指定。 此构建函数在稍后传递给 tf.estimator.Estimator 方法（如 `train` 和 `evaluate`）之前不会被调用。
-这个函数的目的是构造输入数据，它以 @{tf.Tensor}s 或 @{tf.SparseTensor} 的形式表示。
-更详细地说，输入构建函数将返回以下配对：
+在构建 tf.estimator 模型时，输入数据通过 Input Builder 函数指定。 此构建函数在稍后传递给 tf.estimator.Estimator 方法（如 `train` 和 `evaluate`）之前不会被调用。这个函数的目的是构造输入数据，它以 @{tf.Tensor}s 或 @{tf.SparseTensor} 的形式表示。更详细地说，输入构建函数将返回以下配对：
 
 1. `features`：一个由特征列名到 `Tensors` 或 `SparseTensors` 的映射。
 2. `labels`：一个包含标签列的 `Tensor`。
@@ -111,8 +95,7 @@ def input_fn(data_file, num_epochs, shuffle, batch_size):
 
 ## 模型的选择和特征工程
 
-选择和制定正确的特征列是学习一个有效模型的关键。一个 **feature column** 可以是原始 Dataframe 中的原始列之一（我们称之为**基本特征列**），也可以是基于在一个或多个基本列上定义的某些变换创建的任何新列（让我们 称他们**派生特征列**）。基本上，“feature
-column” 是任何可用于预测目标标签的原始或派生变量的抽象概念。
+选择和制定正确的特征列是学习一个有效模型的关键。一个 **feature column** 可以是原始 Dataframe 中的原始列之一（我们称之为**基本特征列**），也可以是基于在一个或多个基本列上定义的某些变换创建的任何新列（让我们 称他们**派生特征列**）。基本上，“feature column” 是任何可用于预测目标标签的原始或派生变量的抽象概念。
 
 ### 基本的类别型特征列
 
@@ -224,11 +207,10 @@ age_buckets_x_education_x_occupation = tf.feature_column.crossed_column(
 
 处理完输入数据并定义所有特征列后，我们现在准备将它们放在一起并构建逻辑回归模型。在上一节中，我们已经看到了几种基本的和派生的特征列，其中包括：
 
-*   `CategoricalColumn`
-*   `NumericColumn`
-*   `BucketizedColumn`
-*   `CrossedColumn`
-
+- `CategoricalColumn`
+- `NumericColumn`
+- `BucketizedColumn`
+- `CrossedColumn`
 
 他们都是抽象类 `FeatureColumn` 的子类，都可以添加到模型的 `feature_columns` 字段中：
 
@@ -270,6 +252,16 @@ for key in sorted(results):
 
 最终输出的第一行应该类似于 `accuracy: 0.83557522`，这意味着准确率为 83.6%。自由地尝试更多的特征和转换，你能做得更好！
 
+在堆模型进行评估之后，我们可以使用该模型对个人年收入是否超过五万美元进行预测。
+
+```python
+pred_iter = model.predict(input_fn=lambda: input_fn(FLAGS.test_data, 1, False, 1))
+for pred in pred_iter:
+  print(pred['classes'])
+```
+
+模型的预测结果类似于 `b['1']` 或者 `b['0']`，分别表示个人年收入超过五万美元或没有超过五万美元。
+
 如果您希望看到一个可用的端到端示例，则可以下载我们的[样例代码](https://github.com/tensorflow/models/tree/master/official/wide_deep/wide_deep.py)并设置 `model_type` 为 `wide`。
 
 ## 加入正则化以防止过拟合
@@ -278,7 +270,7 @@ for key in sorted(results):
 
 在线性模型库中，你可以将L1和L2正则化添加到模型中，如下所示：
 
-```
+```python
 model = tf.estimator.LinearClassifier(
     model_dir=model_dir, feature_columns=base_columns + crossed_columns,
     optimizer=tf.train.FtrlOptimizer(
