@@ -2,7 +2,7 @@
 
 TensorFlow 的 @{tf.layers$`layers` 模块} 提供的高层 API 能让构建神经网络变得简单。它提供了一些便利的方法来创建全连接层和卷积层，添加激活函数，以及应用 dropout 正则化。在这篇教程中，你将会学习到如何使用 `layers` 来创建一个识别手写数字图片（来自于 MNIST 数据集）的卷积神经网络模型。
 
-![MNIST 数据集中 0-9 的手写数字](https://www.tensorflow.org/images/mnist_0-9.png)
+![MNIST 数据集中 0-9 的手写数字](../images/mnist_0-9.png)
 
 **MNIST 数据集由 60,000 张训练样本和 10,000 张测试样本组成，这些样本表示 0-9 的手写数字，都被处理为 28x28 像素大小的灰度图片。**
 

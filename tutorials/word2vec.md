@@ -21,7 +21,7 @@
 
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="https://www.tensorflow.org/images/audio-image-text.png" alt>
+<img style="width:100%" src="../images/audio-image-text.png" alt>
 </div>
 
 [Vector space models](https://en.wikipedia.org/wiki/Vector_space_model)（VSMs）是在一个连续的向量空间中代表单词，并且把语义上相似的单词映射到它附近的点（就是这些单词彼此都靠的很近）。VSMs 在 NLP 领域中历史悠久，但是它依赖的所有方法在某种程度上都是分享语义上的意思，或者声明相同上下文中出现的单词 [Distributional Hypothesis](https://en.wikipedia.org/wiki/Distributional_semantics#Distributional_Hypothesis)。而另一个不同的利用这个原则的方法是深入下面两个分类：*计数方法*（例如：[Latent Semantic Analysis](https://en.wikipedia.org/wiki/Latent_semantic_analysis))，和 *预测方法*（例如：
@@ -52,13 +52,13 @@ $$
 这样会为语言建模产生一个正确标准化的概率模型。然而这样做的代价也是昂贵的，因为我们需要使用当前上下文 \\(h\\) 中所有其他的 \\(V\\) 单词 \\(w'\\) 的得分来对*每一步的训练*都计算和标准化每一个概率。
 
 <div style="width:60%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="https://www.tensorflow.org/images/softmax-nplm.png" alt>
+<img style="width:100%" src="../images/softmax-nplm.png" alt>
 </div>
 
 另一方面，对于 word2vec 的特征学习来说，我们不需要一个完整的概率模型。在同样的上下文中，CBOW 和 skip-gram 模型采用了二元分类 ([logistic regression](https://en.wikipedia.org/wiki/Logistic_regression)) 来从 \\(k\\) 以及虚假的（噪音）单词 \\(\tilde w\\) 中区别出真正的目标单词 \\(w_t\\)。我们会在下面使用 CBOW 模型来示范。对于 skip-gram 模型来说，仅仅改变成相反的方向就可以了。
 
 <div style="width:60%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="https://www.tensorflow.org/images/nce-nplm.png" alt>
+<img style="width:100%" src="../images/nce-nplm.png" alt>
 </div>
 
 从数学的角度讲，每一个例子的目标都是去最大化
@@ -182,7 +182,7 @@ for inputs, labels in generate_batch(...):
 可视化训练之后的词向量。
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="https://www.tensorflow.org/images/tsne.png" alt>
+<img style="width:100%" src="../images/tsne.png" alt>
 </div>
 
 完美！和我们想的一样，同样结尾的单词互相之间离的很近。还有一个更加重量级的 word2vec 的实现，它会展现更多 TensorFlow 的高级特性，请查看 [models/tutorials/embedding/word2vec.py](https://www.tensorflow.org/code/tensorflow_models/tutorials/embedding/word2vec.py)。

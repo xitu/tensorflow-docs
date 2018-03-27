@@ -110,7 +110,7 @@ estimator = tf.contrib.learn.LinearClassifier(
 **直觉上：** 总体思路是用一个非线性的映射关系将输入空间转换到另一个特征空间（可能有更高的维数），这个特征空间几乎是可线性分割的，然后把一个线性模型应用到这个映射特征空间里。这个过程可以通过下面这张图反映：
 
 <div style="text-align:center">
-<img src="https://www.tensorflow.org/versions/master/images/kernel_mapping.png" />
+<img src="../images/kernel_mapping.png" />
 </div>
 
 ### 技术细节
@@ -200,8 +200,8 @@ stddev | eval accuracy
 
 直觉上，映射的输出维数越大，两个映射的矢量的内积越近似这个核，通常都会转化成更好的分类准确性。另一个思考这个问题的方式是输出维数等于线性模型的权重数；维数越大，模型的自由度越大。然而，超过一定的阈值，随着训练次数的增加，高输出维数会增加训练时间，对准确性的提升作用却变得非常小。下面两张图分别描述了评价准确性对输出维数和训练时间的函数变化
 
-![image](https://www.tensorflow.org/versions/master/images/acc_vs_outdim.png)
-![image](https://www.tensorflow.org/versions/master/images/acc-vs-trn_time.png)
+![image](../images/acc_vs_outdim.png)
+![image](../images/acc-vs-trn_time.png)
 
 
 ## 总结
