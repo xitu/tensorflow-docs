@@ -2,11 +2,12 @@
 
 [Quick, Draw!]: http://quickdraw.withgoogle.com
 
-[Quick, Draw!] 是一个让玩家画出物体并让计算机识别所画物体是什么的游戏。
+[Quick, Draw!] 是一个涂鸦游戏，玩家需要画出一系列物体，看电脑能否识别。
 
-[Quick, Draw!] 的识别工作由一个分类器执行，并将用户的输入试做一个由绘制点组成的序列，然后用于对象识别。
+[Quick, Draw!] 的识别功能由一个分类器完成，其输入是玩家的涂鸦，由一连串的笔画（笔画由一系列点的坐标构成）组成，输出则是涂鸦所对应的物体类别。
 
-在本教程中，我们将展示如何基于 RNN 为此问题构建识别器。该模型使用卷积层、LSTM 层以及一个 softmax 输出层来对涂鸦进行分类：
+在这个教程中，我们将会展示如何为这个游戏构建一个基于 RNN （循环神经网络）的分类器。模型将会使用卷积层、LSTM 层以及一个 softmax 输出层来分辨涂鸦的类别。
+
 
 <center> ![RNN 模型架构](../images/quickdraw_model.png) </center>
 
@@ -56,7 +57,7 @@ http://download.tensorflow.org/data/quickdraw_tutorial_dataset_v1.tar.gz
 gsutil ls -r "gs://quickdraw_dataset/full/simplified/*"
 ```
 
-这个命令会输出一长串文件列表：
+其输出是一长串文件列表，如下所示：
 
 ```shell
 gs://quickdraw_dataset/full/simplified/The Eiffel Tower.ndjson
@@ -78,7 +79,8 @@ gsutil -m cp "gs://quickdraw_dataset/full/simplified/*" .
 
 ### 可选：数据转换
 
-将 `ndjson` 文件转换到 @{$python/python_io#tfrecords_format_details$TFRecord} 格式，可以运行下面的命令：
+把 `ndjson` 文件转换为 @{$python/python_io#tfrecords_format_details$TFRecord} 格式，其中含有 ${tf.train.Example} ，请运行下列的命令：
+
 
 ```shell
    python create_dataset.py --ndjson_path rnn_tutorial_data \
@@ -154,7 +156,7 @@ def parse_line(ndjson_line):
   scale = upper - lower
   scale[scale == 0] = 1
   np_ink[:, 0:2] = (np_ink[:, 0:2] - lower) / scale
-  # 2. 计算变化
+  # 2. 计算方差
   np_ink = np_ink[1:, 0:2] - np_ink[0:-1, 0:2]
   return np_ink, class_name
 ```
@@ -211,9 +213,9 @@ if targets is not None:
 
 ### _add_conv_layers
 
-通过参数 `num_conv` 和 `params` 中的 `conv_len` 来配置卷积层的数量以滤波器的长度。
+卷积层的数量和滤波器的长度通过 `params` 字典中的 `num_conv` 和 `conv_len` 来进行配置。
 
-输入为一个序列，其中每个点具有三个维度。我们使用一维卷积来将三个输入作为不同通道。换句话说，输入是一个 `[batch_size, length, 3]` 大小的张量，输出则是 `[batch_size, length, number_of_filters]` 大小的张量。
+输入是一个三维的序列，我们将会使用一维的卷积操作，所以我们把第三维的数据看做是图像的色彩通道。这意味着输入的形状为 `[batch_size, length, 3]`，那么输出的张量形状则会是 `[batch_size, length, number_of_filters]`。
 
 ```python
 convolved = inks
@@ -223,7 +225,7 @@ for i in range(len(params.num_conv)):
     convolved_input = tf.layers.batch_normalization(
         convolved_input,
         training=(mode == tf.estimator.ModeKeys.TRAIN))
-  # 如果启用且不是第一个卷积层，则加入 dropout 层
+  # 如果启用了 dropout，则在除第一层以外的卷积层后增加 dropout 层
   if i > 0 and params.dropout:
     convolved_input = tf.layers.dropout(
         convolved_input,
@@ -254,9 +256,9 @@ outputs, _, _ = contrib_rnn.stack_bidirectional_dynamic_rnn(
     scope="rnn_classification")
 ```
 
-查看代码来获取如何使用 `CUDA` 加速等更多实现细节。
+你可以阅读源码来了解如何使用 `CUDA` 以加速计算的实现。
 
-为了创建更加紧凑且长度固定的嵌入输入，我们累积了 LSTM 的输入。首先将序列中没有数据的位置清零。
+我们对 LSTM 的结果进行求和得到一个密集的固定长度的向量。笔画序列被填充为 0 的部分不参与到结果的计算之中。
 
 ```python
 mask = tf.tile(
@@ -266,17 +268,17 @@ zero_outside = tf.where(mask, outputs, tf.zeros_like(outputs))
 outputs = tf.reduce_sum(zero_outside, axis=1)
 ```
 
-### _add_fc_layers
+### 添加全连接层
 
-输入被完整嵌入到全连接层并用于 softmax 层。
+输入的编码将交给一个全连接层，随后我们再将其输出交给 softmax 层。
 
 ```python
 tf.layers.dense(final_state, params.num_classes)
 ```
 
-### 损失、预测及优化器
+### 损失函数，预测以及优化器
 
-最后，我们需要添加损失、训练运算符以及预测方法给 `ModelFn`：
+最后，我们需要设置损失函数、训练操作以及模型预测来完成 `ModelFn` 的构建：
 
 ```python
 cross_entropy = tf.reduce_mean(
@@ -288,7 +290,7 @@ train_op = tf.contrib.layers.optimize_loss(
     global_step=tf.train.get_global_step(),
     learning_rate=params.learning_rate,
     optimizer="Adam",
-    # 一些梯度截断可以提升训练开始时的稳定性
+    # 梯度截断可以提升训练开始时的稳定性
     clip_gradients=params.gradient_clipping_norm,
     summaries=["learning_rate", "loss", "gradients", "gradient_norm"])
 predictions = tf.argmax(logits, axis=1)
@@ -301,9 +303,9 @@ return model_fn_lib.ModelFnOps(
     eval_metric_ops={"accuracy": tf.metrics.accuracy(targets, predictions)})
 ```
 
-### 训练并估计模型
+### 训练和评估模型
 
-为了训练和评估模型，我们依赖 `Estimator` API，同时使用 `Experiment` API 来训练及评估：
+我们使用 `Estimator` 和 `Experiment` 的 API 来方便地训练和评估我们的模型：
 
 ```python
   estimator = tf.estimator.Estimator(
@@ -326,6 +328,6 @@ return model_fn_lib.ModelFnOps(
       min_eval_frequency=1000)
 ```
 
-注意，本教程只是一个相对较小数据集的简单示例，可让你快速熟悉递归神经网络和估计器的 API。 如果你在大型数据集上进行尝试，这些模型会更加强大。
+这篇教程旨在帮助你熟悉循环神经网络的 API 以及评估器的使用，因而只是在一个比较小的数据集上进行了实验。如果使用更大的数据集的话，模型会取得更加优异的表现。
 
-在对模型进行 1M 步训练时，你可以获得约70％的精确度。值得一提的是，这种精度已经足够好了，因为用户有足够的时间来调整他们的绘图。此外，游戏不仅仅只使用了排名第一的备选项，同时如果目标类别分数高于某个固定的阈值也会接受这个答案。
+训练一百万步之后，你应该能够得到一个准确率约为 70% 的模型。这个结果足以来构建一个快速涂鸦游戏了，因为玩家能够不断地调整他的画作直到被识别。同时，这个游戏不一定要求模型给出完全正确的判断，而只要对应类别的概率高于一定的阈值，就认可玩家的涂鸦。
