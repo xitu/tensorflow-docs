@@ -4,32 +4,26 @@
 
 ## 为什么使用即时编译？
 
-TensorFlow / XLA 即时编译器通过 XLA 编译并运行一部分 TensorFlow 图模型。与标准的 TensorFlow 方法
-相比，XLA 能把多个运算符融合成一系列已编译内核（内核融合）。和 TensorFlow 执行器逐个运行操作符相比，
-融合运算符能减少对内存带宽的要求，提升计算性能。
+TensorFlow / XLA 即时编译器通过 XLA 编译和运行 TensorFlow 图的各个部分。与标准的 TensorFlow 实现相比，XLA 的好处是可以将多个运算符（内核融合）融合到少量的编译内核中。与 TensorFlow 逐个运行操作相比，融合运算能减少对内存带宽的要求，同时提升性能。
 
-## 通过 XLA 计算 TensorFlow 图模型
+## 通过 XLA 运行 TensorFlow 图
 
-通过 XLA 计算 TensorFlow 图模型的方式有两种：一是用 CPU 或 GPU 设备上的即时编译操作符，二是
-把操作符放到 XLA_CPU 或 XLA_GPU TensorFlow 设备上。把操作符直接放到一个 TensorFlow XLA
-设备上将强制执行此操作符，因此这种方法主要用于测试。
+有两种方式通过 XLA 运行 TensorFlow 计算图：一是用 CPU 或 GPU 设备上的即时编译操作，二是把操作放到 `XLA_CPU` 或 `XLA_GPU` TensorFlow 设备上。将操作直接放到一个 TensorFlow XLA
+设备上强制执行，因此这种方法主要用于测试。
 
-> 注意：大部分情况下，XLA CPU 底层会生成快速、单线程的代码，但是不会如 TensorFlow CPU 底层一样并行化。 XLA GPU 后端与标准的 TensorFlow 后端大相径庭，运行速度时快时慢。
+> 注意：XLA CPU 后端会生成快速、单线程的代码，但是不会如 TensorFlow CPU 后端一样并行化。 XLA GPU 后端与标准的 TensorFlow 后端充分竞争，运行速度时快时慢。
 
 ### 开启即时编译
 
-即时编译可以从会话层开启，或选定操作运算手动开启。两种方式都是零拷贝的 --- 数据在同台设备的
-已编译 XLA 内核和 TensorFlow 操作符之间传递时，无需另行复制。
+即时编译可以在会话层开启，或手动进行选择操作。两种方式都是零拷贝 --- 数据在同台设备的已编译 XLA 内核和 TensorFlow 操作之间传递时，无需另行复制。
 
-#### 会话层开启
+#### 会话
 
-在会话层开启即时编译时，系统将尽可能把所有操作符编译成 XLA 计算操作。每个 XLA 计算操作将被编译
-成单个或多个设备底层内核。
+在会话层开启即时编译时，系统将尽可能把所有操作编译成 XLA 计算。每个 XLA 计算将被编译成单个或多个设备底层内核。
 
-受某些限制影响，如果图模型中有两个相邻的操作符都要使用 XLA，它们将会被编译成单个 XLA 计算。
+受某些限制影响，如果图模型中有两个相邻的操作都要使用 XLA，它们将会被编译成单个 XLA 计算。
 
-只需通过把 `global_jit_level` 设置成 `tf.OptimizerOptions.ON_1`，并在会话初始化阶段传入
-配置，就可以在会话层开启即时编译。
+通过将 `global_jit_level` 设置成`tf.OptimizerOptions.ON_1`，并在会话初始化阶段传入配置，就可以在会话层开启即时编译。
 
 ```python
 # 配置开启即时编译
@@ -39,14 +33,12 @@ config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON
 sess = tf.Session(config=config)
 ```
 
-> 注意：在会话层开启即时编译将不会导致为 CPU 编译操作符。CPU 运算的即时编译必须通过下面描述的手
-动方法开启，原因在于 CPU 底层是单线程的。
+> 注意：在会话层开启即时编译将不会导致为 CPU 编译操作。CPU 运算的即时编译必须通过下面描述的手动方法开启，原因在于 CPU 后端是单线程的。
 
 #### 手动开启
 
-对于单个或多个操作符，可以手动开启即时编译，只需要通过给要编译的操作符的 `_XlaCompile=true` 属性
-做标记。最简单的方法就是通过 [`tensorflow/contrib/compiler/jit.py`](https://www.tensorflow.org/code/tensorflow/contrib/compiler/jit.py)
-里定义的 `tf.contrib.compiler.jit.experimental_jit_scope()` 。
+对于单个或多个操作，可以手动开启即时编译，通过对运算进行标记以使用属性 `_XlaCompile=true` 来进行编译。最简单的方法就是通过在 [`tensorflow/contrib/compiler/jit.py`](https://www.tensorflow.org/code/tensorflow/contrib/compiler/jit.py)
+中定义的 `tf.contrib.compiler.jit.experimental_jit_scope()` 。
 使用范例：
 
 ```python
@@ -57,35 +49,31 @@ sess = tf.Session(config=config)
       y = tf.add(x, x)  # add 将被 XLA 编译
 ```
 
-目前，`_XlaCompile` 属性并未支持所有操作符。如果一个操作符无法编译，TensorFlow 将默认退回到常规方法。
+`_XlaCompile` 属性目前是以最佳的方式支持的。如果一个操作无法编译，TensorFlow 将默认回退到常规实现。
 
-### 将操作符加载到 XLA 设备中
+### 将操作加载到 XLA 设备中
 
-另一个通过 XLA 执行计算的方式是将操作符载入到特定的 XLA 设备中。这个方法通常只用于测试。可行设备
-包括 `XLA_CPU` 或 `XLA_GPU`。
+通过 XLA 执行计算的另一种方法是将操作载入到特定的 XLA 设备上。这个方法通常只用于测试。有效设备包括 `XLA_CPU` 或 `XLA_GPU`。
 
 ```python
 with tf.device("/job:localhost/replica:0/task:0/device:XLA_GPU:0"):
   output = tf.add(input1, input2)
 ```
 
-不同于标准 CPU 和 GPU 设备上的即时编译，这些设备在传入和传出数据时需要建立数据副本。这个副本导致
-在同一个图模型中混合使用 XLA 和 TensorFlow 操作符的开销变得很大。
+不同于标准 CPU 和 GPU 设备上的即时编译，这些设备在传输到设备上和关闭设备时，会生成一个数据副本。额外的拷贝导致在同一个图模型中混合使用 XLA 和 TensorFlow 操作的开销变得很大。
 
 ## 教程
 
 这个教程涵盖了一个简单版的 MNIST softmax 训练模型。在会话层开启了即时编译，只支持 GPU。
 
-在开始前，先确认 LD_LIBRARY 环境变量或者 ldconfig 包括了有用于 CUDA 特征描述
-[(CUPTI)](http://docs.nvidia.com/cuda/cupti/index.html) 的
-工具库 `$CUDA_ROOT/extras/CUPTI/lib64`。TensorFlow 用 CUPTI 从 GPU 获取追踪信息。
+在开始本教程之前，先验证 LD_LIBRARY 环境变量或者 ldconfig 包含 `$CUDA_ROOT/extras/CUPTI/lib64`，其中包含 CUDA 分析工具接口库
+[(CUPTI)](http://docs.nvidia.com/cuda/cupti/index.html)。TensorFlow 使用 CUPTI 从 GPU 获取追踪信息。
 
 ### 步骤 #1: 准备代码范例
 
-下载或把[mnist_softmax_xla.py](https://www.tensorflow.org/code/tensorflow/examples/tutorials/mnist/mnist_softmax_xla.py)
-放到 TensorFlow 源码之外的文件夹内。
+下载或移动 [mnist_softmax_xla.py](https://www.tensorflow.org/code/tensorflow/examples/tutorials/mnist/mnist_softmax_xla.py) 到 TensorFlow 源码之外的文件夹中。
 
-### 步骤 #2: 不用 XLA 运行代码
+### 步骤 #2: 无 XLA 运行
 
 执行 python 代码，不用 XLA 训练模型。
 
@@ -93,21 +81,20 @@ with tf.device("/job:localhost/replica:0/task:0/device:XLA_GPU:0"):
 python mnist_softmax_xla.py --xla=''
 ```
 
-用 Chrome 事件追踪特征描述器 (导航到 chrome://tracing)，当代码执行完时打开时间线文件 `timeline.ctf.json`。
-渲染出来的时间线应该和下图相似，可能跨多个 GPU 有一些标有 `MatMul` 的绿块。
+使用 Chrome 跟踪事件探查器 (导航到 chrome://tracing)，当代码执行完时打开时间线文件 `timeline.ctf.json`。呈现的时间线类似于下图，其中有多个绿色框，标记为 `MatMul`，可能跨多个 GPU 。
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="https://www.tensorflow.org/images/jit_timeline_gpu.png">
 </div>
 
 ### 步骤 #3：用 XLA 运行代码
 
-执行 python 代码，用 XLA 训练模型。打开 XLA 调试工具，用环境变量输出 XLA 图。
+执行 python 代码，用 XLA 训练模型，并打开 XLA 调试工具，用环境变量输出 XLA 图。
 
 ```shell
 TF_XLA_FLAGS=--xla_generate_hlo_graph=.* python mnist_softmax_xla.py
 ```
 
-打开时间线文件(`timeline.ctf.json`)。渲染出来的时间线应该和下图相似，可能有一个标有 `_XlaLaunch`
+打开时间线文件(`timeline.ctf.json`)。呈现的时间线类似于下图，其中有一个标有 `_XlaLaunch`
 的长块。
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="https://www.tensorflow.org/images/jit_timeline_gpu_xla.png">
@@ -121,8 +108,7 @@ pipeline start, before inline]: /tmp/hlo_graph_0.dot
 
 ```
 
-控制台显示了包含 XLA 创建的图模型信息的 `hlo_graph_xx.dot` 文件位置。XLA 融合操作符的过程可以
-从 `hlo_graph_0.dot` 开始逐个查看分析图了解到。
+控制台显示了包含 XLA 创建的图模型信息的 `hlo_graph_xx.dot` 文件位置。XLA 融合操作的过程可以从 `hlo_graph_0.dot` 开始逐个查看分析图了解。
 
 为了将 .dot 文件渲染成 png 格式，需安装
 [GraphViz](http://www.graphviz.org/Download..php) 并运行:

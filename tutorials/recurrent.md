@@ -10,8 +10,7 @@
 
 语言模型是很多有趣难题的关键所在，比如语音识别，机器翻译，图像字幕等。更多的相关资料可以查看[这里](https://karpathy.github.io/2015/05/21/rnn-effectiveness)。
 
-本教程的目的是重现 [Zaremba et al., 2014](https://arxiv.org/abs/1409.2329)
-([pdf](https://arxiv.org/pdf/1409.2329.pdf)) 的结果，它在 PTB 数据集上得到了很棒的质量。
+本教程的目的是重现 [Zaremba et al., 2014](https://arxiv.org/abs/1409.2329) ([pdf](https://arxiv.org/pdf/1409.2329.pdf)) 的结果，它在 PTB 数据集上得到了很棒的质量。
 
 ## 教程文件
 
@@ -123,9 +122,7 @@ word_embeddings = tf.nn.embedding_lookup(embedding_matrix, word_ids)
 
 $$ \text{loss} = -\frac{1}{N}\sum_{i=1}^{N} \ln p_{\text{target}_i} $$
 
-我们可以直接使用现成的 `sequence_loss_by_example` 函数，虽然这实现起来并不难。
-
-论文中的典型衡量标准是每个词语的平均困惑度（perplexity），计算式为
+我们可以直接使用现成的 `sequence_loss_by_example` 函数，虽然这实现起来并不难。论文中的典型衡量标准是每个词语的平均困惑度（perplexity），计算式为
 
 $$e^{-\frac{1}{N}\sum_{i=1}^{N} \ln p_{\text{target}_i}} = e^{\text{loss}} $$
 
@@ -133,9 +130,7 @@ $$e^{-\frac{1}{N}\sum_{i=1}^{N} \ln p_{\text{target}_i}} = e^{\text{loss}} $$
 
 ### 多个 LSTM 层堆叠
 
-要想给模型更强的表达能力，可以添加多层 LSTM 来处理数据。第一层的输出作为第二层的输入，以此类推。
-
-类 MultiRNNCell 可以无缝地将其实现：
+要想给模型更强的表达能力，可以添加多层 LSTM 来处理数据。第一层的输出作为第二层的输入，以此类推。类 MultiRNNCell 可以无缝地将其实现：
 
 ```python
 def lstm_cell():
@@ -171,15 +166,13 @@ cd models/tutorials/rnn/ptb
 python ptb_word_lm.py --data_path=$HOME/simple-examples/data/ --model=small
 ```
 
-这里有 3 个支持的模型配置文件在我们教程的代码里：「small」，「medium」和「large」。它们的区别在于 LSTM 的大小，以及用于训练的超参数集。
-
-模型越大，得到的结果应该更好。在测试集中 `small` 模型应该可以达到低于 120 的困惑度（perplexity），`large` 模型则是低于 80，但它可能花费数小时来训练。
+这里有 3 个支持的模型配置文件在我们教程的代码里：「small」，「medium」和「large」。它们的区别在于 LSTM 的大小，以及用于训练的超参数集。模型越大，得到的结果应该更好。在测试集中 `small` 模型应该可以达到低于 120 的困惑度（perplexity），`large` 模型则是低于 80，但它可能花费数小时来训练。
 
 ## 除此之外
 
 还有几个优化模型的技巧没有提到，包括：
 
-* 降低学习率计划表。
-* 在 LSTM 层间使用 dropout。
+- 降低学习率计划表。
+- 在 LSTM 层间使用 dropout。
 
 继续学习和更改代码以进一步改善模型吧。

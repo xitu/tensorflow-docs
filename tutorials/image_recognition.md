@@ -1,18 +1,10 @@
 # 图像识别
 
-我们的大脑视觉成像似乎很容易。区分狮子和美洲豹，识别路标或者辨认人脸这些行为对于人来说都是小菜一碟。
-但是对于计算机来说有些问题真的太难解决了：但是这仅仅是因为我们的大脑在识别图像这方面实力超群。
+我们的大脑视觉成像似乎很容易。区分狮子和美洲豹，识别路标或者辨认人脸这些行为对于人来说都是小菜一碟。但是对于计算机来说有些问题真的太难解决了：但是这仅仅是因为我们的大脑在识别图像这方面实力超群。
 
-在过去的几年中，机器学习领域在解决这些困难的问题方面取得了巨大的进步。
-尤其是，我们已经发现了一种叫做深度 [卷积神经网络](https://colah.github.io/posts/2014-07-Conv-Nets-Modular/) 的
-模型，它在强图像识别任务上的表现已经非常可观--即在一些领域已经有了相当或超过人类的表现。
+在过去的几年中，机器学习领域在解决这些困难的问题方面取得了巨大的进步。尤其是，我们已经发现了一种叫做深度 [卷积神经网络](https://colah.github.io/posts/2014-07-Conv-Nets-Modular/) 的模型，它在强图像识别任务上的表现已经非常可观--即在一些领域已经有了相当或超过人类的表现。
 
-计算机视觉的研究人员将他们的成果和 [ImageNet](http://www.image-net.org)（一个计算机视觉的理论基准测试程序）
-进行校验和对抗，结果表明他们已经取得了稳定的进步。
-这些有继承关系的模型持续的展示着它们的进步，并且每次都会产生新的成果：
-[QuocNet]，[AlexNet]，[Inception (GoogLeNet)]，[BN-Inception-v2]。
-Google 内部和外部的研究人员也都发表了一些论文来描述所有的这些模型，但是成果仍然很难再现。
-我们接下来要做的就是运行我们最新的图像识别模型--[Inception-v3]。
+计算机视觉的研究人员将他们的成果和 [ImageNet](http://www.image-net.org)（一个计算机视觉的理论基准测试程序）进行校验和对抗，结果表明他们已经取得了稳定的进步。这些有继承关系的模型持续的展示着它们的进步，并且每次都会产生新的成果：[QuocNet]，[AlexNet]，[Inception (GoogLeNet)]，[BN-Inception-v2]。Google 内部和外部的研究人员也都发表了一些论文来描述所有的这些模型，但是成果仍然很难再现。我们接下来要做的就是运行我们最新的图像识别模型--[Inception-v3]。
 
 [QuocNet]: https://static.googleusercontent.com/media/research.google.com/en//archive/unsupervised_icml2012.pdf
 [AlexNet]: https://www.cs.toronto.edu/~fritz/absps/imagenet.pdf
@@ -20,37 +12,28 @@ Google 内部和外部的研究人员也都发表了一些论文来描述所有�
 [BN-Inception-v2]: https://arxiv.org/abs/1502.03167
 [Inception-v3]: https://arxiv.org/abs/1512.00567
 
-Inception-v3 从 2012 年就开始使用数据针对 [ImageNet] 这个
-大型视觉挑战任务训练了。
-将所有的图片分成像『斑马』，『达尔马西亚狗』，『洗碗工』等 [1000 个类别] 是计算机视觉领域的一个标准任务，
-例如下面这些图片就是 [AlexNet] 模型分类的结果：
+Inception-v3 从 2012 年就开始使用数据针对 [ImageNet] 这个大型视觉挑战任务训练了。将所有的图片分成像『斑马』，『达尔马西亚狗』，『洗碗工』等 [1000 个类别] 是计算机视觉领域的一个标准任务，例如下面这些图片就是 [AlexNet] 模型分类的结果：
 
 <div style="width:50%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="https://www.tensorflow.org/images/AlexClassification.png">
 </div>
 
-为了和其他模型进行比较，我们通过检查，将前五次测试中模型未能正确预测的频率称作--
-"前五误差率"。[AlexNet] 在 2012 年验证数据集上的前五误差率是 15.3%；[Inception (GoogLeNet)] 
-是 6.67%；[BN-Inception-v2] 是 4.9%；[Inception-v3] 则达到了 3.46%。
+为了和其他模型进行比较，我们通过检查，将前五次测试中模型未能正确预测的频率称作--"前五误差率"。[AlexNet] 在 2012 年验证数据集上的前五误差率是 15.3%；[Inception (GoogLeNet)] 是 6.67%；[BN-Inception-v2] 是 4.9%；[Inception-v3] 则达到了 3.46%。
 
-> 人类在 ImageNet 挑战上的表现如何呢？这里有一篇 Andrej Karpathy 写的 [博客]。
-他自己的前五误差率是 5.1%。
+> 人类在 ImageNet 挑战上的表现如何呢？这里有一篇 Andrej Karpathy 写的 [博客]。他自己的前五误差率是 5.1%。
 
 [ImageNet]: http://image-net.org/
 [1000 classes]: http://image-net.org/challenges/LSVRC/2014/browse-synsets
 [博客]: https://karpathy.github.io/2014/09/02/what-i-learned-from-competing-against-a-convnet-on-imagenet/
 
-本文将会教你如何使用 [Inception-v3]。你将学习到如何使用 Python 或 C++ 
-把图片分成 [1000 种类别]。同时，我们也会讨论如何从这个可以用于其他视觉任务的模型中
-提取出更高层的特征。
+本文将会教你如何使用 [Inception-v3]。你将学习到如何使用 Python 或 C++ 把图片分成 [1000 种类别]。同时，我们也会讨论如何从这个可以用于其他视觉任务的模型中提取出更高层的特征。
 
 让我们来看一看社区是如何使用这个模型的。
 
 
 ## Python API 的使用
 
-`classify_image.py` 这个程序在第一次运行的时候会从 `tensorflow.org` 上下载训练好的模型。
-你需要保证你的硬盘有 200M 的可用空间。
+`classify_image.py` 这个程序在第一次运行的时候会从 `tensorflow.org` 上下载训练好的模型。你需要保证你的硬盘有 200M 的可用空间。
 
 从 clone [TensorFlow models repo](https://github.com/tensorflow/models) 这个项目开始。运行下面的命令：
 
@@ -73,23 +56,18 @@ Inception-v3 从 2012 年就开始使用数据针对 [ImageNet] 这个
 
 如果你想使用 JPEG 类型的图片，那么你需要编辑 `--image_file` 这个参数。
 
-> 如果你下载的模型数据在另一个目录，那么
-你需要通过 `--model_dir` 来指定那个目录。
+> 如果你下载的模型数据在另一个目录，那么你需要通过 `--model_dir` 来指定那个目录。
 
 ## C++ API 的使用
 
-你可以在生产环境运行 C++ 版本的 [Inception-v3] 模型。
-你还可以下载包含 GraphDef 的归档，GraphDef 可以像这样定义模型（在 TensorFlow 的根目录下运行）：
+你可以在生产环境运行 C++ 版本的 [Inception-v3] 模型。你还可以下载包含 GraphDef 的归档，GraphDef 可以像这样定义模型（在 TensorFlow 的根目录下运行）：
 
 ```bash
 curl -L "https://storage.googleapis.com/download.tensorflow.org/models/inception_v3_2016_08_28_frozen.pb.tar.gz" |
   tar -C tensorflow/examples/label_image/data -xz
 ```
 
-下一步我们需要编译包含载入和运行 graph 代码的 C++ 库。
-如果你做过了
-@{$install_sources$the instructions to download the source installation of TensorFlow}
-这一步，你应该就可以通过在你的终端中运行下面的的命令来编译示例了：
+下一步我们需要编译包含载入和运行 graph 代码的 C++ 库。如果你做过了 @{$install_sources$the instructions to download the source installation of TensorFlow} 这一步，你应该就可以通过在你的终端中运行下面的的命令来编译示例了：
 
 ```bash
 bazel build tensorflow/examples/label_image/...
@@ -110,9 +88,7 @@ I tensorflow/examples/label_image/main.cc:206] academic gown (401): 0.0103579
 I tensorflow/examples/label_image/main.cc:206] pickelhaube (716): 0.00800814
 I tensorflow/examples/label_image/main.cc:206] bulletproof vest (466): 0.00535088
 ```
-在这种情况下，我们使用默认图片 [Admiral Grace Hopper](https://en.wikipedia.org/wiki/Grace_Hopper)，
-你可以看到网络使用 0.8 的高分正确的标识出了她穿的是军装。
-
+在这种情况下，我们使用默认图片 [Admiral Grace Hopper](https://en.wikipedia.org/wiki/Grace_Hopper)，你可以看到网络使用 0.8 的高分正确的标识出了她穿的是军装。
 
 <div style="width:45%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="https://www.tensorflow.org/images/grace_hopper.jpg">
@@ -124,25 +100,14 @@ I tensorflow/examples/label_image/main.cc:206] bulletproof vest (466): 0.0053508
 bazel-bin/tensorflow/examples/label_image/label_image --image=my_image.png
 ```
 
-如果你仔细浏览 [`tensorflow/examples/label_image/main.cc`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/label_image/main.cc)
-这个文件，你可以看到
-它是如何工作的。我们希望这部分代码会帮助你将 TensorFlow 整合到
-你自己的应用中，所以我们会通过这些主要的函数一步一步的向你展示：
+如果你仔细浏览 [`tensorflow/examples/label_image/main.cc`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/label_image/main.cc)这个文件，你可以看到它是如何工作的。我们希望这部分代码会帮助你将 TensorFlow 整合到你自己的应用中，所以我们会通过这些主要的函数一步一步的向你展示：
 
 `input_mean` from each pixel value, then divide it by `input_std`.
-命令行参数控制着文件从哪里载入以及输入图片的属性。
-模型希望得到的是 299x299 的 RGB 图片，所以有 `input_width` 和 `input_height` 参数。
-同时我们也需要将 0 到 255 的整型像素值缩放成 graph 操作的浮点数值。
-我们通过控制 `input_mean` 和 `input_std` 这两个参数来控制缩放的比例：首先从
-每一个像素值中减去 `input_mean` 这个值，然后再除以 `input_std`。
+命令行参数控制着文件从哪里载入以及输入图片的属性。模型希望得到的是 299x299 的 RGB 图片，所以有 `input_width` 和 `input_height` 参数。同时我们也需要将 0 到 255 的整型像素值缩放成 graph 操作的浮点数值。我们通过控制 `input_mean` 和 `input_std` 这两个参数来控制缩放的比例：首先从每一个像素值中减去 `input_mean` 这个值，然后再除以 `input_std`。
 
-这些数值是不是看起来很神奇，其实它们都只是原始模型的作者基于他或者她
-训练模型使用的输入图片设定好的值。
-如果你有一个你自己训练的 graph，那么你就需要
-在训练过程中调节这些值来匹配你使用过的值。
+这些数值是不是看起来很神奇，其实它们都只是原始模型的作者基于他或者她训练模型使用的输入图片设定好的值。如果你有一个你自己训练的 graph，那么你就需要在训练过程中调节这些值来匹配你使用过的值。
 
-你可以看到 [`ReadTensorFromImageFile()`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/label_image/main.cc#L88) 
-这个函数是如何应用在一张图片上的。
+你可以看到 [`ReadTensorFromImageFile()`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/label_image/main.cc#L88) 这个函数是如何应用在一张图片上的。
 
 ```C++
 // 给定一张图片的文件名，读取它的数据，接着按照图片来解码，
@@ -163,13 +128,8 @@ Status ReadTensorFromImageFile(string file_name, const int input_height,
       tensorflow::ops::ReadFile(tensorflow::ops::Const(file_name, b.opts()),
                                 b.opts().WithName(input_name));
 ```
-然后创建我们想要运行和加载的小模型的节点，重新调整大小并把像素值缩放成主模型想要的数据。
-我们创建的第一个节点仅仅是一个 `Const` 操作，它保存着我们想要载入的图片的文件名的 tensor。
-然后传给 `ReadFile` 这个操作当做第一个输入。或许你会注意到我们把 `b.opts()` 这个参数当做
-最后一个参数传递给所有的创建函数。这个参数可以确保节点被添加到 `GraphDefBuilder` 定义的模型中。
-同时我们也通过 `b.opts()` 调用 `WithName()` 来给 `ReadFile` 这个操作命名。
-这个操作给了节点一个名字，当然了，这个操作其实并不是强制的，即使如果你不这样做，
-程序也会自动分配一个名字，但是这样不利于调试。
+然后创建我们想要运行和加载的小模型的节点，重新调整大小并把像素值缩放成主模型想要的数据。我们创建的第一个节点仅仅是一个 `Const` 操作，它保存着我们想要载入的图片的文件名的 tensor。然后传给 `ReadFile` 这个操作当做第一个输入。或许你会注意到我们把 `b.opts()` 这个参数当做最后一个参数传递给所有的创建函数。这个参数可以确保节点被添加到 `GraphDefBuilder` 定义的模型中。
+同时我们也通过 `b.opts()` 调用 `WithName()` 来给 `ReadFile` 这个操作命名。这个操作给了节点一个名字，当然了，这个操作其实并不是强制的，即使如果你不这样做，程序也会自动分配一个名字，但是这样不利于调试。
 
 
 ```C++
@@ -227,18 +187,11 @@ Status ReadTensorFromImageFile(string file_name, const int input_height,
   TF_RETURN_IF_ERROR(session->Run({}, {output_name}, {}, out_tensors));
   return Status::OK();
 ```
-然后我们创建一个 @{tf.Session}
-对象，这个对象是真正运行 graph 的接口，并且指明了我们想要从哪个节点得到输出
-以及把输出的数据推送的哪里。
+然后我们创建一个 @{tf.Session}对象，这个对象是真正运行 graph 的接口，并且指明了我们想要从哪个节点得到输出以及把输出的数据推送的哪里。
 
-它给了我们 `Tensor` 对象的一个向量，在我们知道的情况下它仅仅是一个单个的对象。你可以
-把 `Tensor` 想象成一个在这个上下文中的多维数组，它高 299 像素，宽 299 像素，图片的三个通道
-都是浮点数值。如果你在你的产品中已经有了自己的图片处理框架，那么你应该能够用它来替代，
-只要你在给主要的 graph 供给图片之前做同样的转换就可以了。
+它给了我们 `Tensor` 对象的一个向量，在我们知道的情况下它仅仅是一个单个的对象。你可以把 `Tensor` 想象成一个在这个上下文中的多维数组，它高 299 像素，宽 299 像素，图片的三个通道都是浮点数值。如果你在你的产品中已经有了自己的图片处理框架，那么你应该能够用它来替代，只要你在给主要的 graph 供给图片之前做同样的转换就可以了。
 
-这是一个用 C++ 创建小型 TensorFlow 动态 graph 的示例，
-但是对于预训练的 Inception 模型我们想要从文件中载入更清晰的图片。
-你可以在 `LoadGraph()` 这个函数中看到我们是怎么做的。
+这是一个用 C++ 创建小型 TensorFlow 动态 graph 的示例，但是对于预训练的 Inception 模型我们想要从文件中载入更清晰的图片。你可以在 `LoadGraph()` 这个函数中看到我们是怎么做的。
 
 ```C++
 // 从硬盘读取一个模型 graph 的定义，
@@ -253,8 +206,7 @@ Status LoadGraph(string graph_file_name,
                                         graph_file_name, "'");
   }
 ```
-如果你已经看过了加载图片的代码，那么你会发现大部分的术语都很熟悉。
-我们并没有使用 `GraphDefBuilder` 来生产一个 `GraphDef` 对象，而是直接加载一个包含 `GraphDef` 的 protobuf 文件。
+如果你已经看过了加载图片的代码，那么你会发现大部分的术语都很熟悉。我们并没有使用 `GraphDefBuilder` 来生产一个 `GraphDef` 对象，而是直接加载一个包含 `GraphDef` 的 protobuf 文件。
 
 ```C++
   session->reset(tensorflow::NewSession(tensorflow::SessionOptions()));
@@ -265,13 +217,9 @@ Status LoadGraph(string graph_file_name,
   return Status::OK();
 }
 ```
-然后我们用 `GraphDef` 创建一个 Session 对象，
-并把这个对象传递给调用者，这样他们就可以随后再来运行了。
+然后我们用 `GraphDef` 创建一个 Session 对象，并把这个对象传递给调用者，这样他们就可以随后再来运行了。
 
-`GetTopLabels()` 这个函数和图片载入的函数很像，在这种情况下，我们想要获得运行主 graph 的结果，
-并且把它转化成一个有最高分标签的有序列表。就像图片加载器一样，它创建了一个 `GraphDefBuilder`，
-添加了一些节点，并且运行了一个短的 graph 来获得一对 tensors 的输出。
-在这种情况下他们代表着有序的得分以及最高分结果的下标位置。
+`GetTopLabels()` 这个函数和图片载入的函数很像，在这种情况下，我们想要获得运行主 graph 的结果，并且把它转化成一个有最高分标签的有序列表。就像图片加载器一样，它创建了一个 `GraphDefBuilder`，添加了一些节点，并且运行了一个短的 graph 来获得一对 tensors 的输出。在这种情况下他们代表着有序的得分以及最高分结果的下标位置。
 
 ```C++
 // 分析 Inception graph 的输出信息，并且在它们相关的分类上获取
@@ -299,12 +247,10 @@ Status GetTopLabels(const std::vector<Tensor>& outputs, int how_many_labels,
   *indices = out_tensors[1];
   return Status::OK();
 ```
-`PrintTopLabels()` 这个函数获取了那些有序的结果，然后把它们友好的打印了出来。
-`CheckTopLabel()` 这个函数也是老熟人了，但是为了调试，我们还是要确定下
-最顶部的标签就是我们最想要的那个。
 
-最后，[`main()`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/label_image/main.cc#L252)
-函数会把所有这些调用都整理在一起。
+`PrintTopLabels()` 这个函数获取了那些有序的结果，然后把它们友好的打印了出来。`CheckTopLabel()` 这个函数也是老熟人了，但是为了调试，我们还是要确定下最顶部的标签就是我们最想要的那个。
+
+最后，[`main()`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/label_image/main.cc#L252)函数会把所有这些调用都整理在一起。
 
 ```C++
 int main(int argc, char* argv[]) {
@@ -341,6 +287,7 @@ int main(int argc, char* argv[]) {
   }
   const Tensor& resized_tensor = resized_tensors[0];
 ```
+
 载入，缩放以及处理输入的图片。
 
 ```C++
@@ -353,6 +300,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 ```
+
 这里我们运行使用图片作为输入的已经载入的 graph。
 
 ```C++
@@ -372,12 +320,14 @@ int main(int argc, char* argv[]) {
     }
   }
 ```
+
 为了测试，我们检查一下以确保我们得到了我们想要的结果。
 
 ```C++
   // 用我们生成的结果做一些有趣的事情。
   Status print_status = PrintTopLabels(outputs, FLAGS_labels);
 ```
+
 最终我们把我们找到的标签打印出来。
 
 ```C++
@@ -387,31 +337,15 @@ int main(int argc, char* argv[]) {
   }
 ```
 
-这里的异常处理是使用 TensorFlow 的 `Status` 对象，`Status` 对象使用起来非常方便，因为
-它的 `ok()` 检查器可以让你知道是否有任何异常发生，并且还可以以可读的错误信息的形式
-把它们打印出来。
+这里的异常处理是使用 TensorFlow 的 `Status` 对象，`Status` 对象使用起来非常方便，因为它的 `ok()` 检查器可以让你知道是否有任何异常发生，并且还可以以可读的错误信息的形式把它们打印出来。
 
-这里我们只展示了目标识别，但是你应该能够在各种各样的领域中以及任何你发现或者你自己训练的模型中使用这些
-相似的代码。
+这里我们只展示了目标识别，但是你应该能够在各种各样的领域中以及任何你发现或者你自己训练的模型中使用这些相似的代码。
 
-> **练习**：迁移学习是这样的一种概念，就是如果你知道如何解决好这个问题，
-那么你应该能够把一些解决相关问题的理念和方法迁移过去。
-一种表现迁移学习的方法是移除网络最后一个分类层，并且提取出 
-[next-to-last layer of the CNN](https://arxiv.org/abs/1310.1531)，在这种情况下，就是一个 2048 维的向量。
-这里有一篇如何这样做的指南 @{$image_retraining$in the how-to section}。
+> **练习**：迁移学习是这样的一种概念，就是如果你知道如何解决好这个问题，那么你应该能够把一些解决相关问题的理念和方法迁移过去。一种表现迁移学习的方法是移除网络最后一个分类层，并且提取出 [next-to-last layer of the CNN](https://arxiv.org/abs/1310.1531)，在这种情况下，就是一个 2048 维的向量。这里有一篇如何这样做的指南 @{$image_retraining$in the how-to section}。
 
+## 进一步学习的资源
 
-## 延伸学习的资源
-
-学习更多的通用神经网络，Michael Nielsen 的
-[免费在线书籍](http://neuralnetworksanddeeplearning.com/chap1.html)
-是一个很不错的资源。在卷积神经网络方面，
-Chris Olah 有一些
-[很棒的博客](https://colah.github.io/posts/2014-07-Conv-Nets-Modular/)，
-Michael Nielsen 的书中也有一章
-[great chapter](http://neuralnetworksanddeeplearning.com/chap6.html)
-也包含了这部分内容。
-
+学习更多的通用神经网络，Michael Nielsen 的[免费在线书籍](http://neuralnetworksanddeeplearning.com/chap1.html)是一个很不错的资源。在卷积神经网络方面，Chris Olah 有一些[很棒的博客](https://colah.github.io/posts/2014-07-Conv-Nets-Modular/)，Michael Nielsen 的书中也有 [一章](http://neuralnetworksanddeeplearning.com/chap6.html) 也包含了这部分内容。
 
 更多的关于实现卷积神经网络的资源，你可以去 TensorFlow @{$deep_cnn$deep convolutional networks tutorial} 查看，或者跟随我们的 @{$layers$MNIST starter tutorial} 入门指南来来学习。最后，如果你想快速提升在这个领域的研究，可以阅读本篇指南引用的所有论文以及他们近期的工作。
 

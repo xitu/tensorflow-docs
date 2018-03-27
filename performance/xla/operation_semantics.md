@@ -1,42 +1,32 @@
 # 操作语义
 
-本文档描述了操作的语义，即 [`ComputationBuilder`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 接口中所定义的那些操作的语义。通常来说，这些操作与 [`xla_data.proto`](https://www.tensorflow.org/code/tensorflow/compiler/xla/xla_data.proto) 中的 RPC 接口所定义的那些操作是一一对应的。
+本文档介绍了在 [`ComputationBuilder`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 接口中定义的操作语义。通常来说，这些操作与 [`xla_data.proto`](https://www.tensorflow.org/code/tensorflow/compiler/xla/xla_data.proto) 中 RPC 接口所定义的操作是一一对应的。
 
-关于术语：XLA 通常所处理的数据类型为元素类型一致的 N-维数组（比如元素全是 32 比特浮点类型）。在本文档中，**数组** 一词用于表示任意维度的数组。为方便起见，那些特例则使用人们约定俗成的更具体的名称；比如，1维数组称为**向量**，2维数组称为**矩阵**。
+关于术语：广义数据类型 XLA 处理的是一个 N - 维数组，其元素均为某种数据类型（如 32 位浮点数）。在本文档中，**数组** 表示任意维度的数组。为方便起见，有些特例使用人们约定俗成的更具体和更熟悉的名称；比如，1 维数组称为**向量**，2 维数组称为**矩阵**。
 
 ## BatchNormGrad
 
-See also
+算法详情参见 
 [`ComputationBuilder::BatchNormGrad`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)
-and [the original batch normalization paper](https://arxiv.org/abs/1502.03167)
-for a detailed description of the algorithm.
+和 [batch normalization 原始论文](https://arxiv.org/abs/1502.03167)。
 
-Calculates gradients of batch norm.
+计算 batch norm 的梯度
 
 <b> `BatchNormGrad(operand, scale, mean, variance, grad_output, epsilon, feature_index)` </b>
 
-| Arguments       | Type                    | Semantics                        |
+| 类型             | 类型                    | 语义                              |
 | --------------  | ----------------------- | -------------------------------- |
-| `operand`       | `ComputationDataHandle` | n dimensional array to be        |
-:                 :                         : normalized (x)                   :
-| `scale`         | `ComputationDataHandle` | 1 dimensional array              |
-:                 :                         : (\\(\gamma\\))                   :
-| `mean`          | `ComputationDataHandle` | 1 dimensional array (\\(\mu\\))  |
-| `variance`      | `ComputationDataHandle` | 1 dimensional array              |
-:                 :                         : (\\(\sigma^2\\))                 :
-| `grad_output`   | `ComputationDataHandle` | Gradients passed to              |
-:                 :                         : `BatchNormTraining`              :
-:                 :                         : (\\( \nabla y\\))                :
-| `epsilon`       | `float`                 | Epsilon value (\\(\epsilon\\))   |
-| `feature_index` | `int64`                 | Index to feature dimension in    |
-:                 :                         : `operand`                        :
+| `operand`       | `ComputationDataHandle` | 待归一化的 n 维数组 （x）            |
+| `scale`         | `ComputationDataHandle` | 1 维数组 (\\(\gamma\\))           |
+| `mean`          | `ComputationDataHandle` | 1 维数组 (\\(\mu\\))              |
+| `variance`      | `ComputationDataHandle` | 1 维数组 (\\(\sigma^2\\))         |
+| `grad_output`   | `ComputationDataHandle` | 传入 `BatchNormTraining` 的梯度(\\( \nabla y\\)) |
+| `epsilon`       | `float`                 | ε 值 (\\(\epsilon\\))            |
+| `feature_index` | `int64`                 |`operand` 中的特征维数索引          |
 
-For each feature in the feature dimension (`feature_index` is the index for the
-feature dimension in `operand`), the operation calculates the gradients with
-respect to `operand`, `offset` and `scale` across all the other dimensions. The
-`feature_index` must be a valid index for the feature dimension in `operand`.
+对于特征维数中的每一个特征（`feature_index` 即 `operand` 中特征维度的索引），此操作计算 `operand` 的梯度、在所有其他维度上的 `offset` 和 `scale`。`feature_index` 必须是 `operand` 中特征维度的合法索引。
 
-The three gradients are defined by the following formulas:
+如下公式定义了三个渐变：
 
 \\( \nabla x = \nabla y * \gamma * \sqrt{\sigma^2+\epsilon} \\)
 
@@ -44,135 +34,101 @@ The three gradients are defined by the following formulas:
 
 \\( \nabla \beta = sum(\nabla y) \\)
 
-The inputs `mean` and `variance` represents moments value
-across batch and spatial dimensions.
+输入 `mean` 和 `variance` 表示在批处理和空间维度上的矩值。
 
-The output type is a tuple of three handles:
+输出类型是包含三个句柄的元组：
 
-|Outputs       | Type                    | Semantics                           |
+|输出           | 类型                    | 语义                                 |
 |------------- | ----------------------- | ------------------------------------|
-|`grad_operand`| `ComputationDataHandle` | gradient with respect to input      |
-:              :                         : `operand`                           :
-|`grad_scale`  | `ComputationDataHandle` | gradient with respect to input      |
-:              :                         : `scale`                             :
-|`grad_offset` | `ComputationDataHandle` | gradient with respect to input      |
-:              :                         : `offset`                            :
+|`grad_operand`| `ComputationDataHandle` | 输入 `operand` 的梯度                 |
+|`grad_scale`  | `ComputationDataHandle` | 输入 `scale` 的梯度                   |
+|`grad_offset` | `ComputationDataHandle` | 输入 `offset` 的梯度                  |
 
 
 ## BatchNormInference
 
-See also
+算法详情参见
 [`ComputationBuilder::BatchNormInference`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) and
-[the original batch normalization paper](https://arxiv.org/abs/1502.03167)
-for a detailed description of the algorithm.
+[batch normalization 原始论文](https://arxiv.org/abs/1502.03167)。
 
-Normalizes an array across batch and spatial dimensions.
+在批处理和空间维度上归一化数组。
 
 <b> `BatchNormInference(operand, scale, offset, mean, variance, epsilon, feature_index)` </b>
 
-| Arguments       | Type                    | Semantics                       |
+| 参数             | 类型                    | 语义                             |
 | --------------  | ----------------------- | ------------------------------- |
-| `operand`       | `ComputationDataHandle` | n dimensional array to be       |
-:                 :                         : normalized                      :
-| `scale`         | `ComputationDataHandle` | 1 dimensional array             |
-| `offset`        | `ComputationDataHandle` | 1 dimensional array             |
-| `mean`          | `ComputationDataHandle` | 1 dimensional array             |
-| `variance`      | `ComputationDataHandle` | 1 dimensional array             |
-| `epsilon`       | `float`                 | Epsilon value                   |
-| `feature_index` | `int64`                 | Index to feature dimension in   |
-:                 :                         : `operand`                       :
+| `operand`       | `ComputationDataHandle` | 待归一化的 n 维数组                |
+| `scale`         | `ComputationDataHandle` | 1 维数组                         |
+| `offset`        | `ComputationDataHandle` | 1 维数组                         |
+| `mean`          | `ComputationDataHandle` | 1 维数组                         |
+| `variance`      | `ComputationDataHandle` | 1 维数组                         |
+| `epsilon`       | `float`                 | ε 值                            |
+| `feature_index` | `int64`                 | `operand` 中的特征维数索引         |
 
-For each feature in the feature dimension (`feature_index` is the index for the
-feature dimension in `operand`), the operation calculates the mean and variance
-across all the other dimensions and uses the mean and variance to normalize each
-element in `operand`. The `feature_index` must be a valid index for the feature
-dimension in `operand`.
+对于特征维数中的每一个特征（`feature_index` 即 `operand` 中特征维度的索引），此操作计算在所有其他维度上的均值和方差，以及使用均值和方差归一化 `operand` 中的每个元素。`feature_index` 必须是 `operand` 中特征维度的合法索引。
 
-`BatchNormInference`  is equivalent to calling `BatchNormTraining` without
-computing `mean` and `variance` for each batch. It uses the input `mean` and
-`variance` instead as estimated values. The purpose of this op is to reduce
-latency in inference, hence the name `BatchNormInference`.
+`BatchNormInference` 等价于在每批次中不计算 `mean` 和 `variance` 的情况下调用 `BatchNormTraining`。它使用 `mean` 和 `variance` 作为估计值。此操作的目的是减少推断中的延迟，因此命名为 `BatchNormInference`。
 
-The output is an n-dimensional, normalized array with the same shape as input
-`operand`.
+输出是一个 N 维的标准化数组，与输入 `operand` 的形状相同。
 
 ## BatchNormTraining
 
-See also
-[`ComputationBuilder::BatchNormTraining`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) and
-[`the original batch normalization paper`](https://arxiv.org/abs/1502.03167)
-for a detailed description of the algorithm.
+算法详情参见
+[`ComputationBuilder::BatchNormTraining`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 和
+[`batch normalization 原始论文`](https://arxiv.org/abs/1502.03167)。
 
-Normalizes an array across batch and spatial dimensions.
+在批处理和空间维度上归一化数组。
 
 <b> `BatchNormTraining(operand, scale, offset, epsilon, feature_index)` </b>
 
-| Arguments       | Type                    | Semantics                        |
+| 参数             | 类型                    | 语义                              |
 | --------------- | ----------------------- | -------------------------------- |
-| `operand`       | `ComputationDataHandle` | n dimensional array to be        |
-:                 :                         : normalized                       :
-| `scale`         | `ComputationDataHandle` | 1 dimensional array              |
-:                 :                         : (\\(\gamma\\))                   :
-| `offset`        | `ComputationDataHandle` | 1 dimensional array              |
-:                 :                         : (\\(\beta\\ )                    :
-| `epsilon`       | `float`                 | Epsilon value (\\(\epsilon\\))   |
-| `feature_index` | `int64`                 | Index to feature dimension       |
-:                 :                         : in `operand`                     :
+| `operand`       | `ComputationDataHandle` | 待归一化的 N 维数组                 |
+| `scale`         | `ComputationDataHandle` | 1 维数组 (\\(\gamma\\))           |
+| `offset`        | `ComputationDataHandle` | 1 维数组 (\\(\beta\\ )            |
+| `epsilon`       | `float`                 | ε 值 (\\(\epsilon\\))            |
+| `feature_index` | `int64`                 | `operand` 中的特征维数索引         |
 
-For each feature in the feature dimension (`feature_index` is the index for the
-feature dimension in `operand`), the operation calculates the mean and variance
-across all the other dimensions and uses the mean and variance to normalize each
-element in `operand`. The `feature_index` must be a valid index for the feature
-dimension in `operand`.
+对于特征维数中的每一个特征（`feature_index` 即 `operand` 中特征维度的索引），此操作计算在所有其他维度上的均值和方差，以及使用均值和方差归一化 `operand` 中的每个元素。`feature_index` 必须是 `operand` 中特征维度的合法索引。
 
-The algorithm goes as follows for each batch in `operand` \\(x\\) that
-contains `m` elements with `w` and `h` as the size of spatial dimensions (
-assuming `operand` is an 4 dimensional array):
+该算法对 `operand` \\(x\\) 中的每批次数据（包含 `w` 和 `h` 的 `m` 元素作为空间维度的大小）按如下次序执行：
 
-- Calculates batch mean \\(\mu_l\\) for each feature `l` in feature dimension:
+- 在特征维度中，对每个特征 `l` 计算批处理均值 \\(\mu_l\\):
 \\(\mu_l=\frac{1}{mwh}\sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h x_{ijkl}\\)
 
-- Calculates batch variance \\(\sigma^2_l\\):
+- 计算批处理方差 \\(\sigma^2_l\\):
 \\(\sigma^2_l=\frac{1}{mwh}\sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h (x_{ijkl} - \mu_l)^2\\)
 
-- Normalizes, scales and shifts:
+- 归一化、缩放和平移:
 \\(y_{ijkl}=\frac{\gamma_l(x_{ijkl}-\mu_l)}{\sqrt[2]{\sigma^2_l+\epsilon}}+\beta_l\\)
 
-The epsilon value, usually a small number, is added to avoid divide-by-zero errors.
+ε 值，通常是一个很小的数字，以避免 divide-by-zero 错误
 
-The output type is a tuple of three `ComputationDataHandle`s:
+输出类型是一个包含三个 `ComputationDataHandle` 类型元素的元组：
 
-| Outputs      | Type                    | Semantics                            |
+| 输出          | 类型                    | 语义                                  |
 | ------------ | ----------------------- | -------------------------------------|
-| `output`     | `ComputationDataHandle` | n dimensional array with the same    |
-:              :                         : shape as input `operand` (y)         :
-| `batch_mean` | `ComputationDataHandle` | 1 dimensional array (\\(\mu\\))      |
-| `batch_var`  | `ComputationDataHandle` | 1 dimensional array (\\(\sigma^2\\)) |
+| `output`     | `ComputationDataHandle` | 与输入 `operand` (y)具有相同形状的 N 维数组   |
+| `batch_mean` | `ComputationDataHandle` | 1 维数组 (\\(\mu\\))      |
+| `batch_var`  | `ComputationDataHandle` | 1 维数组 (\\(\sigma^2\\)) |
 
-The `batch_mean` and `batch_var` are moments calculated across the batch and
-spatial dimensions using the formulas above.
+输入 `batch_mean ` 和 `batch_var ` 表示使用上述公式在批处理和空间维度上计算的矩值。
 
 ## BitcastConvertType
 
-See also
+同样参见
 [`ComputationBuilder::BitcastConvertType`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
 
-Similar to a `tf.bitcast` in TensorFlow, performs an element-wise bitcast
-operation from a data shape to a target shape. The dimensions must match, and
-the conversion is an element-wise one; e.g. `s32` elements become `f32` elements
-via bitcast routine. Bitcast is implemented as a low-level cast, so machines
-with different floating point representations will give different results.
+类似于 TensorFlow 中的 `tf.bitcast`，对输入数据的每个元素进行 bitcast 操作，从而转化为目标形状。维度必须匹配，且转换是一对一的；如 `s32` 元素通过 bitcast 操作转化为 `f32`。Bitcast 采用底层 cast 操作，所以不同浮点数表示法的机器会产生不同的结果。
 
 <b> `BitcastConvertType(operand, new_element_type)` </b>
 
-Arguments          | Type                    | Semantics
+参数                | 类型                    | 语义
 ------------------ | ----------------------- | ---------------------------
-`operand`          | `ComputationDataHandle` | array of type T with dims D
-`new_element_type` | `PrimitiveType`         | type U
+`operand`          | `ComputationDataHandle` | D 维，类型为 T 的数组
+`new_element_type` | `PrimitiveType`         | 类型 U
 
-The dimensions of the operand and the target shape must match. The bit-width of
-the source and destination element types must be equal. The source
-and destination element types must not be tuples.
+operand 和 目标形状的维度必须匹配。源和目标元素类型的位宽必须一致。源和目标元素类型不能是元组。
 
 ## 广播（Broadcast）
 
@@ -180,9 +136,9 @@ and destination element types must not be tuples.
 
 通过在数组中复制数据来增加其维度。
 
-<b> `广播(operand, broadcast_sizes)` </b>
+<b> `Broadcast(operand, broadcast_sizes)` </b>
 
-参数         | 类型                    | 语义
+参数               | 类型                    | 语义
 ----------------- | ----------------------- | -------------------------------
 `operand`         | `ComputationDataHandle` | 待复制的数组
 `broadcast_sizes` | `ArraySlice<int64>`     | 新维度的形状大小
@@ -195,17 +151,17 @@ and destination element types must not be tuples.
 output[i0, ..., iN, j0, ..., jM] = operand[j0, ..., jM]
 ```
 
-比如，若 `operand` 为一个值为 `2.0f` 的标量，而 `broadcast_sizes` 为 `{2, 3}`，则结果为形状为 `f32[2, 3]` 的一个数组，且它的所有元素的值都为 `2.0f`。
+比如，若 `operand` 为一个值为 `2.0f` 的标量，且 `broadcast_sizes` 为 `{2, 3}`，则结果形状为 `f32[2, 3]` 的一个数组，且它的所有元素的值都为 `2.0f`。
 
 ## 调用（Call）
 
 另请参阅 [`ComputationBuilder::Call`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-给定参数情况下，会触发计算。
+给定参数情况下，触发计算。
 
 <b> `Call(computation, args...)` </b>
 
-| 参数     | 类型                     | 语义                        |
+| 参数           | 类型                     | 语义                              |
 | ------------- | ------------------------ | -------------------------------- |
 | `computation` | `Computation`            | 类型为 `T_0, T_1, ..., T_N ->S` 的计算，它有 N 个任意类型的参数  |
 | `args`        | N 个 `ComputationDataHandle` 的序列            | 任意类型的 N 个 参数 |
@@ -216,20 +172,20 @@ output[i0, ..., iN, j0, ..., jM] = operand[j0, ..., jM]
 
 另请参阅 [`ComputationBuilder::Clamp`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-将一个操作数钳制到一个区间中，即在一个最小值和一个最大值之间。
+将一个操作数钳制在最小值和最大值之间的范围内。
 
 <b> `Clamp(computation, args...)` </b>
 
-| 参数     | 类型                    | 语义                        |
+| 参数           | 类型                    | 语义                              |
 | ------------- | ----------------------- | -------------------------------- |
 | `computation` | `Computation`           | 类型为 `T_0, T_1,..., T_N -> S` 的计算，它有 N 个任意类型的参数 |
 | `min`         | `ComputationDataHandle` | 类型为 T 的数组 |
 | `operand`     | `ComputationDataHandle` | 类型为 T 的数组 |
 | `max`         | `ComputationDataHandle` | 类型为 T 的数组 |
 
-输入是一个操作数和最大最小值，如果操作数位于最大最小值之间，则返回操作数，如果操作数小于最小值，则返回最小值，如果操作数大于最大值，则返回最大值。即 `clamp(a, x, b) =  max(min(a, x), b)`。
+给定操作数，最小和最大值，如果操作数位于最小值和最大值之间，则返回操作数，否则，如果操作数小于最小值，则返回最小值，如果操作数大于最大值，则返回最大值。即 `clamp(a, x, b) =  max(min(a, x), b)`。
 
-输入的三个数组的维度形状必须是一样的。不过，也可以采用一种最严格的[广播](broadcasting.md)形式，即 `min` 和/或 `max` 可以是类型为 `T` 的一个标量。
+输入的三个数组的维度形状必须是一样的。不过，也可以采用一种严格的[广播](broadcasting.md)形式，即 `min` 和/或 `max` 可以是类型为 `T` 的一个标量。
 
 `min` 和 `max` 为标量的示例如下：
 
@@ -340,37 +296,35 @@ Concat({a, b}, 0)
 
 ## Conditional
 
-See also [`ComputationBuilder::Conditional`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::Conditional`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
 
 <b> `Conditional(pred, true_operand, true_computation, false_operand, false_computation)` </b>
 
-| Arguments           | Type                    | Semantics                   |
+| 参数                 | 类型                    | 语义                         |
 | ------------------- | ----------------------- | --------------------------- |
-| `pred`              | `ComputationDataHandle` | Scalar of type `PRED`       |
-| `true_operand`      | `ComputationDataHandle` | Argument of type `T_0`      |
-| `true_computation`  | `Computation`           | Computation of type `T_0 -> |
-:                     :                         : S`                          :
-| `false_operand`     | `ComputationDataHandle` | Argument of type `T_1`      |
-| `false_computation` | `Computation`           | Computation of type `T_1 -> |
-:                     :                         : S`                          :
+| `pred`              | `ComputationDataHandle` | 类型为 `PRED` 的标量          |
+| `true_operand`      | `ComputationDataHandle` | 类型为 `T_0` 的参数           |
+| `true_computation`  | `Computation`           | 类型为 `T_0 -> S` 的计算      |
+| `false_operand`     | `ComputationDataHandle` | 类型为 `T_1` 的参数           |
+| `false_computation` | `Computation`           | 类型为 `T_0 -> S` 的计算      |
 
-Executes `true_computation` if `pred` is `true`, `false_computation` if `pred` is `false`, and returns the result.
+如果 `pred` 为 `true`，执行 `true_computation`，如果 `pred` 为 `false`，则返回结果。
 
-The `true_computation` must take in a single argument of type `T_0` and will be invoked with `true_operand` which must be of the same type. The `false_computation` must take in a single argument of type `T_1` and will be invoked with `false_operand` which must be of the same type. The type of the returned value of `true_computation` and `false_computation` must be the same.
+`true_computation` 必须接受一个类型为 `T_0` 的单参数，并使用 `true_operand` 来调用，它们必须类型相同。  `false_computation` 必须接受一个类型为 `T_1` 的单参数，并使用 `false_operand` 来调用，它们必须类型相同。 `true_computation` 和 `false_computation` 的返回值的类型必须相同。
 
-Note that only one of `true_computation` and `false_computation` will be executed depending on the value of `pred`.
+注意，根据 `pred` 的值，`true_computation` 和 `false_computation` 只能执行其中一个。
 
 ## Conv (卷积)
 
 另请参阅 [`ComputationBuilder::Conv`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-类似于 ConvWithGeneralPadding，但是边缘填充（padding）方式比较简单，要么是 SAME 要么是 VALID。SAME 方式将对输入（`lhs`）边缘填充零，使得不考虑步长（striding）的情况下输出与输入的维度形状一致。VALID 填充方式则表示没有填充。
+类似于 ConvWithGeneralPadding，但是边缘填充（padding）方式比较简单，要么是 SAME 要么是 VALID。SAME 方式将对输入（`lhs`）边缘填充零，使得在不考虑步长（striding）的情况下输出与输入的维度形状一致。VALID 填充方式则表示没有填充。
 
 ## ConvWithGeneralPadding (卷积)
 
 另请参阅 [`ComputationBuilder::ConvWithGeneralPadding`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-在神经网络中要做这种卷积的计算。在这里，一个卷积可想象为一个 n-维窗口在一个 n-维底空间上移动，而窗口的每个可能的位置都触发一次计算。
+计算神经网络中使用的卷积。此处，一个卷积可被认为是一个 n-维窗口在一个 n-维底空间上移动，并对窗口的每个可能的位置执行一次计算。
 
 | 参数 | 类型 | 语义                                         |
 | ---------------- | ----------------------- | ----------------------------- |
@@ -381,7 +335,7 @@ Note that only one of `true_computation` and `false_computation` will be execute
 | `lhs_dilation`   | `ArraySlice<int64>`     | n-维左边扩张因子数组 |
 | `rhs_dilation`   | `ArraySlice<int64>`     | n-维右边扩张因子数组 |
 
-令 n 为空间维度的数目。`lhs` 参数是一个 n+2 阶数组，它描述底空间区域的维度。它被为输入，其实 rhs 也是输入。在神经网络中，它们都属于输入激励。n+2 维的含义依次为：
+设 n 为空间维数。`lhs` 参数是一个 n+2 阶数组，它描述底空间区域的维度。它被称为输入，其实 rhs 也是输入。在神经网络中，它们都属于输入激励。n+2 维的含义依次为：
 
 *   `batch`: 此维中每个坐标表示执行卷积的一个独立输入
 *   `z/depth/features`: 基空间区域中的每个 (y,x) 位置都指定有一个矢量，由这个维度来表示
@@ -399,15 +353,15 @@ Note that only one of `true_computation` and `false_computation` will be execute
 
 `lhs_dilation` 和 `rhs_dilation` 参数指定了扩张系数，分别应用于 lhs 和 rhs 的每个空间维度上。如果在一个空间维度上的扩张系数为 d，则 d-1 个洞将被插入到这个维度的每一项之间，从而增加数组的大小。这些洞被填充上 no-op 值，对于卷积来说表示零值。
 
-Dilation of the rhs is also called atrous convolution. For more details, see @{tf.nn.atrous_conv2d}. Dilation of the lhs is also called transposed convolution. For more details, see @{tf.nn.conv2d_transpose}.
+rhs 的扩张也称为无功卷积。有关更多细节，请参见 @{tf.nn.atrous_conv2d}。lhs 的扩张也称为转置卷积。要了解更多细节，请参见@{tf.nn.conv2d_transpose}。
 
 输出形状的维度含义依次为：
 
 *   `batch`: 和输入（`lhs`）具有相同的 `batch` 大小。
 *   `z`: 和内核（`rhs`）具有相同的 `output-z` 大小。
-*   `spatial_dims`: 卷积窗口的每个合法放置值。
+*   `spatial_dims`: 每个卷积窗口的有效位置的值。
 
-卷积窗口的合法放置是由步长和填充后的底空间区域大小所决定的。
+卷积窗口的有效位置是由步长和填充后的底空间区域大小所决定的。
 
 为描述卷积到底干了什么，考虑一个二维卷积，为输出选择某个固定的 `batch`，`z`，`y`，`x` 坐标。则 `(y,x)` 是底空间区域中的某个窗口的一个角的位置（比如左上角，具体是哪个要看你如何编码其空间维度）。现在，我们从底空间区域中得到了一个二维窗口，其中每一个二维点都指定有一个一维矢量，所以，我们得到一个三维盒子。对于卷积过滤器而言，因为我们固定了输出坐标 `z`，我们也有一个三维盒子。这两个盒子具有相同的维度，所以我们可以让它们逐个元素地相乘并相加（类似于点乘）。最后得到输出值。
 
@@ -431,7 +385,7 @@ for (b, oz, oy, ox) {  // 输出坐标
 
 ## ConvertElementType
 
-See also
+另请参阅
 [`ComputationBuilder::ConvertElementType`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
 
 Similar to an element-wise `static_cast` in C++, performs an element-wise
@@ -439,23 +393,20 @@ conversion operation from a data shape to a target shape. The dimensions must
 match, and the conversion is an element-wise one; e.g. `s32` elements become
 `f32` elements via an `s32`-to-`f32` conversion routine.
 
+与 C++ 中逐元素的 `static_cast` 类似，对输入数据的每个元素进行转换操作，从而转化为目标形状。维度必须匹配，且转换是一对一的；如 `s32` 元素通过 `s32`-to-`f32` 转换过程转换为 `f32`。
+
 <b> `ConvertElementType(operand, new_element_type)` </b>
 
-Arguments          | Type                    | Semantics
+参数          | 类型                    | 语义
 ------------------ | ----------------------- | ---------------------------
-`operand`          | `ComputationDataHandle` | array of type T with dims D
-`new_element_type` | `PrimitiveType`         | type U
+`operand`          | `ComputationDataHandle` | D 维类型为 T 的数组
+`new_element_type` | `PrimitiveType`         | 类型 U
 
-The dimensions of the operand and the target shape must match. The source and
-destination element types must not be tuples.
+操作数和目标形状的维度必须匹配。源和目标元素类型不能是元组。
 
-A conversion such as `T=s32` to `U=f32` will perform a normalizing int-to-float
-conversion routine such as round-to-nearest-even.
+一个 `T=s32` 到 `U=f32` 的转换将执行标准化的 int-to-float 转化过程，如 round-to-nearest-even。
 
-> Note: The precise float-to-int and visa-versa conversions are currently
-> unspecified, but may become additional arguments to the convert operation in
-> the future.  Not all possible conversions have been implemented for all
->targets.
+> 注意：目前没有指定精确的 float-to-int 和 visa-versa 转换，但是将来可能作为转换操作的附加参数。不是所有的目标都实现了所有可能的转换。
 
 ```
 let a: s32[3] = {0, 1, 2};
@@ -555,35 +506,31 @@ extern "C" void myfunc(void* out, void** in) {
 
 ## DotGeneral
 
-See also
+另请参阅
 [`ComputationBuilder::DotGeneral`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
 
 <b> `DotGeneral(lhs, rhs, dimension_numbers)` </b>
 
-| Arguments | Type                    | Semantics
+| 参数 | 类型                    | 语义
 | --------- | ----------------------- | ---------------
-| `lhs`     | `ComputationDataHandle` | array of type T
-| `rhs`     | `ComputationDataHandle` | array of type T
-| `dimension_numbers` | `DotDimensionNumbers` | array of type T
+| `lhs`     | `ComputationDataHandle` | 类型为 T 的数组
+| `rhs`     | `ComputationDataHandle` | 类型为 T 的数组
+| `dimension_numbers` | `DotDimensionNumbers` | 类型为 T 的数组
 
-As Dot, but allows contracting and batch dimension numbers to be specified for
-both the 'lhs' and 'rhs'.
+和点乘一样，但是对于 'lhs' 和 'rhs' 允许收缩和指定批处理维数。
 
-| DotDimensionNumbers Fields | Type                    | Semantics
+| DotDimensionNumbers 成员 | 类型                    | 语义
 | --------- | ----------------------- | ---------------
-| 'lhs_contracting_dimensions' | repeated int64 | 'lhs' contracting dimension numbers |
-| 'rhs_contracting_dimensions' | repeated int64 | 'rhs' contracting dimension numbers |
-| 'lhs_batch_dimensions' | repeated int64 | 'lhs' batch dimension numbers |
-| 'rhs_batch_dimensions' | repeated int64 | 'rhs' batch dimension numbers |
+| 'lhs_contracting_dimensions' | repeated int64 | 'lhs' 转换维数 |
+| 'rhs_contracting_dimensions' | repeated int64 | 'rhs' 转换维数 |
+| 'lhs_batch_dimensions' | repeated int64 | 'lhs' 批处理维数     |
+| 'rhs_batch_dimensions' | repeated int64 | 'rhs' 批处理维数     |
 
-DotGeneral performs the sum of products over contracting dimensions specified
-in 'dimension_numbers'.
+DotGeneral 根据 'dimension_numbers' 指定的维数进行转换操作，然后计算点积和。 
 
-Associated contracting dimension numbers from the 'lhs' and 'rhs' do not need
-to be the same, but must be listed in the same order in both
-'lhs/rhs_contracting_dimensions' arrays and have the same dimension sizes.
+与 'lhs' 和 'rhs' 有关的转换维数不需要相同，但是在 'lhs_contracting_dimensions' 和 'rhs_contracting_dimensions' 数组必须按照相同的顺序列出，同时具有相同的维数大小。
 
-Example with contracting dimension numbers:
+以转换维数为例：
 
 ```
 lhs = { {1.0, 2.0, 3.0},
@@ -600,11 +547,9 @@ DotGeneral(lhs, rhs, dnums) -> { {6.0, 12.0},
                                  {15.0, 30.0} }
 ```
 
-Associated batch dimension numbers from the 'lhs' and 'rhs' must have the same
-dimension number, must be listed in the same order in both arrays, and must
-have the same dimension sizes.
+'lhs' 和 'rhs' 的批处理维数必须相同，在两个数组中必须以相同的顺序列出，同时维数大小必须相同。
 
-Example with batch dimension numbers (batch size 2, 2x2 matrices):
+批处理维数的例子（批处理大小为 2，2x2 矩阵）：
 
 ```
 lhs = { { {1.0, 2.0},
@@ -636,39 +581,22 @@ DotGeneral(lhs, rhs, dnums) -> { { {1.0, 2.0},
 
 ## DynamicSlice
 
-See also
+另请参阅
 [`ComputationBuilder::DynamicSlice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
 
-DynamicSlice extracts a sub-array from the input array at dynamic
-`start_indices`. The size of the slice in each dimension is passed in
-`size_indices`, which specify the end point of exclusive slice intervals in each
-dimension: [start, start + size). The shape of `start_indices` must be rank ==
-1, with dimension size equal to the rank of `operand`.
-Note: handling of out-of-bounds slice indices (generated by incorrect runtime
-calculation of 'start_indices') is currently implementation-defined. Currently,
-slice indices are computed modulo input dimension sizes to prevent out-of-bound
-array accesses, but this behavior may change in future implementations.
+DynamicSlice从动态 `start_indices` 输入数组中提取子数组。`size_indices` 为每个维度的切片大小，它在每个维度上指定了切片范围：[start, start + size)。`start_indices` 的秩必须为 1，且维数大小等于 `operand` 的秩。
+
+注意：当前实现未定义切片索引越界（错误的运行时生成的'start_indices'）的情况。当前，切片索引通过对输入维数大小做模运算来防止越界访问，但是这个机制在未来的实现中可能会修改。
 
 <b> `DynamicSlice(operand, start_indices, size_indices)` </b>
 
-| Arguments       | Type                    | Semantics                        |
+| 参数       | 类型                    | 语义                        |
 | --------------- | ----------------------- | -------------------------------- |
-| `operand`       | `ComputationDataHandle` | N dimensional array of type T    |
-| `start_indices` | `ComputationDataHandle` | Rank 1 array of N integers       |
-:                 :                         : containing the starting indices  :
-:                 :                         : of the slice for each dimension. :
-:                 :                         : Value must be greater than or    :
-:                 :                         : equal to zero.                   :
-| `size_indices`  | `ArraySlice<int64>`     | List of N integers containing    |
-:                 :                         : the slice size for each          :
-:                 :                         : dimension. Each value must be    :
-:                 :                         : strictly greater than zero, and  :
-:                 :                         : start + size must be less than   :
-:                 :                         : or equal to the size of the      :
-:                 :                         : dimension to avoid wrapping      :
-:                 :                         : modulo dimension size.           :
+| `operand`       | `ComputationDataHandle` | 类型为 T 的 N 维数组    |
+| `start_indices` | `ComputationDataHandle` | N 个整数组成的秩为 1 的数组，其中包含每个维度的起始切片索引。值必须大于等于0      |
+| `size_indices`  | `ArraySlice<int64>`     | N 个整数组成的列表，其中包含每个维度的切片大小。值必须大于 0，且 start + size 必须小于等于维度大小，从而避免封装维数大小的模运算    |
 
-1-dimensional example:
+1 维示例如下：
 
 ```
 let a = {0.0, 1.0, 2.0, 3.0, 4.0}
@@ -678,7 +606,7 @@ DynamicSlice(a, s, {2}) produces:
   {2.0, 3.0}
 ```
 
-2-dimensional example:
+2 维示例如下：
 
 ```
 let b =
@@ -694,40 +622,22 @@ DynamicSlice(b, s, {2, 2}) produces:
 ```
 ## DynamicUpdateSlice
 
-See also
+另请参见
 [`ComputationBuilder::DynamicUpdateSlice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
 
-DynamicUpdateSlice generates a result which is the value of the input array
-`operand`, with a slice `update` overwritten at `start_indices`.
-The shape of `update` determines the shape of the sub-array of the result which
-is updated.
-The shape of `start_indices` must be rank == 1, with dimension size equal to
-the rank of `operand`.
-Note: handling of out-of-bounds slice indices (generated by incorrect runtime
-calculation of 'start_indices') is currently implementation-defined. Currently,
-slice indices are computed modulo update dimension sizes to prevent out-of-bound
-array accesses, but this behavior may change in future implementations.
+DynamicUpdateSlice 是在输入数组 `operand` 上，通过切片 `update` 操作覆盖 `start_indices` 后生成的结果。`update` 的形状决定了更新后结果的子数组的形状。 `start_indices` 的秩必须为 1，且维数大小等于 `operand` 的秩。
+
+注意：当前实现未定义切片索引越界（错误的运行时生成的'start_indices'）的情况。当前，切片索引通过对输入维数大小做模运算来防止越界访问，但是这个机制在未来的实现中可能会修改。
 
 <b> `DynamicUpdateSlice(operand, update, start_indices)` </b>
 
-| Arguments       | Type                    | Semantics                        |
+| 参数       | 类型                    | 语义                        |
 | --------------- | ----------------------- | -------------------------------- |
-| `operand`       | `ComputationDataHandle` | N dimensional array of type T    |
-| `update`        | `ComputationDataHandle` | N dimensional array of type T    |
-:                 :                         : containing the slice update.     :
-:                 :                         : Each dimension of update shape    :
-:                 :                         : must be strictly greater than    :
-:                 :                         : zero, and start + update must be :
-:                 :                         : less than operand size for each  :
-:                 :                         : dimension to avoid generating    :
-:                 :                         : out-of-bounds update indices.    :
-| `start_indices` | `ComputationDataHandle` | Rank 1 array of N integers       |
-:                 :                         : containing the starting indices  :
-:                 :                         : of the slice for each dimension. :
-:                 :                         : Value must be greater than or    :
-:                 :                         : equal to zero.                   :
+| `operand`       | `ComputationDataHandle` | 类型为 T 的 N 维数组    |
+| `update`        | `ComputationDataHandle` | 类型为 T 的包含切片更新的 N 维数组，每个维度的更新形状必须大于 0 ，且 start + update 必须小于维度大小，从而避免越界更新索引    |
+| `start_indices` | `ComputationDataHandle` | N 个整数组成的秩为 1 的数组，其中包含每个维度的起始切片索引。值必须大于等于0       |
 
-1-dimensional example:
+1 维示例如下：
 
 ```
 let a = {0.0, 1.0, 2.0, 3.0, 4.0}
@@ -738,7 +648,7 @@ DynamicUpdateSlice(a, u, s) produces:
   {0.0, 1.0, 5.0, 6.0, 4.0}
 ```
 
-2-dimensional example:
+2 维示例如下：
 
 ```
 let b =
@@ -772,10 +682,10 @@ XLA 支持多个逐个元素的二元算术操作。
 
  参数 | 类型 | 语义                                     
 --------- | ----------------------- | ----------------------------------------
-`lhs`     | `ComputationDataHandle` | 左手边操作数：类型为 T 的数组
-`rhs`     | `ComputationDataHandle` | 右手边操作数：类型为 T 的数组
+`lhs`     | `ComputationDataHandle` | 左操作数：类型为 T 的数组
+`rhs`     | `ComputationDataHandle` | 右操作数：类型为 T 的数组
 
-这两个参数的维度形状要么相似，要么兼容。关于维度形状相似或兼容的准确含义，参见文档 @{$broadcasting$broadcasting}。 一个这样的二元操作的结果的维度形状为两个输入数组的广播的结果。虽然可以广播，但不同秩的数组之间的运算是不支持的，除非其中之一是标量。
+这两个参数的维度形状要么相似，要么兼容。关于维度形状相似或兼容的准确含义，参见文档 @{$broadcasting$broadcasting}。 二元操作的结果有一个形状，它是广播两个输入数组的结果。虽然可以广播，但不同秩的数组之间的运算是不支持的，除非其中之一是标量。
 
 当 `Op` 为 `Rem` 时，结果的符号与被除数一致，而结果的绝对值总是小于除数的绝对值。
 
@@ -785,7 +695,7 @@ XLA 支持多个逐个元素的二元算术操作。
 
 其中 `Op` 的含义同上。这种接口用于具有不同秩的数组之间的算术操作（比如将一个矩阵与一个矢量相加）。
 
-额外的参数 `broadcast_dimensions` 为一个整数指标的切片，用于将低阶操作数的秩扩张至高阶操作数的秩。`broadcast_dimensions` 将低阶形状映射到高阶形状上。扩张后的形状的未被映射的维度将被填充为大小为 1 的退化维度。然后执行退化维度广播，即让维度形状沿这些退化维度扩大，使得与两个操作数的形状相等。更多细节请参阅 @{$broadcasting$广播页面}。
+附加参数 `broadcast_dimensions` 为一个整数切片，用于将低阶操作数的秩扩张至高阶操作数的秩。`broadcast_dimensions` 将低阶形状映射到高阶形状上。扩张后的形状的未被映射的维度将被填充为大小为 1 的退化维度。然后执行退化维度广播，即让维度形状沿这些退化维度扩大，使得与两个操作数的形状相等。更多细节请参阅 @{$broadcasting$广播页面}。
 
 ## 逐个元素的比较操作
 
@@ -799,10 +709,10 @@ XLA 还支持标准的逐个元素的二元比较操作。注意：当比较浮�
 
  参数 | 类型 | 语义                                     
 --------- | ----------------------- | ----------------------------------------
-`lhs`     | `ComputationDataHandle` | 左手边操作数：类型为 T 的数组
-`rhs`     | `ComputationDataHandle` | 右手边操作数：类型为 T 的数组
+`lhs`     | `ComputationDataHandle` | 左操作数：类型为 T 的数组
+`rhs`     | `ComputationDataHandle` | 右操作数：类型为 T 的数组
 
-这两个参数的维度形状要么相似要么兼容。维度形状的相似或兼容的具体含义参见文档 @{$broadcasting$broadcasting}。操作结果的维度形状为输入数组的形状广播的结果，结果中的元素类型为 `PERD`。在这类操作中，不同秩的数组之间的操作是不支持的，除非其中之一为标量。
+这两个参数的维度形状要么相似要么兼容。维度形状的相似或兼容的具体含义参见文档 @{$broadcasting$broadcasting}。二元操作的结果有一个形状，它是广播两个输入数组的结果。其中元素类型为 `PERD`。在这类操作中，不同秩的数组之间的操作是不支持的，除非其中之一为标量。
 
 要想用广播来比较不同秩的数组，需要用到如下接口：
 
@@ -810,7 +720,7 @@ XLA 还支持标准的逐个元素的二元比较操作。注意：当比较浮�
 
 其中 `Op` 含义同上。这种接口应该用于不同阶的数组之间的比较操作（比如将一个矩阵加到一个矢量上）。
 
-额外的 `broadcast_dimensions` 操作数是一个整数的指标切片，用于指定将操作数广播时的维度。关于其语义的细节内容可参考 @{$broadcasting$广播页面}。
+附加参数 `broadcast_dimensions` 为一个整数切片，用于指定将操作数广播时的维度。关于其语义的细节内容可参考 @{$broadcasting$广播页面}。
 
 ## 逐个元素的一元函数
 
@@ -826,7 +736,7 @@ ComputationBuilder 支持下列逐个元素的一元函数：
 
 <b>`Floor(operand)`</b> 逐个元素的整数下界 `x -> ⌊x⌋`。
 
-<b>`IsFinite(operand)`</b> 测试 `operand` 的每个元素是否是有限的，即不是正无穷或负无穷，也不是 `NoN`。返回一个 `PRED` 值的数组，维度形状与输入一致，一个元素为 `true` 当且仅当相应的输入元素是有限的。
+<b>`IsFinite(operand)`</b> 测试 `operand` 的每个元素是否是有限的，即不是正无穷或负无穷，也不是 `NaN`。该操作返回一个 `PRED` 值的数组，维度形状与输入一致，数组中的元素当且仅当相应的输入是有限时为 `true`，否则为 `false`。
 
 <b>`Log(operand)`</b> 逐个元素的自然对数 `x -> ln(x)`。
 
@@ -847,15 +757,15 @@ $$\text{sgn}(x) = \begin{cases} -1 & x < 0\\ 0 & x = 0\\ 1 & x > 0 \end{cases}$$
 --------- | ----------------------- | ---------------------------
 `operand` | `ComputationDataHandle` | 函数的操作数
 
-The function is applied to each element in the `operand` array, resulting in an array with the same shape. It is allowed for `operand` to be a scalar (rank 0).
+该函数应用于 `operand` 数组的每个元素，从而形成具有相同形状的数组。它允许操作数为标量（秩 0 ）
 
 ## GetTupleElement
 
 另请参阅 [`ComputationBuilder::GetTupleElement`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-对编译时常量的元组，该操作能提供索引的功能。
+将索引添加到编译时常量的元组中。
 
-输入值必须是编译时常量值，这样才可以通过形状推理获得结果值的类型。
+该值必须是编译时常量，这样才可以通过形状推断确定结果值的类型。
 
 概念上，这类似于 C++ 中的 `std::get<int N>(t)`：
 
@@ -876,9 +786,9 @@ let element_1: s32 = gettupleelement(t, 1);  // 推断出的形状匹配 s32.
 
 | 参数 | 类型 | 语义                                              |
 | -------- | ------- | ----------------------------------------------------- |
-| `shape`  | `Shape` | 从 Infeed 界面读得的数据的维度形状。此形状的数据布局必须与发送到设备上的数据相匹配；否则此行为是未定义的 |
+| `shape`  | `Shape` | 从 Infeed 接口读取数据的维度形状。此形状的数据布局必须与发送到设备上的数据相匹配；否则行为是未定义的 |
 
-从设备的隐式 Infeed 流界面读取单个数据项，根据给定的形状和布局来进行解析，并返回一个此数据的一个 `ComputationDataHandle`。在一个计算中允许有多个 Infeed 操作，但这些 Infeed 操作之间必须有全序。比如，下面代码中两个 Infeed 是有全序的，因为在不同 while 循环之间有依赖关系。
+从设备的隐式 Infeed 流接口读取单个数据项，根据给定的形状和布局来进行解析，并返回一个此数据的 `ComputationDataHandle`。在一个计算中允许有多个 Infeed 操作，但这些 Infeed 操作之间必须是全序的。比如，下面代码中两个 Infeed 是全序的，因为在不同 while 循环之间有依赖关系。
 
 ```
 result1 = while (condition, init = init_value) {
@@ -890,9 +800,9 @@ result2 = while (condition, init = result1) {
 }
 ```
 
-嵌套的元组形状是不支持的。对于一个空的元组形状，Infeed 操作直接是一个 nop，因而不会从设备的 Infeed 中读取任何数据。
+不支持嵌套的元组形状。对于一个空的元组形状，Infeed 操作通常是一个 nop，因而不会从设备的 Infeed 中读取任何数据。
 
-> 注意：我们计划支持没有全序的多个 Infeed 操作，在这种情况下，编译器将提供信息，确定这些 Infeed 操作在编译后的程序中如何串行化。
+> 注意：我们计划允许支持没有全序的多个 Infeed 操作，在这种情况下，编译器将提供信息，确定这些 Infeed 操作在编译后的程序中如何串行化。
 
 
 ## 映射（Map）
@@ -908,9 +818,9 @@ result2 = while (condition, init = result1) {
 | `dimensions`       | `int64` array           | 映射维度的数组  |
 | `static_operands` | M 个 `ComputationDataHandle` 的序列  | 任意类型的 M 个数组  |
 
-将一个标量函数作用于给定的 `operands` 数组，可产生相同维度的数组，其中每个元素都是映射函数（mapped function）作用于相应输入数组中相应元素的结果，而 `static_operands` 是 `computation` 的额外输入。
+将一个标量函数作用于给定的 `operands` 数组，可产生相同维度的数组，其中每个元素都是映射函数（mapped function）作用于相应输入数组中相应元素的结果，而 `static_operands` 是 `computation` 的附加输入。
 
-此映射函数可以是任意计算过程，只不过它必须有 N 类类型为 `T` 的标量参数，和类型为 `S` 的输出。输出的维度与输入 `operands` 相同，只不过元素类型 T 换成了 S。
+此映射函数可以是任意计算过程，只不过它必须有 N 个类型为 `T` 的标量参数，和单个类型为 `S` 的输出。输出的维度与输入 `operands` 相同，只不过元素类型 T 换成了 S。
 
 比如，`Map(op1, op2, op3, computation, par1)` 用 `elem_out <-
 computation(elem1, elem2, elem3, par1)` 将输入数组中的每个（多维）指标映射产生输出数组。
@@ -923,7 +833,7 @@ computation(elem1, elem2, elem3, par1)` 将输入数组中的每个（多维）�
 
 | 参数 | 类型 | 语义                      |
 | ---------------- | ----------------------- | ----------------------------- |
-| `operand`        | `ComputationDataHandle` | 类型为 `T` 的标量的数组 |
+| `operand`        | `ComputationDataHandle` | 类型为 `T` 的数组 |
 | `padding_value`  | `ComputationDataHandle` | 类型为 `T` 的标量，用于填充 |
 | `padding_config` | `PaddingConfig`         | 每个维度的两端的填充量 (low, high) |
 
@@ -937,37 +847,27 @@ computation(elem1, elem2, elem3, par1)` 将输入数组中的每个（多维）�
 
 ## Recv
 
-See also
+另请参阅
 [`ComputationBuilder::Recv`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
 
 <b> `Recv(shape, channel_handle)` </b>
 
-| Arguments        | Type            | Semantics                            |
+| 参数        | 类型            | 语义                            |
 | ---------------- | --------------- | ------------------------------------ |
-| `shape`          | `Shape`         | shape of the data to receive         |
-| `channel_handle` | `ChannelHandle` | unique identifier for each send/recv pair |
+| `shape`          | `Shape`         | 要接收的数据的形状         |
+| `channel_handle` | `ChannelHandle` | 发送/接收对的唯一标识 |
 
-Receives data of the given shape from a `Send` instruction in another
-computation that shares the same channel handle. Returns a
-ComputationDataHandle for the received data.
+从另一台共享相同通道句柄的计算机的 `Send` 指令接收指定形状的数据，返回一个接收数据的 ComputationDataHandle。
 
-The client API of `Recv` operation represents synchronous communication.
-However, the instruction is internally decomposed into 2 HLO instructions
-(`Recv` and `RecvDone`) to enable asynchronous data transfers. See also
-[`HloInstruction::CreateRecv` and `HloInstruction::CreateRecvDone`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/hlo_instruction.h).
+客户端 `Recv` 操作的客户端 API 是同步通信。但是，指令内分解成 2 个 HLO 指令（`Recv` 和 `RecvDone`）用于异步数据传输。请参考 [`HloInstruction::CreateRecv` 和 `HloInstruction::CreateRecvDone`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/hlo_instruction.h)
 
 <b>`Recv(const Shape& shape, int64 channel_id)`</b>
 
-Allocates resources required to receive data from a `Send` instruction with the
-same channel_id. Returns a context for the allocated resources, which is used
-by a following `RecvDone` instruction to wait for the completion of the data
-transfer. The context is a tuple of {receive buffer (shape), request identifier
-(U32)} and it can only be used by a `RecvDone` instruction.
+分配资源从具有相同 channel_id 的 `Send` 指令接收数据。返回已分配资源的上下文，该上下文随后通过 `RecvDone` 指令等待数据传输完成。上下文是 {接收缓冲区 (形状), 请求标识符（U32）} 的元组，且只能用于 `RecvDone` 指令。
 
 <b> `RecvDone(HloInstruction context)` </b>
 
-Given a context created by a `Recv` instruction, waits for the data transfer to
-complete and returns the received data.
+给定一个由 `Recv` 指令创建的上下文，等待数据传输完成并返回接收的数据。
 
 ## Reduce
 
@@ -984,11 +884,11 @@ complete and returns the received data.
 | `computation` | `Computation`           | 类型为 `T, T -> T`的计算  |
 | `dimensions`  | `int64` 数组 | 待归约的未排序的维度数组 |
 
-概念上看，归约（Reduce）操作将输入数组中的一个或多个数组归约为标量。结果数组的秩为 `rank(operand) - len(dimensions)`。 `init_value` 是用于每次归约的初值，如果后端有需求也可以在计算中插入到任何地方。所以，在大多数情况下，`init_value` 应该为归约函数的一个单位元（比如，加法中的 0）。
+从概念上看，归约（Reduce）操作将输入数组中的一个或多个数组归约为标量。结果数组的秩为 `rank(operand) - len(dimensions)`。 `init_value` 是每次归约的初值，如果后端有需求也可以在计算中插入到任何地方。所以，在大多数情况下，`init_value` 应该为归约函数的一个单位元（比如，加法中的 0）。
 
-归约函数的执行顺序是任意的，即可能是非确定的。因而，约化函数不应该对运算的结合性敏感。
+归约函数的执行顺序是任意的，即可能是非确定的。因而，归约函数不应对运算的结合性敏感。
 
-有些归约函数，比如加法，对于浮点数并没有严格遵守结合率。不过，如果对数据的值域进行限制，大多数实际情况中，浮点加法已经足够满足结合率。当然，我们也可以构造出完全不遵守结合率的归约函数，这时，XLA 归约就会产生不正确或不可预测的结果。
+有些归约函数，比如加法，对于浮点数并没有严格遵守结合率。不过，如果数据的范围是有限的，则在大多数实际情况中，浮点加法已经足够满足结合率。当然，我们也可以构造出完全不遵守结合率的归约函数，这时，XLA 归约就会产生不正确或不可预测的结果。
 
 下面是一个示例，对 1D 数组 [10, 11, 12, 13] 进行归约，归约函数为 `f` （即参数 `computation`），则计算结果为：
 
@@ -1063,25 +963,25 @@ for r0 in range(result_shape[0]), r1 in range(result_shape[1]), ...:
 
 另请参阅 [`ComputationBuilder::ReducePrecision`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-当浮点数转换为低精度格式（比如 IEEE-FP16）然后转换回原格式时，值可能会发生变化，ReducePrecision 对这种变化进行建模。低精度格式中的指数（exponent）和尾数（mantissa）的比特数目是可以任意指定的，不过不是所有硬件实现都支持所有的比特数设置。
+当浮点数转换为低精度格式（比如 IEEE-FP16）然后转换回原格式时，值可能会发生变化，ReducePrecision 对这种变化进行建模。低精度格式中的指数（exponent）和尾数（mantissa）的位数目是可以任意指定的，不过不是所有硬件实现都支持所有的位大小。
 
 <b> `ReducePrecision(operand, mantissa_bits, exponent_bits)` </b>
 
 | 参数 | 类型 | 语义                    |
 | ------------------- | ----------------------- | ---------------------------- |
 | `operand`           | `ComputationDataHandle` | 浮点类型 `T` 的数组 |
-| `exponent_bits`     | `int32`                 | 低精度格式中的指数比特数目 |
-| `mantissa_bits`     | `int32`                 | 低精度格式中的尾数比特数目 |
+| `exponent_bits`     | `int32`                 | 低精度格式中的指数位数 |
+| `mantissa_bits`     | `int32`                 | 低精度格式中的尾数位数 |
 
-结果为类型为 `T` 的数组。输入值被舍入至与给定尾数比特的数字最接近的那个值（采用的是"偶数优先"原则）。而超过指数比特所允许的值域时，输入值会被视为正无穷或负无穷。`NaN` 值会保留，不过它可能会被转换为规范化的 NaN 值。
+结果为类型为 `T` 的数组。输入值被舍入至与给定尾数位的数字最接近的那个值（采用的是"偶数优先"原则）。而超过指数位所允许的值域时，输入值会被视为正无穷或负无穷。`NaN` 值会保留，不过它可能会被转换为规范化的 NaN 值。
 
-低精度格式必须至少有一个指数比特（为了区分零和无穷，因为两者的尾数比特数都为零），且尾数比特数必须是非负的。指数或尾数的比特数目可能会超过类型 `T`；这种情况下，相应部分的转换就仅仅是一个 no-op 了。
+低精度格式必须至少有一个指数位（为了区分零和无穷，因为两者的尾数位都为零），且尾数位必须是非负的。指数或尾数位可能会超过类型 `T`；这种情况下，相应部分的转换就仅仅是一个 no-op 了。
 
 ## ReduceWindow
 
 另请参阅 [`ComputationBuilder::ReduceWindow`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-将一个归约函数应用于输入多维数组的每个窗口内的所有元素上，输出一个多维数组，其元素个数等于合法窗口的位置数目。一个池化层可以表示为一个 `ReduceWindow`。
+将一个归约函数应用于输入多维数组的每个窗口内的所有元素上，输出一个多维数组，其元素个数等于合法窗口的元素数目。一个池化层可以表示为一个 `ReduceWindow`。
 
 <b> `ReduceWindow(operand, init_value, computation, window_dimensions,
 window_strides, padding)` </b>
@@ -1124,7 +1024,7 @@ builder.ReduceWindow(
   <img style="width:35%" src="https://www.tensorflow.org/images/ops_reduce_window.png">
 </div>
 
-在一个维度上步长为 1 表示在此维度上两个相邻窗口间隔一个元素，为了让窗口互相不重叠，window_stride_dimensions 和 window_dimensions 应该要相等。下图给出了两种不同步长设置的效果。边缘填充应用于输入的每个维度，计算过程实际发生在填充之后的数组上。
+在维度中，步长为 1 表示在此维度上两个相邻窗口间隔一个元素，为了让窗口互相不重叠，window_stride_dimensions 和 window_dimensions 应该要相等。下图给出了两种不同步长设置的效果。边缘填充应用于输入的每个维度，计算过程实际发生在填充之后的数组上。
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:75%" src="https://www.tensorflow.org/images/ops_reduce_window_stride.png">
@@ -1147,8 +1047,7 @@ builder.ReduceWindow(
 `dimensions` | `int64` vector          | 维度折叠的顺序
 `new_sizes`  | `int64` vector          | 新维度大小的矢量
 
-从概念上看，变形操作首先将一个数组拉平为一个一维矢量，然后将此矢量展开为一个新的形状。输入参数是一个类型为 T 的任意数组，一个编译时常量的维度指标数组，以及表示结果维度大小的一个编译时常量的数组。
-如果给出了 `dimensions` 参数，这个矢量中的值必须是 T 的所有维度的一个置换，其默认值为 `{0, ..., rank - 1}`。`dimensions` 中的维度的顺序是从最慢变化维（最主序）到最快变化维（最次序），按照这个顺序依次将所有元素折叠到一个维度上。`new_sizes` 矢量决定了输出数组的维度大小。`new_sizes[0]` 表示第 0 维的大小，`new_sizes[1]` 表示的是第 1 维的大小，依此类推。`new_sizes` 中的维度值的乘积必须等于 operand 的维度值的乘积。将折叠的一维数组展开为由 `new_sizes` 定义的多维数组时，`new_sizes` 中的维度的顺序也是最慢变化维（最主序）到最快变化维（最次序）。
+从概念上看，变形操作首先将一个数组拉平为一个一维矢量，然后将此矢量展开为一个新的形状。输入参数是一个类型为 T 的任意数组，一个编译时常量的维度指标数组，以及表示结果维度大小的一个编译时常量的数组。如果给出了 `dimensions` 参数，这个矢量中的值必须是 T 的所有维度的一个置换，其默认值为 `{0, ..., rank - 1}`。`dimensions` 中的维度的顺序是从最慢变化维（最主序）到最快变化维（最次序），按照这个顺序依次将所有元素折叠到一个维度上。`new_sizes` 矢量决定了输出数组的维度大小。`new_sizes[0]` 表示第 0 维的大小，`new_sizes[1]` 表示的是第 1 维的大小，依此类推。`new_sizes` 中的维度值的乘积必须等于 operand 的维度值的乘积。将折叠的一维数组展开为由 `new_sizes` 定义的多维数组时，`new_sizes` 中的维度的顺序也是最慢变化维（最主序）到最快变化维（最次序）。
 
 比如，令 v 为包含 24 个元素的数组：
 
@@ -1197,7 +1096,7 @@ Reshape(f32[1x1] {{5}}, {0,1}, {}) == 5;
 Reshape(5, {}, {1,1}) == f32[1x1] {{5}};
 ```
 
-## Rev (倒置)
+## Rev (反转)
 
 另请参阅 [`ComputationBuilder::Rev`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
@@ -1206,9 +1105,9 @@ Reshape(5, {}, {1,1}) == f32[1x1] {{5}};
 参数 | 类型 | 语义
 ------------ | ----------------------- | ---------------------
 `operand`    | `ComputationDataHandle` | 类型为 T 的数组 
-`dimensions` | `ArraySlice<int64>`     | 待倒置的维度
+`dimensions` | `ArraySlice<int64>`     | 待反转的维度
 
-倒置操作将 `operand` 数组沿指定的维度 `dimensions` 将元素的顺序反转，产生一个形状相同的数组。operand 数组的每个元素被存储在输出数组的变换后的位置上。元素的原索引位置在每个待倒置维度上都被反转了，得到其在输出数组中的索引位置（即，如果一个大小为 N 的维度是待倒置的，则索引 i 被变换为 N-i-i）。
+反转操作是将 `operand` 数组沿指定的维度 `dimensions` 对元素的顺序反转，产生一个形状相同的数组。operand 数组的每个元素被存储在输出数组的变换后的位置上。元素的原索引位置在每个待倒置维度上都被反转了，得到其在输出数组中的索引位置（即，如果一个大小为 N 的维度是待倒置的，则索引 i 被变换为 N-i-i）。
 
 `Rev` 操作的一个用途是在神经网络的梯度计算时沿两个窗口维度对卷积权重值进行倒置。
 
@@ -1216,7 +1115,7 @@ Reshape(5, {}, {1,1}) == f32[1x1] {{5}};
 
 另请参阅 [`ComputationBuilder::RngNormal`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-RngNormal 构造一个符合 $$(\mu, \sigma)$$ 正态随机分布的指定形状的随机数组。参数 `mu` 和 `sigma` 为 F32 类型的标量值，而输出形状为 U32 的数组。
+RngNormal 构造一个符合 $$(\mu, \sigma)$$ 正态随机分布的指定形状的随机数组。参数 `mu` 和 `sigma` 为 F32 类型的标量值，而输出形状为 F32 的数组。
 
 <b>`RngNormal(mean, sigma, shape)`</b>
 
@@ -1224,7 +1123,7 @@ RngNormal 构造一个符合 $$(\mu, \sigma)$$ 正态随机分布的指定形状
 | --------- | ----------------------- | -------------------------------------- |
 | `mu`      | `ComputationDataHandle` | 类型为 F32 的标量，指定生成的数的均值  |
 | `sigma`   | `ComputationDataHandle` | 类型为 F32 的标量，指定生成的数的标准差  |
-| `shape`   | `Shape`                 | 类型为 U32 的输出的形状 |
+| `shape`   | `Shape`                 | 类型为 F32 的输出的形状 |
 
 ## RngUniform
 
@@ -1242,32 +1141,24 @@ RngNormal 构造一个符合区间 $$[a,b)$$ 上的均匀分布的指定形状�
 
 ## Select
 
-See also
+另请参阅
 [`ComputationBuilder::Select`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
 
-Constructs an output array from elements of two input arrays, based on the
-values of a predicate array.
+基于 predicate 数组的值，从两个输入数组构造输出数组。
 
 <b> `Select(pred, on_true, on_false)` </b>
 
-Arguments  | Type                    | Semantics
+参数  | 类型                    | 语义
 ---------- | ----------------------- | ------------------
-`pred`     | `ComputationDataHandle` | array of type PRED
-`on_true`  | `ComputationDataHandle` | array of type T
-`on_false` | `ComputationDataHandle` | array of type T
+`pred`     | `ComputationDataHandle` | 类型为 PRED 的数组
+`on_true`  | `ComputationDataHandle` | 类型为 T 的数组
+`on_false` | `ComputationDataHandle` | 类型为 T 的数组
 
-The arrays `on_true` and `on_false` must have the same shape. This is also the
-shape of the output array. The array `pred` must have the same dimensionality as
-`on_true` and `on_false`, with the `PRED` element type.
+数组 `on_true` 和 `on_false` 的形状必须相同。这也是输出数组的形状。数组 `pred` 必须与 `on_true`、 `on_false`具有相同的维度，且值为 `PRED` 类型。
 
-For each element `P` of `pred`, the corresponding element of the output array is
-taken from `on_true` if the value of `P` is `true`, and from `on_false` if the
-value of `P` is `false`. As a restricted form of [broadcasting]
-(broadcasting.md), `pred` can be a scalar of type `PRED`. In this case, the
-output array is taken wholly from `on_true` if `pred` is `true`, and from
-`on_false` if `pred` is `false`.
+对于 `pred` 的每个元素 `P`，当 `P` 值为 `true` 时，相应的输出值从 `on_true` 中获取，否则从 `on_false` 中获取。由于 [broadcasting](broadcasting.md) 限制，`pred` 可以是类型为 `PRED` 的标量。此时，当 `pred ` 值为 `true` 时，输出数组为 `on_true`，否则为 `on_false`。
 
-Example with non-scalar `pred`:
+非标量 `pred` 的示例如下：
 
 ```
 let pred: PRED[4] = {true, false, false, true};
@@ -1277,7 +1168,7 @@ let v2: s32[4] = {100, 200, 300, 400};
 Select(pred, v1, v2) = s32[4]{1, 200, 300, 4};
 ```
 
-Example with scalar `pred`:
+标量 `pred` 的示例如下：
 
 ```
 let pred: PRED = true;
@@ -1287,15 +1178,13 @@ let v2: s32[4] = {100, 200, 300, 400};
 Select(pred, v1, v2) = s32[4]{1, 2, 3, 4};
 ```
 
-Selections between tuples are supported. Tuples are considered to be scalar
-types for this purpose. If `on_true` and `on_false` are tuples (which must have
-the same shape!) then `pred` has to be a scalar of type `PRED`.
+支持元组之间的 Selections 操作。因此元组认为是标量类型。如果 `on_true` 和  `on_false` 为元组（必须形状相同），则 `pred` 必须是类型为 `PRED` 的标量。
 
 ## SelectAndScatter
 
 另请参阅 [`ComputationBuilder::SelectAndScatter`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
 
-这个操作可视为一个复合操作，它先在 `operand` 数组上计算 `ReduceWindow`，以从每个窗口中选择一个数，然后将 `source` 数组散布到选定元素的指标位置上，从而构造出一个与 `operand` 数组形状一样的输出数组。二元函数 `select` 用于从每个窗口中选出一个元素，当调用此函数时，第一个参数的指标矢量的字典序小于第二个参数的指标矢量。如果第一个参数被选中，则 `select` 返回 `true`，如果第二个参数被选中，则返回 `false`。而且该函数必须满足传递性，即如果 `select(a, b)` 和 `select(b, c)` 都为 `true`，则 `select(a, c)` 也为 `true`。这样，被选中的元素不依赖于指定窗口中元素访问的顺序。
+这个操作可视为一个复合操作，它先在 `operand` 数组上计算 `ReduceWindow`，以便从每个窗口中选择一个数，然后将 `source` 数组散布到选定元素的指标位置上，从而构造出一个与 `operand` 数组形状一样的输出数组。二元函数 `select` 用于从每个窗口中选出一个元素，当调用此函数时，第一个参数的指标矢量的字典序小于第二个参数的指标矢量。如果第一个参数被选中，则 `select` 返回 `true`，如果第二个参数被选中，则返回 `false`。而且该函数必须满足传递性，即如果 `select(a, b)` 和 `select(b, c)` 都为 `true`，则 `select(a, c)` 也为 `true`。这样，被选中的元素不依赖于指定窗口中元素访问的顺序。
 
 `scatter` 函数作用在输出数组的每个选中的指标上。它有两个标量参数：
 
@@ -1335,34 +1224,27 @@ padding, source, init_value, scatter)`</b>
 
 <b> `Send(operand, channel_handle)` </b>
 
-| Arguments        | Type                    | Semantics                        |
+| 参数        | 类型                    | 语义                        |
 | ---------------- | ----------------------- | -------------------------------- |
-| `operand`        | `ComputationDataHandle` | data to send (array of type T)   |
-| `channel_handle` | `ChannelHandle`         | unique identifier for each send/recv pair |
+| `operand`        | `ComputationDataHandle` | 待发送的数据（类型为 T 的数组）   |
+| `channel_handle` | `ChannelHandle`         | 发送/接收 对的唯一标识符         |
 
-Sends the given operand data to a `Recv` instruction in another computation
-that shares the same channel handle. Does not return any data.
+将给定的 operand 数据发送到另一台计算机上共享相同通道句柄的 `Recv` 中。不返回任何数据。
 
-Similar to the `Recv` operation, the client API of `Send` operation represents
-synchronous communication, and is internally decomposed into 2 HLO instructions
-(`Send` and `SendDone`) to enable asynchronous data transfers. See also
-[`HloInstruction::CreateSend` and `HloInstruction::CreateSendDone`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/hlo_instruction.h).
+与 `Recv` 操纵类似，`Send` 操作的客户端 API 为同步通信，并在内部分解为 2 个 HLO 指令（`Send` 和 `SendDone`）以使用异步数据传输。另请参阅 [`HloInstruction::CreateSend` 和 `HloInstruction::CreateSendDone`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/hlo_instruction.h)。
 
 <b>`Send(HloInstruction operand, int64 channel_id)`</b>
 
-Initiates an asynchronous transfer of the operand to the resources allocated by
-the `Recv` instruction with the same channel id. Returns a context, which is
-used by a following `SendDone` instruction to wait for the completion of the
-data transfer. The context is a tuple of {operand (shape), request identifier
-(U32)} and it can only be used by a `SendDone` instruction.
+发起 operand 的异步传输过程，将数据传输到具有相同通道 id 的 `Recv` 指令分配的资源中。返回一个上下文，随后使用 `SendDone` 指令等待数据传输完成。上下文是 {operand (shape), request identifier
+(U32)} 的二元组，且只能用于 `SendDone` 指令。
 
 <b> `SendDone(HloInstruction context)` </b>
 
-Given a context created by a `Send` instruction, waits for the data transfer to complete.  The instruction does not return any data.
+根据 `Send` 指令创建的上下文，等待数据传输完成。指令不返回任何数据。
 
 <b> Scheduling of channel instructions </b>
 
-The execution order of the 4 instructions for each channel (`Recv`, `RecvDone`, `Send`, `SendDone`) is as below.
+每个通道的 4 个指令 (`Recv`, `RecvDone`, `Send`, `SendDone`) 的执行顺序如下。
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:70%" src="../../images/send_recv_order.png">
@@ -1373,7 +1255,7 @@ The execution order of the 4 instructions for each channel (`Recv`, `RecvDone`, 
 * `Recv` happens before `RecvDone`
 * `Send` happens before `SendDone`
 
-When the backend compilers generate a linear schedule for each computation that communicates via channel instructions, there must not be cycles across the computations. For example, below schedules lead to deadlocks.
+当后端编译器为通过通道指令进行通信的每一个计算生成一个线性调度时，在计算过程中不能有循环。例如，下面的调度会产生死循环。
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="../../images/send_recv_schedule.png">

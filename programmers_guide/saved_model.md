@@ -22,59 +22,57 @@ TensorFlow 在二进制**快照文件**中保存变量，粗略地讲，就是�
 用 `tf.train.Saver()` 方法创建一个 `Saver` 来管理模型中的所有变量。例如，如下代码演示了如何调用 `tf.train.Saver.save` 方法将变量保存到快照文件中：
 
 ```python
-# Create some variables.
+# 创建变量
 v1 = tf.get_variable("v1", shape=[3], initializer = tf.zeros_initializer)
 v2 = tf.get_variable("v2", shape=[5], initializer = tf.zeros_initializer)
 
 inc_v1 = v1.assign(v1+1)
 dec_v2 = v2.assign(v2-1)
 
-# Add an op to initialize the variables.
+# 添加初始化变量的操作
 init_op = tf.global_variables_initializer()
 
-# Add ops to save and restore all the variables.
+# 添加保存和恢复这些变量的操作
 saver = tf.train.Saver()
 
-# Later, launch the model, initialize the variables, do some work, and save the
-# variables to disk.
+# 然后，加载模型，初始化变量，完成一些工作，并保存这些变量到磁盘中
 with tf.Session() as sess:
   sess.run(init_op)
-  # Do some work with the model.
-  inc_v1.op.run()
+  # 使用模型完成一些工作
+  inc_v1.op.run()
   dec_v2.op.run()
-  # Save the variables to disk.
+  # 将变量保存到磁盘中
   save_path = saver.save(sess, "/tmp/model.ckpt")
   print("Model saved in path: %s" % save_path)
 ```
 
 ### 恢复变量
 
-The `tf.train.Saver` object not only saves variables to checkpoint files, it also restores variables. Note that when you restore variables you do not have to initialize them beforehand. For example, the following snippet demonstrates how to call the `tf.train.Saver.restore` method to restore variables from the checkpoint files:
+`tf.train.Saver` 对象不仅能够将变量保存到快照文件中，它也能够恢复变量。注意恢复变量不需要预先初始化。例如，下面这个示例代码片段演示了如何调用 `tf.train.Saver.restore` 方法并将变量从快照文件中恢复：
 
 ```python
 tf.reset_default_graph()
 
-# Create some variables.
+# 创建一些变量
 v1 = tf.get_variable("v1", shape=[3])
 v2 = tf.get_variable("v2", shape=[5])
 
-# Add ops to save and restore all the variables.
+# 添加保存和恢复这些变量的操作
 saver = tf.train.Saver()
 
-# Later, launch the model, use the saver to restore variables from disk, and
-# do some work with the model.
+# 然后，加载模型，使用 saver 从磁盘中恢复变量，并使用变量完成一些工作
 with tf.Session() as sess:
-  # Restore variables from disk.
+  # 从磁盘中恢复变量
   saver.restore(sess, "/tmp/model.ckpt")
   print("Model restored.")
-  # Check the values of the variables
+  # 检查变量的值
   print("v1 : %s" % v1.eval())
   print("v2 : %s" % v2.eval())
 ```
 
-Notes:
+注意：
 
-*  There is not a physical file called "/tmp/model.ckpt". It is the **prefix** of filenames created for the checkpoint. Users only interact with the prefix instead of physical checkpoint files.
+*  这里没有一个叫做 "/tmp/model.ckpt" 的真实物理文件。它是为快照文件创建的文件名**前缀**。用户和前缀代替真实的快照文件进行交互。
 
 ### 选择需要保存和恢复的变量
 
@@ -93,16 +91,16 @@ Notes:
 
 ```python
 tf.reset_default_graph()
-# Create some variables.
+# 创建一些变量
 v1 = tf.get_variable("v1", [3], initializer = tf.zeros_initializer)
 v2 = tf.get_variable("v2", [5], initializer = tf.zeros_initializer)
 
-# Add ops to save and restore only `v2` using the name "v2"
+# 使用名称“V2”创建只保存和恢复 `v2` 的操作
 saver = tf.train.Saver({"v2": v2})
 
-# Use the saver object normally after that.
+# 在此之后正常的使用 saver 对象
 with tf.Session() as sess:
-  # Initialize v1 since the saver will not.
+  # 由于 saver 没有初始化 v1，初始化 v1。
   v1.initializer.run()
   saver.restore(sess, "/tmp/model.ckpt")
 
@@ -129,10 +127,10 @@ with tf.Session() as sess:
 继续之前展示的保存/恢复示例：
 
 ```python
-# import the inspect_checkpoint library
+# 导入 inspect_checkpoint 库
 from tensorflow.python.tools import inspect_checkpoint as chkp
 
-# print all tensors in checkpoint file
+# 打印快照文件中的所有张量
 chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='', all_tensors=True)
 
 # tensor_name:  v1
@@ -140,13 +138,13 @@ chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='', all_ten
 # tensor_name:  v2
 # [-1. -1. -1. -1. -1.]
 
-# print only tensor v1 in checkpoint file
+# 只打印快照文件中的张量 v1
 chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='v1', all_tensors=False)
 
 # tensor_name:  v1
 # [ 1.  1.  1.]
 
-# print only tensor v2 in checkpoint file
+# pr只打印快照文件中的张量 v2
 chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='v2', all_tensors=False)
 
 # tensor_name:  v2
@@ -189,7 +187,7 @@ with tf.Session(graph=tf.Graph()) as sess:
                                        signature_def_map=foo_signatures,
                                        assets_collection=foo_assets)
 ...
-# Add a second MetaGraphDef for inference.
+# 为推理添加一秒的 MetaGraphDef
 with tf.Session(graph=tf.Graph()) as sess:
   ...
   builder.add_meta_graph([tag_constants.SERVING])
@@ -236,30 +234,20 @@ LoadSavedModel(session_options, run_options, export_dir, {kSavedModelTagTrain},
                &bundle);
 ```
 
-### Loading and Serving a SavedModel in TensorFlow Serving
+### 在 TensorFlow 服务中加载一个 SavedModel 并构建服务
 
-You can easily load and serve a SavedModel with the TensorFlow Serving Model
-Server binary. See [instructions](https://www.tensorflow.org/serving/setup#installing_using_apt-get)
-on how to install the server, or build it if you wish.
+你可以通过 ensorFlow Serving Model Server 二进制文件简便的加载 SavedModel 并构建服务。查看 [instructions](https://www.tensorflow.org/serving/setup#installing_using_apt-get)了解怎样安装服务，或者你也可以构建它。
 
-Once you have the Model Server, run it with:
+一旦你安装好 Model Server，使用以下语句运行它：
 ```
 tensorflow_model_server --port=port-numbers --model_name=your-model-name --model_base_path=your_model_base_path
 ```
-Set the port and model_name flags to values of your choosing. The
-model_base_path flag expects to be to a base directory, with each version of
-your model residing in a numerically named subdirectory. If you only have a
-single version of your model, simply place it in a subdirectory like so:
-* Place the model in /tmp/model/0001
-* Set model_base_path to /tmp/model
 
-Store different versions of your model in numerically named subdirectories of a
-common base directory. For example, suppose the base directory is `/tmp/model`.
-If you have only one version of your model, store it in `/tmp/model/0001`. If
-you have two versions of your model, store the second version in
-`/tmp/model/0002`, and so on.  Set the `--model-base_path` flag to the base
-directory (`/tmp/model`, in this example).  TensorFlow Model Server will serve
-the model in the highest numbered subdirectory of that base directory.
+设置端口和模块名称标识。model_base_path 标志应该是一个根目录，其中模型的每个版本都以数字命名子文件夹。如果只有模型一个版本，直接将其以如下方式放入子文件夹：
+* 将模型放入 /tmp/model/0001
+* 设置 model_base_path 为 /tmp/model
+
+将不同版本的模型保存在同一根目录下以数字命名的子文件夹中。例如，加载根目录是 `/tmp/model`。如果你只有模型的一个版本，将其保存在 `/tmp/model/0001`。如果有模型的两个版本，保存第二个版本在`/tmp/model/0002`，以此类推。设置 `--model-base_path` 为根目录（此例中为 `/tmp/model`）。TensorFlow Model Server 会根据根目录下最高数字的子文件夹中模型构建服务。
 
 ### 标准常量
 
@@ -296,7 +284,7 @@ SaveModel 为多种使用案例提供了创建和加载 TensorFlow 计算图的�
 
 ### 准备运行时的输入
 
-During training, an @{$premade_estimators#input_fn$`input_fn()`} ingests data and prepares it for use by the model.  At serving time, similarly, a `serving_input_receiver_fn()` accepts inference requests and prepares them for the model. This function has the following purposes:
+在训练时，@{$premade_estimators#input_fn$`input_fn()`} 提取数据并传递给模型。在服务运行时，类似的 `serving_input_receiver_fn()` 会接收推理请求并传递给模型。这个函数有以下目的：
 
 *  为系统运行时的推理请求添加占位符。
 *  添加任意额外需要的操作，用于将输入数据转换成模型所需要的特征 `Tensor`。
@@ -314,7 +302,7 @@ feature_spec = {'foo': tf.FixedLenFeature(...),
                 'bar': tf.VarLenFeature(...)}
 
 def serving_input_receiver_fn():
-  """An input receiver that expects a serialized tf.Example."""
+  """需要一个已序列化的 tf.Example 的输入接收器"""
   serialized_tf_example = tf.placeholder(dtype=tf.string,
                                          shape=[default_batch_size],
                                          name='input_example_tensor')
@@ -537,7 +525,7 @@ The given SavedModel SignatureDef contains the following input(s):
 inputs['inputs'] tensor_info:
     dtype: DT_FLOAT
     shape: (-1, 1)
-    name: x2:0
+    name: x2
 The given SavedModel SignatureDef contains the following output(s):
 outputs['scores'] tensor_info:
     dtype: DT_FLOAT
@@ -626,11 +614,8 @@ usage: saved_model_cli run [-h] --dir DIR --tag_set TAG_SET --signature_def
 
 #### `--inputs_examples`
 
-To pass `tf.train.Example` as inputs, specify the `--input_examples` option.
-For each input key, it takes a list of dictionary, where each dictionary is an
-instance of `tf.train.Example`. The dictionary keys are the features and the
-values are the value lists for each feature.
-For example:
+要将 `tf.train.Example` 当做输入传入，指定 `--input_examples` 选项。其中每个键值都是字典，这些字典都是一个 `tf.train.Example`的实例。字典中的键值是特性，对应特性的值列表。
+例如：
 
 ```bsh
 `<input_key>=[{"age":[22,24],"education":["BS","MS"]}]`
@@ -730,6 +715,3 @@ saved_model.pb|saved_model.pbtxt
 ![SavedModel represents checkpoints, assets, and one or more MetaGraphDefs](../images/SavedModel.svg)
 
 每个计算图都与一组特定的标签相关联, 能够在加载或还原操作期间识别不同的计算图。
-
-
-

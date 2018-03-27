@@ -1,6 +1,6 @@
 # 简易语音识别
 
-这个教程会教你建立一个基础语音识别网络，它能够识别出十个不同词语。但能够运用到实际场景中的语音识别系统很复杂，和 MNIST 数据集与实际场景中图像识别的复杂度差距类似，所以这个教程只会带你了解其中涉及的技术方法。当你完成这个教程，你能够得到一个语音识别模型，它能够识别一个语音片段，并区分为静默，一个未知词语，"yes", "no", "up", "down", "left", "right", "on", "off", "stop", 或者 "go" 。你也能将它运行在一个安卓应用中。
+这个教程会教你建立一个能够识别出十个不同词语基础语音识别网络。但是想要将其运用到实际场景中的语音识别系统中则会很复杂，这与希望将 MNIST 数据集应用到实际场景中的图像识别的复杂程度类似，所以这个教程只会带你了解其中涉及的技术方法。当你完成这个教程，你能够得到一个语音识别模型，它能够识别一个语音片段，并区分为静默，一个未知词语，"yes", "no", "up", "down", "left", "right", "on", "off", "stop", 或者 "go" 。你也能将它运行在一个安卓应用中。
 
 ## 准备
 
@@ -35,12 +35,12 @@ I0730 16:53:47.289078   55030 train.py:217] Step #1: rate 0.001000, accuracy 7.0
 
 一百轮之后，你会看到这样一行输出信息：
 
-`I0730 16:54:41.813438 55030 train.py:252] Saving to
-"/tmp/speech_commands_train/conv.ckpt-100"`
+```
+I0730 16:54:41.813438 55030 train.py:252] Saving to
+"/tmp/speech_commands_train/conv.ckpt-100"
+```
 
-这表示现在把当前训练权重保存到了一个记录文件，如果你的训练脚本运行中断了，你能够找到最近的一个保存点并把它作为一个参数重启训练脚本。
-`--start_checkpoint=/tmp/speech_commands_train/conv.ckpt-100` 
-这样脚本就会从保存点开始训练过程。
+这表示现在把当前训练权重保存到了一个记录文件，如果你的训练脚本运行中断了，你能够找到最近的一个保存点并把它作为一个参数重启训练脚本。 `--start_checkpoint=/tmp/speech_commands_train/conv.ckpt-100`  这样脚本就会从保存点开始训练过程。
 
 ## 混淆矩阵
 
@@ -94,7 +94,7 @@ I0730 16:57:38.073667   55030 train.py:243] Confusion Matrix:
 然后在浏览器中访问 [http://localhost:6006](http://localhost:6006) ，你就可以看到展现你模型运行过程的表格和图形。
 
 <div style="width:50%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="https://storage.googleapis.com/download.tensorflow.org/example_images/speech_commands_tensorflow.png"/>
+<img style="width:100%" src="../images/speech_commands_tensorflow.png"/>
 </div>
 
 ## 训练完成
@@ -153,7 +153,7 @@ bazel run tensorflow/examples/wav_to_spectrogram:wav_to_spectrogram -- \
 如果你打开 `/tmp/spectrogram.png` 你能够看到这样的图像：
 
 <div style="width:50%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="https://storage.googleapis.com/download.tensorflow.org/example_images/spectrogram.png"/>
+<img style="width:100%" src="../images/spectrogram.png"/>
 </div>
 
 因为 TensorFlow 的存储次序，这个图像的时间方向是从上往下的，频率方向是从左往右的，而不像通常的声谱图中，时间方向是从左往右的。你应该能够看出图像中一些不同的部分，比如第一个音节 "Ha" 与 "ppy" 明显不同。
@@ -233,7 +233,8 @@ bazel run tensorflow/examples/speech_commands:test_streaming_accuracy -- \
 
 这个脚本使用的默认模型相当的大，每轮推算要进行八十亿次浮点运算每秒而且使用 940,000 权重参数。这个数值在桌面环境或者移动手机上都是可以接受的，但是它在只拥有有限资源的设备上以交互模式运行时，对它来说就是过大的运算压力了。为了应对这种使用场景，有以下几种替代方案可供选择：
 
-**low_latency_conv**
+**low_latency_conv** 
+
 基于在 [Convolutional Neural Networks for Small-footprint Keyword Spotting paper](http://www.isca-speech.org/archive/interspeech_2015/papers/i15_1478.pdf) 中的 'cnn-one-fstride4'技术。它的精确度略低于 'conv'，但权重参数的数值大致相同，而且它只需要一千一百万次浮点运算每秒即可进行一次预测，这样就使预测速度更快了。
 
 使用这种模型，你要在命令行中特别指定 `--model_architecture=low_latency_conv` 。你也需要修正学习速率和训练轮次，所以完整的命令会是这样的：

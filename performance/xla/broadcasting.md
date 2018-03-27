@@ -1,13 +1,13 @@
-# 语义广播
+# 广播语义
 
-本文档描述 XLA 中 语义的广播是如何工作的。
+本文档描述 XLA 中的广播语义是如何工作的。
 
 ## 何为广播？
 
 
-广播是让不同形状的数组的变得相容从而参与算术操作的一种过程。这个术语来自于 Numpy [(广播)](http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html)。
+广播是使不同形状的数组具有用于算术运算的兼容形状的过程。这个术语来自于 Numpy [(广播)](http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html)。
 
-广播在一些操作中会用到，比如不同阶的多维数组之间的操作，或具有不同但相容的形状的多维数组之间的操作。以加法 `X+v` 为例，这里 `X` 是一个矩阵（2阶数组），`v` 是一个矢量（1阶数组）。为执行逐个元素的加法，XLA 需要将矢量 `v` "广播" 为和 `X` 一样的秩，即将 `v` 复制多次。此矢量的长度必需至少与矩阵的某一维度相同。
+广播在一些操作中可能会用到，比如不同阶的多维数组之间的操作，或者在具有不同但兼容的形状的多维数组之间的操作。以加法 `X+v` 为例，这里 `X` 是一个矩阵（2 阶数组），`v` 是一个矢量（1 阶数组）。为执行逐个元素的加法，XLA 需要将矢量 `v` "广播" 为和 `X` 一样的秩，即将 `v` 复制多次。此矢量的长度必须至少与矩阵的某一维度相同。
 
 比如：
 
@@ -23,11 +23,13 @@
 
 ## 广播的原则
 
-The XLA language is as strict and explicit as possible, avoiding implicit and "magical" features. Such features may make some computations slightly easier to define, at the cost of more assumptions baked into user code that will be difficult to change in the long term. If necessary, implicit and magical features can be added in client-level wrappers.
+XLA 语言尽可能严格和明确，避免了隐含的和“不可思议的”特性。这样的特性以牺牲用户代码中的更多假设（这种假设在长期内很难改变）为代价，可能会使一些计算变得稍微容易一些。如果有必要，可以在客户级包装器中添加隐式和不可思议的特性。
+
+在广播方面，需要对不同秩的数组之间的操作定义明确的广播规范。这与Numpy不同，它会在可能的情况下推断出规范。
 
 ## 将低阶数组广播为高阶数组
 
-**标量**总是可以广播为数组而无需显式指定维度的广播规范。因而，一个标量和一个数据之间的逐个元素二元操作相当于将此标量作用于数组的每个元素。比如，将一个标量加上一个矩阵上，相当于产生一个矩阵，其每个是原矩阵相应元素加上该标量。
+**标量**总是可以广播为数组，而无需显式地指定广播维度。因而，一个标量和一个数组之间的逐个元素的二元操作意味着对数组中的每个元素进行标量运算。比如，将一个标量加到一个矩阵上，相当于产生一个矩阵，其每个元素是原矩阵相应元素加上该标量。
 
     |1 2 3| + 7 = |8  9  10|
     |4 5 6|       |11 12 13|
@@ -53,16 +55,15 @@ The XLA language is as strict and explicit as possible, avoiding implicit and "m
      |8|     |8 8 8|
      |9|     |9 9 9|
 
-> 注意：当让一个 2x3 矩阵加上一个 3 元素的矢量时，维度为 0 的广播是非法的。
+> 注意：当一个 2x3 矩阵加上一个 3 元素的矢量时，维度为 0 的广播是非法的。
 
 广播维度可以是一个元组，用于描述秩更小的形状如何广播为一个更大秩的形状。比如，给定一个 2x3x4 的方阵和一个 3x4 矩阵，广播元组 (1,2) 表示让矩阵的维度匹配到方阵的第 1 维和第 2 维。
 
-这种广播类型用于 `ComputationBuilder` 中的二元操作，使用时需要指定 `broadcast_dimensions` 参数。比如，参见源码 [ComputationBuilder::Add](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.cc)。
-在 XLA 源码中，这种广播类型有时候称为 "InDim" 广播。
+这种广播类型用于 `ComputationBuilder` 中的二元操作，使用时需要指定 `broadcast_dimensions` 参数。比如，参见源码 [ComputationBuilder::Add](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.cc)。在 XLA 源码中，这种广播类型有时候称为 "InDim" 广播。
 
-### 形式化定义
+### 正式定义
 
-广播允许低阶数组匹配高阶数组，即指定高阶数组中的哪些维度用于匹配。比如，对于维度为 MxNxPxQ 的数组，维度为 T 的矢量可以按下列方式匹配：
+广播属性允许低阶数组匹配高阶数组，即指定高阶数组中的哪些维度用于匹配。比如，对于维度为 MxNxPxQ 的数组，维度为 T 的矢量可以按下列方式匹配：
 
              MxNxPxQ
 
@@ -85,12 +86,12 @@ The XLA language is as strict and explicit as possible, avoiding implicit and "m
 
 ## 广播具有退化维度的秩相似的数组
 
-一个常见的广播问题是广播具有相同的秩但是不同的维度大小的两个数组。类似于 Numpy 的规则，只有在两个数组**相容**的条件下这种广播才有可能。两个数组的所有维度相容时，它们才是相容的。两个维度相容的条件是：
+一个常见的广播问题是广播两个具有相同的秩但是不同的维度大小的数组。类似于 Numpy 的规则，只有在两个数组**兼容**的条件下这种广播才有可能。两个数组的所有维度兼容时，它们才是兼容的。两个维度兼容的条件是：
 
   * 它们相等，或
   * 其中之一为 1 (即"退化"的维度)
 
-当两个相容的数组相遇时，它们的操作结果的形状的各个维度都为输入在各维度上的最大值。
+当两个兼容的数组相遇时，它们的操作结果的形状的各个维度为输入在各维度上的最大值。
 
 示例：
 
@@ -99,9 +100,9 @@ The XLA language is as strict and explicit as possible, avoiding implicit and "m
   3.  (7,2,5) 和 (7,1,5) 广播为 (7,2,5)
   4.  (7,2,5) 和 (7,2,6) 不相容，无法广播
 
-其中有一种特例，即每个输入数组都在一个不同的维度上具有退化的维度。这时，结果为它们的"外操作"：(2,1) 和 (1,3) 广播为 (2,3)。更多示例，参考 [Numpy 关于广播的文档](http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html)。
+其中有一种特例，即每个输入数组都在一个不同的维度上具有退化的维度。这时，结果为它们的"外部操作"：(2,1) 和 (1,3) 广播为 (2,3)。更多示例，参考 [Numpy 关于广播的文档](http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html)。
 
-## 广播的复合
+## 广播组成
 
 一个低阶数组到高阶数组的广播和退化维度的广播可用于同一个二元操作上。比如，大小为 4 的矢量和大小为 1x2 的矩阵可以用广播维度 (0) 来实现相加：
 

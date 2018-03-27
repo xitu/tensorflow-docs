@@ -8,11 +8,11 @@
 在开始前，我们需要导入一些库。
 
 ```python
-# Import libraries for simulation
+# 导入用于模拟的库
 import tensorflow as tf
 import numpy as np
 
-# Imports for visualization
+# 导入用于可视化的库
 import PIL.Image
 from io import BytesIO
 from IPython.display import Image, display
@@ -22,8 +22,7 @@ from IPython.display import Image, display
 
 ```python
 def DisplayFractal(a, fmt='jpeg'):
-  """Display an array of iteration counts as a
-     colorful picture of a fractal."""
+  """将一个迭代累计的数组显示为一个分形彩色图片"""
   a_cyclic = (6.28*a/20.0).reshape(list(a.shape)+[1])
   img = np.concatenate([10+20*np.cos(a_cyclic),
                         30+50*np.sin(a_cyclic),
@@ -47,8 +46,7 @@ sess = tf.InteractiveSession()
 我们可以轻松地混合使用 NumPy 与 TensorFlow。
 
 ```python
-# Use NumPy to create a 2D array of complex numbers
-
+# 使用 numpy 创建一个二维的复数数组
 Y, X = np.mgrid[-1.3:1.3:0.005, -2:1:0.005]
 Z = X+1j*Y
 ```
@@ -72,22 +70,20 @@ tf.global_variables_initializer().run()
 现在我们指定一系列的运算
 
 ```python
-# Compute the new values of z: z^2 + x
+# 计算 z: z^2 + x
 zs_ = zs*zs + xs
 
-# Have we diverged with this new value?
+# 新值是否发散？
 not_diverged = tf.abs(zs_) < 4
 
-# Operation to update the zs and the iteration count.
+# 操作并更新 zs 并对迭代进行计数
 #
-# Note: We keep computing zs after they diverge! This
-#       is very wasteful! There are better, if a little
-#       less simple, ways to do this.
+# 注意: 始终在 zs 发散后进行计算，这是一种浪费，有更好的方法
 #
 step = tf.group(
   zs.assign(zs_),
   ns.assign_add(tf.cast(not_diverged, tf.float32))
-  )
+)
 ```
 
 并运行几百步
@@ -102,7 +98,7 @@ for i in range(200): step.run()
 DisplayFractal(ns.eval())
 ```
 
-![jpeg](https://www.tensorflow.org/images/mandelbrot_output.jpg)
+![jpeg](../images/mandelbrot_output.jpg)
 
 不错！
 

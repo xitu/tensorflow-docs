@@ -92,11 +92,11 @@ Embedding Projector 为数据集降维提供了三种方法。
   </tr>
   <tr>
     <td style="width: 30%;">
-      Custom projection controls.
-    </td>
+      projection 自定义控制。
+    </td>
     <td style="width: 70%;">
-      Custom projection of neighbors of "politics" onto "best" - "worst" vector.
-    </td>
+      "politics" 在 "best" - "worst" 向量上定制的 projection。
+    </td>
   </tr>
 </table>
 
