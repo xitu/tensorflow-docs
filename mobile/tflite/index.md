@@ -114,6 +114,6 @@ TensorFlow Lite 作为开发人员预览的点，包括以下内容：
 ## 下一步
 
 对于开发人员的预览，我们的大部分文档都在GitHub上。请看看[TensorFlow Lite
-库(https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)在GitHub上获取更多信息和代码示例，演示应用程序等等。
+库](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)在GitHub上获取更多信息和代码示例，演示应用程序等等。
 
 
