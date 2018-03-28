@@ -262,7 +262,7 @@ $ python trainer.py \
 
 任务对应于特定的 TensorFlow 服务器，并且通常对应于到一个进程。一个任务属于一个特定的“作业”，并在该作业列表的索引中被唯一标识。
 
-** TensorFlow 服务器**
+**TensorFlow 服务器**
 
 运行着 @{tf.train.Server} 实例的进程，是集群的成员，并对外提供 `master 服务` 和 `worker 服务`。
 
