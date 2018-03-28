@@ -261,7 +261,7 @@ TensorShape([Dimension(None), Dimension(None), Dimension(None)])
 
 因为除非能够足够快地提供数据，否则不可能使用 Cloud TPU，所以在使用 Cloud TPU 时，如何高效使用 `tf.data.Dataset` API 是至关重要的。有关数据集性能的详细信息，请参见 @{$datasets_performance}。
 
-对于最简单的实验（使用 @{tf.data.Dataset.from_tensor_slices 或其他图中数据），需要将 `TPUEstimator` 中的 `Dataset` 读取的所有数据文件存储在  Google Cloud Storage Buckets 上。
+对于最简单的实验（使用 @{tf.data.Dataset.from_tensor_slices} 或其他图中数据），需要将 `TPUEstimator` 中的 `Dataset` 读取的所有数据文件存储在  Google Cloud Storage Buckets 上。
 
 <!--TODO(markdaoust): link to the `TFRecord` doc when it exists.-->
 
