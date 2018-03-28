@@ -36,7 +36,7 @@ TensorFlow “集群”是一组参与分布式执行 TensorFlow 计算图的“
 2. **创建一个 `tf.train.Server`**，将 `tf.train.ClusterSpec` 传给构造函数，并用工作名称标识本地任务和任务索引。
 
 
-###创建一个 `tf.train.ClusterSpec` 来描述集群
+### 创建一个 `tf.train.ClusterSpec` 来描述集群
 
 群集规范（ClusterSpec）是一个将作业名称映射到网络地址列表地址的字典。把该字典传递给 @{tf.train.ClusterSpec} 构造函数。例如：
 
