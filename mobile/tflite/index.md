@@ -19,7 +19,7 @@ TensorFlow Lite 基于
 
 TensorFlow Lite 拥有一个新的移动设备优化的解释器保证应用程序的精简和快速。解释器使用静态图形排序和自定义(less-dynamic)内存分配器来确保最小的负载，初始化和执行延迟。
 
-TensorFlow Lite 针对支持的设备提供了一个利用硬件加速的借口。 通过 Android 神经​​网络库，作为 Android O-MR1 的一部分发布。
+TensorFlow Lite 针对支持的设备提供了一个利用硬件加速的接口。 通过 Android 神经​​网络库，作为 Android O-MR1 的一部分发布。
 
 ## 为什么我们需要针对移动端的库?
 
