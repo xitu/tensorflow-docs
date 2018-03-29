@@ -77,7 +77,7 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%"
   alt="Petal geometry compared for three iris species: Iris setosa, Iris virginica, and Iris versicolor"
-  src="../images/iris_three_species.jpg">
+  src="https://www.tensorflow.org/images/iris_three_species.jpg">
 </div>
 
 **从左至右为
@@ -128,7 +128,7 @@ Iris 数据集包含四个特征和一个[标签](https://developers.google.com/
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%"
   alt="A diagram of the network architecture: Inputs, 2 hidden layers, and outputs"
-  src="../images/custom_estimators/full_network.png">
+  src="https://www.tensorflow.org/images/custom_estimators/full_network.png">
 </div>
 
 ### 接口
