@@ -7,7 +7,7 @@
 
 你需要先做如下几件事，才能够使用本文档的样例代码：
 
-* [安装 TensorFlow](https://www.tensorflow.org/install/).
+* @{$install$Install TensorFlow}.
 * 如果你在 virtualenv 或者 Anaconda 上安装了 TensorFlow，启动你的 TensorFlow 环境。
 * 通过以下命令安装或升级 pandas：
 
@@ -66,9 +66,9 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 
 我们强烈建议使用如下 API 编写 TensorFlow 程序：
 
-* [Estimators](https://www.tensorflow.org/programmers_guide/estimators), 是一个完整的模型。Estimator API
+* @{$programmers_guide/estimators$Estimators}, 是一个完整的模型。Estimator API
    提供了各类方法来训练模型，评估和生成预测。
-* [Dataset](https://www.tensorflow.org/get_started/datasets_quickstart), 建立了一个数据输入通道。Dataset API 提供了加载和修改数据，并向模型输入数据的方法， 它与 Estimators API 相得益彰。
+* @{$get_started/datasets_quickstart$Datasets}, 建立了一个数据输入通道。Dataset API 提供了加载和修改数据，并向模型输入数据的方法， 它与 Estimators API 相得益彰。
 
 ## 对　irises　分类：概览
 
@@ -143,8 +143,8 @@ Iris 数据集包含四个特征和一个[标签](https://developers.google.com/
 
 ## 使用 Estimators 编程的概览
 
-一个 Estimator 是 TensorFlow 的一个完整模型的高层次表示。它自己处理了初始化，日志，存储和重新存储等问题，因而你可以专注于你的模型搭建。更多信息请见 [Estimators](https://www.tensorflow.org/programmers_guide/estimators)。
-一个 Estimator 是从 `[tf.estimator.Estimator](https://www.tensorflow.org/api_docs/python/tf/estimator/Estimator)` 中派生出的。TensorFlow 提供了一系列的 
+一个 Estimator 是 TensorFlow 的一个完整模型的高层次表示。它自己处理了初始化，日志，存储和重新存储等问题，因而你可以专注于你的模型搭建。更多信息请见 @{$programmers_guide/estimators}。
+一个 Estimator 是从 @{tf.estimator.Estimator} 中派生出的。TensorFlow 提供了一系列的 
 [预制的 Estimators](https://developers.google.com/machine-learning/glossary/#pre-made_Estimator)
 （例如, `LinearRegressor`）来实现常用的 ML 算法。除此之外，你可以编写你自己的
 [自定义 Estimators](https://developers.google.com/machine-learning/glossary/#custom_Estimator)。
@@ -163,7 +163,7 @@ Iris 数据集包含四个特征和一个[标签](https://developers.google.com/
 
 你必须创建一个输入函数来支持为训练，评估和预测提供数据支持。
 
-一个**输入函数**返回一个 `[tf.data.Dataset](https://www.tensorflow.org/api_docs/python/tf/data/Dataset)` 对象， 该对象输出如下的含有两个元素的元组：
+一个**输入函数**返回一个 @{tf.data.Dataset} 对象， 该对象输出如下的含有两个元素的元组：
 
 * [`features`](https://developers.google.com/machine-learning/glossary/#feature) - 一个 Python 字典：
     * 每个键为特征的名字。
@@ -218,7 +218,7 @@ def train_input_fn(features, labels, batch_size):
 
 ## 定义特征列
 
-一个[**特征列**](https://developers.google.com/machine-learning/glossary/#feature_columns)是一个对象，描述了模型应该如何通过特征字典（feature dictionary）来使用原始输入数据。当你建立一个 Estimator 模型时，你向它传输一个列表的特征列，描述了所有你希望在模型中使用的特征。`[tf.feature_column](https://www.tensorflow.org/api_docs/python/tf/feature_column)`模块提供了很多向模型表述数据的选项。
+一个[**特征列**](https://developers.google.com/machine-learning/glossary/#feature_columns)是一个对象，描述了模型应该如何通过特征字典（feature dictionary）来使用原始输入数据。当你建立一个 Estimator 模型时，你向它传输一个列表的特征列，描述了所有你希望在模型中使用的特征。@{tf.feature_column} 模块提供了很多向模型表述数据的选项。
 
 对于 Iris 来说，4 个原始的特征为数值，所以我们将会建立一个特征列的列表来告诉 Estimator 模型，将四个特征分别表示为 32 位的浮点数值。因此，用于建立特征列的代码为：
 
@@ -229,7 +229,7 @@ for key in train_x.keys():
     my_feature_columns.append(tf.feature_column.numeric_column(key=key))
 ```
 
-特征列可以变的比我们在这里展示的复杂得多。我们将更多关于特征列的细节放在了[之后](https://www.tensorflow.org/get_started/feature_columns)的入门教程中。
+特征列可以变的比我们在这里展示的复杂得多。我们将更多关于特征列的细节放在了之后 @{$get_started/feature_columns$later on} 的入门教程中。
 
 如今我们有了如何让模型表示原始特征的定义，我们可以开始搭建 Estimator 了。
 
@@ -238,9 +238,9 @@ for key in train_x.keys():
 
 Iris 问题是一个经典的分类问题。幸运的是，TensorFlow 提供了一些预制的 Estimator 分类器，包含：
 
-* `[tf.estimator.DNNClassifier](https://www.tensorflow.org/api_docs/python/tf/estimator/DNNClassifier)`用于深层模型
-* `[tf.estimator.DNNLinearCombinedClassifier](https://www.tensorflow.org/api_docs/python/tf/estimator/DNNLinearCombinedClassifier)` 用于有深度和广度的模型
-* `[tf.estimator.LinearClassifier](https://www.tensorflow.org/api_docs/python/tf/estimator/LinearClassifier)`用于基于线性模型的分类器
+* @{tf.estimator.DNNClassifier} 用于深层模型
+* @{tf.estimator.DNNLinearCombinedClassifier} 用于有深度和广度的模型
+* @{tf.estimator.LinearClassifier} 用于基于线性模型的分类器
 
 对于 Iris 问题，`tf.estimator.DNNClassifier` 看起来是最佳选择。
 以下是我们如何实例化这个 Estimator：
@@ -349,7 +349,7 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 
 现在如果你已经开始编写 TensorFlow 程序了，那么注意关注如下的资料：
 
-* [Checkpoints](https://www.tensorflow.org/get_started/checkpoints)来学习如何存储和加载模型
-* [Datasets](https://www.tensorflow.org/get_started/datasets_quickstart)来学习如何将数据导入你的模型中
-* [Creating Custom Estimators](https://www.tensorflow.org/get_started/custom_estimators)来学习如何编写你的自定义 Estimator，解决特定的问题
+* @{$get_started/checkpoints$Checkpoints} 来学习如何存储和加载模型
+* @{$get_started/datasets_quickstart$Datasets} 来学习如何将数据导入你的模型中
+* @{$get_started/custom_estimators$Creating Custom Estimators} 来学习如何编写你的自定义 Estimator，解决特定的问题
 
