@@ -1,85 +1,67 @@
-# Datasets Quick Start
+# 数据集：快速了解
 
-The @{tf.data} module contains a collection of classes that allows you to
-easily load data, manipulate it, and pipe it into your model. This document
-introduces the API by walking through two simple examples:
+@{tf.data} 模块包含了一组类，这些类可以让你轻松的加载数据、操作数据，并将数据传送到您的模型中。文档通过如下这两个简单的例子来介绍该 API：
 
-* Reading in-memory data from numpy arrays.
-* Reading lines from a csv file.
+* 从 numpy 数组读取内存数据。
+* 逐行读取 csv 文件。
 
 <!-- TODO(markdaoust): Add links to an example reading from multiple-files
 (image_retraining), and a from_generator example. -->
 
-## Basic input
+## 基本输入
 
-Taking slices from an array is the simplest way to get started with `tf.data`.
+学习如何获取数组的片段，是开始学习 `tf.data` 最简单的方式。
 
-The @{$get_started/premade_estimators$Premade Estimators} chapter describes
-the following `train_input_fn`, from
-[`iris_data.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/iris_data.py),
-to pipe the data into the Estimator:
+章节 @{$get_started/premade_estimators$Premade Estimators} 在文件 [`iris_data.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/iris_data.py) 中定义了 `train_input_fn`，它可以将数据传输到 Estimator。
 
 ``` python
 def train_input_fn(features, labels, batch_size):
-    """An input function for training"""
-    # Convert the inputs to a Dataset.
+    """一个用来训练的输入函数"""
+    # 将输入值转化为数据集。
     dataset = tf.data.Dataset.from_tensor_slices((dict(features), labels))
 
-    # Shuffle, repeat, and batch the examples.
+    # 混排、重复、批处理样本。
     dataset = dataset.shuffle(1000).repeat().batch(batch_size)
 
-    # Build the Iterator, and return the read end of the pipeline.
-    return dataset.make_one_shot_iterator().get_next()
+    # 返回数据集。
+    return dataset
 ```
 
-Let's look at this more closely.
+下面我们来对这个函数做更仔细的分析。
 
-### Arguments
+### 参数
 
-This function expects three arguments. Arguments expecting an "array" can
-accept nearly anything that can be converted to an array with `numpy.array`.
-One exception is
-[`tuple`](https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences)
-which has special meaning for `Datasets`.
+这个函数一共需要三个参数。如果一个参数的期望类型是 “array” （数组），那么它将可以接受几乎所有可以用 `numpy.array` 来转化为数组的值。只有一个例外：[`tuple`](https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences)，我们将在后面看到，tuple 对 `Datasets` 有特殊的含义。
 
-* `features`: A `{'feature_name':array}` dictionary (or
-  [`DataFrame`](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html))
-  containing the raw input features.
-* `labels` : An array containing the
-  [label](https://developers.google.com/machine-learning/glossary/#label)
-  for each example.
-* `batch_size` : An integer indicating the desired batch size.
+* `features`：一个形如 `{'feature_name':array}` 的数据字典（或者是 [`DataFrame`](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html)），它包含了原始的输入特征。
+* `labels`：一个包含每个样本的 [label](https://developers.google.com/machine-learning/glossary/#label) 的数组
+* `batch_size`：一个指示所需批量大小的整数。
 
-In [`premade_estimator.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/premade_estimator.py)
-we retrieved the Iris data using the `iris_data.load_data()` function.
-You can run it, and unpack the results as follows:
+在 [`premade_estimator.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/premade_estimator.py) 中，我们使用 `iris_data.load_data()` 函数来检索虹膜数据。
+你可以运行该函数，并按如下方式解压结果：
 
 ``` python
 import iris_data
 
-# Fetch the data
+# 获取数据
 train, test = iris_data.load_data()
 features, labels = train
 ```
 
-Then we passed this data to the input function, with a line similar to this:
+然后用像下面这样一行代码，将数据传递给 train_input_fn 函数。
 
 ``` python
 batch_size=100
 iris_data.train_input_fn(features, labels, batch_size)
 ```
 
-Let's walk through the `train_input_fn()`.
+让我们来具体看看 `train_input_fn()` 函数。
 
-### Slices
+### （数组）片段
 
-In the simplest cases, @{tf.data.Dataset.from_tensor_slices} function takes an
-array and returns a @{tf.data.Dataset} representing slices of the array. For
-example, an array containing the @{$tutorials/layers$mnist training data}
-has a shape of `(60000, 28, 28)`. Passing this to `from_tensor_slices` returns
-a `Dataset` object containing 60000 slices, each one a 28x28 image.
+在 `train_input_fn()` 函数中，首先使用 @{tf.data.Dataset.from_tensor_slices} 创建了 @{tf.data.Dataset} 来表示数组片段。数组是在第一个维度上被切片的。例如，一个包含 @{$tutorials/layers$mnist training data} 的数组的格式为 `(60000, 28, 28)`。将这个数组作为参数传入 `from_tensor_slices` 将会返回一个包含了 60000 个切片，每个切片为一个 28x28 图像的 `Dataset` 对象。
 
-The code that returns this `Dataset` is as follows:
+返回这个 `Dataset` 的代码如下所示：
 
 ``` python
 train, test = tf.keras.datasets.mnist.load_data()
@@ -89,18 +71,15 @@ mnist_ds = tf.data.Dataset.from_tensor_slices(mnist_x)
 print(mnist_ds)
 ```
 
-This will print the following line, showing the @{$programmers_guide/tensors#shapes$shapes} and @{$programmers_guide/tensors#data_types$types} of the items in
-the dataset. Note that the dataset does not know how many items it contains.
+这段代码将打印出下面这行内容，并展现出数据集内元素的 @{$programmers_guide/tensors#shapes$shapes} 和 @{$programmers_guide/tensors#data_types$types}。注意，`Dataset` 并不知道它自己包含多少个元素。
 
 ``` None
 <TensorSliceDataset shapes: (28,28), types: tf.uint8>
 ```
 
-The dataset above represents a collection of simple arrays, but datasets are
-much more powerful than this. Datasets transparently handle any nested
-combination of dictionaries or tuples. For example, ensuring that `features`
-is a standard dictionary, you can then convert the dictionary of arrays to
-a `Dataset` of dictionaries as follows:
+上文的 `Dataset` 代表了一个简单的数组集合，但是数据集比这要强大的多。一个 `Dataset` 能够透明地处理任何字典或元组（或者 [`namedtuple`](https://docs.python.org/2/library/collections.html#collections.namedtuple)）的嵌套组合。
+
+例如，在把虹膜特征转化成标准的 python 字典后，你可以用如下方式再将字典数组转化为字典 `Dataset`。
 
 ``` python
 dataset = tf.data.Dataset.from_tensor_slices(dict(features))
@@ -119,19 +98,14 @@ print(dataset)
 >
 ```
 
-Here we see that when a `Dataset` contains structured elements, the `shapes`
-and `types` of the `Dataset` take on the same structure. This dataset contains
-dictionaries of @{$programmers_guide/tensors#rank$scalars}, all of type
-`tf.float64`.
+这里我们可以发现，当 `Dataset` 包含了结构化的元素时，`Dataset` 的 `shapes` 和 `types` 就会采用相同结构。这个数据集包含了 @{$programmers_guide/tensors#rank$scalars} 字典，并且都是 `tf.float64` 类型。
 
-The first line of `train_input_fn` uses the same functionality, but adds
-another level of structure. It creates a dataset containing
-`(features, labels)` pairs.
+`train_input_fn` 的第一行代码使用了相同的功能，但是增加了一层结构。它创建了一个包含 `(features_dict, label)` 数据对的数据集。
 
-The following code shows that the label is a scalar with type `int64`:
+以下代码表明，标签是类型为 `int64` 的标量：
 
 ``` python
-# Convert the inputs to a Dataset.
+# 将输入转化为数据集。
 dataset = tf.data.Dataset.from_tensor_slices((dict(features), labels))
 print(dataset)
 ```
@@ -150,32 +124,20 @@ print(dataset)
         tf.int64)>
 ```
 
-### Manipulation
+### 操纵
 
-Currently the `Dataset` would iterate over the data once, in a fixed order, and
-only produce a single element at a time. It needs further processing before it
-can be used for training. Fortunately, the `tf.data.Dataset` class provides
-methods to better prepare the data for training. The next line of the input
-function takes advantage of several of these methods:
+目前，`Dataset` 会按照固定顺序遍历数据一次，且一次只能生成一个元素。在可以用于训练之前，它需要进一步的处理。幸运的是，`tf.data.Dataset` 类提供了方法来让数据为训练作出更好的准备。`train_input_fn` 的下一行代码就利用了几个这样的方法：
 
 ``` python
-# Shuffle, repeat, and batch the examples.
+# 样本的混排、重复、批处理。
 dataset = dataset.shuffle(1000).repeat().batch(batch_size)
 ```
 
-The @{tf.data.Dataset.shuffle$`shuffle`} method uses a fixed-size buffer to
-shuffle the items as they pass through. Setting a `buffer_size` greater than
-the number of examples in the `Dataset` ensures that the data is completely
-shuffled. The Iris data set only contains 150 examples.
+@{tf.data.Dataset.shuffle$`shuffle`} 方法使用了一个大小固定的缓冲区，当元素通过的时候，会被打乱顺序。在这种情况下，`buffer_size` 就会比 `Dataset` 中的样本数大很多，保证了所有数据能被充分地打乱（Iris 数据集仅包含了 150 个样本）。
 
-The @{tf.data.Dataset.repeat$`repeat`} method has the `Dataset` restart when
-it reaches the end. To limit the number of epochs, set the `count` argument.
+@{tf.data.Dataset.repeat$`repeat`} 方法在 `Dataset` 结束的时将它重启。如果要限制重复的次数，设置 `count` 参数。
 
-The @{tf.data.Dataset.repeat$`batch`} method collects a number of examples and
-stacks them, to create batches. This adds a dimension to their shape. The new
-dimension is added as the first dimension. The following code uses
-the `batch` method on the MNIST `Dataset`, from earlier. This results in a
-`Dataset` containing 3D arrays representing stacks of `(28,28)` images:
+@{tf.data.Dataset.batch$`batch`} 方法将会收集一定数量的样本并入栈，以此创建一个批次。这个操作会为样本的 shape 增加一个维度，且新的维度将作为第一维。如下代码在 MNIST 数据集上相对早地应用了 `batch` 方法，导致 `Dataset` 包含了表示 `(28,28)` 图像的三维数组。
 
 ``` python
 print(mnist_ds.batch(100))
@@ -186,11 +148,10 @@ print(mnist_ds.batch(100))
   shapes: (?, 28, 28),
   types: tf.uint8>
 ```
-Note that the dataset has an unknown batch size because the last batch will
-have fewer elements.
 
-In `train_input_fn`, after batching the `Dataset` contains 1D vectors of
-elements where each scalar was previously:
+注意，因为最后一个批次将会有比较少的元素，因此数据集的批量大小是不确定的，
+
+在 `train_input_fn` 中，批处理之后，`数据集` 包含元素们的一维向量，这些一维向量的前面部分是：
 
 ```python
 print(dataset)
@@ -210,128 +171,76 @@ print(dataset)
         tf.int64)>
 ```
 
+### 返回
 
-### Return
+到了这一步，`Dataset` 包含了 `(features_dict, labels)` 这样的数据对。这正是 `train` 和 `evaluate` 方法所期望的格式，因此，`input_fn` 函数返回了数据集。
 
-<!-- TODO(markdaoust) This line can be simplified to "return dataset" -->
+当使用 `predict` 方法时，`labels` 可以/应该被省略。
 
-The `train`, `evaluate`, and `predict` methods of every Estimator require
-input functions to return a `(features, label)` pair containing
-@{$programmers_guide/tensors$tensorflow tensors}. The `train_input_fn` uses
-the following line to convert the Dataset into the expected format:
+## 读取 CSV 文件
 
-```python
-# Build the Iterator, and return the read end of the pipeline.
-features_result, labels_result = dataset.make_one_shot_iterator().get_next()
-```
+现实中对 `Dataset` 类最常见的应用是从磁盘的文档中获取数据流。@{tf.data} 模块包括了一系列的文件读取器。我们来看看如何使用 `Dataset` 从 csv 文件中分析虹膜数据集。
 
-The result is a structure of @{$programmers_guide/tensors$TensorFlow tensors},
-matching the layout of the items in the `Dataset`.
-For an introduction to what these objects are and how to work with them,
-see @{$programmers_guide/low_level_intro}.
-
-``` python
-print((features_result, labels_result))
-```
-
-```None
-({
-    'SepalLength': <tf.Tensor 'IteratorGetNext:2' shape=(?,) dtype=float64>,
-    'PetalWidth': <tf.Tensor 'IteratorGetNext:1' shape=(?,) dtype=float64>,
-    'PetalLength': <tf.Tensor 'IteratorGetNext:0' shape=(?,) dtype=float64>,
-    'SepalWidth': <tf.Tensor 'IteratorGetNext:3' shape=(?,) dtype=float64>},
-Tensor("IteratorGetNext_1:4", shape=(?,), dtype=int64))
-```
-
-## Reading a CSV File
-
-The most common real-world use case for the `Dataset` class is to stream data
-from files on disk. The @{tf.data} module includes a variety of
-file readers. Let's see how parsing the Iris dataset from the csv file looks
-using a `Dataset`.
-
-The following call to the `iris_data.maybe_download` function downloads the
-data if necessary, and returns the pathnames of the resulting files:
+如下对 `iris_data.maybe_download` 函数的调用，将会在必要的时候下载数据，并返回结果文件的路径。
 
 ``` python
 import iris_data
 train_path, test_path = iris_data.maybe_download()
 ```
 
-The [`iris_data.csv_input_fn`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/iris_data.py)
-function contains an alternative implementation that parses the csv files using
-a `Dataset`.
+[`iris_data.csv_input_fn`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/iris_data.py) 函数包括了一个用 `Dataset` 解析 csv 文件的替代方案。
 
-Let's look at how to build an Estimator-compatible input function that reads
-from the local files.
+让我们来看看如何构建一个兼容 Estimator 的、可以读取本地文件的输入函数。
 
-### Build the `Dataset`
+### 建立 `Dataset`
 
-We start by building a @{tf.data.TextLineDataset$`TextLineDataset`} object to
-read the file one line at a time. Then, we call the
-@{tf.data.Dataset.skip$`skip`} method to skip over the first line of the file, which contains a header, not an example:
+我们从建立一个 @{tf.data.TextLineDataset$`TextLineDataset`} 对象开始，这个对象一次只读取文件的一行。之后，调用 @{tf.data.Dataset.skip$`skip`} 方法，跳过文件的第一行——这是文件的头部，而不是样本。
 
 ``` python
 ds = tf.data.TextLineDataset(train_path).skip(1)
 ```
 
-### Build a csv line parser
+### 建立一个 csv 行解析器
 
-Ultimately we will need to parse each of the lines in the dataset, to
-produce the necessary `(features, label)` pairs.
+我们从建立一个可以解析一行的函数开始。
 
-We will start by building a function to parse a single line.
+如下的 `iris_data.parse_line` 函数完成了这个目标，它使用了 @{tf.decode_csv} 方法以及一些简单的 python 代码。
 
-The following `iris_data.parse_line` function accomplishes this task using the
-@{tf.decode_csv} function, and some simple python code:
-
-We must parse each of the lines in the dataset in order to generate the
-necessary `(features, label)` pairs. The following `_parse_line` function
-calls @{tf.decode_csv} to parse a single line into its features
-and the label. Since Estimators require that features be represented as a
-dictionary, we rely on Python's built-in `dict` and `zip` functions to build
-that dictionary.  The feature names are the keys of that dictionary.
-We then call the dictionary's `pop` method to remove the label field from
-the features dictionary:
+为了生成必需的 `(features, label)` 数据对，我们必须解析数据集内的每一行。如下的 `_parse_line` 函数调用了 @{tf.decode_csv} 来将单独一行解析为特征和标签。因为 Estimators 需要特征以字典的方式展现，我们就依靠 python 内建的 `dict` 和 `zip` 函数来建立这个字典。特征的名字是字典的键值 key。然后，调用字典的 `pop` 方法来从特征字典中移除标签字段。
 
 ``` python
-# Metadata describing the text columns
+# 描述文本列的元数据
 COLUMNS = ['SepalLength', 'SepalWidth',
            'PetalLength', 'PetalWidth',
            'label']
 FIELD_DEFAULTS = [[0.0], [0.0], [0.0], [0.0], [0]]
 def _parse_line(line):
-    # Decode the line into its fields
+    # 将行解码到 fields 中
     fields = tf.decode_csv(line, FIELD_DEFAULTS)
 
-    # Pack the result into a dictionary
+    # 将结果打包成字典
     features = dict(zip(COLUMNS,fields))
 
-    # Separate the label from the features
+    # 将标签从特征中分离
     label = features.pop('label')
 
     return features, label
 ```
 
-### Parse the lines
+### 解析多行
 
-Datasets have many methods for manipulating the data while it is being piped
-to a model. The most heavily-used method is @{tf.data.Dataset.map$`map`}, which
-applies a transformation to each element of the `Dataset`.
+当数据集将被传输到一个模型中时，它有很多操作数据的方法。其中，使用最多的是 @{tf.data.Dataset.map$`map`}，这个方法会将某种转换应用于 `Dataset` 的每一个元素。
 
-The `map` method takes a `map_func` argument that describes how each item in the
-`Dataset` should be transformed.
+这个 `map` 方法接受一个 `map_func` 参数，这个参数描述了 `Dataset` 中的每一个元素应该如何被转化。
 
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/datasets/map.png">
 </div>
 <div style="text-align: center">
-The @{tf.data.Dataset.map$`map`} method applies the `map_func` to
-transform each item in the <code>Dataset</code>.
+@{tf.data.Dataset.map$`map`} 方法将会对 `Dataset` 中的每一个元素应用 `map_func` 来完成它们的转化。
 </div>
 
-So to parse the lines as they are streamed out of the csv file, we pass our
-`_parse_line` function to the `map` method:
+因此，为了在多行数据被从文件中读取出来的时候解析它们，我们为 `map` 方法提供自定义的 `_parse_line` 函数：
 
 ``` python
 ds = ds.map(_parse_line)
@@ -347,56 +256,42 @@ types: (
     tf.int32)>
 ```
 
-Now instead of simple scalar strings, the dataset contains `(features, label)`
-pairs.
+现在，数据集中包含的是 `(features, label)` 数据对，而不是简单的字符串标量了。
 
-the remainder of the `iris_data.csv_input_fn` function is identical
-to `iris_data.train_input_fn` which was covered in the in the
-[Basic input](#basic_input) section.
+`iris_data.csv_input_fn` 函数的余下部分和 [Basic input](#basic_input) 中介绍的 `iris_data.train_input_fn` 函数相同。
 
-### Try it out
+### 实践
 
-This function can be used as a replacement for
-`iris_data.train_input_fn`. It can be used to feed an estimator as follows:
+这个函数可以作为 `iris_data.train_input_fn` 的替代。它可以像如下这样，来给 estimator（估值器）提供数据：
 
 ``` python
 train_path, test_path = iris_data.maybe_download()
 
-# All the inputs are numeric
+# 所有的输入都是数字
 feature_columns = [
     tf.feature_column.numeric_column(name)
     for name in iris_data.CSV_COLUMN_NAMES[:-1]]
 
-# Build the estimator
+# 建立 estimator（估值器）
 est = tf.estimator.LinearClassifier(feature_columns,
                                     n_classes=3)
-# Train the estimator
+# 训练 estimator（估值器）
 batch_size = 100
 est.train(
     steps=1000,
     input_fn=lambda : iris_data.csv_input_fn(train_path, batch_size))
 ```
 
-Estimators expect an `input_fn` to take no arguments. To work around this
-restriction, we use `lambda` to capture the arguments and provide the expected
-interface.
+估值器 estimator 期望 `input_fn` 没有任何参数。要解除这个限制，我们使用 `lambda` 来捕获参数并提供预期的接口。
 
-## Summary
+## 总结
 
-The `tf.data` module provides a collection of classes and functions for easily
-reading data from a variety of sources. Furthermore, `tf.data` has simple
-powerful methods for applying a wide variety of standard and custom
-transformations.
+为了从不同的数据源中便捷的读取数据，`tf.data` 模块提供了一些列的方法和类。除此之外，`tf.data` 有简单并且强大的方法，来应用各种标准和自定义转换。
 
-Now you have the basic idea of how to efficiently load data into an
-Estimator. Consider the following documents next:
+现在你已经基本了解了如何为 Estimator 估值器高效的获取数据。（作为扩展）接下来可以思考如下的文档：
 
+* @{$get_started/custom_estimators}: 论述了如何建立自定义的 `Estimator` 模型。
 
-* @{$get_started/custom_estimators}, which demonstrates how to build your own
-  custom `Estimator` model.
-* The @{$low_level_intro#datasets$Low Level Introduction}, which demonstrates
-  how to experiment directly with `tf.data.Datasets` using TensorFlow's low
-  level APIs.
-* @{$programmers_guide/datasets} which goes into great detail about additional
-  functionality of `Datasets`.
+* @{$low_level_intro#datasets$Low Level Introduction}: 论述了如何利用 TensorFlow 的低级 APIs 来直接使用 `tf.data.Datasets` 进行实验。
 
+* @{$programmers_guide/datasets} 详细介绍了 `Datasets` 的附加方法。
