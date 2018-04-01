@@ -1,73 +1,73 @@
-# Building TensorFlow on Android
+# 在安卓上构建 TensorFlow
 
-To get you started working with TensorFlow on Android, we'll walk through two
-ways to build our TensorFlow mobile demos and deploying them on an Android
-device. The first is Android Studio, which lets you build and deploy in an
-IDE. The second is building with Bazel and deploying with ADB on the command
-line.
+为了让你开始在安卓中使用 TensorFlow， 我们将浏览两种方法来
+构建我们的 TensorFlow 移动端的 demo，并且在安卓上部署这些 demo。
+第一种方法就是使用 Android Studio，使用 Android Studio 可以让你在 IDE 中。
+构建和部署应用。第二种方式是使用 Bazel 和 ADB 在命令行中发布
+和构建应用。
 
-Why choose one or the other of these methods?
+我们为什么选择这一种或者另外一种方法去构建呢？
 
-The simplest way to use TensorFlow on Android is to use Android Studio. If you
-aren't planning to customize your TensorFlow build at all, or if you want to use
-Android Studio's editor and other features to build an app and just want to add
-TensorFlow to it, we recommend using Android Studio.
+使用 Android Studio 是在 Android 上使用 tensorFlow 最简单的方法。如果你
+不准备定制你的 TensorFlow， 或者，如果你想使用 Android Studio 的编辑器
+或者其他功能去构建一个 app ，并且，仅仅添加 TensorFlow 
+到应用里面，我们推荐使用 Android Studio 。
 
-If you are using custom ops, or have some other reason to build TensorFlow from
-scratch, scroll down and see our instructions
-for [building the demo with Bazel](#build_the_demo_using_bazel).
+如果你想使用自定义操作，或者基于其他理由去构建 TensorFlow，
+那么你向下滑，并且你将会看到我们关于
+[使用 Bazel 构建 demo 的描述文档](#build_the_demo_using_bazel).
 
-## Build the demo using Android Studio
+## 使用 Android Studio 构建构建 demo 
 
-**Prerequisites**
+**先决条件**
 
-If you haven't already, do the following two things:
+如果你没有准备好，你需要做下面两件事情：
 
-- Install [Android Studio](https://developer.android.com/studio/index.html),
-  following the instructions on their website.
+- 遵循 Android Studio 网站的说明，安装[Android Studio](https://developer.android.com/studio/index.html)。
+  
 
-- Clone the TensorFlow repository from Github:
+- 从 Github 上克隆 TensorFlow 的仓库：
 
         git clone https://github.com/tensorflow/tensorflow
 
-**Building**
+**构建**
 
-1. Open Android Studio, and from the Welcome screen, select **Open an existing
+1.  打开 Android Studio，在欢迎界面中选择 **Open an existing
    Android Studio project**.
 
-2. From the **Open File or Project** window that appears, navigate to and select
-    the `tensorflow/examples/android` directory from wherever you cloned the
-    TensorFlow Github repo.  Click OK.
+2. 从 **Open File or Project** 窗口中，导航并选择
+     `tensorflow/examples/android` 目录，这个目录在你克隆的
+    TensorFlow 的 Github repo 中, 点击 OK.
 
-    If it asks you to do a Gradle Sync, click OK.
+    如果，IDE 请求你去同步 Gradle，点击 OK。
 
-    You may also need to install various platforms and tools, if you get
-    errors like "Failed to find target with hash string 'android-23' and similar.
+    如果你得到了类似于“Failed to find target with hash string 'android-23”这样的错误，
+    你也可能需要安装多个平台和工具。
 
-3. Open the `build.gradle` file (you can go to **1:Project** in the side panel
-    and find it under the **Gradle Scripts** zippy under **Android**). Look for
-    the `nativeBuildSystem` variable and set it to `none` if it isn't already:
+3. 打开 `build.gradle` 文件 （你可以到侧边面板的 **1.Project** 下，
+    并在 Android 下的 **Gradle Script** 中找到它）。 找到
+    `nativeBuildSystem`变量，如果尚未置为 `none`，就把它置为`none`：
 
         // set to 'bazel', 'cmake', 'makefile', 'none'
         def nativeBuildSystem = 'none'
 
-4. Click the Run button (the green arrow) or use **Run -> Run 'android'** from the top menu.
+4. 点击启动按钮（绿色的箭头）或者从顶部菜单使用 **Run -> Run 'android'**。
 
-    If it asks you to use Instant Run, click **Proceed Without Instant Run**.
+    如果它请求你使用 Instant Run，点击**Proceed Without Instant Run**。
 
-    Also, you need to have an Android device plugged in with developer options
-    enabled at this
-    point. See [here](https://developer.android.com/studio/run/device.html) for
-    more details on setting up developer devices.
+  你还需要插入一个已经打开了
+  开发者选项的  Android 
+  设备。 看[这里](https://developer.android.com/studio/run/device.html)你可以
+  了解更多关于设置开发者设备的更多细节。
 
-This installs three apps on your phone that are all part of the TensorFlow
-Demo. See [Android Sample Apps](#android_sample_apps) for more information about
-them.
+这将会安装三个 app 在你的手机中，这些 app 都是 TensorFlow 的 demo。
+看 [Android 示例程序](#android_sample_apps) ，你将得到关于
+它们更多的信息。
 
-## Adding TensorFlow to your apps using Android Studio
+## 使用 Android Studio 添加 TensorFlow 到你的 app 中
 
-To add TensorFlow to your own apps on Android, the simplest way is to add the
-following lines to your Gradle build file:
+添加 TensorFlow 到你自己的 Android app中，最简单的方法是添加
+下面几行到你的 Gradle 构建文件中：
 
     allprojects {
         repositories {
@@ -79,98 +79,98 @@ following lines to your Gradle build file:
         compile 'org.tensorflow:tensorflow-android:+'
     }
 
-This automatically downloads the latest stable version of TensorFlow as an AAR
-and installs it in your project.
+这将自动下载最新的稳定版本的 TensorFlow ARR包，
+并且，安装到你的项目中。
 
-## Build the demo using Bazel
+##  使用 Bazel 构建 demo
 
-Another way to use TensorFlow on Android is to build an APK
-using [Bazel](https://bazel.build/) and load it onto your device
-using [ADB](https://developer.android.com/studio/command-line/adb.html). This
-requires some knowledge of build systems and Android developer tools, but we'll
-guide you through the basics here.
+另一种在 Android 中使用 TensorFlow 的方法是
+使用 [Bazel](https://bazel.build/) 来构建一个 APK，并且通过
+using [ADB](https://developer.android.com/studio/command-line/adb.html) 中加载它。这
+需要一些关于构建系统和 Android 开发者工具的知识，但我们会
+在这里引导您完成基础步骤。
 
-- First, follow our instructions for @{$install/install_sources$installing from sources}.
-  This will also guide you through installing Bazel and cloning the
-  TensorFlow code.
+- 首先, 跟随我们关于 @{$install/install_sources$installing from sources} 的文档。
+  它也会带领你安装 Bazel 和克隆
+  TensorFlow 的代码。
 
-- Download the Android [SDK](https://developer.android.com/studio/index.html)
-  and [NDK](https://developer.android.com/ndk/downloads/index.html) if you do
-  not already have them. You need at least version 12b of the NDK, and 23 of the
-  SDK.
+- 下载 Android 的 [SDK](https://developer.android.com/studio/index.html)
+  and [NDK](https://developer.android.com/ndk/downloads/index.html) 如果你以前
+  没下载它们的话。你需要下载最新的 12b 版本的 NDK，和版本为 23 及以上
+  的 SDK。
 
-- In your copy of the TensorFlow source, update the
+- 在你复制的 TensorFlow 源代码中，更新 
   [WORKSPACE](https://github.com/tensorflow/tensorflow/blob/master/WORKSPACE)
-  file with the location of your SDK and NDK, where it says &lt;PATH_TO_NDK&gt;
-  and &lt;PATH_TO_SDK&gt;.
+  文件中的 &lt;PATH_TO_NDK&gt;和 &lt;PATH_TO_SDK&gt;，
+  为SDK 和 NDK 的位置。
 
-- Run Bazel to build the demo APK:
+- 运行 Bazel 去构建 demo APK:
 
         bazel build -c opt //tensorflow/examples/android:tensorflow_demo
 
-- Use [ADB](https://developer.android.com/studio/command-line/adb.html#move) to
-  install the APK onto your device:
+- 使用 [ADB](https://developer.android.com/studio/command-line/adb.html#move) to
+  安装 APK 文件到你的安卓设备:
 
         adb install -r bazel-bin/tensorflow/examples/android/tensorflow_demo.apk
 
-Note: In general when compiling for Android with Bazel you need
-`--config=android` on the Bazel command line, though in this case this
-particular example is Android-only, so you don't need it here.
+注意：当使用 Bazel 编译 Android 你需要在命令行中指定 
+`--config=android`。在当前场景中，
+p这个例子是专门为 Android 打造的，所以，在这里你不需要指定。
 
-This installs three apps on your phone that are all part of the TensorFlow
-Demo. See [Android Sample Apps](#android_sample_apps) for more information about
-them.
+这将安装三个 app 到你的手机，这些 app 都是 TensorFlow 的部分
+示例。看 [Android 示例 Apps](#android_sample_apps) 来获取更多关于
+示例程序的信息。
 
-## Android Sample Apps
+## Android 示例 app
 
-The
-[Android example code](https://www.tensorflow.org/code/tensorflow/examples/android/) is
-a single project that builds and installs three sample apps which all use the
-same underlying code. The sample apps all take video input from a phone's
-camera:
 
-- **TF Classify** uses the Inception v3 model to label the objects it’s pointed
-  at with classes from Imagenet. There are only 1,000 categories in Imagenet,
-  which misses most everyday objects and includes many things you’re unlikely to
-  encounter often in real life, so the results can often be quite amusing. For
-  example there’s no ‘person’ category, so instead it will often guess things it
-  does know that are often associated with pictures of people, like a seat belt
-  or an oxygen mask. If you do want to customize this example to recognize
-  objects you care about, you can use
-  the
-  [TensorFlow for Poets codelab](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/index.html#0) as
-  an example for how to train a model based on your own data.
+[Android 示例代码](https://www.tensorflow.org/code/tensorflow/examples/android/) 是
+一个单独的项目，这个项目构建和安装三个示例 app，这些 app 
+都使用相同的底层代码。这些示例程序都是用手机的摄像头作为
+输入：
 
-- **TF Detect** uses a multibox model to try to draw bounding boxes around the
-  locations of people in the camera. These boxes are annotated with the
-  confidence for each detection result. Results will not be perfect, as this
-  kind of object detection is still an active research topic.  The demo also
-  includes optical tracking for when objects move between frames, which runs
-  more frequently than the TensorFlow inference. This improves the user
-  experience since the apparent frame rate is faster, but it also gives the
-  ability to estimate which boxes refer to the same object between frames, which
-  is important for counting objects over time.
+- **TF Classify** 使用 Inception v3 模型去标记对象。
+  它用 Imagenet 来分类。在 Imagenet 中有 1000 种分类，
+  这几乎包含了日常生活中的物品，并且，
+  也包括了你在日常生活中不经常遇到东西，所以结果会是十分有趣的。 举个
+  例子，这里没有‘人’类别，，因此，让它猜测照片中的人
+ ，它会尽可能去猜测人附近的东西， 例如，安全带
+  或者氧气面罩。如果你想定制这个例子去识别你感兴趣的东西，
+  你可以使用
+ 
+  [TensorFlow for Poets codelab](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/index.html#0)
+  作为例子， 来了解如何培养模型的基础上你自己的数据。
 
-- **TF Stylize** implements a real-time style transfer algorithm on the camera
-  feed. You can select which styles to use and mix between them using the
-  palette at the bottom of the screen, and also switch out the resolution of the
-  processing to go higher or lower rez.
+- **TF Detect** 使用多盒模型去尝试画出在
+  相机中人的位置绘制边界框。 这些框对每个侦测结
+  果注释了信心表。 结果将不会是完美的， 这类
+  的物体侦测仍然是一个活跃的研究话题。这个 demo 也
+  包括了可视追踪，当对象在帧之间移动，这比
+   TensorFlow 推断的速度要快很多。当明显的帧率加快，
+  极大的改善了用户体验，但它还能够估计那些框
+  指向帧之间画面的同一对象，这对于随着时间变化
+  对对象计数起着非常重要的作用。
 
-When you build and install the demo, you'll see three app icons on your phone,
-one for each of the demos. Tapping on them should open up the app and let you
-explore what they do. You can enable profiling statistics on-screen by tapping
-the volume up button while they’re running.
+- **TF Stylize** 实现了基于摄像头返回的数据的实时风格转化算法。
+  你可以选择你想用的风格，
+  可以通过屏幕下面的调色板混合它们，
+  也可以将处理的分辨率转换为更高或更低。
 
-### Android Inference Library
+当你构建和安装这些示例，你将会看到三个 app 的 icon 在你的手机上，
+每一个对应一个 demo。点击这些 icon，将会打开对应的 app 并且让
+你去探索它们是干什么的。当这些 app 运行的时候，
+你可以点击音量增加按钮来在你的屏幕上启动分析统计。
 
-Because Android apps need to be written in Java, and core TensorFlow is in C++,
-TensorFlow has a JNI library to interface between the two. Its interface is aimed
-only at inference, so it provides the ability to load a graph, set up inputs,
-and run the model to calculate particular outputs. You can see the full
-documentation for the minimal set of methods in
+### Android 接口库
+
+因为安卓 app 使用 java 编写，但是，TensorFlow 的核心使用的是 c++，
+TensorFlow 有一个 JNI 库来向两种语言之间提供接口。这个接口的只是针对推理的，
+因此它提供了加载 graph，设置输入，
+和运行模型来计算特殊的输出。您可以在
 [TensorFlowInferenceInterface.java](https://www.tensorflow.org/code/tensorflow/contrib/android/java/org/tensorflow/contrib/android/TensorFlowInferenceInterface.java)
+中查看少量的一组方法的完整文档。
 
-The demos applications use this interface, so they’re a good place to look for
-example usage. You can download prebuilt binary jars
-at
-[ci.tensorflow.org](https://ci.tensorflow.org/view/Nightly/job/nightly-android/).
+示例程序都是使用这个接口，因此，它们都是学习使用方法的好地方。
+您可以在
+[ci.tensorflow.org](https://ci.tensorflow.org/view/Nightly/job/nightly-android/)
+下载预先构建好的二进制 jar 包。
