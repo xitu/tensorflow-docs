@@ -15,7 +15,6 @@
 
 然后，应用一系列一维卷积，然后使用 LSTM 层将所有的输出传递给 softmax 层，进而进行涂鸦分类。
 
-This tutorial uses the data from actual [Quick, Draw!] games [that is publicly available](https://quickdraw.withgoogle.com/data). This dataset contains of 50M drawings in 345 categories.
 此教程使用的数据来自实际的 [Quick, Draw!] 游戏[公开数据集](https://quickdraw.withgoogle.com/data)。数据包含了 50M 个涂鸦以及 345 个分类。
 
 ## 运行教程代码
