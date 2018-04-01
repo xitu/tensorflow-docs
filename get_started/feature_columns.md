@@ -1,8 +1,8 @@
 # 特征列
 
-本篇文档将详细介绍特征列。**特征列（feature columns）**可以视为原始数据和估计器间的中介。特征列非常丰富，可以让你将各种不同的原始数据转化为估计器可用的格式，从而轻松的进行实验。
+本篇文档将详细介绍特征列。**特征列（feature columns）**可以视为原始数据和 Estimator 间的中介。特征列非常丰富，可以让你将各种不同的原始数据转化为 Estimator 可用的格式，从而轻松的进行实验。
 
-在 @{$get_started/premade_estimators$Premade Estimators} 里，我们使用预设的估计器 @{tf.estimator.DNNClassifier$`DNNClassifier`} 来训练模型，并根据 4 个输入特征，预测不同种类的鸢尾花。这个例子仅仅创建了（@{tf.feature_column.numeric_column} 类型的）数字特征列。尽管数字特征列有效地模拟了花瓣和萼片的长度，但是现实世界的数据集会包含所有类型的特征，其中很多是非数字的。
+在 @{$get_started/premade_estimators$Premade Estimators} 里，我们使用预设的 Estimator @{tf.estimator.DNNClassifier$`DNNClassifier`} 来训练模型，并根据 4 个输入特征，预测不同种类的鸢尾花。这个例子仅仅创建了（@{tf.feature_column.numeric_column} 类型的）数字特征列。尽管数字特征列有效地模拟了花瓣和萼片的长度，但是现实世界的数据集会包含所有类型的特征，其中很多是非数字的。
 
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/feature_columns/feature_cloud.jpg">
@@ -13,19 +13,19 @@
 
 ## 输入至深度神经网络
 
-深度神经网络可以操作什么样的数据？答案当然是数字（例如，`tf.float32`）。毕竟，神经网络的每个神经元都会对权重和输入值进行乘法和加法操作。但是，现实中的输入数据经常包含非数字的（分类的）数据。例如，一个“产品类别”特征就可能包含如下三个非数字的值：
+深度神经网络可以操作什么样的数据？答案当然是数字（例如，`tf.float32`）。毕竟，神经网络的每个神经元都会对权重和输入值进行乘法和加法操作。但是，现实中的输入数据经常包含非数字的（分类的）数据。例如，一个 `product_class` 特征就可能包含如下三个非数字的值：
 
 * 厨具
 * 电子产品
 * 运动产品
 
-机器学习模型通常都会以简单的向量代表分类值，在向量中，1 表示某值存在，0 表示值不存在。例如，当产品类别是运动产品的集合时，一个机器学习模型通常会以 `[0, 0, 1]` 表示产品类别，含义是：
+机器学习模型通常都会以简单的向量代表分类值，在向量中，1 表示某值存在，0 表示值不存在。例如，当 `product_class` 运动产品的集合时，一个机器学习模型通常会以 `[0, 0, 1]` 表示 `product_class` ，含义是：
 
 * `0`: 厨具不存在
 * `0`: 电子产品不存在
 * `1`: 运动产品存在
 
-所以，尽管原始数据可能是数字或者分类的内容，机器学习模型都要以数字表示所有的特征。
+所以，尽管原始数据可能是数字或者分类，机器学习模型都要以数字表示所有的特征。
 
 ## 特征列
 
@@ -61,19 +61,19 @@
 虽然 `tf.numeric_column` 提供了可选的参数，但是像如下所示这样，不带任何参数的调用它却是一个不错的方式，这样可以用默认的数据类型（`tf.float32`）来指定模型输入的数值。
 
 ```python
-# 默认为 tf.float32 纯量。
+# 默认为 tf.float32 标量。
 numeric_feature_column = tf.feature_column.numeric_column(key="SepalLength")
 ```
 
 如果想指定非默认的数据类型，可以定义 `dtype` 参数。例如：
 
 ``` python
-# 代表 tf.float64 纯量。
+# 代表 tf.float64 标量。
 numeric_feature_column = tf.feature_column.numeric_column(key="SepalLength",
                                                           dtype=tf.float64)
 ```
 
-默认情况下，一个数值列仅创建一个值（纯量）。使用 shape 参数来定义其他的数据格式。例如：
+默认情况下，一个数值列仅创建一个值（标量）。使用 shape 参数来定义数据维度。例如：
 
 <!--TODO(markdaoust) link to full example-->
 ```python
@@ -88,7 +88,7 @@ matrix_feature_column = tf.feature_column.numeric_column(key="MyMatrix",
 
 ### 分桶列
 
-通常情况下，我们不希望直接将数值传入模型，而是根据取值范围将数值放进不同的类别中。可以通过创建 @{tf.feature_column.bucketized_column$bucketized column} 完成上述功能。例如，考虑一组表示房屋建成年份原始数据。我们应该将年份放入 4 个不同的 buckets 中，而不是把每一个年份数值都作为一个纯量数值列。
+通常情况下，我们不希望直接将数值传入模型，而是根据取值范围将数值放进不同的类别中。可以通过创建 @{tf.feature_column.bucketized_column$bucketized column} 完成上述功能。例如，考虑一组表示房屋建成年份原始数据。我们应该将年份放入 4 个不同的 buckets 中，而不是把每一个年份数值都作为一个标量数值列：
 
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/feature_columns/bucketized_column.jpg">
@@ -125,16 +125,16 @@ bucketized_feature_column = tf.feature_column.bucketized_column(
 
 ### 分类标识列
 
-**分类标识列（Categorical identity columns）** 可以被看作 bucketized columns 的一个特殊实例。传统的 bucketized columns 中，每一个 bucket 代表一个范围的数值（例如，从 1960 到 1979）。在分类标识列中，每一个 bucket 则代表了一单一、独立的整数。例如，你想要表示一个在 `[0, 4)` 范围内的整数，也就是 0、1、2 或者 3。这时，分类标识的 map 如下所示：
+**分类标识列（Categorical identity columns）** 可以被看作分桶列的一个特殊实例。传统的分桶列中，每一个 bucket 代表一个范围的数值（例如，从 1960 到 1979）。在分类标识列中，每一个 bucket 则代表了一单一、独立的整数。例如，你想要表示一个在 `[0, 4)` 范围内的整数，也就是 0、1、2 或者 3。这时，分类标识的映射如下所示：
 
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/feature_columns/categorical_column_with_identity.jpg">
 </div>
 <div style="text-align: center">
-一个分类标识列的 map。注意，这是独热编码，而不是二进制数字编码。
+一个分类标识列的映射。注意，这是独热编码，而不是二进制数字编码。
 </div>
 
-和 bucketized columns 一样，模型能够从每个分类标识列的分类中学习单独的权重。如下所示，我们用唯一的数字而不是字符串来代表 `product_class` 中的值：
+和分桶列一样，模型能够从每个分类标识列的分类中学习单独的权重。如下所示，我们用唯一的数字而不是字符串来代表 `product_class` 中的值：
 
 * `0="厨具"`
 * `1="电子产品"`
@@ -237,9 +237,6 @@ hashed_feature_column =
 
 更具体说来，假如我希望模型计算亚特兰大房地产价格。由于位置不同，城市内房地产价格差别很大。将纬度和经度表示为单独的特征在识别房地产位置依赖性方面并不是非常有用；然而，将纬度和经度交叉成单个特征可以精确定位位置。假设亚特兰大是一个 100×100 的矩形网格，并通过纬度和经度的交叉特征识别这 10,000 个部分中的每一个。这样的特征交叉让模型可以在每个独立部分的价格条件下进行训练，这比单独使用经度或者纬度都要强健。
 
-The following figure shows our plan, with the latitude & longitude values for
-the corners of the city in red text:
-
 下图展示了上述计划，以红色文本显示城市四角的纬度和经度值：
 
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
@@ -282,13 +279,13 @@ fc = [
     longitude_bucket_fc,
     crossed_lat_lon_fc]
 
-# 建立并训练估计器。
+# 建立并训练 Estimator。
 est = tf.estimator.LinearRegressor(fc, ...)
 ```
 
 你可以采用如下方法中的任何一个来创建一个交叉特征：
 
-* 特征名，也就是，从 `input_fn` 返回 `dict` 中的名字。
+* 特征名；也就是，从 `input_fn` 返回 `dict` 中的名字。
 * 任意一个分类列，除了 `categorical_column_with_hash_bucket`（因为 `crossed_column` 散列了输入）。
 
 特征列 `latitude_bucket_fc` 和 `longitude_bucket_fc` 交叉后，TensorFlow 将会为每个样本创建数据对 `(latitude_fc, longitude_fc)`。这将会产生如下这样的全量概率网格：
@@ -318,9 +315,6 @@ est = tf.estimator.LinearRegressor(fc, ...)
 <div style="text-align: center">
 在指针列中表示数据。
 </div>
-
-Here's how you create an indicator column by calling
-@{tf.feature_column.indicator_column}:
 
 如下所示是如何通过调用 @{tf.feature_column.indicator_column} 来创建指针列：
 
@@ -372,8 +366,6 @@ embedding_dimensions =  number_of_categories**0.25
 ```
 注意这仅是一个一般准则，你可以将嵌入的维度设置为任何你喜欢的值。
 
-Call @{tf.feature_column.embedding_column} to create an `embedding_column` as
-suggested by the following snippet:
 如下代码片段建议，调用 @{tf.feature_column.embedding_column} 来创建 `embedding_column`。
 
 ``` python
@@ -388,12 +380,9 @@ embedding_column = tf.feature_column.embedding_column(
 
 @{$programmers_guide/embedding$Embeddings} 是机器学习中一个很重要的问题。这些信息只是为了能让你开始以特征列来使用它们。
 
-## 将特征列传递给估计器
+## 将特征列传递给 Estimator
 
-As the following list indicates, not all Estimators permit all types of
-`feature_columns` argument(s):
-
-如下列表所示，并不是所有估计器都允许 `feature_columns` 参数的所有类别：
+如下列表所示，并不是所有 Estimator 都允许 `feature_columns` 参数的所有类别：
 
 * @{tf.estimator.LinearClassifier$`LinearClassifier`} 和
   @{tf.estimator.LinearRegressor$`LinearRegressor`}: 接受所有类型特征列。
@@ -411,7 +400,6 @@ As the following list indicates, not all Estimators permit all types of
 * @{$low_level_intro#feature_columns$Low Level Introduction} 演示了如何用 TensorFlow 的低级 APIs 和 `feature_columns` 直接开始实验。
 * @{$wide$wide} 和 @{$wide_and_deep$Wide & Deep} 教程基于各种输入数据类型，使用 `feature_columns` 解决了二元分类问题。
 
-To learn more about embeddings, see the following:
 学习更多和嵌入相关的知识，参见如下：
 
 * [Deep Learning, NLP, and representations](http://colah.github.io/posts/2014-07-NLP-RNNs-Representations/)
