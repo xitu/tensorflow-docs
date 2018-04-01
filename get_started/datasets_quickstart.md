@@ -60,12 +60,6 @@ iris_data.train_input_fn(features, labels, batch_size)
 
 ### （数组）片段
 
-In the simplest cases, @{tf.data.Dataset.from_tensor_slices} function takes an
-array and returns a @{tf.data.Dataset} representing slices of the array. For
-example, an array containing the @{$tutorials/layers$mnist training data}
-has a shape of `(60000, 28, 28)`. Passing this to `from_tensor_slices` returns
-a `Dataset` object containing 60000 slices, each one a 28x28 image.
-
 在最简单的例子中，@{tf.data.Dataset.from_tensor_slices} 函数接受数组作为参数，并返回一个表示数组片段的 @{tf.data.Dataset}。例如，一个包含 @{$tutorials/layers$mnist training data} 的数组的格式为 `(60000, 28, 28)`。将这个数组作为参数传入 `from_tensor_slices` 将会返回一个包含了 60000 个切片，每个切片为一个 28x28 图像的 `Dataset` 对象。
 
 返回这个 `Dataset` 的代码如下所示：
