@@ -1,16 +1,16 @@
-# 低级 API 编程介绍
+# 底层 API 编程介绍
 
-这篇指南将帮助你使用低级的 TensorFlow API（TensorFlow Core) 进行编程，会涉及到以下几个部分：
+这篇指南将帮助你使用底层的 TensorFlow 核心 API 进行编程，会涉及到以下几个部分：
 
   * 管理你的 TensorFlow 程序（一张 TensorFlow 计算图，`tf.Graph`）以及 TensorFlow 运行时（一个 TensorFlow 会话，`tf.Session`），而不是依赖 Estimators 来管理它们
   * 使用 `tf.Session` 运行 TensorFlow 操作
-  * 在底层环境中使用高级的组件（[datasets](#datasets), [layers](#layers), 以及 [feature_column](#feature_columns)）
+  * 在底层环境中使用高级的组件（[datasets](#datasets), [layers](#layers), 以及 [特征列](#feature_columns)）
   * 创建你自己的训练循环，而不是使用 @{$get_started/premade_estimators$ provided by Estimator}
 
-我们推荐尽量使用更高层次的 API 来构建模型，但了解 TensorFlow Core 有以下几个优点：
+我们推荐尽量使用更高层次的 API 来构建模型，但了解 TensorFlow 核心 API 有以下几个优点：
 
   * 使用低级 TensorFlow 的操作能帮你更加切中肯綮地进行实验和 debug 
-  * 在使用高级 API 的时候，你能够知道其内部是如何运作的
+  * 在使用高层次 API 的时候，你能够知道其内部是如何运作的
 
 ## 配置
 
@@ -48,9 +48,9 @@ TensorFlow 核心的数据单元是**张量**（Tensor），一个张量由一�
 
 TensorFlow 使用 numpy 数组来表示张量的**值**。
 
-## TensorFlow Core 实战
+## TensorFlow 核心 API 实战
 
-使用 TensorFlow Core 编程由以下两部分组成：
+使用 TensorFlow 核心 API 编程由以下两部分组成：
 
 1.  构建计算图 (一张 @{tf.Graph})。
 2.  运行计算图 (使用 @{tf.Session})。
@@ -113,8 +113,6 @@ tensorboard --logdir .
 ```
 
 你可以在你的浏览器里打开 TensorBoard 的[计算图页面](http://localhost:6006/#graphs)，你应该会看到和下面类似的一张图
-
-
 
 ![TensorBoard screenshot](https://www.tensorflow.org/images/getting_started_add.png)
 
@@ -202,7 +200,7 @@ print(sess.run(z, feed_dict={x: [1, 3], y: [2, 4]}))
 
 简单的实验我们可以使用占位符， 在处理大量数据时，使用 @{tf.data$Datasets} 来向模型传递数据是更好的方法。
 
-从 Dataset 中获取一个能够运行的 `tf.Tensor` 对象，你需要先将其转换为 @{tf.data.Iterator} 类型，然后调用迭代器的 @{tf.data.Iterator.get_next$`get_next`} 方法。
+从数据集（Dataset）中获取一个能够运行的 `tf.Tensor` 对象，你需要先将其转换为 @{tf.data.Iterator} 类型，然后调用迭代器（Iterator）的 @{tf.data.Iterator.get_next$`get_next`} 方法。
 
 最简单的办法就是使用 @{tf.data.Dataset.make_one_shot_iterator$`make_one_shot_iterator`} 创建一个迭代器。比如下列的代码中，每次调用 `run`，`next_item` 会返回 `my_data` 数组中的一行。
 
@@ -237,7 +235,7 @@ while True:
 
 ### 创建网络层
 
-下面的代码创建了一个 @{tf.layers.Dense$`Dense`} 层，它以一个 batch 的向量作为输入，并且对每个 batch 的向量产生一个单值输出。你只需要像调用函数一样，就能够将该层作用在输入上：
+下面的代码创建了一个 @{tf.layers.Dense$`Dense`} 层，它以一个向量批次（即多个向量）作为输入，并且对每个批次产生一个单值输出。你只需要像调用函数一样，就能够将该层作用在输入上：
 
 ```python
 x = tf.placeholder(tf.float32, shape=[None, 3])
@@ -264,9 +262,6 @@ sess.run(init)
 
 ### 执行网络层
 
-Now that the layer is initialized, we can evaluate the `linear_model`'s output
-tensor as we would any other tensor. For example, the following code:
-
 网络层初始化之后，和其他张量一样，我们可以对 `linear_model` 的输出张量进行求值。如下面的代码所示：
 
 ```python
@@ -282,7 +277,7 @@ print(sess.run(y, {x: [[1, 2, 3],[4, 5, 6]]}))
 
 ### 网络层函数快捷键
 
-对于每个网络层类（像 @{tf.layers.Dense}），TensorFlow 都提供了一个快捷函数（像 @{tf.layers.dense}）。唯一的区别就是快捷函数能够只用一行就完成创建和调用操作，下面的代码和先前的是等价的：
+对于每个网络层类（像 @{tf.layers.Dense}），TensorFlow 都提供了一个便捷函数（像 @{tf.layers.dense}）。唯一的区别就是便捷函数能够只用一行就完成创建和调用操作，下面的代码和先前的是等价的：
 
 ```python
 x = tf.placeholder(tf.float32, shape=[None, 3])
@@ -345,7 +340,7 @@ print(sess.run(inputs))
 
 ## 训练
 
-熟悉了 TensorFlow 核心的操作之后，一起来动手训练一个小的回归模型吧。
+熟悉了 TensorFlow 的核心操作之后，一起来动手训练一个小的回归模型吧。
 
 ### 定义数据
 
