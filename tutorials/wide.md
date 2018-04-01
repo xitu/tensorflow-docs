@@ -6,7 +6,7 @@
 
 可以通过如下步骤尝试本教程的代码:
 
-1. @{$install$Install TensorFlow} 如果还没安装。
+1. 如果还没安装，请 @{$install$安装 TensorFlow}。
 
 2. 下载[教程代码](https://github.com/tensorflow/models/tree/master/official/wide_deep/)。
 
@@ -26,30 +26,30 @@
 
 由于该任务是一个二元分类问题，我们将构造一个名为 “label” 的标签列，如果收入超过 5 万美元，那么它的值为 1，否则为 0。有关参考，请参阅 [wide_deep.py](https://github.com/tensorflow/models/tree/master/official/wide_deep/wide_deep.py)。
 
-接下来，让我们看看 Dataframe，看看我们可以使用哪些列来预测目标标签。这些列可以分为两类：类别列和连续列：
+接下来，让我们看看数据结构，看看我们可以使用哪些列来预测目标标签。这些列可以分为两类：类别列和连续列：
 
 - 如果某列的值只能是有限集合中的某个类别，则称该列为**类别列**。例如，一个人的关系状况（妻子，丈夫，未婚等）或教育水平（高中，大学等）都是类别列。
 - 如果某个列的值可以是连续范围内的任何数值，则称该列为**连续列**。例如，一个人的资本收入（例如 $14,084）是一个连续列。
 
 以下是 Census Income 数据集中可用列的列表：
 
-| Column Name | Type        | Description                                                  |
+| 列名 | 类型        | 描述                                                  |
 | ----------- | ----------- | ------------------------------------------------------------ |
-| age         | Continuous  | The age of the individual                                    |
-| workclass   | Categorical | The type of employer the individual has (government, military, private, etc.). |
-| fnlwgt         | Continuous  | The number of people the census takers believe that observation represents (sample weight). Final weight will not be used.   |
-| education      | Categorical | The highest level of education achieved for that individual.    |
-| education_num  | Continuous  | The highest level of education in numerical form. |
-| marital_status | Categorical | Marital status of the individual. |
-| occupation     | Categorical | The occupation of the individual. |
-| relationship   | Categorical | Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried.         |
-| race           | Categorical | White, Asian-Pac-Islander, Amer-Indian-Eskimo, Other, Black.        |
-| gender         | Categorical | Female, Male.                     |
-| capital_gain   | Continuous  | Capital gains recorded.           |
-| capital_loss   | Continuous  | Capital Losses recorded.          |
-| hours_per_week | Continuous  | Hours worked per week.            |
-| native_country | Categorical | Country of origin of the individual.          |
-| income_bracket | Categorical | ">50K" or "<=50K", meaning whether the person makes more than $50,000 annually.        |
+| age         | 连续型  | 此人的年龄。                                  |
+| workclass   | 类别型 | 其雇主类型 (政府、军队、 私企 等)。 |
+| fnlwgt         | 连续型  | 普查者认为本样本所能代表的人数（样本权重）。最终权重不会被用到。   |
+| education      | 类别型 | 此人最高学历。   |
+| education_num  | 连续型  | 最高学历数值表示。 |
+| marital_status | 类别型 | 婚姻状态。 |
+| occupation     | 类别型 | 职业。 |
+| relationship   | 类别型 | 家庭关系：Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried。         |
+| race           | 类别型 | 种族：White, Asian-Pac-Islander, Amer-Indian-Eskimo, Other, Black。  |
+| gender         | 类别型 | 性别：Female, Male。                     |
+| capital_gain   | 连续型  | 登记资本增值。         |
+| capital_loss   | 连续型  | 登记资本亏损。         |
+| hours_per_week | 连续型  | 每周工作时长。  |
+| native_country | 类别型 | 原国籍。  |
+| income_bracket | 类别型 | 年收入分类：">5万" 或 "<=5万"，即此人年收入是否高于 5 万。       |
 
 ## 将数据转化为张量
 
