@@ -6,7 +6,7 @@
 
 可以通过如下步骤尝试本教程的代码:
 
-1. 如果还没安装，请 @{$install$安装 TensorFlow}。
+1. 如果还没安装，请 @{$install$Install TensorFlow}。
 
 2. 下载[教程代码](https://github.com/tensorflow/models/tree/master/official/wide_deep/)。
 
