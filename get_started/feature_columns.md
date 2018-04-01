@@ -1,6 +1,6 @@
 # 特征列
 
-本篇文档将详细介绍特征列。**特征列（feature columns）**可以视为原始数据和 Estimator 间的中介。特征列非常丰富，可以让你将各种不同的原始数据转化为 Estimator 可用的格式，从而轻松的进行实验。
+本篇文档将详细介绍特征列。**特征列**可以视为原始数据和 Estimator 间的中介。特征列非常丰富，可以让你将各种不同的原始数据转化为 Estimator 可用的格式，从而轻松的进行实验。
 
 在 @{$get_started/premade_estimators$Premade Estimators} 里，我们使用预设的 Estimator @{tf.estimator.DNNClassifier$`DNNClassifier`} 来训练模型，并根据 4 个输入特征，预测不同种类的鸢尾花。这个例子仅仅创建了（@{tf.feature_column.numeric_column} 类型的）数字特征列。尽管数字特征列有效地模拟了花瓣和萼片的长度，但是现实世界的数据集会包含所有类型的特征，其中很多是非数字的。
 
