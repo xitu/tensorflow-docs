@@ -12,29 +12,30 @@
 
 学习如何获取数组的片段，是开始学习 `tf.data` 最简单的方式。
 
-章节 @{$get_started/premade_estimators$Premade Estimators} 在文件 [`iris_data.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/iris_data.py) 中定义了 `train_input_fn`，它可以将数据传输到 Estimator。
+章节 @{$get_started/premade_estimators$Premade Estimators} 在文件 [`iris_data.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/iris_data.py) 中定义了 `train_input_fn`，它可以将数据传输到 Estimator：
 
 ``` python
 def train_input_fn(features, labels, batch_size):
-    """一个用来训练的输入函数"""
+    """一个用来训练的输入函数"""
     # 将输入值转化为数据集。
     dataset = tf.data.Dataset.from_tensor_slices((dict(features), labels))
 
     # 混排、重复、批处理样本。
     dataset = dataset.shuffle(1000).repeat().batch(batch_size)
 
-    # 返回数据集。
-    return dataset
+    # 建立迭代器，返回管道的读取结束点。
+    return dataset.make_one_shot_iterator().get_next()
 ```
 
 下面我们来对这个函数做更仔细的分析。
 
+### Arguments
 ### 参数
 
-这个函数一共需要三个参数。如果一个参数的期望类型是 “array” （数组），那么它将可以接受几乎所有可以用 `numpy.array` 来转化为数组的值。只有一个例外：[`tuple`](https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences)，我们将在后面看到，tuple 对 `Datasets` 有特殊的含义。
+这个函数一共需要三个参数。如果一个参数的期望类型是 “array” （数组），那么它将可以接受几乎所有可以用 `numpy.array` 来转化为数组的值。只有一个例外：[`tuple`](https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences)，它对 `Datasets` 有特殊的含义。
 
 * `features`：一个形如 `{'feature_name':array}` 的数据字典（或者是 [`DataFrame`](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html)），它包含了原始的输入特征。
-* `labels`：一个包含每个样本的 [label](https://developers.google.com/machine-learning/glossary/#label) 的数组
+* `labels`：一个包含每个样本的 [label](https://developers.google.com/machine-learning/glossary/#label) 的数组。
 * `batch_size`：一个指示所需批量大小的整数。
 
 在 [`premade_estimator.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/premade_estimator.py) 中，我们使用 `iris_data.load_data()` 函数来检索虹膜数据。
@@ -48,7 +49,7 @@ train, test = iris_data.load_data()
 features, labels = train
 ```
 
-然后用像下面这样一行代码，将数据传递给 train_input_fn 函数。
+然后用像下面这样的一行代码，将数据传递给 input 函数：
 
 ``` python
 batch_size=100
@@ -59,7 +60,13 @@ iris_data.train_input_fn(features, labels, batch_size)
 
 ### （数组）片段
 
-在 `train_input_fn()` 函数中，首先使用 @{tf.data.Dataset.from_tensor_slices} 创建了 @{tf.data.Dataset} 来表示数组片段。数组是在第一个维度上被切片的。例如，一个包含 @{$tutorials/layers$mnist training data} 的数组的格式为 `(60000, 28, 28)`。将这个数组作为参数传入 `from_tensor_slices` 将会返回一个包含了 60000 个切片，每个切片为一个 28x28 图像的 `Dataset` 对象。
+In the simplest cases, @{tf.data.Dataset.from_tensor_slices} function takes an
+array and returns a @{tf.data.Dataset} representing slices of the array. For
+example, an array containing the @{$tutorials/layers$mnist training data}
+has a shape of `(60000, 28, 28)`. Passing this to `from_tensor_slices` returns
+a `Dataset` object containing 60000 slices, each one a 28x28 image.
+
+在最简单的例子中，@{tf.data.Dataset.from_tensor_slices} 函数接受数组作为参数，并返回一个表示数组片段的 @{tf.data.Dataset}。例如，一个包含 @{$tutorials/layers$mnist training data} 的数组的格式为 `(60000, 28, 28)`。将这个数组作为参数传入 `from_tensor_slices` 将会返回一个包含了 60000 个切片，每个切片为一个 28x28 图像的 `Dataset` 对象。
 
 返回这个 `Dataset` 的代码如下所示：
 
@@ -77,9 +84,7 @@ print(mnist_ds)
 <TensorSliceDataset shapes: (28,28), types: tf.uint8>
 ```
 
-上文的 `Dataset` 代表了一个简单的数组集合，但是数据集比这要强大的多。一个 `Dataset` 能够透明地处理任何字典或元组（或者 [`namedtuple`](https://docs.python.org/2/library/collections.html#collections.namedtuple)）的嵌套组合。
-
-例如，在把虹膜特征转化成标准的 python 字典后，你可以用如下方式再将字典数组转化为字典 `Dataset`。
+上文的 `Dataset` 代表了一个简单的数组集合，但是数据集比这要强大的多。数据集能够透明地处理任何字典或元组的嵌套组合。例如，确保 `features` 是一个标准字典后，你可以用如下方式将数组字典转化为字典 `Dataset`：
 
 ``` python
 dataset = tf.data.Dataset.from_tensor_slices(dict(features))
@@ -124,7 +129,7 @@ print(dataset)
         tf.int64)>
 ```
 
-### 操纵
+### 操作
 
 目前，`Dataset` 会按照固定顺序遍历数据一次，且一次只能生成一个元素。在可以用于训练之前，它需要进一步的处理。幸运的是，`tf.data.Dataset` 类提供了方法来让数据为训练作出更好的准备。`train_input_fn` 的下一行代码就利用了几个这样的方法：
 
@@ -133,11 +138,11 @@ print(dataset)
 dataset = dataset.shuffle(1000).repeat().batch(batch_size)
 ```
 
-@{tf.data.Dataset.shuffle$`shuffle`} 方法使用了一个大小固定的缓冲区，当元素通过的时候，会被打乱顺序。在这种情况下，`buffer_size` 就会比 `Dataset` 中的样本数大很多，保证了所有数据能被充分地打乱（Iris 数据集仅包含了 150 个样本）。
+@{tf.data.Dataset.shuffle$`shuffle`} 方法使用了一个大小固定的缓冲区，当元素通过的时候，会被打乱顺序。在这种情况下，`buffer_size` 就会比 `Dataset` 中的样本数大很多，保证了所有数据能被充分地打乱。Iris 数据集仅包含了 150 个样本。
 
 @{tf.data.Dataset.repeat$`repeat`} 方法在 `Dataset` 结束的时将它重启。如果要限制重复的次数，设置 `count` 参数。
 
-@{tf.data.Dataset.batch$`batch`} 方法将会收集一定数量的样本并入栈，以此创建一个批次。这个操作会为样本的 shape 增加一个维度，且新的维度将作为第一维。如下代码在 MNIST 数据集上相对早地应用了 `batch` 方法，导致 `Dataset` 包含了表示 `(28,28)` 图像的三维数组。
+@{tf.data.Dataset.batch$`batch`} 方法将会收集一定数量的样本并入栈，以此创建一个批次。这个操作会为样本的 shape 增加一个维度，且新的维度将作为第一维。如下代码在 MNIST 数据集上相对早地应用了 `batch` 方法，导致 `Dataset` 包含了表示 `(28,28)` 图像的三维数组：
 
 ``` python
 print(mnist_ds.batch(100))
@@ -148,8 +153,7 @@ print(mnist_ds.batch(100))
   shapes: (?, 28, 28),
   types: tf.uint8>
 ```
-
-注意，因为最后一个批次将会有比较少的元素，因此数据集的批量大小是不确定的，
+注意，因为最后一个批次将会有比较少的元素，因此数据集的批量大小是不确定的。
 
 在 `train_input_fn` 中，批处理之后，`数据集` 包含元素们的一维向量，这些一维向量的前面部分是：
 
@@ -171,17 +175,39 @@ print(dataset)
         tf.int64)>
 ```
 
+
 ### 返回
 
-到了这一步，`Dataset` 包含了 `(features_dict, labels)` 这样的数据对。这正是 `train` 和 `evaluate` 方法所期望的格式，因此，`input_fn` 函数返回了数据集。
+<!-- TODO(markdaoust) This line can be simplified to "return dataset" -->
 
-当使用 `predict` 方法时，`labels` 可以/应该被省略。
+每一个 Estimator 的 `train`, `evaluate`, 和 `predict` 方法都需要输入函数返回一个包含 @{$programmers_guide/tensors$tensorflow tensors} 的 `(features, label)` 数据对。`train_input_fn` 使用下面一行代码将数据集转化为希望的格式：
+
+```python
+# 建立迭代器，返回管道的读取结束点。
+features_result, labels_result = dataset.make_one_shot_iterator().get_next()
+```
+
+结果是 @{$programmers_guide/tensors$TensorFlow tensors} 结构的，匹配 `Dataset` 中的项目的布局。
+查看 @{$programmers_guide/low_level_intro} 可以获取到这些对象是什么以及他们是如何工作的介绍。
+
+``` python
+print((features_result, labels_result))
+```
+
+```None
+({
+    'SepalLength': <tf.Tensor 'IteratorGetNext:2' shape=(?,) dtype=float64>,
+    'PetalWidth': <tf.Tensor 'IteratorGetNext:1' shape=(?,) dtype=float64>,
+    'PetalLength': <tf.Tensor 'IteratorGetNext:0' shape=(?,) dtype=float64>,
+    'SepalWidth': <tf.Tensor 'IteratorGetNext:3' shape=(?,) dtype=float64>},
+Tensor("IteratorGetNext_1:4", shape=(?,), dtype=int64))
+```
 
 ## 读取 CSV 文件
 
 现实中对 `Dataset` 类最常见的应用是从磁盘的文档中获取数据流。@{tf.data} 模块包括了一系列的文件读取器。我们来看看如何使用 `Dataset` 从 csv 文件中分析虹膜数据集。
 
-如下对 `iris_data.maybe_download` 函数的调用，将会在必要的时候下载数据，并返回结果文件的路径。
+如下对 `iris_data.maybe_download` 函数的调用，将会在必要的时候下载数据，并返回结果文件的路径：
 
 ``` python
 import iris_data
@@ -194,7 +220,7 @@ train_path, test_path = iris_data.maybe_download()
 
 ### 建立 `Dataset`
 
-我们从建立一个 @{tf.data.TextLineDataset$`TextLineDataset`} 对象开始，这个对象一次只读取文件的一行。之后，调用 @{tf.data.Dataset.skip$`skip`} 方法，跳过文件的第一行——这是文件的头部，而不是样本。
+我们从建立一个 @{tf.data.TextLineDataset$`TextLineDataset`} 对象开始，这个对象一次只读取文件的一行。之后，调用 @{tf.data.Dataset.skip$`skip`} 方法，跳过文件的第一行——这是文件的头部，而不是样本：
 
 ``` python
 ds = tf.data.TextLineDataset(train_path).skip(1)
@@ -202,11 +228,13 @@ ds = tf.data.TextLineDataset(train_path).skip(1)
 
 ### 建立一个 csv 行解析器
 
+最终我们需要解析数据集中的每一行，来生成必要的 `(features, label)` 数据对。
+
 我们从建立一个可以解析一行的函数开始。
 
-如下的 `iris_data.parse_line` 函数完成了这个目标，它使用了 @{tf.decode_csv} 方法以及一些简单的 python 代码。
+如下的 `iris_data.parse_line` 函数完成了这个目标，它使用了 @{tf.decode_csv} 方法以及一些简单的 python 代码：
 
-为了生成必需的 `(features, label)` 数据对，我们必须解析数据集内的每一行。如下的 `_parse_line` 函数调用了 @{tf.decode_csv} 来将单独一行解析为特征和标签。因为 Estimators 需要特征以字典的方式展现，我们就依靠 python 内建的 `dict` 和 `zip` 函数来建立这个字典。特征的名字是字典的键值 key。然后，调用字典的 `pop` 方法来从特征字典中移除标签字段。
+为了生成必需的 `(features, label)` 数据对，我们必须解析数据集内的每一行。如下的 `_parse_line` 函数调用了 @{tf.decode_csv} 来将单独一行解析为特征和标签。因为 Estimators 需要特征以字典的方式展现，我们就依靠 python 内建的 `dict` 和 `zip` 函数来建立这个字典。特征的名字是字典的键值 key。然后，调用字典的 `pop` 方法来从特征字典中移除标签字段：
 
 ``` python
 # 描述文本列的元数据
@@ -240,7 +268,7 @@ def _parse_line(line):
 @{tf.data.Dataset.map$`map`} 方法将会对 `Dataset` 中的每一个元素应用 `map_func` 来完成它们的转化。
 </div>
 
-因此，为了在多行数据被从文件中读取出来的时候解析它们，我们为 `map` 方法提供自定义的 `_parse_line` 函数：
+因此，为了在多行数据被从 csv 文件中读取出来的时候解析它们，我们为 `map` 方法提供 `_parse_line` 函数：
 
 ``` python
 ds = ds.map(_parse_line)
@@ -262,7 +290,7 @@ types: (
 
 ### 实践
 
-这个函数可以作为 `iris_data.train_input_fn` 的替代。它可以像如下这样，来给 estimator（估值器）提供数据：
+这个函数可以作为 `iris_data.train_input_fn` 的替代。它可以像如下这样，来给 estimator 提供数据：
 
 ``` python
 train_path, test_path = iris_data.maybe_download()
@@ -272,26 +300,26 @@ feature_columns = [
     tf.feature_column.numeric_column(name)
     for name in iris_data.CSV_COLUMN_NAMES[:-1]]
 
-# 建立 estimator（估值器）
+# 建立 estimator
 est = tf.estimator.LinearClassifier(feature_columns,
                                     n_classes=3)
-# 训练 estimator（估值器）
+# 训练 estimator
 batch_size = 100
 est.train(
     steps=1000,
     input_fn=lambda : iris_data.csv_input_fn(train_path, batch_size))
 ```
 
-估值器 estimator 期望 `input_fn` 没有任何参数。要解除这个限制，我们使用 `lambda` 来捕获参数并提供预期的接口。
+Estimator 期望 `input_fn` 没有任何参数。要解除这个限制，我们使用 `lambda` 来捕获参数并提供预期的接口。
 
 ## 总结
 
 为了从不同的数据源中便捷的读取数据，`tf.data` 模块提供了一些列的方法和类。除此之外，`tf.data` 有简单并且强大的方法，来应用各种标准和自定义转换。
 
-现在你已经基本了解了如何为 Estimator 估值器高效的获取数据。（作为扩展）接下来可以思考如下的文档：
+现在你已经基本了解了如何为 Estimator 高效的获取数据。（作为扩展）接下来可以思考如下的文档：
+
 
 * @{$get_started/custom_estimators}: 论述了如何建立自定义的 `Estimator` 模型。
-
 * @{$low_level_intro#datasets$Low Level Introduction}: 论述了如何利用 TensorFlow 的低级 APIs 来直接使用 `tf.data.Datasets` 进行实验。
-
 * @{$programmers_guide/datasets} 详细介绍了 `Datasets` 的附加方法。
+
