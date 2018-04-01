@@ -9,7 +9,7 @@
 在这个教程中，我们将会展示如何为这个游戏构建一个基于 RNN （循环神经网络）的分类器。模型将会使用卷积层、LSTM 层以及一个 softmax 输出层来分辨涂鸦的类别。
 
 
-<center> ![RNN 模型架构](../images/quickdraw_model.png) </center>
+![RNN 模型架构](../images/quickdraw_model.png)
 
 上图展示了此教程中构建的模型架构。输入为一个图形，编码为由 x, y 和 n 构成的坐标点序列，其中 n 表示该点是否是新笔划中的第一个点。
 
@@ -22,7 +22,7 @@ This tutorial uses the data from actual [Quick, Draw!] games [that is publicly a
 
 运行这个教程的代码：
 
-1.  如果你还没有安装 TensorFlow，那么请@{$install$Install TensorFlow}。
+1.  如果你还没有安装 TensorFlow，那么请@{$install$安装 TensorFlow}。
 2.  下载[教程代码](https://github.com/tensorflow/models/tree/master/tutorials/rnn/quickdraw/train_model.py).
 3.  [下载](http://download.tensorflow.org/data/quickdraw_tutorial_dataset_v1.tar.gz) `TFRecord` 格式的[数据](#下载数据) 并解压。更多细节请参考[可选：下载整个 Quick Draw 数据](#可选：下载整个 Quick Draw 数据) 以及[如何转换原始 Quick, Draw! 数据](可选：数据转换)。
 
