@@ -53,7 +53,7 @@
 
 ## 将数据转化为张量
 
-在构建 tf.estimator 模型时，输入数据通过 Input Builder 函数指定。 此构建函数在稍后传递给 tf.estimator.Estimator 方法（如 `train` 和 `evaluate`）之前不会被调用。这个函数的目的是构造输入数据，它以 @{tf.Tensor}s 或 @{tf.SparseTensor} 的形式表示。更详细地说，输入构建函数将返回以下配对：
+在构建 tf.estimator 模型时，输入数据通过 Input Builder 函数指定。 此构建函数在稍后传递给 tf.estimator.Estimator 方法（如 `train` 和 `evaluate`）之前不会被调用。这个函数的目的是构造输入数据，它以 @{tf.Tensor}s 或 @{tf.SparseTensor}s 的形式表示。更详细地说，输入构建函数将返回以下配对：
 
 1. `features`：一个由特征列名到 `Tensors` 或 `SparseTensors` 的映射。
 2. `labels`：一个包含标签列的 `Tensor`。
