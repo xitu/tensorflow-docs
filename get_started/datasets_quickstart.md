@@ -29,7 +29,6 @@ def train_input_fn(features, labels, batch_size):
 
 下面我们来对这个函数做更仔细的分析。
 
-### Arguments
 ### 参数
 
 这个函数一共需要三个参数。如果一个参数的期望类型是 “array” （数组），那么它将可以接受几乎所有可以用 `numpy.array` 来转化为数组的值。只有一个例外：[`tuple`](https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences)，它对 `Datasets` 有特殊的含义。
