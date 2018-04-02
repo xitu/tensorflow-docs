@@ -8,12 +8,9 @@ TensorFlow Lite 使用多项技术降低延迟，例如移动 app 内核优化�
 
 ## TensorFlow Lite 都包含什么？
 
-TensorFlow Lite 支持一系列量子和浮点的核心运算符, 并针对移动平台进行了优化。它结合 pre-fused
-激活和其他技术来进一步提高性能和量化精度。 此外，TensorFlow Lite 还支持在模型中使用自定义操作。
+TensorFlow Lite 支持一系列量子和浮点的核心运算符, 并针对移动平台进行了优化。它结合 pre-fused 激活和其他技术来进一步提高性能和量化精度。 此外，TensorFlow Lite 还支持在模型中使用自定义操作。
 
-TensorFlow Lite 基于
-[FlatBuffers](https://google.github.io/flatbuffers/)定义了一个新的模型文件格式。FlatBuffers 是一个开源的高效的跨平台序列化库。 它与
-[protocol buffers](https://developers.google.com/protocol-buffers/?hl=en)类似, 但主要区别是 FlatBuffers 常与 per-object 内存分配相结合在您直接访问数据时不需要再次解析包。 此外，FlatBuffers 的代码体积比 protocol buffers 小很多。
+TensorFlow Lite 基于[FlatBuffers](https://google.github.io/flatbuffers/)定义了一个新的模型文件格式。FlatBuffers 是一个开源的高效的跨平台序列化库。 它与[protocol buffers](https://developers.google.com/protocol-buffers/?hl=en)类似, 但主要区别是 FlatBuffers 常与 per-object 内存分配相结合在您直接访问数据时不需要再次解析包。 此外，FlatBuffers 的代码体积比 protocol buffers 小很多。
 
 TensorFlow Lite 拥有一个新的移动设备优化的解释器保证应用程序的精简和快速。解释器使用静态图形排序和自定义(less-dynamic)内存分配器来确保最小的负载，初始化和执行延迟。
 
@@ -61,8 +58,7 @@ TensorFlow Lite 作为开发者预览版亮点，包括以下内容：
       一系列移动优先计算机视觉模型，旨在有效提高准确性，同时注重 on-device 或嵌入式应用程序的有限资源。它们很小，低延迟，低功耗，模型参数化，以满足各种用例的资源约束。它们可以建立在分类，检测，嵌入和分割之上。 MobileNet 模型比较小，但是比 Inception V3 [准确度更低](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html)。
 
     - 在设备智能回复上, 提供能通过建议上下文相关的消息来回复传入的文本消息的 one-touch 的 on-device 模型，该模型专为内存受限的设备而建立，如手表和手机，
-      它已被成功应用到[Android Wear 智能回复](https://research.googleblog.com/2017/02/on-device-machine-intelligence.html)
-      所有官方和第三方应用.
+      它已被成功应用到[Android Wear 智能回复](https://research.googleblog.com/2017/02/on-device-machine-intelligence.html)所有官方和第三方应用.
 
 - MobileNet 模型量子版本, 其运行速度比 CPU 上的 non-quantized (浮点)版本快。
 
@@ -80,8 +76,7 @@ TensorFlow Lite 作为开发者预览版亮点，包括以下内容：
 
 这里的 pre-trained 模型已经在 ImageNet 数据集上进行了训练 ，该数据集由 1000 个预定义的类组成。如果这些类不适合您的用例，那么您需要重新训练这些模型。 这种从一个已经被训练过的问题的模型开始，然后在类似的问题上进行再训练叫做迁移学习。 从头开始深入学习可能需要几天，但迁移学习可以很快完成。为了做到这一点，您需要生成标有相关类的自定义数据集。 
 
-[TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/)
-一步一步实现了这个过程，再训练代码支持浮点和量化推理的再训练。
+[TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/)一步一步实现了这个过程，再训练代码支持浮点和量化推理的再训练。
 
 ## TensorFlow Lite 架构
 
@@ -111,7 +106,6 @@ TensorFlow Lite 作为开发者预览版亮点，包括以下内容：
 
 ## 下一步
 
-对于开发人员的预览，我们的大部分文档都在 GitHub 上。请查看[TensorFlow Lite
-库](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)在GitHub上获取更多信息和代码示例，演示应用程序等等。
+对于开发人员的预览，我们的大部分文档都在 GitHub 上。请查看[TensorFlow Lite 库](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)在GitHub上获取更多信息和代码示例，演示应用程序等等。
 
 
