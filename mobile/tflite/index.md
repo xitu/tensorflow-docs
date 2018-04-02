@@ -1,8 +1,6 @@
 # TensorFlow Lite 简介
 
-TensorFlow Lite 是 TensorFlow 移动和嵌入式设备轻量级解决方案。 它使设备机器学习具有低延迟和更小的二进制体积。
-TensorFlow Lite 同时支持[Android 神经网络
-API](https://developer.android.com/ndk/guides/neuralnetworks/index.html)的硬件加速.
+TensorFlow Lite 是 TensorFlow 移动和嵌入式设备轻量级解决方案。它使设备机器学习具有低延迟和更小的二进制体积。TensorFlow Lite 同时支持[Android 神经网络 API](https://developer.android.com/ndk/guides/neuralnetworks/index.html)的硬件加速.
 
 TensorFlow Lite 使用多项技术降低延迟，例如移动 app 内核优化、 pre-fused 激活 、允许更快更小（定点）模型的量化内核。
 
