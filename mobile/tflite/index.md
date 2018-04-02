@@ -4,9 +4,9 @@ TensorFlow Lite 是 TensorFlow 移动和嵌入式设备轻量级解决方案。 
 TensorFlow Lite 同时支持[Android 神经网络
 API](https://developer.android.com/ndk/guides/neuralnetworks/index.html)的硬件加速.
 
-TensorFlow Lite 使用多项技术降低延迟，例如移动 app 内核优化、 pre-fused 激活 、允许更快更小（定点）模型的量化内核。
+TensorFlow Lite 使用多项技术降低延迟，例如移动 app 内核优化、 pre-fused 激活 、允许更快更小（定点）模型的量化内核。
 
-目前大部分 TensorFlow Lite 文档放在  [Github](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)上。
+目前大部分 TensorFlow Lite 文档放在 [Github] (https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)上。
 
 ## TensorFlow Lite 都包含什么？
 
@@ -19,9 +19,9 @@ TensorFlow Lite 基于
 
 TensorFlow Lite 拥有一个新的移动设备优化的解释器保证应用程序的精简和快速。解释器使用静态图形排序和自定义(less-dynamic)内存分配器来确保最小的负载，初始化和执行延迟。
 
-TensorFlow Lite 针对支持的设备提供了一个利用硬件加速的接口。 通过 Android 神经​​网络库，作为 Android O-MR1 的一部分发布。
+TensorFlow Lite 针对支持的设备提供了一个利用硬件加速的接口。 通过 Android 神经网络库，作为 Android O-MR1 的一部分发布。
 
-## 为什么我们需要针对移动端的库?
+## 为什么我们需要针对移动端的库?
 
 机器学习正在改变计算模式，我们看到了移动和嵌入式设备上使用的新趋势。 消费者的期望也趋向于与他们的设备自然而友好地互动，由相机和语音交互模式驱动。
 
@@ -37,7 +37,7 @@ TensorFlow Lite 针对支持的设备提供了一个利用硬件加速的接口�
 
 - 能够在设备不需要连接到网络的情况下提供"离线"用例。
 
-我们相信下一波机器学习应用将在移动和嵌入式设备上重大进步。
+我们相信下一波机器学习应用将在移动和嵌入式设备上重大进步。
 
 ## TensorFlow Lite 开发者预览版亮点
 
@@ -70,13 +70,13 @@ TensorFlow Lite 作为开发者预览版亮点，包括以下内容：
 
 - 新的 Android 演示应用程序来说明使用 TensorFlow Lite 与量子化的 MobileNet 模型进行对象分类。
 
-- Java 和 C++ API支持
+- Java 和 C++ API 支持
 
-注意：这是一个开发者版本，很可能在即将到来的版本中会有API的变化。我们不保证向后或向前兼容这个版本。
+注意：这是一个开发者版本，很可能在即将到来的版本中会有 API 的变化。我们不保证向后或向前兼容这个版本。
 
 ## 入门
 
-我们建议您使用上述的 TensorFlow Lite 的 pre-tested 模型。 如果有一个现有的模型，则需要测试模型是否兼容转换器和支持的操作集。要测试你的模型，请看[GitHub文档](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)。
+我们建议您使用上述的 TensorFlow Lite 的 pre-tested 模型。 如果有一个现有的模型，则需要测试模型是否兼容转换器和支持的操作集。要测试你的模型，请看[GitHub 文档](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)。
 
 ### 为自定义数据集重置 Inception-V3 或 MobileNet
 
@@ -101,7 +101,7 @@ TensorFlow Lite 作为开发者预览版亮点，包括以下内容：
 
 - 解释器: 使用一组内核来执行模型。解释器支持选择性内核加载;没有内核，只有 100 KB，加载了所有内核，有 300 KB。这比 TensorFlow Mobile 要求的 1.5 M 的显著减少。
 
-- 在选定的Android设备上，解释器将使用 Android 神经​​网络 API 进行硬件加速，如果没有可用的，则默认为 CPU 执行。
+- 在选定的Android设备上，解释器将使用 Android 神经网络 API 进行硬件加速，如果没有可用的，则默认为 CPU 执行。
 
 您也可以使用解释器可以使用的 C++ API 来实现定制的内核。
 
