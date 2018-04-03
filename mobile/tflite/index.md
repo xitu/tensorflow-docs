@@ -1,202 +1,111 @@
-# Introduction to TensorFlow Lite
+# TensorFlow Lite 简介
 
-TensorFlow Lite is TensorFlow’s lightweight solution for mobile and embedded
-devices. It enables on-device machine learning inference with low latency and a
-small binary size. TensorFlow Lite also supports hardware acceleration with the
-[Android Neural Networks
-API](https://developer.android.com/ndk/guides/neuralnetworks/index.html).
+TensorFlow Lite 是 TensorFlow 移动和嵌入式设备轻量级解决方案。它使设备机器学习具有低延迟和更小的二进制体积。TensorFlow Lite 同时支持 [Android 神经网络 API](https://developer.android.com/ndk/guides/neuralnetworks/index.html)的硬件加速.
 
-TensorFlow Lite uses many techniques for achieving low latency such as
-optimizing the kernels for mobile apps, pre-fused activations, and quantized
-kernels that allow smaller and faster (fixed-point math) models.
+TensorFlow Lite 使用多项技术降低延迟，例如移动 app 内核优化、pre-fused 激活、允许更快更小（定点）模型的量化内核。
 
-Most of our TensorFlow Lite documentation is [on
-Github](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)
-for the time being.
+目前大部分 TensorFlow Lite 文档放在 [Github](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)上。
 
-## What does TensorFlow Lite contain?
+## TensorFlow Lite 都包含什么？
 
-TensorFlow Lite supports a set of core operators, both quantized and
-float, which have been tuned for mobile platforms. They incorporate pre-fused
-activations and biases to further enhance performance and quantized
-accuracy. Additionally, TensorFlow Lite also supports using custom operations in
-models.
+TensorFlow Lite 支持一系列量子和浮点的核心运算符,并针对移动平台进行了优化。它结合 pre-fused 激活和其他技术来进一步提高性能和量化精度。此外，TensorFlow Lite 还支持在模型中使用自定义操作。
 
-TensorFlow Lite defines a new model file format, based on
-[FlatBuffers](https://google.github.io/flatbuffers/). FlatBuffers is an
-open-sourced, efficient cross platform serialization library. It is similar to
-[protocol buffers](https://developers.google.com/protocol-buffers/?hl=en), but
-the primary difference is that FlatBuffers does not need a parsing/unpacking
-step to a secondary representation before you can access data, often coupled
-with per-object memory allocation. Also, the code footprint of FlatBuffers is an
-order of magnitude smaller than protocol buffers.
+TensorFlow Lite 基于 [FlatBuffers](https://google.github.io/flatbuffers/)定义了一个新的模型文件格式。FlatBuffers 是一个开源的高效的跨平台序列化库。它与 [protocol buffers](https://developers.google.com/protocol-buffers/?hl=en)类似,但主要区别是 FlatBuffers 常与 per-object 内存分配相结合在您直接访问数据时不需要再次解析包。此外，FlatBuffers 的代码体积比 protocol buffers 小很多。
 
-TensorFlow Lite has a new mobile-optimized interpreter, which has the key goals
-of keeping apps lean and fast. The interpreter uses a static graph ordering and
-a custom (less-dynamic) memory allocator to ensure minimal load, initialization,
-and execution latency.
+TensorFlow Lite 拥有一个新的移动设备优化的解释器保证应用程序的精简和快速。解释器使用静态图形排序和自定义（less-dynamic）内存分配器来确保最小的负载，初始化和执行延迟。
 
-TensorFlow Lite provides an interface to leverage hardware acceleration, if
-available on the device. It does so via the Android Neural Networks library,
-released as part of Android O-MR1.
+TensorFlow Lite 针对支持的设备提供了一个利用硬件加速的接口。通过 Android 神经网络库，作为 Android O-MR1 的一部分发布。
 
-## Why do we need a new mobile-specific library?
+## 为什么我们需要针对移动端的库?
 
-Machine Learning is changing the computing paradigm, and we see an emerging
-trend of new use cases on mobile and embedded devices. Consumer expectations are
-also trending toward natural, human-like interactions with their devices, driven
-by the camera and voice interaction models.
+机器学习正在改变计算模式，我们看到了移动和嵌入式设备上使用的新趋势。消费者的期望也趋向于与他们的设备自然而友好地互动，由相机和语音交互模式驱动。
 
-There are several factors which are fueling interest in this domain:
+有几个因素促成了这个领域：
 
-- Innovation at the silicon layer is enabling new possibilities for hardware
-  acceleration, and frameworks such as the Android Neural Networks API make it
-  easy to leverage these.
+- 硅层的创新为硬件加速带来了新的可能性，像 Android Neural Networks API 这样的框架可以很容易地利用这些特性。
 
-- Recent advances in real-time computer-vision and spoken language understanding
-  have led to mobile-optimized benchmark models being open sourced
-  (e.g. MobileNets, SqueezeNet).
+- 实时计算机视觉和口头语言理解的最新进展：一些 mobile-optimized 评测模型已开放源代码(例如 MobileNets，SqueezeNet)。
 
-- Widely-available smart appliances create new possibilities for
-  on-device intelligence.
+- 广泛使用的智能设备为 on-device 智能创造了新的可能性。
 
-- Interest in stronger user data privacy paradigms where user data does not need
-  to leave the mobile device.
+- 更强大的用户隐私保护方案，使用户数据不需要离开移动设备。
 
-- Ability to serve ‘offline’ use cases, where the device does not need to be
-  connected to a network.
+- 能够在设备不需要连接到网络的情况下提供"离线"用例。
 
-We believe the next wave of machine learning applications will have significant
-processing on mobile and embedded devices.
+我们相信下一波机器学习应用将在移动和嵌入式设备上重大进步。
 
-## TensorFlow Lite developer preview highlights
+## TensorFlow Lite 开发者预览版亮点
 
-TensorFlow Lite is available as a developer preview and includes the
-following:
+TensorFlow Lite 作为开发者预览版亮点，包括以下内容：
 
-- A set of core operators, both quantized and float, many of which have been
-  tuned for mobile platforms.  These can be used to create and run custom
-  models.  Developers can also write their own custom operators and use them in
-  models.
+- 一组核心操作符，既有量子化也有浮点值，其中很多已经针对移动平台进行了优化。这些可以用来创建和运行自定义模型。开发人员也可以编写自己的自定义操作符并在模型中使用它们。
 
-- A new [FlatBuffers](https://google.github.io/flatbuffers/)-based
-  model file format.
+- 基于 [FlatBuffers](https://google.github.io/flatbuffers/)模型文件格式。
 
-- On-device interpreter with kernels optimized for faster execution on mobile.
+- On-device 解释器，内核经过优化，可在移动设备上更快执行。
 
-- TensorFlow converter to convert TensorFlow-trained models to the TensorFlow
-  Lite format.
+- TensorFlow 转换器将 TensorFlow 训练好的模型转换为 TensorFlow Lite 格式。
 
-- Smaller in size: TensorFlow Lite is smaller than 300KB when all supported
-  operators are linked and less than 200KB when using only the operators needed
-  for supporting InceptionV3 and Mobilenet.
+- 更小的体积：当所有支持的操作符链接时，TensorFlow Lite 小于 300 KB，而仅使用支持 Inception V3 和 Mobilenet 所需的操作符时，TensorFlow Lite 小于 200 KB。
 
-- **Pre-tested models:**
+- **预设模型:**
 
-    All of the following models are guaranteed to work out of the box:
+    以下所有预设模型均可保证开箱即用：
 
-    - Inception V3, a popular model for detecting the dominant objects
-      present in an image.
+    - Inception V3 是一种用于检测图像中存在的主要对象的流行模型。
 
     - [MobileNets](https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md),
-      a family of mobile-first computer vision models designed to effectively
-      maximize accuracy while being mindful of the restricted resources for an
-      on-device or embedded application. They are small, low-latency, low-power
-      models parameterized to meet the resource constraints of a variety of use
-      cases. They can be built upon for classification, detection, embeddings
-      and segmentation. MobileNet models are smaller but [lower in
-      accuracy](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html)
-      than Inception V3.
+      一系列移动优先计算机视觉模型，旨在有效提高准确性，同时注重 on-device 或嵌入式应用程序的有限资源。它们很小，低延迟，低功耗，模型参数化，以满足各种用例的资源约束。它们可以建立在分类，检测，嵌入和分割之上。MobileNet 模型比较小，但是比 Inception V3 [准确度更低](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html)。
 
-    - On Device Smart Reply, an on-device model which provides one-touch
-      replies for an incoming text message by suggesting contextually relevant
-      messages. The model was built specifically for memory constrained devices
-      such as watches & phones and it has been successfully used to surface
-      [Smart Replies on Android
-      Wear](https://research.googleblog.com/2017/02/on-device-machine-intelligence.html)
-      to all first-party and third-party apps.
+    - 在设备智能回复上, 提供能通过建议上下文相关的消息来回复传入的文本消息的 one-touch 的 on-device 模型，该模型专为内存受限的设备而建立，如手表和手机，
+      它已被成功应用到 [Android Wear 智能回复](https://research.googleblog.com/2017/02/on-device-machine-intelligence.html)所有官方和第三方应用.
 
-- Quantized versions of the MobileNet model, which runs faster than the
-  non-quantized (float) version on CPU.
+- MobileNet 模型量子版本, 其运行速度比 CPU 上的 non-quantized（浮点）版本快。
 
-- New Android demo app to illustrate the use of TensorFlow Lite with a quantized
-  MobileNet model for object classification.
+- 新的 Android 演示应用程序来说明使用 TensorFlow Lite 与量子化的 MobileNet 模型进行对象分类。
 
-- Java and C++ API support
+- Java 和 C++ API 支持
 
-Note: This is a developer release, and it’s likely that there will be changes in
-the API in upcoming versions. We do not guarantee backward or forward
-compatibility with this release.
+注意：这是一个开发者版本，很可能在即将到来的版本中会有 API 的变化。我们不保证向后或向前兼容这个版本。
 
-## Getting Started
+## 入门
 
-We recommend you try out TensorFlow Lite with the pre-tested models indicated
-above. If you have an existing mode, you will need to test whether your model is
-compatible with both the converter and the supported operator set.  To test your
-model, see the [documentation on
-GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite).
+我们建议您使用上述的 TensorFlow Lite 的 pre-tested 模型。如果有一个现有的模型，则需要测试模型是否兼容转换器和支持的操作集。要测试你的模型，请看 [GitHub 文档](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)。
 
-### Retrain Inception-V3 or MobileNet for a custom data set
+### 为自定义数据集重置 Inception-V3 或 MobileNet
 
-The pre-trained models mentioned above have been trained on the ImageNet data
-set, which consists of 1000 predefined classes. If those classes are not
-relevant or useful for your use case, you will need to retrain those
-models. This technique is called transfer learning, which starts with a model
-that has been already trained on a problem and will then be retrained on a
-similar problem. Deep learning from scratch can take days, but transfer learning
-can be done fairly quickly. In order to do this, you'll need to generate your
-custom data set labeled with the relevant classes.
+这里的 pre-trained 模型已经在 ImageNet 数据集上进行了训练 ，该数据集由 1000 个预定义的类组成。如果这些类不适合您的用例，那么您需要重新训练这些模型。这种从一个已经被训练过的问题的模型开始，然后在类似的问题上进行再训练叫做迁移学习。从头开始深入学习可能需要几天，但迁移学习可以很快完成。为了做到这一点，您需要生成标有相关类的自定义数据集。
 
-The [TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/)
-codelab walks through this process step-by-step. The retraining code supports
-retraining for both floating point and quantized inference.
+[TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/) 一步一步实现了这个过程，再训练代码支持浮点和量化推理的再训练。
 
-## TensorFlow Lite Architecture
+## TensorFlow Lite 架构
 
-The following diagram shows the architectural design of TensorFlow Lite:
+下图显示了 TensorFlow Lite 的架构设计：
 
-![tensorflow lite architecture](https://www.tensorflow.org/images/tflite-architecture.jpg)
+![tensorflow lite 架构](https://www.tensorflow.org/images/tflite-architecture.jpg)
 
-Starting with a trained TensorFlow model on disk, you'll convert that model to
-the TensorFlow Lite file format (`.tflite`) using the TensorFlow Lite
-Converter. Then you can use that converted file in your mobile application.
+在硬盘上练习 TensorFlow 模型, 您需要使用 TensorFlow Lite 转换器把模型转换为 TensorFlow Lite（`.tflite`）文件格式。然后，您可以在移动应用程序中使用该转换后的文件。
 
-Deploying the TensorFlow Lite model file uses:
+部署 TensorFlow Lite 模型文件使用：
 
-- Java API: A convenience wrapper around the C++ API on Android.
+- Java API: 围绕 Android 上 C++ API 的便捷包装。
 
-- C++ API: Loads the TensorFlow Lite Model File and invokes the Interpreter. The
-  same library is available on both Android and iOS.
+- C++ API: 加载 TensorFlow Lite 模型文件并调用解释器。Android 和 iOS 都提供相同的库。
 
-- Interpreter: Executes the model using a set of kernels. The interpreter
-  supports selective kernel loading; without kernels it is only 100KB, and 300KB
-  with all the kernels loaded. This is a significant reduction from the 1.5M
-  required by TensorFlow Mobile.
+- 解释器: 使用一组内核来执行模型。解释器支持选择性内核加载;没有内核，只有 100 KB，加载了所有内核，有 300 KB。这比 TensorFlow Mobile 要求的 1.5 M 的显著减少。
 
-- On select Android devices, the Interpreter will use the Android Neural
-  Networks API for hardware acceleration, or default to CPU execution if none
-  are available.
+- 在选定的 Android 设备上，解释器将使用 Android 神经网络 API 进行硬件加速，如果没有可用的，则默认为 CPU 执行。
 
-You can also implement custom kernels using the C++ API that can be used by the
-Interpreter.
+您也可以使用解释器可以使用的 C++ API 来实现定制的内核。
 
-## Future Work
+## 未来工作
 
-In future releases, TensorFlow Lite will support more models and built-in
-operators, contain performance improvements for both fixed point and floating
-point models, improvements to the tools to enable easier developer workflows and
-support for other smaller devices and more. As we continue development, we hope
-that TensorFlow Lite will greatly simplify the developer experience of targeting
-a model for small devices.
+在未来的版本中，TensorFlow Lite 支持更多的模型和内置运算符, 包含定点和浮点模型的性能改进，改进工具以简化开发者工作流程以及支持其他更小的设备等等。随着我们的不断发展，我们希望 TensorFlow Lite 能够大大简化针对小型设备定位模型的开发者体验。
 
-Future plans include using specialized machine learning hardware to get the best
-possible performance for a particular model on a particular device.
+未来的计划包括使用专门的机器学习硬件，以获得特定设备上特定型号的最佳性能。
 
-## Next Steps
+## 下一步
 
-For the developer preview, most of our documentation is on GitHub. Please take a
-look at the [TensorFlow Lite
-repository](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)
-on GitHub for more information and for code samples, demo applications, and
-more.
+对于开发人员的预览，我们的大部分文档都在 GitHub 上。请查看 [TensorFlow Lite 库](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)在 GitHub 上获取更多信息和代码示例，演示应用程序等等。
+
 
