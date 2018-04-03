@@ -7,10 +7,10 @@ TensorFlow 提供了 Go 程序中可以调用的 API。这些 API 非常适合�
 
 ## 支持的平台
 
-This guide explains how to install TensorFlow for Go.  Although these instructions might also work on other variants, we have only tested (and we only support) these instructions on machines meeting the following requirements:
+这篇教程主要讲述如何安装 Go 版本 TensorFlow。虽然这些命令可能适用于其他平台，但我们现在仅在以下配置环境下进行过测试：
 
   * Linux, 64-bit, x86
-  * macOS X, 10.11 (El Capitan) or higher
+  * macOS X, 10.11 (El Capitan) 或更高版本
 
 
 ## 安装
