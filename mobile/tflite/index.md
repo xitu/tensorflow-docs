@@ -2,7 +2,7 @@
 
 TensorFlow Lite 是 TensorFlow 移动和嵌入式设备轻量级解决方案。它使设备机器学习具有低延迟和更小的二进制体积。TensorFlow Lite 同时支持 [Android 神经网络 API](https://developer.android.com/ndk/guides/neuralnetworks/index.html)的硬件加速.
 
-TensorFlow Lite 使用多项技术降低延迟，例如移动 app 内核优化、 pre-fused 激活 、允许更快更小（定点）模型的量化内核。
+TensorFlow Lite 使用多项技术降低延迟，例如移动 app 内核优化、pre-fused 激活、允许更快更小（定点）模型的量化内核。
 
 目前大部分 TensorFlow Lite 文档放在 [Github](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)上。
 
@@ -76,7 +76,7 @@ TensorFlow Lite 作为开发者预览版亮点，包括以下内容：
 
 这里的 pre-trained 模型已经在 ImageNet 数据集上进行了训练 ，该数据集由 1000 个预定义的类组成。如果这些类不适合您的用例，那么您需要重新训练这些模型。这种从一个已经被训练过的问题的模型开始，然后在类似的问题上进行再训练叫做迁移学习。从头开始深入学习可能需要几天，但迁移学习可以很快完成。为了做到这一点，您需要生成标有相关类的自定义数据集。
 
-[TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/)一步一步实现了这个过程，再训练代码支持浮点和量化推理的再训练。
+[TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/) 一步一步实现了这个过程，再训练代码支持浮点和量化推理的再训练。
 
 ## TensorFlow Lite 架构
 
