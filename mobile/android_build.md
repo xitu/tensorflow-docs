@@ -19,7 +19,7 @@
 
 ## 使用 Android Studio 构建构建 demo 
 
-**先决条件**
+**准备环境**
 
 如果你没有准备好，你需要做下面两件事情：
 
@@ -46,7 +46,7 @@
 
 3. 打开 `build.gradle` 文件 （你可以到侧边面板的 **1.Project** 下，
     并在 Android 下的 **Gradle Script** 中找到它）。 找到
-    `nativeBuildSystem`变量，如果尚未置为 `none`，就把它置为`none`：
+    `nativeBuildSystem` 变量，如果尚未置为 `none`，就把它置为`none`：
 
         // set to 'bazel', 'cmake', 'makefile', 'none'
         def nativeBuildSystem = 'none'
@@ -95,7 +95,7 @@ using [ADB](https://developer.android.com/studio/command-line/adb.html) 中加�
   TensorFlow 的代码。
 
 - 下载 Android 的 [SDK](https://developer.android.com/studio/index.html)
-  and [NDK](https://developer.android.com/ndk/downloads/index.html) 如果你以前
+  和 [NDK](https://developer.android.com/ndk/downloads/index.html) 如果你以前
   没下载它们的话。你需要下载最新的 12b 版本的 NDK，和版本为 23 及以上
   的 SDK。
 
