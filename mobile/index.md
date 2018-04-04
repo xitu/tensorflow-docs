@@ -2,7 +2,7 @@
 
 TensorFlow 被设计用来给移动平台，提供好的解决方案。
 当前我们在移动平台和嵌入式平台上发布机器学习应用
-有两个问题：
+有两个解决方案：
 @{$mobile/mobile_intro$TensorFlow for Mobile} 和 @{$mobile/tflite$TensorFlow Lite}.
 
 ## TensorFlow Lite 与 TensorFlow mobile 
@@ -28,8 +28,8 @@ TensorFlow Lite 在移动平台，提供更好的性能和更小的二进制文�
 API](https://developer.android.com/ndk/guides/neuralnetworks/index.html)来实现目标加速。
 
 TensorFlow Lite 目前涵盖了有限的操作，虽然
-TensorFlow 默认支持受限的操作集合，原则上，
-如果你实用任意的 TensorFlow 操作符，它可以通过定制
+TensorFlow for mobile 默认支持受限的操作集合，但原则上，
+如果你要使用任意的 TensorFlow 操作符，可以通过定制
 内核来构建。这种用例 TensorFlow Lite 当前不支持
 ，需要继续使用 TensorFlow mobile。随着 TensorFlow Lite 的发展，
 它将添加更多的操作，而且这个决定很容易去
