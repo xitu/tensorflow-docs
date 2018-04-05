@@ -1,10 +1,10 @@
 
 # 创建定制化 Estimators
 
-本文档介绍定制化 Estimators。特别是， In particular, this document
-本文档将演示如何创建定制化 @{tf.estimator.Estimator$Estimator} 
-它可以模拟预制的 Estimator
-@{tf.estimator.DNNClassifier$`DNNClassifier`} 在解决 Iris 问题中的行为。
+本文档介绍定制化 Estimators。特别是，
+本文档将演示如何创建定制化 @{tf.estimator.Estimator$Estimator} ，
+@{tf.estimator.DNNClassifier$`DNNClassifier`} 在解决 Iris 问题的行为中，
+它可以模拟预制的 Estimator。
 有关虹膜问题的详细信息，请参阅 
 @{$get_started/premade_estimators$Pre-Made Estimators chapter} 。
 
@@ -16,7 +16,7 @@ cd models/samples/core/get_started
 ```
 
 在本文档中，我们将查看
-[`custom_estimator.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/custom_estimator.py).
+[`custom_estimator.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/custom_estimator.py)。
 您可以使用以下命令运行它：
 
 ```bsh
@@ -26,16 +26,15 @@ python custom_estimator.py
 如果你感到不耐烦，可随时将
 [`custom_estimator.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/custom_estimator.py)
 与
-[`premade_estimator.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/premade_estimator.py) 进行比较（对比）。
-（它们在同一目录中）。
+[`premade_estimator.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/premade_estimator.py) 进行比较（对比），它们在同一目录中。
 
 
 
 ## 预制 vs. 定制化
 
 如下图所示，预制 Estimators 
-是 @{tf.estimator.Estimator} 基类的子类，而定制化 Estimators  
-是 tf.estimator.Estimator 的实例：
+是 @{tf.estimator.Estimator} 基类的子类，而定制化 Estimators  
+则是 tf.estimator.Estimator 的实例：
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="display:block; margin: 0 auto"
@@ -46,34 +45,34 @@ python custom_estimator.py
 预制和定制化 Estimators 都是 Estimators.
 </div>
 
-预制 Estimators are fully baked。有时候您需要更多地控制 Estimator 的行为。
-这是定制化 Estimator 出现的地方。
+预制 Estimators 更加成熟。有时候您需要更多地控制 Estimator 的行为。
+这就是定制化 Estimator 出现的场景。
 您可以创建一个定制化 Estimator 来做任何事情。
 如果希望以某种不寻常的方式连接隐藏层，请编写定制化 Estimator。
-如果想要计算模型的唯一[metric](https://developers.google.com/machine-learning/glossary/#metric)，
+如果想要计算模型的唯一[度量](https://developers.google.com/machine-learning/glossary/#metric)，
 请编写定制化 Estimator。
-for your model, write a custom Estimator.  
-基本上，如果想要针对特定问题优化的 Estimator，请编写定制化 Estimator。
+基本上，如果想要针对特定问题优化的 Estimator， 
+请编写定制化 Estimator。
 
-一个模型函数（或者 `model_fn`）实现了 ML 算法，
+一个函数模型（或者 `model_fn`）实现了 ML 算法，
 使用预制和定制化 Estimator 的 
 唯一区别是：
 
-* 预制 Estimators，已经有人为您编写了模型函数。 
-* 定制化 Estimators，您必须自己写模型函数。
+* 预制 Estimators，已经有人为您编写了函数模型。 
+* 定制化 Estimators，您必须自己写函数模型。
 
-您的模型函数可以实现范围广泛的算法，定义各种隐藏层和 metrics。
-与输入函数一样，所有模型函数都必须接受一组标准的输入参数，
+您的函数模型可以实现范围更广的算法，定义各种隐藏层和度量。
+与输入函数一样，所有函数模型都必须接受一组标准的输入参数，
 并返回一组标准的输出值。
-就像输入函数可以利用 Dataset API 一样，
-模型函数可以利用层 API 和 Metrics API。
+就像输入函数可以利用数据集 API 一样，
+函数模型可以利用层 API 和 度量 API。
 
 让我们看看如何使用定制化 Estimator 解决 Iris 问题。 
 快速提醒 --  这是我们尝试模仿虹膜模型的组织结构：
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="display:block; margin: 0 auto"
-  alt="A diagram of the network architecture: Inputs, 2 hidden layers, and outputs"
+  alt="网络体系结构的图表：输入、两个隐藏层和输出"
   src="../images/custom_estimators/full_network.png">
 </div>
 <div style="text-align: center">
@@ -113,8 +112,8 @@ def train_input_fn(features, labels, batch_size):
 您都可以用相同的方式定义列。
 
 下面的代码为每个输入特征创建一个简单的 `numeric_column` ，
-表明输入特征值应该直接作为
-模型的输入：
+表明输入特征值
+应该直接作为模型的输入：
 
 ```python
 # 特征列描述如何使用输入。
@@ -125,7 +124,7 @@ for key in train_x.keys():
 
 ## 写一个模型函数
 
-我们将使用的模型函数具有以下调用签名：
+我们将使用的函数模型具有以下调用签名：
 
 ```python
 def my_model_fn(
@@ -137,13 +136,13 @@ def my_model_fn(
 
 前两个参数是输入函数返回的功能部件和标签的批次：也就是说，
  `features` 和 `labels` 是您的模型将使用的数据的句柄。
-`mode` 参数指示调用方
+`mode` 参数指向调用方
 是否请求训练、预测或评估。
 
 调用者可以将 `params` 传递给 Estimator 的构造函数。任何传递给构造函数的`params`  接着都会传递给 
  `model_fn`。
 在 [`custom_estimator.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/custom_estimator.py) 中
-以下几行创建 estimator 并设置参数来配置该参数模型。 
+以下几行会创建 estimator 并设置参数来配置该参数模型。 
 此配置步骤与我们在
 @{$get_started/premade_estimators} 中如何配置 @{tf.estimator.DNNClassifier} 相似。
 
@@ -159,12 +158,12 @@ classifier = tf.estimator.Estimator(
     })
 ```
 
-实现一个典型的模型函数，你必须做如下操作：
+实现一个典型的函数模型，你必须做如下操作：
 
 * [定义模型](#define_the_model)
-* Specify additional calculations for each of
-  the [three different modes](#modes):
-  * [预测](#predict)
+*  为每种[三种不同模式](#modes):
+ 指定附加计算
+  * [预测](#predict)
   * [评估](#evaluate)
   * [训练](#train)
 
@@ -174,7 +173,7 @@ classifier = tf.estimator.Estimator(
 
 * 一个[输入层](https://developers.google.com/machine-learning/glossary/#input_layer)
 * 一个或者更多的[隐藏层](https://developers.google.com/machine-learning/glossary/#hidden_layer)
-* 一个[输出 层](https://developers.google.com/machine-learning/glossary/#output_layer)
+* 一个[输出层](https://developers.google.com/machine-learning/glossary/#output_layer)
 
 ### 定义输出层
 
@@ -200,11 +199,11 @@ classifier = tf.estimator.Estimator(
 ### 隐藏层
 
 如果要创建深度神经网络，则必须定义一个或多个隐藏层 
-Layers API 提供一组丰富的函数来定义所有类型的隐藏层，
+层 API 提供一组丰富的函数来定义所有类型的隐藏层，
 包括卷积层、池层和丢弃层。对于 Iris，  
 我们只需要简单调用 @{tf.layers.dense} 来创建隐藏层，
 其维度由 `params['hidden_layers']` 定义。在每个节点的 `dense` 层
-连接到前一层中的每个节点。以下是相关代码：
+连接到上一层中的每个节点。以下是相关代码：
 
 ``` python
     # 根据 'hidden_units' 参数构建隐藏层。
@@ -213,7 +212,7 @@ Layers API 提供一组丰富的函数来定义所有类型的隐藏层，
 ```
 
 *  `units`  参数定义了给定层中输出神经元的数量。
-*  `activation` 参数定义 [activation 函数](https://developers.google.com/machine-learning/glossary/#a) --
+*  `activation` 参数定义[激活函数](https://developers.google.com/machine-learning/glossary/#a) --
  在本例中为
  [Relu](https://developers.google.com/machine-learning/glossary/#ReLU) 
 
@@ -223,7 +222,7 @@ Layers API 提供一组丰富的函数来定义所有类型的隐藏层，
 它使用 `net` 将上一层的输出作为输入。
 
 创建两个隐藏层后，我们的网络如下所示。
-简而言之，该图不显示不现实每层的所有单元。
+简而言之，该图不显示每层的所有单元。
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="display:block; margin: 0 auto"
@@ -231,7 +230,7 @@ Layers API 提供一组丰富的函数来定义所有类型的隐藏层，
   src="../images/custom_estimators/add_hidden_layer.png">
 </div>
 
-请注意 @{tf.layers.dense} 提供了许多附加功能，including
+请注意 @{tf.layers.dense} 提供了许多附加功能，
 包括设置众多正则化参数的能力。
 不过，为了简单起见，
 我们将简单地接受其他参数的默认值。
@@ -239,7 +238,7 @@ Layers API 提供一组丰富的函数来定义所有类型的隐藏层，
 ### 输出层
 
 我们将再次调用 @{tf.layers.dense} 来定义输出层，
-这次没有 activation 函数：
+这次没有激活函数：
 
 ```python
     # 计算 logits (每个 class 一个)。
@@ -259,8 +258,8 @@ Layers API 提供一组丰富的函数来定义所有类型的隐藏层，
 </div>
 
 定义输出层时，`units` 参数指定输出的数量。
-因此，通过将 `units` 设置为 `params['n_classes']`,  
-该模型会为每个 class 生成一个输出值。 
+因此，将 `units` 设置为 `params['n_classes']`,  
+该模型会为每个类生成一个输出值。 
 输出向量的每个元素都将包含得分，或 logit，为关联的 Iris 类计算：Setosa，
 Versicolor 或 Virginica。
 
@@ -269,8 +268,8 @@ Versicolor 或 Virginica。
 
 ## 实现训练、评估、预测 {# 模式}
 
-创建模型函数的最后一步是编写分支代码
-实现预测、评估和训练。implements prediction, evaluation, and training.
+创建函数模型的最后一步是编写分支代码
+实现预测、评估和训练。
 
 当有人调用 Estimator 的 `train` 时，模型函数就会调用
 `evaluate` 或者 `predict` 方法。  
@@ -294,25 +293,25 @@ def my_model_fn(
 |@{tf.estimator.Estimator.evaluate$`evaluate()`}  |@{tf.estimator.ModeKeys.EVAL$`ModeKeys.EVAL`}      |
 |@{tf.estimator.Estimator.predict$`predict()`}|@{tf.estimator.ModeKeys.PREDICT$`ModeKeys.PREDICT`} |
 
-例如，假设您实例化一个 自定义 Estimator 来生成一个 
-叫做 `classifier` 的对象。然后你执行以下调用： 
+例如，假设您实例化一个自定义 Estimator 来生成一个 
+叫做 `classifier` 的对象。然后您执行以下调用： 
 
 ``` python
 classifier = tf.estimator.Estimator(...)
 classifier.train(input_fn=lambda: my_input_fn(FILE_TRAIN, True, 500))
 ```
-Estimator 框架调用您的模型函数，
+Estimator 框架调用您的函数模型，
 模式设置为 `ModeKeys.TRAIN`。
 
-您的模型函数必须提供处理所有三个模式值的代码。
+您的函数模型必须提供处理所有三个模式值的代码。
 对于每个模式值，您的代码必须返回 `tf.estimator.EstimatorSpec`，
 包含调用者的请求信息。
 让我们检查每一种模式。
 
 ### 预测
 
-当 Estimator 的 `predict`  方法被调用时，`model_fn` 会接收到 
-`mode = ModeKeys.PREDICT`。在这种情况下，模型函数必须返回一个
+当 Estimator 的 `predict` 方法被调用时，`model_fn` 会接收到 
+`mode = ModeKeys.PREDICT`。在这种情况下，函数模型必须返回一个
 包含预测的 `tf.estimator.EstimatorSpec`。 
 
 在进行预测之前，模型必须经过训练。
@@ -332,8 +331,8 @@ if mode == tf.estimator.ModeKeys.PREDICT:
     }
     return tf.estimator.EstimatorSpec(mode, predictions=predictions)
 ```
+在预测模式下，
 预测字典包含模型运行时返回的所有内容。
-在预测模式下。
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="display:block; margin: 0 auto"
@@ -381,12 +380,12 @@ loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
 `tf.estimator.EstimatorSpec` 包含模型损失和可选的一个
 或者更多的指标。
 
-虽然返回 metrics 是可选的，但大多数定制化 Estimator 至少返回一个 metric。
+虽然返回度量是可选的，但大多数定制化 Estimator 至少返回一个度量。
 TensorFlow 提供了一个 Metrics 模块 @{tf.metrics} 
-来计算通用 metric。为了简介起见，我们只返回准确性。
+来计算通用度量。为了简洁起见，我们只返回准确性。
 @{tf.metrics.accuracy} 函数将我们的预测与真值进行比较，
 即与输入函数提供的标签进行比较。
-@{tf.metrics.accuracy}  函数要求标签和预测具有相同的形状。
+@{tf.metrics.accuracy} 函数要求标签和预测具有相同的形状。
 下面是对 @{tf.metrics.accuracy} 的调用：计算评估度量。
 
 ``` python
@@ -402,10 +401,10 @@ accuracy = tf.metrics.accuracy(labels=labels,
 * `loss`，这是模型损失。
 * `eval_metric_ops`，这是一个可选的度量字典。
 
-So, we'll create a dictionary containing our sole metric. If we had calculated
-other metrics, we would have added them as additional key/value pairs to that
-same dictionary.  Then, we'll pass that dictionary in the `eval_metric_ops`
-argument of `tf.estimator.EstimatorSpec`. Here's the code:
+所以我们将创建一个包含我们唯一度量标准的字典。
+如果我们计算了其他度量，我们会将它们添加为与其他键值对相同的字典。
+然后我们将在 `eval_metric_ops` 中传递该字典
+`tf.estimator.EstimatorSpec` 的参数。代码如下：
 
 ```python
 metrics = {'accuracy': accuracy}
@@ -505,7 +504,7 @@ classifier.train(
 查看此报告，请从命令行启动 TensorBoard，如下所示：
 
 ```bsh
-# 将 PATH  替换为以 model_dir 形式传递的实际路径
+# 将 PATH 替换为以 model_dir 形式传递的实际路径
 tensorboard --logdir=PATH
 ```
 
@@ -513,22 +512,22 @@ tensorboard --logdir=PATH
 
 所有预制 Estimator 都会自动将大量信息记录到 TensorBoard 中。
 而对于定制化的 Estimators，TensorBoard 只提供一个默认日志（损失图）
-已经显示告诉 TensorBoard 进行日志记录的信息。
+以及显式告诉 TensorBoard 进行日志记录的信息。
 对于您刚刚创建的定制化 Estimator，
 TensorBoard 生成以下内容：
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
 
 <img style="display:block; margin: 0 auto"
-  alt="Accuracy, 'scalar' graph from tensorboard"
+  alt="精度，来自 tensorboard 的'标量'图形"
   src="../images/custom_estimators/accuracy.png">
 
 <img style="display:block; margin: 0 auto"
-  alt="loss 'scalar' graph from tensorboard"
+  alt="损失 '来自 tensorboard 的'标量'图形"
   src="../images/custom_estimators/loss.png">
 
 <img style="display:block; margin: 0 auto"
-  alt="steps/second 'scalar' graph from tensorboard"
+  alt="steps/second '来自 tensorboard 的'标量'图形"
   src="../images/custom_estimators/steps_per_second.png">
 </div>
 
@@ -540,14 +539,14 @@ TensorBoard 显示三个图形。
 简而言之，下面三张图将告诉您：
 
 * global**step/sec: 显示多少批的性能指标
-  （梯度更新），我们每秒处理的作为训练模型)  **。
+  （更新），我们每秒处理的作为训练模型)**。
 
 * 损失：损失报告。  
 
 * 准确性：准确性由以下两行记录： 
 
   * `eval_metric_ops={'my_accuracy': accuracy})`，在评估期间
-  * `tf.summary.scalar('accuracy', accuracy[1])`， 在训练期间
+  * `tf.summary.scalar('accuracy', accuracy[1])`，在训练期间
 
 这些 tensorboard 是向优化的`minimize` 方法传递
 `global_step` 的主要原因之一。
@@ -571,7 +570,7 @@ x 轴范围的图形。
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="display:block; margin: 0 auto"
-  alt="Check-boxes allowing the user to select which runs are shown."
+  alt="复选框允许用户选择显示哪些运行。"
   src="../images/custom_estimators/select_run.jpg">
 </div>
 <div style="text-align: center">
@@ -595,8 +594,8 @@ x 轴范围的图形。
 * TensorFlow
   [官方模型库](https://github.com/tensorflow/models/tree/master/official),
   其中包含了更多使用定制化 Estimator 的示例。
-* 本 [TensorBoard 视频](https://youtu.be/eBbEDRsCmv4)
+* [TensorBoard 视频](https://youtu.be/eBbEDRsCmv4)
 * 介绍 TensorBoard。
 * @{$low_level_intro$Low Level Introduction} 
-  演示了如何直接使用 TensorFLow 的低级 API 进行实验，
- 从而让调试更加简单。
+  演示了如何直接使用 TensorFlow 低级 API 进行实验，
+  从而让调试更加简单。
