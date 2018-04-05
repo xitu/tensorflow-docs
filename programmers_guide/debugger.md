@@ -96,7 +96,7 @@ tfdbg> run
 | | `-r <range>` | 筛选出指定数值区间内的元素。如果有多个区间可以结合使用。| `pt hidden/Relu:0 -a -r [[-inf,-1],[1,inf]]` |
 | | `-n <number>` | Print dump corresponding to specified 0-based dump number. Required for tensors with multiple dumps. | `pt -n 0 hidden/Relu:0` |
 | | `-s` | 打印数值张量的摘要（仅适用于布尔型和数字类型的非空张量，如 `int *` 和 `float *`） | `pt -s hidden/Relu:0[0:50,:]` |
-| | `-w` | Write the value of the tensor (possibly sliced) to a Numpy file using [`numpy.save()`](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.save.html) | `pt -s hidden/Relu:0 -w /tmp/relu.npy` |
+| | `-w` | 使用 [`numpy.save()`](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.save.html) 将张量（可能已分片）的值写入一个 Numpy 文件 | `pt -s hidden/Relu:0 -w /tmp/relu.npy` |
 | **`@[coordinates]`** | | 根据坐标值导航到 `pt` 命令输出值的指定位置。| `@[10,0]` or `@10,0` |
 | **`/regex`** | | [less](https://linux.die.net/man/1/less) 风格的正则表达式搜索 | `/inf` |
 | **`/`** | | 滚动到下一个正则表达式匹配的结果（如果有）。| `/` |
@@ -105,7 +105,7 @@ tfdbg> run
 | **eval** | | **运行 Python 和 numpy 表达式。** | |
 | | `eval <expression>` | 运行 Python / numpy 表达式，用 np 来表示 numpy，调试的张量名需要加上到引号。| ``eval "np.matmul((`output/Identity:0` / `Softmax:0`).T, `Softmax:0`)"`` |
 | | `-a` | 打印表达式返回的结果，就算结果很长也不截断。| ``eval -a 'np.sum(`Softmax:0`, axis=1)'`` |
-| | `-w` | Write the result of the evaluation to a Numpy file using [`numpy.save()`](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.save.html) | ``eval -a 'np.sum(`Softmax:0`, axis=1)' -w /tmp/softmax_sum.npy`` |
+| | `-w` | 使用 [`numpy.save()`](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.save.html) 将评估器的结果写入一个 Numpy 文件 | ``eval -a 'np.sum(`Softmax:0`, axis=1)' -w /tmp/softmax_sum.npy`` |
 | **`ni`** | | **显示结点信息** | |
 | | `-a` | 在输出中包含结点属性。| `ni -a hidden/Relu` |
 | | `-d` | 列出结点可用的调试转储。| `ni -d hidden/Relu` |
@@ -114,7 +114,7 @@ tfdbg> run
 | | `-r` | 递归的列出结点的输入（输入树）。| `li -r hidden/Relu:0` |
 | | `-d <max_depth>` | 限制 -r 模式下的递归深度。| `li -r -d 3 hidden/Relu:0` |
 | | `-c` | 包含控制输入 | `li -c -r hidden/Relu:0` |
-| | `-t` | Show op types of input nodes. | `li -t -r hidden/Relu:0` |
+| | `-t` | 显示输入节点的操作类型| `li -t -r hidden/Relu:0` |
 | **`lo`** | | **列出结点输出的接收者** | |
 | | `-r` | 递归地列出节点的输出接收者（输出树）。 | `lo -r hidden/Relu:0` |
 | | `-d <max_depth>` | 限制 `-r` 模式下的递归深度。 | `lo -r -d 3 hidden/Relu:0` |
