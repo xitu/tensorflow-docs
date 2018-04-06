@@ -1,19 +1,19 @@
 # 在安卓上构建 TensorFlow
 
 为了让你开始在安卓中使用 TensorFlow， 我们将浏览两种方法来
-构建我们的 TensorFlow 移动端的 demo，并且在安卓上部署这些 demo。
+构建我们的 TensorFlow 移动端的 demo，并且在安卓上部署这些 demo，
 第一种方法就是使用 Android Studio，使用 Android Studio 可以让你在 IDE 中。
 构建和部署应用。第二种方式是使用 Bazel 和 ADB 在命令行中发布
 和构建应用。
 
-我们为什么选择这一种或者另外一种方法去构建呢？
+如何决定用哪一种方法呢？
 
-使用 Android Studio 是在 Android 上使用 tensorFlow 最简单的方法。如果你
+在 Android 上使用 TensorFlow 最简单的方式是通过 Android Studio 来构建。如果你
 不准备定制你的 TensorFlow， 或者，如果你想使用 Android Studio 的编辑器
 或者其他功能去构建一个 app ，并且，仅仅添加 TensorFlow 
 到应用里面，我们推荐使用 Android Studio 。
 
-如果你想使用自定义操作，或者基于其他理由去构建 TensorFlow，
+如果你想使用自定义操作，或者基于其他理由去重新构建 TensorFlow，
 那么你向下滑，并且你将会看到我们关于
 [使用 Bazel 构建 demo 的描述文档](#build_the_demo_using_bazel).
 
@@ -35,16 +35,16 @@
 1.  打开 Android Studio，在欢迎界面中选择 **Open an existing
    Android Studio project**.
 
-2. 从 **Open File or Project** 窗口中，导航并选择
+2. 从 **Open File or Project** 窗口中，切换文件目录并选择
      `tensorflow/examples/android` 目录，这个目录在你克隆的
     TensorFlow 的 Github repo 中, 点击 OK.
 
-    如果，IDE 请求你去同步 Gradle，点击 OK。
+    如果，IDE 需要去同步 Gradle，点击 OK。
 
-    如果你得到了类似于“Failed to find target with hash string 'android-23”这样的错误，
+    如果你得到了类似于“Failed to find target with hash string 'android-23‘”这样的错误，
     你也可能需要安装多个平台和工具。
 
-3. 打开 `build.gradle` 文件 （你可以到侧边面板的 **1.Project** 下，
+3. 打开 `build.gradle` 文件 （你可以到侧边面板的 **1:Project** 下，
     并在 Android 下的 **Gradle Script** 中找到它）。 找到
     `nativeBuildSystem` 变量，如果尚未置为 `none`，就把它置为`none`：
 
@@ -56,7 +56,7 @@
     如果它请求你使用 Instant Run，点击**Proceed Without Instant Run**。
 
   你还需要插入一个已经打开了
-  开发者选项的  Android 
+  开发者选项的 Android 
   设备。 看[这里](https://developer.android.com/studio/run/device.html)你可以
   了解更多关于设置开发者设备的更多细节。
 
@@ -66,7 +66,7 @@
 
 ## 使用 Android Studio 添加 TensorFlow 到你的 app 中
 
-添加 TensorFlow 到你自己的 Android app中，最简单的方法是添加
+添加 TensorFlow 到你自己的 Android app 中，最简单的方法是添加
 下面几行到你的 Gradle 构建文件中：
 
     allprojects {
@@ -79,8 +79,8 @@
         compile 'org.tensorflow:tensorflow-android:+'
     }
 
-这将自动下载最新的稳定版本的 TensorFlow ARR包，
-并且，安装到你的项目中。
+这将自动下载最新的稳定版本的 TensorFlow ARR 包，
+并安装到你的项目中。
 
 ##  使用 Bazel 构建 demo
 
@@ -90,7 +90,7 @@ using [ADB](https://developer.android.com/studio/command-line/adb.html) 中加�
 需要一些关于构建系统和 Android 开发者工具的知识，但我们会
 在这里引导您完成基础步骤。
 
-- 首先, 跟随我们关于 @{$install/install_sources$installing from sources} 的文档。
+- 首先参考 @{$install/install_sources$installing from sources} 的文档。
   它也会带领你安装 Bazel 和克隆
   TensorFlow 的代码。
 
@@ -99,23 +99,23 @@ using [ADB](https://developer.android.com/studio/command-line/adb.html) 中加�
   没下载它们的话。你需要下载最新的 12b 版本的 NDK，和版本为 23 及以上
   的 SDK。
 
-- 在你复制的 TensorFlow 源代码中，更新 
+- 在你复制的 TensorFlow 源代码副本中，更新 
   [WORKSPACE](https://github.com/tensorflow/tensorflow/blob/master/WORKSPACE)
   文件中的 &lt;PATH_TO_NDK&gt;和 &lt;PATH_TO_SDK&gt;，
-  为SDK 和 NDK 的位置。
+  分别为 SDK 和 NDK 的位置。
 
 - 运行 Bazel 去构建 demo APK:
 
         bazel build -c opt //tensorflow/examples/android:tensorflow_demo
 
-- 使用 [ADB](https://developer.android.com/studio/command-line/adb.html#move) to
+- 使用 [ADB](https://developer.android.com/studio/command-line/adb.html#move) 
   安装 APK 文件到你的安卓设备:
 
         adb install -r bazel-bin/tensorflow/examples/android/tensorflow_demo.apk
 
 注意：当使用 Bazel 编译 Android 你需要在命令行中指定 
 `--config=android`。在当前场景中，
-p这个例子是专门为 Android 打造的，所以，在这里你不需要指定。
+这个例子是专门为 Android 打造的，所以，在这里你不需要指定。
 
 这将安装三个 app 到你的手机，这些 app 都是 TensorFlow 的部分
 示例。看 [Android 示例 Apps](#android_sample_apps) 来获取更多关于
@@ -129,8 +129,8 @@ p这个例子是专门为 Android 打造的，所以，在这里你不需要指�
 都使用相同的底层代码。这些示例程序都是用手机的摄像头作为
 输入：
 
-- **TF Classify** 使用 Inception v3 模型去标记对象。
-  它用 Imagenet 来分类。在 Imagenet 中有 1000 种分类，
+- **TF Classify** 标记指向的对象用的是 Inception v3 模型，
+  并用 Imagenet 来分类。在 Imagenet 中有 1000 种分类，
   这几乎包含了日常生活中的物品，并且，
   也包括了你在日常生活中不经常遇到东西，所以结果会是十分有趣的。 举个
   例子，这里没有『人』类别，因此，让它猜测照片中的人
@@ -139,17 +139,17 @@ p这个例子是专门为 Android 打造的，所以，在这里你不需要指�
   你可以使用
  
   [TensorFlow for Poets codelab](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/index.html#0)
-  作为例子， 来了解如何培养模型的基础上你自己的数据。
+  作为例子，基于自己的数据训练模型。
 
 - **TF Detect** 使用多盒模型去尝试画出在
-  相机中人的位置绘制边界框。 这些框对每个侦测结
-  果注释了信心表。 结果将不会是完美的， 这类
+  人在相机中位置的边界框。这些框对每个侦测结
+  果注释了置信度。结果还不是完美的， 这类
   的物体侦测仍然是一个活跃的研究话题。这个 demo 也
   包括了可视追踪，当对象在帧之间移动，这比
-   TensorFlow 推断的速度要快很多。当明显的帧率加快，
-  极大的改善了用户体验，但它还能够估计那些框
-  指向帧之间画面的同一对象，这对于随着时间变化
-  对对象计数起着非常重要的作用。
+   TensorFlow 推断的速度要快很多。因为帧率明显加快，
+  可以显著提高用户体验，而且这也能够计算出不同帧中指向
+  相同对象的框，这对在一段时间内统计
+  对象个数起着非常重要的作用。
 
 - **TF Stylize** 实现了基于摄像头返回的数据的实时风格转化算法。
   你可以选择你想用的风格，
