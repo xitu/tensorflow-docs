@@ -4,7 +4,7 @@
 
 如何决定用哪一种方法呢？
 
-在 Android 上使用 TensorFlow 最简单的方式是通过 Android Studio 来构建。如果你不准备定制你的 TensorFlow， 或者，如果你想使用 Android Studio 的编辑器或者其他功能去构建一个 app ，并且，仅仅添加 TensorFlow 到应用里面，我们推荐使用 Android Studio 。如果你想使用自定义操作，或者基于其他理由去重新构建 TensorFlow，那么你向下滑参考[使用 Bazel 构建 demo](#使用-Bazel-构建-demo) 一节。
+在 Android 上使用 TensorFlow 最简单的方式是通过 Android Studio 来构建。如果你不准备定制你的 TensorFlow， 或者，如果你想使用 Android Studio 的编辑器或者其他功能去构建一个 app ，并且，仅仅添加 TensorFlow 到应用里面，我们推荐使用 Android Studio 。如果你想使用自定义操作，或者基于其他理由去重新构建 TensorFlow，那么你向下滑参考[使用 Bazel 构建 demo](#使用-bazel-构建-demo) 一节。
 
 ## 使用 Android Studio 构建构建 demo 
 
@@ -40,7 +40,7 @@
 
   你还需要插入一个已经打开了开发者选项的 Android 设备。看[这里](https://developer.android.com/studio/run/device.html)你可以了解更多关于设置开发者设备的更多细节。
 
-这将会安装三个 app 在你的手机中，这些 app 都是 TensorFlow 的 demo。看 [Android 示例程序](#Android-示例-app) ，你将得到关于它们更多的信息。
+这将会安装三个 app 在你的手机中，这些 app 都是 TensorFlow 的 demo。看 [Android 示例程序](#android-示例-app) ，你将得到关于它们更多的信息。
 
 ## 使用 Android Studio 添加 TensorFlow 到你的 app 中
 
@@ -78,7 +78,7 @@
 
 注意：当使用 Bazel 编译 Android 你需要在命令行中指定`--config=android`。在当前场景中，这个例子是专门为 Android 打造的，所以，在这里你不需要指定。
 
-这将安装三个 app 到你的手机，这些 app 都是 TensorFlow 的部分示例。看 [Android 示例 Apps](#Android-示例-app) 来获取更多关于示例程序的信息。
+这将安装三个 app 到你的手机，这些 app 都是 TensorFlow 的部分示例。看 [Android 示例 Apps](#android-示例-app) 来获取更多关于示例程序的信息。
 
 ## Android 示例 app
 
