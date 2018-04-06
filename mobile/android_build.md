@@ -21,7 +21,7 @@
 
 **构建**
 
-1.  打开 Android Studio，在欢迎界面中选择 **Open an existing Android Studio project**.
+1.  打开 Android Studio，在欢迎界面中选择 **Open an existing Android Studio project**。
 
 2. 从 **Open File or Project** 窗口中，切换文件目录并选择`tensorflow/examples/android` 目录，这个目录在你克隆的 TensorFlow 的 Github repo 中, 点击 OK。
 
