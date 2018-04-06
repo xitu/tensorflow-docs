@@ -1,7 +1,7 @@
 # Android 的 TensorFlow Lite Demo
 
-TensorFlow Lite 的 demo 是一个摄像头 app，这个 app 持续分类，
-它从后面摄像头拍摄到的任何东西。使用了量化移动网络模型。
+TensorFlow Lite 的 demo 是一个摄像头 app，它使用了量化移动网络模型，
+可以连续对后置摄像头拍摄到的任何东西进行分类。
 
 你需要一个安卓设备，并且这个设备的安卓版本号要高于5.0，才能运行这个 demo。
 
@@ -38,5 +38,5 @@ TensorFlow Lite 的 demo 是一个摄像头 app，这个 app 持续分类，
 
 5. 在 Android Studio 中构建和测试 app。
 
-你将准许 app 使用设备摄像头的权限。 
+你需要打开 app 访问摄像头的权限。
 将相机指向各种物体，并欣赏模型如何对物体进行分类！
