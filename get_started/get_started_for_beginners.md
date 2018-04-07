@@ -1,4 +1,4 @@
-# Getting Started for ML Beginners 机器学习新手入门
+# 机器学习新手入门
 
 该文档阐述了如何使用机器学习，对鸢尾花的种属（Iris flowers Dataset）进行分类，深入 TensorFlow 源码，阐述机器学习基本原理。
 
@@ -135,13 +135,13 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 
 ## TensorFlow 技术栈
 
-如下图所示，TensorFlow 技术栈提供了多层 APIs
+如下图所示，TensorFlow 技术栈提供了多层 API
 
 <div style="margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/tensorflow_programming_environment.png">
 </div>
 
-**TensorFlow 技术栈**
+**TensorFlow 编程环境**
 <p>&nbsp;</p>
 
 在开始写 TensorFlow 程序时，我们强烈建议您使用下列两类高层 API：
@@ -223,7 +223,7 @@ def load_data(label_name='Species'):
 ```
 
 Keras 是一个开源机器学习库；`tf.keras` 是 TensorFlow 对 Keras 的实现。
- `premade_estimator.py` 程序只使用了一个 `tf.keras` 函数，即： `tf.keras.utils.get_file` 方法，使拷贝远程 CSV 文件到本地系统更便捷。
+ `premade_estimator.py` 程序只是 `tf.keras` 的一个函数入口，即： `tf.keras.utils.get_file` 方法，使拷贝远程 CSV 文件到本地系统更便捷。
 
 调用 `load_data` 函数返回值为两组 `(feature,label)` 对，两组数据相对应训练集和测试集：
 
@@ -304,7 +304,7 @@ my_feature_columns = [
 *   [**预定义 Estimator**](https://developers.google.com/machine-learning/glossary/#pre-made_Estimator)，代码已经由他人写好。
 *   [**定制 Estimator**](https://developers.google.com/machine-learning/glossary/#custom_estimator)，你需要或多或少自己写代码。
 
-为了实现这个神经网络，`premade_estimators.py`程序使用预定义 Estimator @{tf.estimator.DNNClassifier}，构建神经网络将样本分类。下面代码实例化一个`DNNClassifier`。
+为了实现这个神经网络，`premade_estimators.py`程序使用预定义 Estimator @{tf.estimator.DNNClassifier}，构建神经网络将样本分类。接下来调用一个实例化的`DNNClassifier`。
 
 ```python
     classifier = tf.estimator.DNNClassifier(
@@ -378,7 +378,7 @@ def train_input_fn(features, labels, batch_size):
     dataset = tf.data.Dataset.from_tensor_slices((dict(features), labels))
 ```
 
-`tf.dataset` 类提供了很多好用的样本预处理函数。比如下面 3 个函数:
+`tf.dataset` 类给训练提供了许多有用的预备样本。比如下面 3 个函数:
 
 ```python
     dataset = dataset.shuffle(buffer_size=1000).repeat(count=None).batch(batch_size)
@@ -402,7 +402,7 @@ def train_input_fn(features, labels, batch_size):
 
 ### 评估模型
 
-**评估** 用来判断模型预测结果的有效性。为了评价鸢尾花分类模型的有效性，我们向模型传入一些花瓣花萼的测量值，让其预测传入数据的花种属，然后对比模型的预测结果与实际标记。举例说明，模型若能够预测正确一半的样本数据，则[准确率](https://developers.google.com/machine-learning/glossary/#accuracy)为 0.5。下面例子展示了一个有效性较好的模型：
+**评估** 用来判断模型预测结果的有效性。为了评价鸢尾花分类模型的有效性，我们向模型传入一些花瓣花萼的测量值，让其预测传入数据的花种属，然后对比模型的预测结果与实际标记。举例说明，模型若能够预测正确一半的样本数据，则[准确率](https://developers.google.com/machine-learning/glossary/#accuracy)为 0.5。下面例子展示了一个更有效的模型：
 
 
 <table>
@@ -507,7 +507,7 @@ predictions = classifier.predict(
 2.  从刚才的数据集中创建批量的 3 个样本
 3.  返回批量的样本给 `classifier.predict`
 
-`predict` 方法返回了一个 python iterable 对象，以字典结构输出每个样本的预测结果。该字典包含多个键值对。键 `probabilities` 的值是一个包含 3 个浮点值的列表，每个浮点值代表输入样本是该鸢尾花种属的可能性。例如，下面这个 `probabilities` 列表：
+`predict` 方法返回了一个 python iterable 对象，以字典结构输出每个样本的预测结果。该字典包含多个键值对。`probabilities` 的值是一个包含 3 个浮点值的列表，每个浮点值代表输入样本是该鸢尾花种属的可能性。例如，下面这个 `probabilities` 列表：
 
 ```none
 'probabilities': array([  1.19127117e-08,   3.97069454e-02,   9.60292995e-01])
@@ -519,7 +519,7 @@ predictions = classifier.predict(
 *   有 3.97% 概率为 Versicolor 类。
 *   有 96.0% 概率为 Virginica 类。
 
-键 `class_ids` 的值为仅有一个元素的数组，表明该样本最可能是的种类：
+`class_ids` 的值为仅有一个元素的数组，表明该样本最有可能是哪个种类：
 
 ```none
 'class_ids': array([2])
@@ -554,7 +554,7 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 <!--TODO(barryr): When MLCC is released, add pointers to relevant sections.-->
 此文档提供一个机器学习的简短介绍。
 
-由于 `premade_estimators.py` 依赖于高层 APIs，机器学习中大部分的复杂数学被隐藏。如果你想要深入学习机器学习，我们推荐学习[**梯度下降**](https://developers.google.com/machine-learning/glossary/#gradient_descent)，
+由于 `premade_estimators.py` 依赖于高层 API，机器学习中大部分的复杂数学被隐藏。如果你想要深入学习机器学习，我们推荐学习[**梯度下降**](https://developers.google.com/machine-learning/glossary/#gradient_descent)，
 批量，还有神经网络。
 
 推荐阅读 @{$feature_columns$Feature Columns} 文档，了解机器学习中的不同类别数据表述。
