@@ -18,7 +18,7 @@
 
 `Reader` 用于从文件中读取记录。TensorFlow 中已经有一些预建好的读取操作样例：
 
-*   @{tf.TFRecordReader} ([source in `kernels/tf_record_reader_op.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/tf_record_reader_op.cc))
+*   @{tf.TFRecordReader} ([source in `kernels/tf_record_reader_op.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/tf_record_reader_op.cc))
 *   @{tf.FixedLengthRecordReader} ([source in `kernels/fixed_length_record_reader_op.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/fixed_length_record_reader_op.cc))
 *   @{tf.TextLineReader} ([source in `kernels/text_line_reader_op.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/text_line_reader_op.cc))
 
