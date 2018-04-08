@@ -156,8 +156,7 @@ final_state = state
 ```bsh
 tar xvfz simple-examples.tgz -C $HOME
 ```
-_(注意：在 windows 下，你可能需要其他的
-[工具](https://wiki.haskell.org/How_to_unpack_a_tar_file_in_Windows).)_
+**(注意：在 windows 下，你可能需要其他的[工具](https://wiki.haskell.org/How_to_unpack_a_tar_file_in_Windows).)**
 
 现在，从 [TensorFlow 模型仓库](https://github.com/tensorflow/models)中克隆一份代码后，执行下面命令：
 
