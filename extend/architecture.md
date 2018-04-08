@@ -10,7 +10,7 @@
 
 TensorFlow 运行时是一个跨平台库。图 1 展示了其总体框架。通过一套 C API 将核心运行时与不同语言的用户级代码分离开来。
 
-![TensorFlow 架构层级](https://www.tensorflow.org/images/layers.png){: width="300"}
+![TensorFlow 架构层级](https://www.tensorflow.org/images/layers.png)
 
 **图 1**
 
@@ -32,7 +32,7 @@ TensorFlow 运行时是一个跨平台库。图 1 展示了其总体框架。通
 
 图 2 展示了这些组件之间的交互。`/job:worker/task:0` 和 `/job:ps/task:0` 均为具有工作进程的任务。`PS` 代表参数服务器：负责存储和更新模型参数的任务。其他任务在优化参数时会向这些参数发送更新。任务之间的这种特定分工并不是必须的，但是这在分布式训练中很常用。
 
-![TensorFlow 架构图示](https://www.tensorflow.org/images/diag1.svg){: width="500"}
+![TensorFlow 架构图示](https://www.tensorflow.org/images/diag1.svg)
 
 **图 2**
 
@@ -48,7 +48,7 @@ TensorFlow 运行时是一个跨平台库。图 1 展示了其总体框架。通
 
 在图 3 中，客户端构建了一个图，其权值 (w) 与特征向量 (x) 相乘，然后将其与偏置 (b) 相加，并最后将结果保存在变量 (s) 中。
 
-![TensorFlow 架构图示：客户端](https://www.tensorflow.org/images/graph_client.svg){: width="700"}
+![TensorFlow 架构图示：客户端](https://www.tensorflow.org/images/graph_client.svg)
 
 **图 3**
 
@@ -66,25 +66,25 @@ TensorFlow 运行时是一个跨平台库。图 1 展示了其总体框架。通
 
 由于主控端了解在每一步计算中的整个计算过程，它首先使用了诸如公共子表达式消除、常量拆叠等标准优化方法对计算子图进行优化，然后再负责协调优化后的子图去执行一系列任务。
 
-![TensorFlow 架构图示：Master](https://www.tensorflow.org/images/graph_master_cln.svg){: width="700"}
+![TensorFlow 架构图示：Master](https://www.tensorflow.org/images/graph_master_cln.svg)
 
 **图 4**
 
 图 5 展示了一个示例图可能的划分。分布式主控端已将模型的参数分组，以便于将它们存储在参数服务器上。
 
-![划分图](https://www.tensorflow.org/images/graph_split1.svg){: width="700"}
+![划分图](https://www.tensorflow.org/images/graph_split1.svg)
 
 **图 5**
 
 当图的边被分区所切断时，分布式 Master 则会介入并在接受和发送节点间传递任务信息（如图 6）。
 
-![划分图](https://www.tensorflow.org/images/graph_split2.svg){: width="700"}
+![划分图](https://www.tensorflow.org/images/graph_split2.svg)
 
 **图 6**
 
 然后，分布式 Master 会将子图分配给分布式任务。
 
-![分区图](https://www.tensorflow.org/images/graph_workers_cln.svg){: width="700"}
+![分区图](https://www.tensorflow.org/images/graph_workers_cln.svg)
 
 **图 7**
 
@@ -116,7 +116,7 @@ TensorFlow 运行时是一个跨平台库。图 1 展示了其总体框架。通
 我们也为用于多 GPU 通信的 Nvidia NCCL 库提供了初步支持 (见 [`tf.contrib.nccl`](
 https://www.tensorflow.org/code/tensorflow/contrib/nccl/python/ops/nccl_ops.py))。
 
-![分区图](https://www.tensorflow.org/images/graph_send_recv.svg){: width="700"}
+![分区图](https://www.tensorflow.org/images/graph_send_recv.svg)
 
 **图 8**
 
