@@ -85,11 +85,11 @@ print(eval_metrics)
 ```
 下面这张表总结了评估数据的结果。
 
-metric        | value
+度量        | 值
 :------------ | :------------
-loss          | 0.25 to 0.30
+loss          | 0.25 到 0.30
 accuracy      | 92.5%
-training time | ~25 seconds on my machine
+training time | 在我的机器上约 25 秒
 
 注意：评估结果会因各种因素的影响而不同。
 
@@ -176,18 +176,18 @@ estimator = tf.contrib.kernel_methods.KernelLinearClassifier(
 
 先前代码的运行结果总结在下面这张表里。我们可以通过提高映射输出维数和对标准差调优进一步提高准确性。
 
-metric        | value
+度量  | 值
 :------------ | :------------
 loss          | 0.10
 accuracy      | 97%
-training time | ~35 seconds on my machine
+training time | 在我的机器上约 35 秒
 
 
 ### stddev
 
 分类的质量对 stddev 的值非常敏感。下面这张表显示的是分类器在不同 stddev 上的评估数据的准确性。最优值是 stddev=5.0。注意看太大或者太小的 stddev 值是怎样迅速地降低分类的准确性的。
 
-stddev | eval accuracy
+stddev | 评估精度
 :----- | :------------
 1.0    | 0.1362
 2.0    | 0.4764
