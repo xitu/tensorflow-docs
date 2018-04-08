@@ -48,9 +48,9 @@ TensorBoard 包含了 **Embedding Projector**，一个让你能够交互式查�
 
 Embedding Projector 有三个面板：
 
-- *Data panel* 在顶部左侧，这里你可以选择运行，通过点击改变 embedding 变量，和数据列颜色或将他们打上标签。
-- *Projections panel* 在底部左侧，在这里你可以选择展示的类型。
-- *Inspector panel* 在右侧，这里你可以查询特殊的点并查看最近元素列表。
+- Data panel 在顶部左侧，这里你可以选择运行，通过点击改变 embedding 变量，和数据列颜色或将他们打上标签。
+- Projections panel 在底部左侧，在这里你可以选择展示的类型。
+- Inspector panel 在右侧，这里你可以查询特殊的点并查看最近元素列表。
 
 ### Projections
 Embedding Projector 为数据集降维提供了三种方法。
