@@ -1,10 +1,10 @@
 index.md
 
-### Getting Started
+### 入门
 get_started_for_beginners.md
 premade_estimators.md
 
-### Details
+### 细节
 checkpoints.md
 feature_columns.md
 datasets_quickstart.md
