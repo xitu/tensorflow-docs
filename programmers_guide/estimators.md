@@ -114,25 +114,25 @@ keras_inception_v3 = tf.keras.applications.inception_v3.InceptionV3(weights=None
 keras_inception_v3.compile(optimizer=tf.keras.optimizers.SGD(lr=0.0001, momentum=0.9),
                           loss='categorical_crossentropy',
                           metric='accuracy')
-# Create an Estimator from the compiled Keras model. Note the initial model
-# state of the keras model is preserved in the created Estimator.
+# 从已编译的 Keras 模型中创建一个评估器，注意，keras 模型的初始状态会被保存在这个评估器中。
 est_inception_v3 = tf.keras.estimator.model_to_estimator(keras_model=keras_inception_v3)
 
 # Treat the derived Estimator as you would with any other Estimator.
 # First, recover the input name(s) of Keras model, so we can use them as the
 # feature column name(s) of the Estimator input function:
+# 像处理其他评估器一样处理派生评估器。
+# 首先，恢复 Keras 模型的输入名称，这样就可以将它们当做评估器数去函数的特征列名：
 keras_inception_v3.input_names  # print out: ['input_1']
-# Once we have the input name(s), we can create the input function, for example,
-# for input(s) in the format of numpy ndarray:
+# 一旦有了输入名称，就可以创建输入函数，例如，对于 numpy ndarray 格式的输入：
 train_input_fn = tf.estimator.inputs.numpy_input_fn(
     x={"input_1": train_data},
     y=train_labels,
     num_epochs=1,
     shuffle=False)
-# To train, we call Estimator's train function:
+# 需要进行训练时，调用评估器的训练函数：
 est_inception_v3.train(input_fn=train_input_fn, steps=2000)
 ```
 
-Note that the names of feature columns and labels of a keras estimator come from the corresponding compiled keras model. For example, the input key names for `train_input_fn` above can be obtained from `keras_inception_v3.input_names`, and similarly, the predicted output names can be obtained from `keras_inception_v3.output_names`.
+注意，Keras 评估器的特征列和标签的名称来自相应的已编译 Keras 模型。例如上面的 `train_input_fn` 的输入键值可以从 `keras_inception_v3.input_names` 获取，类似地，预测的输出名称可以从 `keras_inception_v3.output_names` 获得。
 
 想要了解更多的细节，请查阅 @{tf.keras.estimator.model_to_estimator} 。
