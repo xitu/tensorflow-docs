@@ -143,10 +143,8 @@ Iris 数据集包含四个特征和一个[标签](https://developers.google.com/
 ## 使用 Estimators 编程的概览
 
 一个 Estimator 是 TensorFlow 的一个完整模型的高层次表示。它自己处理了初始化，日志，存储和重新存储等问题，因而你可以专注于你的模型搭建。更多信息请见 @{$programmers_guide/estimators}。
-一个 Estimator 是从 @{tf.estimator.Estimator} 中派生出的。TensorFlow 提供了一系列的 
-[预制的 Estimators](https://developers.google.com/machine-learning/glossary/#pre-made_Estimator)
-（例如, `LinearRegressor`）来实现常用的 ML 算法。除此之外，你可以编写你自己的
-[定制化 Estimators](https://developers.google.com/machine-learning/glossary/#custom_Estimator)。
+
+一个 Estimator 是从 @{tf.estimator.Estimator} 中派生出的。TensorFlow 提供了一系列的[预制的 Estimators ](https://developers.google.com/machine-learning/glossary/#pre-made_Estimator)（例如, `LinearRegressor`）来实现常用的 ML 算法。除此之外，你可以编写你自己的[定制化 Estimators ](https://developers.google.com/machine-learning/glossary/#custom_Estimator)。
 我们建议在刚开始使用 TensorFlow 的时候仅使用预制的 Estimator。在拥有了使用预制的 Estimator 的经验后，我们推荐你创建定制化的 Estimator 来优化你的模型。
 
 要写出一个基于预制的 Estimator 的 TensorFlow 程序，你可以进行如下任务：
@@ -167,8 +165,7 @@ Iris 数据集包含四个特征和一个[标签](https://developers.google.com/
 * [`features`](https://developers.google.com/machine-learning/glossary/#feature) - 一个 Python 字典：
     * 每个键为特征的名字。
     * 每个值为一个包含所有该特征的值的数组。
-* `label` - 一个数组包含着所有
-  例子的[标签](https://developers.google.com/machine-learning/glossary/#label) 。
+* `label` - 一个数组包含着所有例子的[标签](https://developers.google.com/machine-learning/glossary/#label) 。
 
 这里有一个输入函数的实现，来展示它的格式：
 
@@ -187,7 +184,7 @@ def input_evaluation_set():
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%"
   alt="一个显示数据集类的子类的表格"
-  src="../images/dataset_classes.png">
+  src="https://www.tensorflow.org/images/dataset_classes.png">
 </div>
 
 其中，单独的成员为：
@@ -240,8 +237,7 @@ Iris 问题是一个经典的分类问题。幸运的是，TensorFlow 提供了�
 * @{tf.estimator.DNNLinearCombinedClassifier} 用于有深度和广度的模型
 * @{tf.estimator.LinearClassifier} 用于基于线性模型的分类器
 
-对于 Iris 问题，`tf.estimator.DNNClassifier` 看起来是最佳选择。
-以下是我们如何实例化这个 Estimator：
+对于 Iris 问题，`tf.estimator.DNNClassifier` 看起来是最佳选择。以下是我们如何实例化这个 Estimator：
 
 ```python
 # 创建一个有两个隐藏层和每层10个节点的 DNN 
@@ -286,8 +282,7 @@ eval_result = classifier.evaluate(
 print('\nTest set accuracy: {accuracy:0.3f}\n'.format(**eval_result))
 ```
 
-与我们调用 `train` 方法不同，我们并不能将 `steps` 参数传给评估方法。我们的 `eval_input_fn` 仅产生了一次
-[epoch（轮数）](https://developers.google.com/machine-learning/glossary/#epoch) 的数据。
+与我们调用 `train` 方法不同，我们并不能将 `steps` 参数传给评估方法。我们的 `eval_input_fn` 仅产生了一次[epoch（轮数）](https://developers.google.com/machine-learning/glossary/#epoch) 的数据。
 
 运行这段代码会产生如下的输出（或者类似的东西）：
 
