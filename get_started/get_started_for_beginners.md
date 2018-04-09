@@ -8,8 +8,7 @@
 *   想学习编写 TensorFlow 程序
 *   会使用 Python 编程
 
-如果你已经熟悉基础的机器学习概念，只是 TensorFlow 新手，建议移步
-@{$premade_estimators$Getting Started with TensorFlow: for ML Experts}
+如果你已经熟悉基础的机器学习概念，只是 TensorFlow 新手，建议移步 @{$premade_estimators$Getting Started with TensorFlow: for ML Experts}。
 
 ## 鸢尾花分类问题
 
@@ -27,21 +26,13 @@
   src="../images/iris_three_species.jpg">
 </div>
 
-**从左至右,
-[*Iris setosa*](https://commons.wikimedia.org/w/index.php?curid=170298) (by
-[Radomil](https://commons.wikimedia.org/wiki/User:Radomil), CC BY-SA 3.0),
-[*Iris versicolor*](https://commons.wikimedia.org/w/index.php?curid=248095) (by
-[Dlanglois](https://commons.wikimedia.org/wiki/User:Dlanglois), CC BY-SA 3.0),
-和 [*Iris virginica*](https://www.flickr.com/photos/33397993@N05/3352169862)
-(by [Frank Mayfield](https://www.flickr.com/photos/33397993@N05), CC BY-SA
-2.0).**
+**从左至右，[*Iris setosa*](https://commons.wikimedia.org/w/index.php?curid=170298) (by [Radomil](https://commons.wikimedia.org/wiki/User:Radomil), CC BY-SA 3.0)，[*Iris versicolor*](https://commons.wikimedia.org/w/index.php?curid=248095) (by [Dlanglois](https://commons.wikimedia.org/wiki/User:Dlanglois), CC BY-SA 3.0) 和 [*Iris virginica*](https://www.flickr.com/photos/33397993@N05/3352169862) (by [Frank Mayfield](https://www.flickr.com/photos/33397993@N05)，CC BY-SA 2.0)。**
 <p>&nbsp;</p>
 
-我们找来[ Iris 数据集](https://en.wikipedia.org/wiki/Iris_flower_data_set)，包含 120 条带有花萼、花瓣测量的数据。
-该数据集非常典型，是机器学习分类问题很好的入门材料。
-( [ MNIST 数据集](https://en.wikipedia.org/wiki/MNIST_database)，包含大量手写数字，也是分类问题的典型常用数据)
-Iris 数据集的前 5 行如下:
+我们找来 [Iris 数据集](https://en.wikipedia.org/wiki/Iris_flower_data_set)，包含 120 条带有花萼、花瓣测量的数据。该数据集非常典型，是机器学习分类问题很好的入门材料。
 
+([MNIST 数据集](https://en.wikipedia.org/wiki/MNIST_database)，包含大量手写数字，也是分类问题的典型常用数据)
+Iris 数据集的前 5 行如下：
 
 | 花萼长度 | 花萼宽度 | 花瓣长度 | 花瓣宽度 | 种属
 | ---          | ---         | ---          | ---         | ---
@@ -53,9 +44,7 @@ Iris 数据集的前 5 行如下:
 
 我们首先介绍一些术语：
 
-*   最后一列 (种属) 被称为  [**标记**](https://developers.google.com/machine-learning/glossary/#label)（label）；
-    前四列被称为  [**特征**](https://developers.google.com/machine-learning/glossary/#feature)（feature）。
-    **特征**用来形容样本数据，**标记**用于之后的结果预测。
+*   最后一列 (种属) 被称为 [**标记**](https://developers.google.com/machine-learning/glossary/#label)（label）；前四列被称为 [**特征**](https://developers.google.com/machine-learning/glossary/#feature)（feature）。**特征**用来形容样本数据，**标记**用于之后的结果预测。
 
 *   一个 [**样本**](https://developers.google.com/machine-learning/glossary/#example)（example）包含所有特征的集合和样本的标记。上表中，5 条样本数据来自于一个数据量为 120 条数据的数据集。
 
@@ -76,9 +65,6 @@ Iris 数据集的前 5 行如下:
 鸢尾花问题是 [**监督式学习**](https://developers.google.com/machine-learning/glossary/#supervised_machine_learning) 的一个典型，这类模型通过标记的样本数据训练得出。
 还有一类机器学习：[**无监督式学习**](https://developers.google.com/machine-learning/glossary/#unsupervised_machine_learning)。这类样本模型是未标记的，模型只通过特征寻找规律。）
 
-
-
-
 ## 运行示例程序前的准备工作
 
 在运行示例程序前，先安装 TensorFlow：
@@ -88,7 +74,6 @@ Iris 数据集的前 5 行如下:
 3.  安装/升级 pandas :
 
      `pip install pandas`
-
 
 按照以下步骤，找到示例程序：
 
@@ -101,7 +86,6 @@ Iris 数据集的前 5 行如下:
        `cd models/samples/core/get_started/`
 
 在 `get_started` 文件目录下，找到名为 `premade_estimator.py`的 python 文件。
-
 
 ## 运行示例程序
 
@@ -122,7 +106,6 @@ Prediction is "Versicolor" (99.8%), expected "Versicolor"
 
 Prediction is "Virginica" (97.9%), expected "Virginica"
 
-
 ```
 如果程序报错，没有生成预测结果。
 查看以下问题：
@@ -130,8 +113,6 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 * 是否成功安装 TensorFlow ？
 * 是否使用了正确版本的 TensorFlow ？程序`premade_estimators.py`需要版本号至少为 TensorFlow v1.4。
 * 如果你通过 virtualenv 或 Anaconda 安装的 TensorFlow，是否初始化环境？
-
-
 
 ## TensorFlow 技术栈
 
@@ -151,7 +132,6 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 
 尽管我们偶尔需要使用到其它底层 API ，这篇文档将主要介绍这两类 API。
 
-
 ## 程序代码
 
 有耐心看到这里的读者，来，我们继续深挖代码。和大部分 TensorFlow 程序相似，如下是`premade_estimator.py`程序的例行步骤：
@@ -164,7 +144,6 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 *   使用训练后的模型进行预测。
 
 下面各小节展开解释。
-
 
 ### 引入数据集并解析
 
@@ -179,10 +158,11 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 其中的大部分作为训练数据、剩余部分作为测试数据。
 增加训练集样本数量通常能构造出更好的模型，而增加测试集样本的数量能够更好的评估模型。
 
-`premade_estimators.py` 程序通过 `load_data`函数读取相邻路径的 [`iris_data.py`](
+`premade_estimators.py` 程序通过 `load_data` 函数读取相邻路径的 [`iris_data.py`](
 https://github.com/tensorflow/models/blob/master/samples/core/get_started/iris_data.py) 文件并解析为训练集和测试集。
 
 代码如下（包含详细注释）
+
 ```python
 # 定义数据 csv 文件地址
 TRAIN_URL = "http://download.tensorflow.org/data/iris_training.csv"
@@ -222,8 +202,7 @@ def load_data(label_name='Species'):
     return (train_features, train_label), (test_features, test_label)
 ```
 
-Keras 是一个开源机器学习库；`tf.keras` 是 TensorFlow 对 Keras 的实现。
- `premade_estimator.py` 程序只是 `tf.keras` 的一个函数入口，即： `tf.keras.utils.get_file` 方法，使拷贝远程 CSV 文件到本地系统更便捷。
+Keras 是一个开源机器学习库；`tf.keras` 是 TensorFlow 对 Keras 的实现。`premade_estimator.py` 程序只是 `tf.keras` 的一个函数入口，即： `tf.keras.utils.get_file` 方法，使拷贝远程 CSV 文件到本地系统更便捷。
 
 调用 `load_data` 函数返回值为两组 `(feature,label)` 对，两组数据相对应训练集和测试集：
 
@@ -278,13 +257,7 @@ my_feature_columns = [
 
 接下来我们需要选择要训练的模型类型。模型有很多，但找到最理想的模型需要一定经验。
 我们选择神经网络解决鸢尾花问题。
-通过 [**神经网络**](https://developers.google.com/machine-learning/glossary/#neural_network)
-可以找到特征和标记间的复杂关系。神经网络是一个高度结构化的图，组成了一个或多个
-[**隐藏层**](https://developers.google.com/machine-learning/glossary/#hidden_layer)。
-每个隐藏层包含一个或多个
-[**神经元**](https://developers.google.com/machine-learning/glossary/#neuron)。
-神经网络有不同的类别。这里我们使用
-[**全连接神经网络**](https://developers.google.com/machine-learning/glossary/#fully_connected_layer)，就是说：每一层中神经元的输入，来自于上一层的 *所有* 神经元。举个例子，下图阐述了全连接神经网络，它包含 3 个隐藏层：
+通过 [**神经网络**](https://developers.google.com/machine-learning/glossary/#neural_network) 可以找到特征和标记间的复杂关系。神经网络是一个高度结构化的图，组成了一个或多个 [**隐藏层**](https://developers.google.com/machine-learning/glossary/#hidden_layer)。每个隐藏层包含一个或多个 [**神经元**](https://developers.google.com/machine-learning/glossary/#neuron)。神经网络有不同的类别。这里我们使用 [**全连接神经网络**](https://developers.google.com/machine-learning/glossary/#fully_connected_layer)，就是说：每一层中神经元的输入，来自于上一层的 **所有** 神经元。举个例子，下图阐述了全连接神经网络，它包含 3 个隐藏层：
 
 *   第一层有 4 个神经元，
 *   第二次有 3 个神经元，
@@ -298,8 +271,7 @@ my_feature_columns = [
 <p>&nbsp;</p>
 
 我们通过实例化一个
-[**Estimator**](https://developers.google.com/machine-learning/glossary/#Estimators)
-类来指定模型类型。TensorFlow 提供两类 Estimator：
+[**Estimator**](https://developers.google.com/machine-learning/glossary/#Estimators) 类来指定模型类型。TensorFlow 提供两类 Estimator：
 
 *   [**预定义 Estimator**](https://developers.google.com/machine-learning/glossary/#pre-made_Estimator)，代码已经由他人写好。
 *   [**定制 Estimator**](https://developers.google.com/machine-learning/glossary/#custom_estimator)，你需要或多或少自己写代码。
@@ -320,29 +292,18 @@ my_feature_columns = [
         hidden_units=[10, 10],
 ```
 
-`hidden_units`列表的长度即隐藏层数
-（此处为 2 层）。
-列表中的每一个数值代表着该层神经元的个数
-（此处第一层有 10 个神经元，第二层有 10 个神经元）。只需简单地改变`hidden_units`的列表参数，就可以调试隐藏层数或神经元的个数。
+`hidden_units`列表的长度即隐藏层数（此处为 2 层）。列表中的每一个数值代表着该层神经元的个数（此处第一层有 10 个神经元，第二层有 10 个神经元）。只需简单地改变`hidden_units`的列表参数，就可以调试隐藏层数或神经元的个数。
 
-理想的层数/神经元数量是由数据集或问题本身决定的。
-正如同机器学习领域的其它方方面面，选择好神经网络的形状，需要大量实验和多方面的知识储备。
-根据经验法则，增加隐藏层数量/神经元数量*往往*能构造更强大的模型，这需要更多数据的有效训练。
+理想的层数/神经元数量是由数据集或问题本身决定的。正如同机器学习领域的其它方方面面，选择好神经网络的形状，需要大量实验和多方面的知识储备。根据经验法则，增加隐藏层数量/神经元数量*往往*能构造更强大的模型，这需要更多数据的有效训练。
 
-参数规定了神经网络预测可能值的数量。
-由于该问题中对 3 中鸢尾花进行分类，我们设置`n_classes`为 3。
+参数规定了神经网络预测可能值的数量。由于该问题中对 3 中鸢尾花进行分类，我们设置`n_classes`为 3。
 
-`tf.Estimator.DNNClassifier` 的构造函数有一个可选参数 `optimizer` 优化器，在这里我们的程序没有声明。[**优化器**](https://developers.google.com/machine-learning/glossary/#optimizer)
-控制着模型怎样训练。当你在机器学习领域深入，优化器 和
-[**学习率 learning rate**](https://developers.google.com/machine-learning/glossary/#learning_rate) 将会变的很重要。
-
-
-
+`tf.Estimator.DNNClassifier` 的构造函数有一个可选参数 `optimizer` 优化器，在这里我们的程序没有声明。[**优化器**](https://developers.google.com/machine-learning/glossary/#optimizer) 控制着模型怎样训练。当你在机器学习领域深入，优化器和[**学习率 learning rate**](https://developers.google.com/machine-learning/glossary/#learning_rate) 将会变的很重要。
 
 ### 训练模型
 
-实例化 `tf.Estimator.DNNClassifier` 搭建了一个学习模型的框架。
-抽象来说，我们织好了一张网络，但还没有载入数据。
+实例化 `tf.Estimator.DNNClassifier` 搭建了一个学习模型的框架。抽象来说，我们织好了一张网络，但还没有载入数据。
+
 现在通过调用 estimator 对象的 `train` 方法训练神经网络。如下：
 
 ```python
