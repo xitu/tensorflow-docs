@@ -1,62 +1,39 @@
-# Getting Started for ML Beginners
+# 机器学习新手入门
 
-This document explains how to use machine learning to classify (categorize)
-Iris flowers by species.  This document dives deeply into the TensorFlow
-code to do exactly that, explaining ML fundamentals along the way.
+该文档阐述了如何使用机器学习，对鸢尾花的种属（Iris flowers Dataset）进行分类，深入 TensorFlow 源码，阐述机器学习基本原理。
 
-If the following list describes you, then you are in the right place:
+如果你符合下列三个条件，就继续看下去吧：
 
-*   You know little to nothing about machine learning.
-*   You want to learn how to write TensorFlow programs.
-*   You can code (at least a little) in Python.
+*   或多或少听说过机器学习
+*   想学习编写 TensorFlow 程序
+*   会使用 Python 编程
 
-If you are already familiar with basic machine learning concepts
-but are new to TensorFlow, read
-@{$premade_estimators$Getting Started with TensorFlow: for ML Experts}.
+如果你已经熟悉基础的机器学习概念，只是 TensorFlow 新手，建议移步 @{$premade_estimators$Getting Started with TensorFlow: for ML Experts}。
 
-## The Iris classification problem
+## 鸢尾花分类问题
 
-Imagine you are a botanist seeking an automated way to classify each
-Iris flower you find.  Machine learning provides many ways to classify flowers.
-For instance, a sophisticated machine learning program could classify flowers
-based on photographs.  Our ambitions are more modest--we're going to classify
-Iris flowers based solely on the length and width of their
-[sepals](https://en.wikipedia.org/wiki/Sepal) and
-[petals](https://en.wikipedia.org/wiki/Petal).
+假设你是一个植物学家，想将鸢尾花自动分类。机器学习提供多种分类算法。比如，优秀的分类算法通过图像识别对花进行分类。而我们不想止步于此，我们想要在仅知道花瓣、花萼的长度以及宽度的情况下对花进行分类。
 
-The Iris genus entails about 300 species, but our program will classify only
-the following three:
+鸢尾花专家能识别出 300 多个花种，不过我们的程序目前在以下三种中进行分类：
 
-*   Iris setosa
-*   Iris virginica
-*   Iris versicolor
+*   setosa 类
+*   virginica 类
+*   versicolor 类
 
 <div style="margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%"
-  alt="Petal geometry compared for three iris species: Iris setosa, Iris virginica, and Iris versicolor"
+  alt="三种鸢尾花呈现出的不同花瓣花萼外形"
   src="../images/iris_three_species.jpg">
 </div>
 
-**From left to right,
-[*Iris setosa*](https://commons.wikimedia.org/w/index.php?curid=170298) (by
-[Radomil](https://commons.wikimedia.org/wiki/User:Radomil), CC BY-SA 3.0),
-[*Iris versicolor*](https://commons.wikimedia.org/w/index.php?curid=248095) (by
-[Dlanglois](https://commons.wikimedia.org/wiki/User:Dlanglois), CC BY-SA 3.0),
-and [*Iris virginica*](https://www.flickr.com/photos/33397993@N05/3352169862)
-(by [Frank Mayfield](https://www.flickr.com/photos/33397993@N05), CC BY-SA
-2.0).**
+**从左至右，[*Iris setosa*](https://commons.wikimedia.org/w/index.php?curid=170298) (by [Radomil](https://commons.wikimedia.org/wiki/User:Radomil), CC BY-SA 3.0)，[*Iris versicolor*](https://commons.wikimedia.org/w/index.php?curid=248095) (by [Dlanglois](https://commons.wikimedia.org/wiki/User:Dlanglois), CC BY-SA 3.0) 和 [*Iris virginica*](https://www.flickr.com/photos/33397993@N05/3352169862) (by [Frank Mayfield](https://www.flickr.com/photos/33397993@N05)，CC BY-SA 2.0)。**
 <p>&nbsp;</p>
 
-Fortunately, someone has already created [a data set of 120 Iris
-flowers](https://en.wikipedia.org/wiki/Iris_flower_data_set)
-with the sepal and petal measurements.  This data set has become
-one of the canonical introductions to machine learning classification problems.
-(The [MNIST database](https://en.wikipedia.org/wiki/MNIST_database),
-which contains handwritten digits, is another popular classification
-problem.) The first 5 entries of the Iris data set
-look as follows:
+我们找来 [Iris 数据集](https://en.wikipedia.org/wiki/Iris_flower_data_set)，包含 120 条带有花萼、花瓣测量的数据。该数据集非常典型，是机器学习分类问题很好的入门材料。([MNIST 数据集](https://en.wikipedia.org/wiki/MNIST_database)，包含大量手写数字，也是分类问题的典型常用数据)。
 
-| Sepal length | sepal width | petal length | petal width | species
+Iris 数据集的前 5 行如下：
+
+| 花萼长度 | 花萼宽度 | 花瓣长度 | 花瓣宽度 | 种属
 | ---          | ---         | ---          | ---         | ---
 |6.4           | 2.8         | 5.6          | 2.2         | 2
 |5.0           | 2.3         | 3.3          | 1.0         | 1
@@ -64,102 +41,59 @@ look as follows:
 |4.9           | 3.1         | 1.5          | 0.1         | 0
 |5.7           | 3.8         | 1.7          | 0.3         | 0
 
-Let's introduce some terms:
+我们首先介绍一些术语：
 
-*   The last column (species) is called the
-    [**label**](https://developers.google.com/machine-learning/glossary/#label);
-    the first four columns are called
-    [**features**](https://developers.google.com/machine-learning/glossary/#feature).
-    Features are characteristics of an example, while the label is
-    the thing we're trying to predict.
+*   最后一列 (种属) 被称为 [**标记**](https://developers.google.com/machine-learning/glossary/#label)（label）；前四列被称为 [**特征**](https://developers.google.com/machine-learning/glossary/#feature)（feature）。**特征**用来形容样本数据，**标记**用于之后的结果预测。
 
-*   An [**example**](https://developers.google.com/machine-learning/glossary/#example)
-    consists of the set of features and the label for one sample
-    flower. The preceding table shows 5 examples from a data set of
-    120 examples.
+*   一个 [**样本**](https://developers.google.com/machine-learning/glossary/#example)（example）包含所有特征的集合和样本的标记。上表中，5 条样本数据来自于一个数据量为 120 条数据的数据集。
 
-Each label is naturally a string (for example, "setosa"), but machine learning
-typically relies on numeric values. Therefore, someone mapped each string to
-a number.  Here's the representation scheme:
+每个标记都是一个字符串（例如，“setosa”），但由于机器学习通常使用数字，因而我们将每个字符串与数字相对应，对应范式如下：
 
-* 0 represents setosa
-* 1 represents versicolor
-* 2 represents virginica
+* 0 对应 setosa
+* 1 对应 versicolor
+* 2 对应 virginica
 
+## 模型训练
 
-## Models and training
+**模型**（model）可以看作是特征与标记之间的关系。在鸢尾花问题中，模型定义了花萼花瓣测量数据与花种属之间的关系。有时短短几行代数符号就可以描述一个简单的模型；而有些复杂的模型包含大量的数学符号与复杂的变量关系，很难数字化表达。
 
-A **model** is the relationship between features
-and the label.  For the Iris problem, the model defines the relationship
-between the sepal and petal measurements and the Iris species.
-Some simple models can be described with a few lines of algebra;
-more complex machine learning models
-contain such a large number of interlacing mathematical functions and
-parameters that they become hard to summarize mathematically.
+现在问题来了：四个特征，一个花种属标记，你能在不使用机器学习的情况下，定义它们之间的关系么？换句话问，你能使用传统的程序语言（比如大量诸如 if/else 的条件语句）来创建模型么？有这个可能。如果你有大把的时间研究数据集，最终也许会找到花萼花瓣与花种属之间的关系。然而，一个好的机器学习算法能够为你预测模型。只要你有足够数量的，足够有代表性的数据，套用适当的模型，最终程序会帮你完美定义花种属与花萼花瓣的关系。
 
-Could you determine the relationship between the four features and the
-Iris species *without* using machine learning?  That is, could you use
-traditional programming techniques (for example, a lot of conditional
-statements) to create a model?  Maybe. You could play with the data set
-long enough to determine the right relationships of petal and sepal
-measurements to particular species.  However, a good machine learning
-approach *determines the model for you*.  That is, if you feed enough
-representative examples into the right machine learning model type, the program
-will determine the relationship between sepals, petals, and species.
+**训练** （training）是监督式机器学习的一个阶段，是模型逐渐优化（自我学习）的过程。
+鸢尾花问题是 [**监督式学习**](https://developers.google.com/machine-learning/glossary/#supervised_machine_learning) 的一个典型，这类模型通过标记的样本数据训练得出。
+还有一类机器学习：[**无监督式学习**](https://developers.google.com/machine-learning/glossary/#unsupervised_machine_learning)。这类样本模型是未标记的，模型只通过特征寻找规律。）
 
-**Training** is the stage of machine learning in which the model is
-gradually optimized (learned).  The Iris problem is an example
-of [**supervised machine
-learning**](https://developers.google.com/machine-learning/glossary/#supervised_machine_learning)
-in which a model is trained from examples that contain labels.  (In
-[**unsupervised machine
-learning**](https://developers.google.com/machine-learning/glossary/#unsupervised_machine_learning),
-the examples don't contain labels. Instead, the model typically finds
-patterns among the features.)
+## 运行示例程序前的准备工作
 
+在运行示例程序前，先安装 TensorFlow：
 
-
-
-## Get the sample program
-
-Prior to playing with the sample code in this document, do the following:
-
-1.  @{$install$Install TensorFlow}.
-2.  If you installed TensorFlow with virtualenv or Anaconda, activate your
-    TensorFlow environment.
-3.  Install or upgrade pandas by issuing the following command:
+1.  @{$install$Install TensorFlow}
+2.  如果你是使用 virtualenv 或 Anaconda 安装 TensorFlow 的，初始化 TensorFlow 环境。
+3.  安装/升级 pandas :
 
      `pip install pandas`
 
+按照以下步骤，找到示例程序：
 
-Take the following steps to get the sample program:
-
-1. Clone the TensorFlow Models repository from github by entering the following
-   command:
+1. 将 TensorFlow 模型 远程仓库从 github 克隆到本地，命令如下：
 
        `git clone https://github.com/tensorflow/models`
 
-2. Change directory within that branch to the location containing the examples
-   used in this document:
+2. 在该分支下，cd 到包含本文示例代码的目录下：
 
        `cd models/samples/core/get_started/`
 
-In that `get_started` directory, you'll find a program
-named `premade_estimator.py`.
+在 `get_started` 文件目录下，找到名为 `premade_estimator.py`的 python 文件。
 
+## 运行示例程序
 
-## Run the sample program
-
-You run TensorFlow programs as you would run any Python program. Therefore,
-issue the following command from a command line to
-run `premade_estimators.py`:
+像运行 Python 程序一样运行 TensorFlow 程序。在命令行敲如下命令运行 `premade_estimators.py`：
 
 ``` bash
 python premade_estimator.py
 ```
 
-Running the program should output a whole bunch of information ending with
-three prediction lines like the following:
+运行程序后会输出一大堆信息，结尾 3 行是预测结果，如下：
 
 ```None
 ...
@@ -168,86 +102,62 @@ Prediction is "Setosa" (99.6%), expected "Setosa"
 Prediction is "Versicolor" (99.8%), expected "Versicolor"
 
 Prediction is "Virginica" (97.9%), expected "Virginica"
+
 ```
+如果程序报错，没有生成预测结果。查看以下问题：
 
-If the program generates errors instead of predictions, ask yourself the
-following questions:
+* 是否成功安装 TensorFlow ？
+* 是否使用了正确版本的 TensorFlow ？程序`premade_estimators.py`需要版本号至少为 TensorFlow v1.4。
+* 如果你通过 virtualenv 或 Anaconda 安装的 TensorFlow，是否初始化环境？
 
-* Did you install TensorFlow properly?
-* Are you using the correct version of TensorFlow?  The `premade_estimators.py`
-  program requires at least TensorFlow v1.4.
-* If you installed TensorFlow with virtualenv or Anaconda, did you activate
-  the environment?
+## TensorFlow 技术栈
 
-
-
-## The TensorFlow programming stack
-
-As the following illustration shows, TensorFlow
-provides a programming stack consisting of multiple API layers:
+如下图所示，TensorFlow 技术栈提供了多层 API
 
 <div style="margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/tensorflow_programming_environment.png">
 </div>
 
-**The TensorFlow Programming Environment.**
+**TensorFlow 编程环境**
 <p>&nbsp;</p>
 
-As you start writing TensorFlow programs, we strongly recommend focusing on
-the following two high-level APIs:
+在开始写 TensorFlow 程序时，我们强烈建议您使用下列两类高层 API：
 
 *   Estimators
 *   Datasets
 
-Although we'll grab an occasional convenience function from other APIs,
-this document focuses on the preceding two APIs.
+尽管我们偶尔需要使用到其它底层 API ，这篇文档将主要介绍这两类 API。
 
+## 程序代码
 
-## The program itself
+有耐心看到这里的读者，来，我们继续深挖代码。和大部分 TensorFlow 程序相似，如下是`premade_estimator.py`程序的例行步骤：
 
-Thanks for your patience; let's dig into the code.
-The general outline of `premade_estimator.py`--and many other TensorFlow
-programs--is as follows:
+*   引入数据集并解析
+*   创建特征列描述数据
+*   选择模型
+*   训练模型
+*   评估模型
+*   使用训练后的模型进行预测。
 
-*   Import and parse the data sets.
-*   Create feature columns to describe the data.
-*   Select the type of model
-*   Train the model.
-*   Evaluate the model's effectiveness.
-*   Let the trained model make predictions.
+下面各小节展开解释。
 
-The following subsections detail each part.
+### 引入数据集并解析
 
+鸢尾花问题需要引入下列两个 csv 文件的数据：
 
-### Import and parse the data sets
+*   训练数据集` http://download.tensorflow.org/data/iris_training.csv`
+*   测试数据集`  http://download.tensorflow.org/data/iris_test.csv`
 
-The Iris program requires the data from the following two .csv files:
+**训练数据集** 包含用来训练模型的样本；**测试数据集** 包含用来评估模型的样本。
 
-*   `http://download.tensorflow.org/data/iris_training.csv`, which contains
-    the training set.
-*   `http://download.tensorflow.org/data/iris_test.csv`, which contains the
-    the test set.
+训练数据集和测试数据集在最开始是在同一个数据集中，后来该样本数据集被处理：其中的大部分作为训练数据、剩余部分作为测试数据。增加训练集样本数量通常能构造出更好的模型，而增加测试集样本的数量能够更好的评估模型。
 
-The **training set** contains the examples that we'll use to train the model;
-the **test set** contains the examples that we'll use to evaluate the trained
-model's effectiveness.
+`premade_estimators.py` 程序通过 `load_data` 函数读取相邻路径的 [`iris_data.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/iris_data.py) 文件并解析为训练集和测试集。
 
-The training set and test set started out as a
-single data set.  Then, someone split the examples, with the majority going into
-the training set and the remainder going into the test set.  Adding
-examples to the training set usually builds a better model; however, adding
-more examples to the test set enables us to better gauge the model's
-effectiveness. Regardless of the split, the examples in the test set
-must be separate from the examples in the training set.  Otherwise, you can't
-accurately determine the model's effectiveness.
-
-The `premade_estimators.py` program relies on the `load_data` function
-in the adjacent [`iris_data.py`](
-https://github.com/tensorflow/models/blob/master/samples/core/get_started/iris_data.py)
-file to read in and parse the training set and test set.
-Here is a heavily commented version of the function:
+代码如下（包含详细注释）
 
 ```python
+# 定义数据 csv 文件地址
 TRAIN_URL = "http://download.tensorflow.org/data/iris_training.csv"
 TEST_URL = "http://download.tensorflow.org/data/iris_test.csv"
 
@@ -259,52 +169,42 @@ CSV_COLUMN_NAMES = ['SepalLength', 'SepalWidth',
 def load_data(label_name='Species'):
     """Parses the csv file in TRAIN_URL and TEST_URL."""
 
-    # Create a local copy of the training set.
+    # 新建路径本地训练集文件
     train_path = tf.keras.utils.get_file(fname=TRAIN_URL.split('/')[-1],
                                          origin=TRAIN_URL)
-    # train_path now holds the pathname: ~/.keras/datasets/iris_training.csv
+    # 训练集路径为: ~/.keras/datasets/iris_training.csv
 
-    # Parse the local CSV file.
+    # 解析本地 CSV 文件
     train = pd.read_csv(filepath_or_buffer=train_path,
-                        names=CSV_COLUMN_NAMES,  # list of column names
-                        header=0  # ignore the first row of the CSV file.
+                        names=CSV_COLUMN_NAMES,  # 列
+                        header=0  # 忽略 CSV 文件首行
                        )
-    # train now holds a pandas DataFrame, which is data structure
-    # analogous to a table.
+    # 定义 train 变量为 DataFrame（pandas 库中类似表的数据结构）。
 
-    # 1. Assign the DataFrame's labels (the right-most column) to train_label.
-    # 2. Delete (pop) the labels from the DataFrame.
-    # 3. Assign the remainder of the DataFrame to train_features
+    # 1. 定义变量 train_label 为样本标记，DataFrame 的最右行，
+    # 2. 从 DataFrame 中删除最右行，
+    # 3. 定义 DataFrame 中的剩余行为 train_features 样本特征。
     train_features, train_label = train, train.pop(label_name)
 
-    # Apply the preceding logic to the test set.
+    # 对测试数据集执行上述操作
     test_path = tf.keras.utils.get_file(TEST_URL.split('/')[-1], TEST_URL)
     test = pd.read_csv(test_path, names=CSV_COLUMN_NAMES, header=0)
     test_features, test_label = test, test.pop(label_name)
 
-    # Return four DataFrames.
+    # 返回解析好的 DataFrame
     return (train_features, train_label), (test_features, test_label)
 ```
 
-Keras is an open-sourced machine learning library; `tf.keras` is a TensorFlow
-implementation of Keras.  The `premade_estimator.py` program only accesses
-one `tf.keras` function; namely, the `tf.keras.utils.get_file` convenience
-function, which copies a remote CSV file to a local file system.
+Keras 是一个开源机器学习库；`tf.keras` 是 TensorFlow 对 Keras 的实现。`premade_estimator.py` 程序只是 `tf.keras` 的一个函数入口，即： `tf.keras.utils.get_file` 方法，使拷贝远程 CSV 文件到本地系统更便捷。
 
-The call to `load_data` returns two `(feature,label)` pairs, for the training
-and test sets respectively:
+调用 `load_data` 函数返回值为两组 `(feature,label)` 对，两组数据相对应训练集和测试集：
 
 ```python
-    # Call load_data() to parse the CSV file.
+    # 调用 load_data() 解析 CSV 文件
     (train_feature, train_label), (test_feature, test_label) = load_data()
 ```
 
-Pandas is an open-source Python library leveraged by several
-TensorFlow functions.  A pandas
-[**DataFrame**](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html)
-is a table with named columns headers and numbered rows.
-The features returned by `load_data` are packed in `DataFrames`.
-For example, the `test_feature` DataFrame looks as follows:
+Pandas 是一个开源的 Python 库，被用于 TensorFlow 函数中。Pandas 的[**DataFrame**](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html) 是类似表的数据结构，每一列有列头，每一行有行标。下例为 `test_feature` DataFrame。
 
 ```none
     SepalLength  SepalWidth  PetalLength  PetalWidth
@@ -317,35 +217,20 @@ For example, the `test_feature` DataFrame looks as follows:
 29          6.4         2.9          4.3         1.3
 ```
 
+### 描述数据
 
-### Describe the data
+**特征列** 可以看作是一个数据结构，为你的模型解释每一个特征的数据。在鸢尾花问题中，我们想让模型将每一特征按照字面浮点值解释。就是说，我们希望模型将 5.4 这样的输入值直接解析为，呃，5.4。而在某些机器学习问题中，我们喜欢将数据解析地不那么直接。特征列数据解释是一个很深的话题，我们在另一篇文档 @{$feature_columns$document} 中整篇描述。
 
-A **feature column** is a data structure that tells your model
-how to interpret the data in each feature.  In the Iris problem,
-we want the model to interpret the data in each
-feature as its literal floating-point value; that is, we want the
-model to interpret an input value like 5.4 as, well, 5.4.  However,
-in other machine learning problems, it is often desirable to interpret
-data less literally.  Using feature columns to
-interpret data is such a rich topic that we devote an entire
-@{$feature_columns$document} to it.
-
-From a code perspective, you build a list of `feature_column` objects by calling
-functions from the @{tf.feature_column} module. Each object describes an input
-to the model. To tell the model to interpret data as a floating-point value,
-call @{tf.feature_column.numeric_column).  In `premade_estimator.py`, all
-four features should be interpreted as literal floating-point values, so
-the code to create a feature column looks as follows:
+从代码中来看，通过调用 @{tf.feature_column} 模块函数创建了一个 `feature_column` 对象列表。每个对象描述了模型的一个输入。我们想要模型以浮点数值解释数据，可以调用 @{tf.feature_column.numeric_column) 函数。在 `premade_estimator.py`中，四列特征被直接解释为字面浮点数值，程序创建了特征列如下：
 
 ```python
-# Create feature columns for all features.
+# 为所有特征创建特征列
 my_feature_columns = []
 for key in train_x.keys():
     my_feature_columns.append(tf.feature_column.numeric_column(key=key))
 ```
 
-Here is a less elegant, but possibly clearer, alternative way to
-encode the preceding block:
+下面代码不那么优雅，但更清楚地编码了上述过程，
 
 ```python
 my_feature_columns = [
@@ -356,51 +241,28 @@ my_feature_columns = [
 ]
 ```
 
+### 选择模型类型
 
-### Select the type of model
+接下来我们需要选择要训练的模型类型。模型有很多，但找到最理想的模型需要一定经验。我们选择神经网络解决鸢尾花问题。
+通过 [**神经网络**](https://developers.google.com/machine-learning/glossary/#neural_network) 可以找到特征和标记间的复杂关系。神经网络是一个高度结构化的图，组成了一个或多个 [**隐藏层**](https://developers.google.com/machine-learning/glossary/#hidden_layer)。每个隐藏层包含一个或多个 [**神经元**](https://developers.google.com/machine-learning/glossary/#neuron)。神经网络有不同的类别。这里我们使用 [**全连接神经网络**](https://developers.google.com/machine-learning/glossary/#fully_connected_layer)，就是说：每一层中神经元的输入，来自于上一层的 **所有** 神经元。举个例子，下图阐述了全连接神经网络，它包含 3 个隐藏层：
 
-We need the select the kind of model that will be trained.
-Lots of model types exist; picking the ideal type takes experience.
-We've selected a neural network to solve the Iris problem.  [**Neural
-networks**](https://developers.google.com/machine-learning/glossary/#neural_network)
-can find complex relationships between features and the label.
-A neural network is a highly-structured graph, organized into one or more
-[**hidden layers**](https://developers.google.com/machine-learning/glossary/#hidden_layer).
-Each hidden layer consists of one or more
-[**neurons**](https://developers.google.com/machine-learning/glossary/#neuron).
-There are several categories of neural networks.
-We'll be using a [**fully connected neural
-network**](https://developers.google.com/machine-learning/glossary/#fully_connected_layer),
-which means that the neurons in one layer take inputs from *every* neuron in
-the previous layer.  For example, the following figure illustrates a 
-fully connected neural network consisting of three hidden layers:
-
-*   The first hidden layer contains four neurons.
-*   The second hidden layer contains three neurons.
-*   The third hidden layer contains two neurons.
+*   第一层有 4 个神经元，
+*   第二次有 3 个神经元，
+*   第三层有 2 个神经元。
 
 <div style="margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/simple_dnn.svg">
 </div>
 
-**A neural network with three hidden layers.**
+**包含 3 个隐藏层的神经网络**
 <p>&nbsp;</p>
 
-To specify a model type, instantiate an
-[**Estimator**](https://developers.google.com/machine-learning/glossary/#Estimators)
-class.  TensorFlow provides two categories of Estimators:
+我们通过实例化一个 [**Estimator**](https://developers.google.com/machine-learning/glossary/#Estimators) 类来指定模型类型。TensorFlow 提供两类 Estimator：
 
-*   [**pre-made
-    Estimators**](https://developers.google.com/machine-learning/glossary/#pre-made_Estimator),
-    which someone else has already written for you.
-*   [**custom
-    Estimators**](https://developers.google.com/machine-learning/glossary/#custom_estimator),
-    which you must code yourself, at least partially.
+*   [**预定义 Estimator**](https://developers.google.com/machine-learning/glossary/#pre-made_Estimator)，代码已经由他人写好。
+*   [**定制 Estimator**](https://developers.google.com/machine-learning/glossary/#custom_estimator)，你需要或多或少自己写代码。
 
-To implement a neural network, the `premade_estimators.py` program uses
-a pre-made Estimator named @{tf.estimator.DNNClassifier}.  This Estimator
-builds a neural network that classifies examples.  The following call
-instantiates `DNNClassifier`:
+为了实现这个神经网络，`premade_estimators.py`程序使用预定义 Estimator @{tf.estimator.DNNClassifier}，构建神经网络将样本分类。接下来调用一个实例化的`DNNClassifier`。
 
 ```python
     classifier = tf.estimator.DNNClassifier(
@@ -409,50 +271,25 @@ instantiates `DNNClassifier`:
         n_classes=3)
 ```
 
-Use the `hidden_units` parameter to define the number of neurons
-in each hidden layer of the neural network.  Assign this parameter
-a list. For example:
+使用 `hidden_units` 参数定义每一隐藏层中神经元的数量。赋值该参数一个列表。如下：
 
 ```python
         hidden_units=[10, 10],
 ```
 
-The length of the list assigned to `hidden_units` identifies the number of
-hidden layers (2, in this case).
-Each value in the list represents the number of neurons in a particular
-hidden layer (10 in the first hidden layer and 10 in the second hidden layer).
-To change the number of hidden layers or neurons, simply assign a different
-list to the `hidden_units` parameter.
+`hidden_units`列表的长度即隐藏层数（此处为 2 层）。列表中的每一个数值代表着该层神经元的个数（此处第一层有 10 个神经元，第二层有 10 个神经元）。只需简单地改变`hidden_units`的列表参数，就可以调试隐藏层数或神经元的个数。
 
-The ideal number of hidden layers and neurons depends on the problem
-and the data set. Like many aspects of machine learning,
-picking the ideal shape of the neural network requires some mixture
-of knowledge and experimentation.
-As a rule of thumb, increasing the number of hidden layers and neurons
-*typically* creates a more powerful model, which requires more data to
-train effectively.
+理想的层数/神经元数量是由数据集或问题本身决定的。正如同机器学习领域的其它方方面面，选择好神经网络的形状，需要大量实验和多方面的知识储备。根据经验法则，增加隐藏层数量/神经元数量*往往*能构造更强大的模型，这需要更多数据的有效训练。
 
-The `n_classes` parameter specifies the number of possible values that the
-neural network can predict.  Since the Iris problem classifies 3 Iris species,
-we set `n_classes` to 3.
+参数规定了神经网络预测可能值的数量。由于该问题中对 3 中鸢尾花进行分类，我们设置`n_classes`为 3。
 
-The constructor for `tf.Estimator.DNNClassifier` takes an optional argument
-named `optimizer`, which our sample code chose not to specify.  The
-[**optimizer**](https://developers.google.com/machine-learning/glossary/#optimizer)
-controls how the model will train.  As you develop more expertise in machine
-learning, optimizers and
-[**learning
-rate**](https://developers.google.com/machine-learning/glossary/#learning_rate)
-will become very important.
+`tf.Estimator.DNNClassifier` 的构造函数有一个可选参数 `optimizer` 优化器，在这里我们的程序没有声明。[**优化器**](https://developers.google.com/machine-learning/glossary/#optimizer) 控制着模型怎样训练。当你在机器学习领域深入，优化器和[**学习率 **](https://developers.google.com/machine-learning/glossary/#learning_rate) （learning rate）将会变的很重要。
 
+### 训练模型
 
+实例化 `tf.Estimator.DNNClassifier` 搭建了一个学习模型的框架。抽象来说，我们织好了一张网络，但还没有载入数据。
 
-### Train the model
-
-Instantiating a `tf.Estimator.DNNClassifier` creates a framework for learning 
-the model. Basically, we've wired a network but haven't yet let data flow 
-through it. To train the neural network, call the Estimator object's `train` 
-method. For example:
+现在通过调用 estimator 对象的 `train` 方法训练神经网络。如下：
 
 ```python
     classifier.train(
@@ -460,190 +297,127 @@ method. For example:
         steps=args.train_steps)
 ```
 
-The `steps` argument tells `train` to stop training after the specified
-number of iterations.  Increasing `steps` increases the amount of time
-the model will train.  Counter-intuitively, training a model longer
-does not guarantee a better model.  The default value of `args.train_steps`
-is 1000.  The number of steps to train is a
-[**hyperparameter**](https://developers.google.com/machine-learning/glossary/#hyperparameter)
-you can tune. Choosing the right number of steps usually
-requires both experience and experimentation.
+`steps`参数值指：通过多少次迭代后停止模型训练。`steps` 参数越大，意味着训练模型的时间越长。但训练模型时间越长，并不意味着模型更好。`args.train_steps` 的缺省值为 1000，训练的步骤数是一个可以调优的[**超参数**](https://developers.google.com/machine-learning/glossary/#hyperparameter)。选择恰当的步骤数往往需要大量经验实践的积累。
 
-The `input_fn` parameter identifies the function that supplies the
-training data.  The call to the `train` method indicates that the
-`train_input_fn` function will supply the training data.  Here's that
-method's signature:
+`input_fn` 参数赋值为获得训练数据的函数，train 方法的调用通过 `train_input_fn` 函数获得训练数据。下面是该函数签名：
 
 ```python
 def train_input_fn(features, labels, batch_size):
 ```
 
-We're passing the following arguments to `train_input_fn`:
+给 `train_input_fn` 传入下列参数值：
 
-* `train_feature` is a Python dictionary in which:
-    * Each key is the name of a feature.
-    * Each value is an array containing the values for each example in the
-      training set.
-* `train_label` is an array containing the values of the label for every
-  example in the training set.
-* `args.batch_size` is an integer defining the [**batch
-  size**](https://developers.google.com/machine-learning/glossary/#batch_size).
+* `train_feature` 是一个 Python 的字典，该字典中：
+    * key 为样本特征名，
+    * value 为一个包含训练集所有样本值的数组
+* `train_label` 为一个包含训练集所有样本标记的数组
+* `args.batch_size` 数据类型为整型，定义了[**批量大小**](https://developers.google.com/machine-learning/glossary/#batch_size)。
 
-The `train_input_fn` function relies on the **Dataset API**. This is a
-high-level TensorFlow API for reading data and transforming it into a form
-that the `train` method requires.  The following call converts the
-input features and labels into a `tf.data.Dataset` object, which is the base
-class of the Dataset API:
+`train_input_fn` 函数依赖于 **Dataset API**。这是一个高层 TensorFlow API，用于读取数据并转化成 `train` 方法所需的格式。
+下面的函数调用将输入的特征和标记转化为一个 `tf.data.Dataset` 对象，Dataset API的基类:
 
 ```python
     dataset = tf.data.Dataset.from_tensor_slices((dict(features), labels))
 ```
 
-The `tf.dataset` class provides many useful functions for preparing examples
-for training. The following line calls three of those functions:
+`tf.dataset` 类给训练提供了许多有用的预备样本。比如下面 3 个函数:
 
 ```python
     dataset = dataset.shuffle(buffer_size=1000).repeat(count=None).batch(batch_size)
 ```
 
-Training works best if the training examples are in
-random order.  To randomize the examples, call
-`tf.data.Dataset.shuffle`.  Setting the `buffer_size` to a value
-larger than the number of examples (120) ensures that the data will
-be well shuffled.
+随机的训练样本会使训练效果更好。通过函数 `tf.data.Dataset.shuffle` 将样本随机化，设置 `buffer_size` 值大于样本数量（120）以确保数据洗牌效果。
 
-During training, the `train` method typically processes the
-examples multiple times.  Calling the
-`tf.data.Dataset.repeat` method without any arguments ensures
-that the `train` method has an infinite supply of (now shuffled)
-training set examples.
+训练过程中，`train` 方法通常要多次处理样本。不带参数调用 `tf.data.Dataset.repeat` 使 `train` 方法有无穷的（通过不断随机化过程模拟）训练样本集。
 
-The `train` method processes a
-[**batch**](https://developers.google.com/machine-learning/glossary/#batch)
-of examples at a time.
-The `tf.data.Dataset.batch` method creates a batch by
-concatenating multiple examples.
-This program sets the default [**batch
-size**](https://developers.google.com/machine-learning/glossary/#batch_size)
-to 100, meaning that the `batch` method will concatenate groups of
-100 examples.  The ideal batch size depends on the problem.  As a rule
-of thumb, smaller batch sizes usually enable the `train` method to train
-the model faster at the expense (sometimes) of accuracy.
+`train` 方法每次[**批量**](https://developers.google.com/machine-learning/glossary/#batch)处理样本，都通过`tf.data.Dataset.batch`方法串联多个样本创建一个批处理。我们程序中设置默认 [**批量大小**](https://developers.google.com/machine-learning/glossary/#batch_size) 为 100，意味着 `batch` 方法串联几组数量为 100 的样本。理想的批量大小取决于问题本身，根据经验法则，小批量往往可以使 `train` 方法更快地训练模型，但有时候要付出准确率下降的代价。
 
-The following `return` statement passes a batch of examples back to
-the caller (the `train` method).
+ `return` 返回一批样本给调用方法（`train` 方法）。
 
 ```python
    return dataset.make_one_shot_iterator().get_next()
 ```
 
+### 评估模型
 
-### Evaluate the model
-
-**Evaluating** means determining how effectively the model makes
-predictions.  To determine the Iris classification model's effectiveness,
-pass some sepal and petal measurements to the model and ask the model
-to predict what Iris species they represent. Then compare the model's
-prediction against the actual label.  For example, a model that picked
-the correct species on half the input examples would have an
-[accuracy](https://developers.google.com/machine-learning/glossary/#accuracy)
-of 0.5.  The following suggests a more effective model:
-
+**评估** 用来判断模型预测结果的有效性。为了评价鸢尾花分类模型的有效性，我们向模型传入一些花瓣花萼的测量值，让其预测传入数据的花种属，然后对比模型的预测结果与实际标记。举例说明，模型若能够预测正确一半的样本数据，则[准确率](https://developers.google.com/machine-learning/glossary/#accuracy)为 0.5。下面例子展示了一个更有效的模型：
 
 <table>
   <tr>
     <th style="background-color:darkblue" colspan="5">
-       Test Set</th>
+       测试集</th>
   </tr>
   <tr>
-    <th colspan="4">Features</th>
-    <th colspan="1">Label</th>
-    <th colspan="1">Prediction</th>
+    <th colspan="4">特征</th>
+    <th colspan="1">标记</th>
+    <th colspan="1">预测</th>
   </tr>
-  <tr> <td>5.9</td> <td>3.0</td> <td>4.3</td> <td>1.5</td> <td>1</td> 
+  <tr> <td>5.9</td> <td>3.0</td> <td>4.3</td> <td>1.5</td> <td>1</td>
           <td style="background-color:green">1</td></tr>
-  <tr> <td>6.9</td> <td>3.1</td> <td>5.4</td> <td>2.1</td> <td>2</td> 
+  <tr> <td>6.9</td> <td>3.1</td> <td>5.4</td> <td>2.1</td> <td>2</td>
           <td style="background-color:green">2</td></tr>
-  <tr> <td>5.1</td> <td>3.3</td> <td>1.7</td> <td>0.5</td> <td>0</td> 
+  <tr> <td>5.1</td> <td>3.3</td> <td>1.7</td> <td>0.5</td> <td>0</td>
           <td style="background-color:green">0</td></tr>
-  <tr> <td>6.0</td> <td>3.4</td> <td>4.5</td> <td>1.6</td> <td>1</td> 
+  <tr> <td>6.0</td> <td>3.4</td> <td>4.5</td> <td>1.6</td> <td>1</td>
           <td style="background-color:red">2</td></tr>
-  <tr> <td>5.5</td> <td>2.5</td> <td>4.0</td> <td>1.3</td> <td>1</td> 
+  <tr> <td>5.5</td> <td>2.5</td> <td>4.0</td> <td>1.3</td> <td>1</td>
           <td style="background-color:green">1</td></tr>
 </table>
 
-**A model that is 80% accurate.**
+**该模型有 80% 正确率**
 <p>&nbsp;</p>
 
-To evaluate a model's effectiveness, each Estimator provides an `evaluate`
-method.  The `premade_estimator.py` program calls `evaluate` as follows:
+为了评估模型的有效性，每个 estimator 都提供了 `evaluate` 方法。`premade_estimator.py` 程序中调用 `evaluate` 如下：
 
 ```python
-# Evaluate the model.
+# 评估模型
 eval_result = classifier.evaluate(
     input_fn=lambda:eval_input_fn(test_x, test_y, args.batch_size))
 
 print('\nTest set accuracy: {accuracy:0.3f}\n'.format(**eval_result))
 ```
 
-The call to `classifier.evaluate` is similar to the call to `classifier.train`.
-The biggest difference is that `classifier.evaluate` must get its examples
-from the test set rather than the training set.  In other words, to
-fairly assess a model's effectiveness, the examples used to
-*evaluate* a model must be different from the examples used to *train*
-the model.  The `eval_input_fn` function serves a batch of examples from
-the test set.  Here's the `eval_input_fn` method:
+调用 `classifier.evaluate` 和 `classifier.train` 类似。最大的区别在于`classifier.evaluate` 需要从测试数据集获取数据，而非训练数据集。换句话说，为了公平地评估模型的有效性，用来*评估*模型的样本和用于*训练*的样本必需不同。我们通过调用 `eval_input_fn` 函数处理了测试集的一批样本。如下：
 
 ```python
 def eval_input_fn(features, labels=None, batch_size=None):
     """An input function for evaluation or prediction"""
     if labels is None:
-        # No labels, use only features.
+        # 无标记，仅使用特征
         inputs = features
     else:
         inputs = (features, labels)
 
-    # Convert inputs to a tf.dataset object.
+    # 转换输入为 tf.dataset 对象
     dataset = tf.data.Dataset.from_tensor_slices(inputs)
 
-    # Batch the examples
+    # 批量处理样本
     assert batch_size is not None, "batch_size must not be None"
     dataset = dataset.batch(batch_size)
 
-    # Return the read end of the pipeline.
+    # 返回流程的读结尾
     return dataset.make_one_shot_iterator().get_next()
 ```
 
-In brief, `eval_input_fn` does the following when called by
-`classifier.evaluate`:
+简单来说，`eval_input_fn` 在调用 `classifier.evaluate` 函数时做了以下步骤：
 
-1.  Converts the features and labels from the test set to a `tf.dataset`
-    object.
-2.  Creates a batch of test set examples.  (There's no need to shuffle
-    or repeat the test set examples.)
-3.  Returns that batch of test set examples to `classifier.evaluate`.
+1.  处理测试集数据，将特征和标记转化为 `tf.dataset` 对象。
+2.  创建一批测试集样本（测试集样本不需要洗牌或重复随机化）。
+3.  返回测试集样本给 `classifier.evaluate`。
 
-Running this code yields the following output (or something close to it):
+执行代码得出类似下面的输出：
 
 ```none
 Test set accuracy: 0.967
 ```
 
-An accuracy of 0.967 implies that our trained model correctly classified 29
-out of the 30 Iris species in the test set.
+准确率 0.967 意味着：我们训练出的模型能将测试集里 30 个鸢尾花样本中的 29 个正确分类。
 
+### 预测
 
-### Predicting
+现在我们训练好模型，而且“证明”了在鸢尾花分类问题中它还不错，虽然并不完美。现在我们用训练的模型在[**无标记样本**](https://developers.google.com/machine-learning/glossary/#unlabeled_example)（没有标记仅有特征的样本）上做预测；
 
-We've now trained a model and "proven" that it is good--but not
-perfect--at classifying Iris species.  Now let's use the trained
-model to make some predictions on [**unlabeled
-examples**](https://developers.google.com/machine-learning/glossary/#unlabeled_example);
-that is, on examples that contain features but not a label.
-
-In real-life, the unlabeled examples could come from lots of different
-sources including apps, CSV files, and data feeds.  For now, we're simply
-going to manually provide the following three unlabeled examples:
+在实际生活中，无标记的样本来自不同来源：应用中，CSV 文件，数据流等。不过现在我们简单起见，人造下面几个无标记样本：
 
 ```python
     predict_x = {
@@ -654,49 +428,40 @@ going to manually provide the following three unlabeled examples:
     }
 ```
 
-Every Estimator provides a `predict` method, which `premade_estimator.py`
-calls as follows:
+每个 estimator 提供一个提供一个 `predict` 方法，`premade_estimator.py` 这样调用：
 
 ```python
 predictions = classifier.predict(
     input_fn=lambda:eval_input_fn(predict_x, batch_size=args.batch_size))
 ```
 
-As with the `evaluate` method, our `predict` method also gathers examples
-from the `eval_input_fn` method.
+同 `evaluate` 方法一样，`predict` 方法通过 `eval_input_fn` 收集样本。
 
-When doing predictions, we're *not* passing labels to `eval_input_fn`.
-Therefore, `eval_input_fn` does the following:
+预测时，我们**不**传标记给 `eval_input_fn`，而是做如下步骤：
 
-1.  Converts the features from the 3-element manual set we just created.
-2.  Creates a batch of 3 examples from that manual set.
-3.  Returns that batch of examples to `classifier.predict`.
+1.  将我们刚刚人造的 3-元素 数据集特征转换。
+2.  从刚才的数据集中创建批量的 3 个样本。
+3.  返回批量的样本给 `classifier.predict`。
 
-The `predict` method returns a python iterable, yielding a dictionary of
-prediction results for each example.  This dictionary contains several keys.
-The `probabilities` key holds a list of three floating-point values,
-each representing the probability that the input example is a particular
-Iris species.  For example, consider the following `probabilities` list:
+`predict` 方法返回了一个 python iterable 对象，以字典结构输出每个样本的预测结果。该字典包含多个键值对。`probabilities` 的值是一个包含 3 个浮点值的列表，每个浮点值代表输入样本是该鸢尾花种属的可能性。例如，下面这个 `probabilities` 列表：
 
 ```none
 'probabilities': array([  1.19127117e-08,   3.97069454e-02,   9.60292995e-01])
 ```
 
-The preceding list indicates:
+该列表表明：
 
-*   A negligible chance of the Iris being Setosa.
-*   A 3.97% chance of the Iris being Versicolor.
-*   A 96.0% chance of the Iris being Virginica.
+*   该鸢尾花样本是 Setosa 的概率忽略不计。
+*   有 3.97% 概率为 Versicolor 类。
+*   有 96.0% 概率为 Virginica 类。
 
-The `class_ids` key holds a one-element array that identifies the most
-probable species.  For example:
+`class_ids` 的值为仅有一个元素的数组，表明该样本最有可能是哪个种类：
 
 ```none
 'class_ids': array([2])
 ```
 
-The number `2` corresponds to Virginica.  The following code iterates
-through the returned `predictions` to report on each prediction:
+第 `2` 类对应 Virginica 类鸢尾花。下面代码迭代整个 `predictions` 并针对每个 `predictions` 生成报告：
 
 ``` python
 for pred_dict, expec in zip(predictions, expected):
@@ -707,8 +472,7 @@ for pred_dict, expec in zip(predictions, expected):
     print(template.format(SPECIES[class_id], 100 * probability, expec))
 ```
 
-Running the program yields the following output:
-
+程序输出如下：
 
 ``` None
 ...
@@ -719,18 +483,11 @@ Prediction is "Versicolor" (99.8%), expected "Versicolor"
 Prediction is "Virginica" (97.9%), expected "Virginica"
 ```
 
-
-## Summary
+## 小结
 
 <!--TODO(barryr): When MLCC is released, add pointers to relevant sections.-->
-This document provides a short introduction to machine learning.
+此文档提供一个机器学习的简短介绍。
 
-Because `premade_estimators.py` relies on high-level APIs, much of the
-mathematical complexity in machine learning is hidden.
-If you intend to become more proficient in machine learning, we recommend
-ultimately learning more about [**gradient
-descent**](https://developers.google.com/machine-learning/glossary/#gradient_descent),
-batching, and neural networks.
+由于 `premade_estimators.py` 依赖于高层 API，机器学习中大部分的复杂数学被隐藏。如果你想要深入学习机器学习，我们推荐学习[**梯度下降**](https://developers.google.com/machine-learning/glossary/#gradient_descent)，批量，还有神经网络。
 
-We recommend reading the @{$feature_columns$Feature Columns} document next,
-which explains how to represent different kinds of data in machine learning.
+推荐阅读 @{$feature_columns$Feature Columns} 文档，了解机器学习中的不同类别数据表述。
