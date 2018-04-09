@@ -437,11 +437,11 @@ predictions = classifier.predict(
 
 同 `evaluate` 方法一样，`predict` 方法通过 `eval_input_fn` 收集样本。
 
-预测时，我们*不*传标记给 `eval_input_fn`，而是做如下步骤：
+预测时，我们**不**传标记给 `eval_input_fn`，而是做如下步骤：
 
-1.  将我们刚刚人造的 3-元素 数据集特征转换
-2.  从刚才的数据集中创建批量的 3 个样本
-3.  返回批量的样本给 `classifier.predict`
+1.  将我们刚刚人造的 3-元素 数据集特征转换。
+2.  从刚才的数据集中创建批量的 3 个样本。
+3.  返回批量的样本给 `classifier.predict`。
 
 `predict` 方法返回了一个 python iterable 对象，以字典结构输出每个样本的预测结果。该字典包含多个键值对。`probabilities` 的值是一个包含 3 个浮点值的列表，每个浮点值代表输入样本是该鸢尾花种属的可能性。例如，下面这个 `probabilities` 列表：
 
