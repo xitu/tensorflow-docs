@@ -1,6 +1,6 @@
 # 概述
 
-TensorFlow 被设计用来给移动平台，提供好的解决方案。当前我们在移动平台和嵌入式平台上发布机器学习应用有两个解决方案：@{$mobile/mobile_intro$TensorFlow for Mobile} 和 @{$mobile/tflite$TensorFlow Lite}.
+TensorFlow 被设计用来给移动平台，提供好的解决方案。当前我们在移动平台和嵌入式平台上发布机器学习应用有两个解决方案：@{$mobile/mobile_intro$TensorFlow for Mobile} 和 @{$mobile/tflite$TensorFlow Lite}。
 
 ## TensorFlow Lite 与 TensorFlow mobile 
 
