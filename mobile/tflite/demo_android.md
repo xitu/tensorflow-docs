@@ -1,42 +1,29 @@
-# TensorFlow Lite Demo for Android
+# Android 的 TensorFlow Lite Demo
 
-The TensorFlow Lite demo is a camera app that continuously classifies whatever
-it sees from your device's back camera, using a quantized MobileNet model.
+TensorFlow Lite 的 demo 是一个摄像头 app，它使用了量化移动网络模型，可以连续对后置摄像头拍摄到的任何东西进行分类。
 
-You'll need an Android device running Android 5.0 or higher to run the demo.
+你需要一个安卓设备，并且这个设备的安卓版本号要高于5.0，才能运行这个 demo。
 
-To get you started working with TensorFlow Lite on Android, we'll walk you
-through building and deploying our TensorFlow demo app in Android Studio.
+为了让你在安卓设备上使用 TensorFlow Lite，我们将带领你在 Android studio 上构建和发布我们的 TensorFlow demo app。
 
-Note: For a more detailed guide see the
-[TFLite Codelab](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets-2-tflite/index.html#0)
+注意:更多的细节指南，请看 [TFLite Codelab](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets-2-tflite/index.html#0)。当然，这也可以使用 Bazel 去构建 demo app，但是，我们仅仅推荐进阶的十分熟悉 Bazel 构建环境的用户这样做。关于使用 Bazel 更多的信息， 请看我们在 [Github](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite#building-tensorflow-lite-and-the-demo-app-from-source) 上的页面。
 
-It's also possible to build the demo app with Bazel, but we only recommend
-this for advanced users who are very familiar with the Bazel build
-environment. For more information on that, see our page [on Github](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite#building-tensorflow-lite-and-the-demo-app-from-source).
+## 在 Android Studio 上构建和发布
 
-## Build and deploy with Android Studio
-
-1. Clone the TensorFlow repository from GitHub if you haven't already:
+1. 从 Github 上克隆 TensorFlow 的储存库，如果你以前没克隆过：
 
         git clone https://github.com/tensorflow/tensorflow
 
-2. Install the latest version of Android Studio from [here](https://developer.android.com/studio/index.html).
+2. 从[这里](https://developer.android.com/studio/index.html)下载安装最新的 Android Studio。
 
-3. From the **Welcome to Android Studio** screen, use the **Import Project
-   (Gradle, Eclipse ADT, etc)** option to import the
-   `tensorflow/contrib/lite/java/demo` directory as an existing Android Studio
-   Project.
+3. 从 **Android Studio 欢迎** 页面, 选择 **Import Project(Gradle, Eclipse ADT, etc)** 选项去作为一个已存在的 Android Studio 项目，导入`tensorflow/contrib/lite/java/demo`。
 
-    Android Studio may prompt you to install Gradle upgrades and other tool
-    versions; you should accept these upgrades.
+    Android Studio可能提示你安装 Gradle 的升级和其他版本工具升级；你需要接受这些升级。
 
-4. Download the TensorFlow Lite MobileNet model from [here](https://storage.googleapis.com/download.tensorflow.org/models/tflite/mobilenet_v1_224_android_quant_2017_11_08.zip).
+4. 从[这里]((https://storage.googleapis.com/download.tensorflow.org/models/tflite/mobilenet_v1_224_android_quant_2017_11_08.zip))下载 TensorFlow Lite 移动网络模型。
 
-    Unzip this and copy the `mobilenet_quant_v1_224.tflite` file to the assets
-    directory: `tensorflow/contrib/lite/java/demo/app/src/main/assets/`
+    解压复制 `mobilenet_quant_v1_224.tflite` 文件到资源目录：`tensorflow/contrib/lite/java/demo/app/src/main/assets/`
 
-5. Build and run the app in Android Studio.
+5. 在 Android Studio 中构建和测试 app。
 
-You'll have to grant permissions for the app to use the device's camera. Point
-the camera at various objects and enjoy seeing how the model classifies things!
+你需要打开 app 访问摄像头的权限。将相机指向各种物体，并欣赏模型如何对物体进行分类！
