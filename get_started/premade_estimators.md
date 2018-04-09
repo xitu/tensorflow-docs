@@ -61,7 +61,7 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 在深入程序细节之前，让我们先了解一下程序的环境。如下所示，TensorFlow 提供了一个含有很多 API 层的程序栈：
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/tensorflow_programming_environment.png">
+<img style="width:100%" src="https://www.tensorflow.org/images/tensorflow_programming_environment.png">
 </div>
 
 我们强烈建议使用如下 API 编写 TensorFlow 程序：
