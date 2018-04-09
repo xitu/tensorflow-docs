@@ -78,9 +78,8 @@ with tf.name_scope('cross_entropy'):
   #
   # 可能在数值上不稳定。
   #
-  # So here we use tf.losses.sparse_softmax_cross_entropy on the
-  # raw logit outputs of the nn_layer above.
-  with tf.name_scope('total'):
+  # 所以这里，我们使用 tf.losses.sparse_softmax_cross_entropy 处理前面 nn_layer 输出的原始 logit
+  with tf.name_scope('total'):
     cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=y_, logits=y)
 tf.summary.scalar('cross_entropy', cross_entropy)
 
@@ -95,8 +94,7 @@ with tf.name_scope('accuracy'):
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 tf.summary.scalar('accuracy', accuracy)
 
-  # 合并所有的汇总信息，并把它们写到 /tmp/mnist_logs（ 默认路
-  # 径 ）
+  # 合并所有的汇总信息，并把它们写到 /tmp/mnist_logs（ 默认路径 ）
 merged = tf.summary.merge_all()
 train_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/train',
                                       sess.graph)
