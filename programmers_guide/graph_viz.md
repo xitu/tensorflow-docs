@@ -41,7 +41,7 @@ with tf.name_scope('hidden') as scope:
   </tr>
   <tr>
     <td style="width: 50%;">
-      Initial view of top-level name scope <code>pool_1</code>. 顶级名称域 pool_1 的初始视图。点击右上角橙色 + 号按钮或双击节点本身将会展开它。
+      顶级名称域  <code>pool_1</code> 的初始视图。点击右上角橙色 + 号按钮或双击节点本身将会展开它。
     </td>
     <td style="width: 50%;">
       名称域 pool_1 的扩展视图。点击右上角的橙色 - 按钮或双击节点本身将折叠名称范围。
@@ -190,13 +190,13 @@ TensorBoard 提供了几种方法来改变图形的视觉布局。这不会改�
 通常收集运行时的元数据是非常有用的，例如总内存使用量，总计算时间和节点的张量形状。下面的代码示例是修改自 @{$layers$simple MNIST tutorial} 中的一个片段，其中我们记录了摘要法和运行时统计的信息。有关如何记录摘要的详细信息，请参阅 @{$summaries_and_tensorboard#serializing-the-data$Summaries Tutorial}。完整的源代码在[这里](https://www.tensorflow.org/code/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py)。
 
 ```python
-  # Train the model, and also write summaries.
-  # Every 10th step, measure test-set accuracy, and write test summaries
-  # All other steps, run train_step on training data, & add training summaries
+  # 训练模型，并记录日志
+  # 每 10 步，评估测试数据集准确性，并记录测试日志
+  # 所有其他步骤中，在训练集上运行训练步骤，并记录训练日志
 
   def feed_dict(train):
-    """Make a TensorFlow feed_dict: maps data onto Tensor placeholders."""
-    if train or FLAGS.fake_data:
+    """创建一个 TensorFlow feed_dict：将数据映射到 Tensor 占位符上。"""
+    if train or FLAGS.fake_data:
       xs, ys = mnist.train.next_batch(100, fake_data=FLAGS.fake_data)
       k = FLAGS.dropout
     else:
@@ -220,8 +220,8 @@ TensorBoard 提供了几种方法来改变图形的视觉布局。这不会改�
         train_writer.add_run_metadata(run_metadata, 'step%d' % i)
         train_writer.add_summary(summary, i)
         print('Adding run metadata for', i)
-      else:  # Record a summary
-        summary, _ = sess.run([merged, train_step], feed_dict=feed_dict(True))
+      else:  # 记录日志
+        summary, _ = sess.run([merged, train_step], feed_dict=feed_dict(True))
         train_writer.add_summary(summary, i)
 ```
 
