@@ -72,12 +72,12 @@ Feeding 是 TensorFlow Session API 的一个机制，它允许你
 两段代码是等价的：
 
 ```python
-# Using `Session.run()`.
+# 使用 `Session.run()`.
 sess = tf.Session()
 c = tf.constant(5.0)
 print(sess.run(c))
 
-# Using `Tensor.eval()`.
+# 使用 `Tensor.eval()`.
 c = tf.constant(5.0)
 with tf.Session():
   print(c.eval())
