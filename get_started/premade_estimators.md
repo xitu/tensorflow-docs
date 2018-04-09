@@ -1,4 +1,3 @@
-
 # TensorFlow 入门教程
 
 该文档将介绍 TensorFlow 的编程环境，并会向你展示如何使用 TensorFlow 解决 Iris 分类问题。
@@ -7,7 +6,7 @@
 
 你需要先做如下几件事，才能够使用本文档的样例代码：
 
-* @{$install$Install TensorFlow}.
+* @{$install$Install TensorFlow}。
 * 如果你在 virtualenv 或者 Anaconda 上安装了 TensorFlow，启动你的 TensorFlow 环境。
 * 通过以下命令安装或升级 pandas：
 
