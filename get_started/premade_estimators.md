@@ -58,7 +58,7 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 
 ## 程序栈
 
-在深入程序细节之前，让我们先了解一下程序的环境。如下所示， TensorFlow 提供了一个含有很多 API 层的程序栈：
+在深入程序细节之前，让我们先了解一下程序的环境。如下所示，TensorFlow 提供了一个含有很多 API 层的程序栈：
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/tensorflow_programming_environment.png">
@@ -66,17 +66,16 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 
 我们强烈建议使用如下 API 编写 TensorFlow 程序：
 
-* @{$programmers_guide/estimators$Estimators}, 是一个完整的模型。Estimator API
-   提供了各类方法来训练模型，评估和生成预测。
-* @{$get_started/datasets_quickstart$Datasets}, 建立了一个数据输入通道。Dataset API 提供了加载和修改数据，并向模型输入数据的方法， 它与 Estimators API 相得益彰。
+* @{$programmers_guide/estimators$Estimators}，是一个完整的模型。Estimator API 提供了各类方法来训练模型，评估和生成预测。
+* @{$get_started/datasets_quickstart$Datasets}，建立了一个数据输入通道。Dataset API 提供了加载和修改数据，并向模型输入数据的方法， 它与 Estimators API 相得益彰。
 
 ## 对　irises　分类：概览
 
-本文档中的这个样例程序搭建并测试了一个模型，根据花的[萼片](https://en.wikipedia.org/wiki/Sepal)和[花瓣](https://en.wikipedia.org/wiki/Petal)将　Iris　花分成不同种类。
+本文档中的这个样例程序搭建并测试了一个模型，根据花的[萼片](https://en.wikipedia.org/wiki/Sepal)和[花瓣](https://en.wikipedia.org/wiki/Petal)将 Iris 花分成不同种类。
 
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%"
-  alt="Petal geometry compared for three iris species: Iris setosa, Iris virginica, and Iris versicolor"
+  alt="三个 Iris 花种的花瓣几何形状的对比： Iris setosa, Iris virginica, and Iris versicolor"
   src="https://www.tensorflow.org/images/iris_three_species.jpg">
 </div>
 
@@ -147,8 +146,8 @@ Iris 数据集包含四个特征和一个[标签](https://developers.google.com/
 一个 Estimator 是从 @{tf.estimator.Estimator} 中派生出的。TensorFlow 提供了一系列的 
 [预制的 Estimators](https://developers.google.com/machine-learning/glossary/#pre-made_Estimator)
 （例如, `LinearRegressor`）来实现常用的 ML 算法。除此之外，你可以编写你自己的
-[自定义 Estimators](https://developers.google.com/machine-learning/glossary/#custom_Estimator)。
-我们建议在刚开始使用 TensorFlow 的时候仅使用预制的 Estimator。在拥有了使用预制的 Estimator 的经验后，我们推荐你创建自定义的 Estimator 来优化你的模型。
+[定制化 Estimators](https://developers.google.com/machine-learning/glossary/#custom_Estimator)。
+我们建议在刚开始使用 TensorFlow 的时候仅使用预制的 Estimator。在拥有了使用预制的 Estimator 的经验后，我们推荐你创建定制化的 Estimator 来优化你的模型。
 
 要写出一个基于预制的 Estimator 的 TensorFlow 程序，你可以进行如下任务：
 
@@ -161,7 +160,7 @@ Iris 数据集包含四个特征和一个[标签](https://developers.google.com/
 
 ## 创建输入函数
 
-你必须创建一个输入函数来支持为训练，评估和预测提供数据支持。
+你必须创建一个可以为训练，评估和预测提供数据提供支持的输入函数。
 
 一个**输入函数**返回一个 @{tf.data.Dataset} 对象， 该对象输出如下的含有两个元素的元组：
 
@@ -183,11 +182,11 @@ def input_evaluation_set():
     return features, labels
 ```
 
-你的输入函数可以通过任意的方法来生成 `features` 字典和 `label` 列表。不过，我们推荐使用 TensorFlow 的 Dataset API，它可以处理所有种类的数据。从高层次看， Dataset API 包含了如下的类：
+你的输入函数可以通过任意的方法来生成 `features` 字典和 `label` 列表。不过，我们推荐使用 TensorFlow 的 Dataset API，它可以处理所有种类的数据。从高层次看，Dataset API 包含了如下的类：
 
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%"
-  alt="A diagram showing subclasses of the Dataset class"
+  alt="一个显示数据集类的子类的表格"
   src="../images/dataset_classes.png">
 </div>
 
@@ -201,8 +200,7 @@ def input_evaluation_set():
 
 Dataset API 可以为你处理很多常见的情况。例如，使用它可以简单地从一系列巨大的文件中并行地读取记录并合成一个单个的流。
 
-为了让这个例子简单易见，我们将会使用
-[pandas](https://pandas.pydata.org/)来加载数据，并根据这个在内存中的数据来建立我们的输入管道。
+为了让这个例子简单易见，我们将会使用 [pandas](https://pandas.pydata.org/) 来加载数据，并根据这个在内存中的数据来建立我们的输入管道。
 
 这个是此程序训练中使用的输入函数，可以在[`iris_data.py`](https://github.com/tensorflow/models/blob/master/samples/core/get_started/iris_data.py)找到。
 
@@ -238,7 +236,7 @@ for key in train_x.keys():
 
 Iris 问题是一个经典的分类问题。幸运的是，TensorFlow 提供了一些预制的 Estimator 分类器，包含：
 
-* @{tf.estimator.DNNClassifier} 用于深层模型
+* @{tf.estimator.DNNClassifier} 用于执行多类分类的深度模型
 * @{tf.estimator.DNNLinearCombinedClassifier} 用于有深度和广度的模型
 * @{tf.estimator.LinearClassifier} 用于基于线性模型的分类器
 
@@ -274,8 +272,7 @@ classifier.train(
     steps=args.train_steps)
 ```
 
-这里我们将 `input_fn` 的调用包含在一个
-[`lambda`](https://docs.python.org/3/tutorial/controlflow.html)中来在提供一个无参数的输入函数时获取 Estimator 所需的参数。`steps` 参数告诉方法要在一定数量的训练次数后停止训练。
+这里我们将 `input_fn` 的调用包含在一个 [`lambda`](https://docs.python.org/3/tutorial/controlflow.html) 中来在提供一个无参数的输入函数时获取 Estimator 所需的参数。`steps` 参数告诉方法要在一定数量的训练次数后停止训练。
 
 ### 评估训练好的模型
 
