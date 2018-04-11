@@ -28,21 +28,15 @@
 
 如下图所示，您可以通过 Estimator（鸢尾花模型使用了 `DNNClassifier` ）的 `feature_columns` 参数指定模型的输入。特征列桥接输入数据（由 `input_fn` 返回的数据）和模型。
 
-<div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/feature_columns/inputs_to_model_bridge.jpg">
-</div>
-<div style="text-align: center">
-特征列将原始数据和模型需要的数据桥接起来
-</div>
+<img style="width:100%" src="">
+
+特征列将原始数据和模型需要的数据桥接起来。
 
 调用 @{tf.feature_column} 模块的方法可以创建特征列。这个文档定义了该模块的九个方法。如下图所示，这九个方法都会返回 Categorical-Column 或 Dense-Column 对象中的一个，而不是继承自上面两个类的 `bucketized_column` 对象：
 
-<div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/feature_columns/some_constructors.jpg">
-</div>
-<div style="text-align: center">
+<img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/some_constructors.jpg">
+
 特征列方法分为两个主类和一个混合类。
-</div>
 
 下面让我们更具体的了解这几个方法。
 
@@ -87,12 +81,9 @@ matrix_feature_column = tf.feature_column.numeric_column(key="MyMatrix",
 
 通常情况下，我们不希望直接将数值传入模型，而是根据取值范围将数值放进不同的类别中。可以通过创建 @{tf.feature_column.bucketized_column$bucketized column} 完成上述功能。例如，考虑一组表示房屋建成年份原始数据。我们应该将年份放入 4 个不同的 buckets 中，而不是把每一个年份数值都作为一个标量数值列：
 
-<div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/feature_columns/bucketized_column.jpg">
-</div>
-<div style="text-align: center">
+<img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/bucketized_column.jpg">
+
 将年份数据分散到四个 buckets 中。
-</div>
 
 模型将按照如下表格表示 buckets：
 
@@ -124,12 +115,9 @@ bucketized_feature_column = tf.feature_column.bucketized_column(
 
 **分类标识列（Categorical identity columns）** 可以被看作分桶列的一个特殊实例。传统的分桶列中，每一个 bucket 代表一个范围的数值（例如，从 1960 到 1979）。在分类标识列中，每一个 bucket 则代表了一单一、独立的整数。例如，你想要表示一个在 `[0, 4)` 范围内的整数，也就是 0、1、2 或者 3。这时，分类标识的映射如下所示：
 
-<div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/feature_columns/categorical_column_with_identity.jpg">
-</div>
-<div style="text-align: center">
+<img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/categorical_column_with_identity.jpg">
+
 一个分类标识列的映射。注意，这是独热编码，而不是二进制数字编码。
-</div>
 
 和分桶列一样，模型能够从每个分类标识列的分类中学习单独的权重。如下所示，我们用唯一的数字而不是字符串来代表 `product_class` 中的值：
 
@@ -158,12 +146,9 @@ def input_fn():
 
 我们不能将字符串直接作为模型的输入值。我们必须首先将字符串对应为数字或分类的值。分类词汇列（Categorical vocabulary columns）提供了一个不错的用独热向量来代表字符串的方式。例如：
 
-<div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/feature_columns/categorical_column_with_vocabulary.jpg">
-</div>
-<div style="text-align: center">
+<img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/categorical_column_with_vocabulary.jpg">
+
 将字符串映射为词列。
-</div>
 
 如你所见，分类词汇列（Categorical vocabulary columns）是分类标识列（Categorical identity columns）的一种枚举版本。TensorFlow 提供了如下两个不同的方法来建立是分类标识列：
 
@@ -219,12 +204,9 @@ hashed_feature_column =
 ```
 此时，你理所当然可能会想：这太疯狂了！毕竟，我们强制把不同的输入值变为一个较小的分类集合。这意味着两个可能不相关的输入将会被映射到一个类中，因此也就意味着在神经网络中会发生同样的事情。下图详细说明了这个进退两难的困境，可以看到，厨具和运动产品都被分类到了类别（哈希桶）12：
 
-<div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/feature_columns/hashed_column.jpg">
-</div>
-<div style="text-align: center">
+<img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/hashed_column.jpg">
+
 使用哈希桶来表示数据。
-</div>
 
 与机器学习中的许多违反直觉的现象一样，事实表明哈希算法在实践中的表现很好。这是因为哈希分类为模型提供了一些离散特性。模型可以使用附加特征来进一步将厨具和运动产品分离。
 
@@ -236,12 +218,9 @@ hashed_feature_column =
 
 下图展示了上述计划，以红色文本显示城市四角的纬度和经度值：
 
-<div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/feature_columns/Atlanta.jpg">
-</div>
-<div style="text-align: center">
+<img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/Atlanta.jpg">
+
 亚特兰大地图。想象这个地图被分为大小相同的 10,000 个部分。
-</div>
 
 下面的解决方案中，我们结合了前面提到的 `bucketized_column` 和方法 @{tf.feature_column.crossed_column}。
 
@@ -306,12 +285,9 @@ est = tf.estimator.LinearRegressor(fc, ...)
 
 使用指针列时，我们就是在告诉 TensorFlow 去做分类产品样本一样的事。也就是，**指针列**将每一个类别当作一个独热向量的元素，这个向量中与结果匹配的类是 1，其他都是 0。
 
-<div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/feature_columns/categorical_column_with_identity.jpg">
-</div>
-<div style="text-align: center">
+<img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/categorical_column_with_identity.jpg">
+
 在指针列中表示数据。
-</div>
 
 如下所示是如何通过调用 @{tf.feature_column.indicator_column} 来创建指针列：
 
@@ -335,12 +311,9 @@ indicator_column = tf.feature_column.indicator_column(categorical_column)
 
 在这个例子中，如下图所示说明了嵌入列和指针列的处理途径。
 
-<div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/feature_columns/embedding_vs_indicator.jpg">
-</div>
-<div style="text-align: center">
+<img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/embedding_vs_indicator.jpg">
+
 相比于指针列，嵌入列用维度较低的向量来存储分类数据。（我们只是将随机数放入了嵌入向量；训练决定真实的数字）
-</div>
 
 当一个样本被处理时，其中一个 `categorical_column_with...` 函数将样本字符串映射为数字的分类值。例如，一个方法将“勺子”映射为 `[32]`。（这里的 32 是我们假想的 - 实际值取决于映射函数。）接下来，你可以用如下两种方式来表示这些数字分类值：
 
