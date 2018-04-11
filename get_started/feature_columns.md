@@ -4,12 +4,9 @@
 
 在 @{$get_started/premade_estimators$Premade Estimators} 里，我们使用预设的 Estimator @{tf.estimator.DNNClassifier$`DNNClassifier`} 来训练模型，并根据 4 个输入特征，预测不同种类的鸢尾花。这个例子仅仅创建了（@{tf.feature_column.numeric_column} 类型的）数字特征列。尽管数字特征列有效地模拟了花瓣和萼片的长度，但是现实世界的数据集会包含所有类型的特征，其中很多是非数字的。
 
-<div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/feature_columns/feature_cloud.jpg">
-</div>
-<div style="text-align: center">
+<img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/feature_cloud.jpg">
+
 现实世界中，一些的特征（例如经度）是数字的，但是很多（特征）并不是（数字的）。
-</div>
 
 ## 输入至深度神经网络
 
