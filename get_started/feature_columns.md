@@ -29,7 +29,7 @@
 
 ## 特征列
 
-如下图所示，您可以通过 Estimator（鸢尾花模型使用了 `DNNClassifier` ） 的 `feature_columns` 参数指定模型的输入。特征列桥接输入数据（由 `input_fn` 返回的数据）和模型。
+如下图所示，您可以通过 Estimator（鸢尾花模型使用了 `DNNClassifier` ）的 `feature_columns` 参数指定模型的输入。特征列桥接输入数据（由 `input_fn` 返回的数据）和模型。
 
 <div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/feature_columns/inputs_to_model_bridge.jpg">
@@ -106,7 +106,7 @@ matrix_feature_column = tf.feature_column.numeric_column(key="MyMatrix",
 |>= 1980 but < 2000   | [0, 0, 1, 0] |
 |> 2000               | [0, 0, 0, 1] |
 
-为什么要把可以完美输入到模型中的数值分散到表示不同范围的类别呢？我们注意到，分类后，数值变成了一个四元素向量，因此现在模型可以学习 _四个独立的权值_ 而不是从前的一个；四个权值能比一个权值创建出更丰富的模型。更重要的是，分桶操作让模型能更清晰的区分不同的年份类，因为向量中仅有一个元素置 (1) 而其他都是 (0)。当只用一个年份数值作为输入的时候，模型只能学习线性关系。这样看来，分桶操作为模型提供了附加的灵活性，模型可以基于此进行学习。
+为什么要把可以完美输入到模型中的数值分散到表示不同范围的类别呢？我们注意到，分类后，数值变成了一个四元素向量，因此现在模型可以学习**四个独立的权值** 而不是从前的一个；四个权值能比一个权值创建出更丰富的模型。更重要的是，分桶操作让模型能更清晰的区分不同的年份类，因为向量中仅有一个元素置 (1) 而其他都是 (0)。当只用一个年份数值作为输入的时候，模型只能学习线性关系。这样看来，分桶操作为模型提供了附加的灵活性，模型可以基于此进行学习。
 
 下面的代码详述了如何创建 bucketized 特征。
 
@@ -120,7 +120,7 @@ bucketized_feature_column = tf.feature_column.bucketized_column(
     source_column = numeric_feature_column,
     boundaries = [1960, 1980, 2000])
 ```
-注意，一个 _三_ 元素的边界向量将会创建 _四_ 元素的分桶向量。
+注意，一个**三** 元素的边界向量将会创建**四** 元素的分桶向量。
 
 
 ### 分类标识列
@@ -384,12 +384,9 @@ embedding_column = tf.feature_column.embedding_column(
 
 如下列表所示，并不是所有 Estimator 都允许 `feature_columns` 参数的所有类别：
 
-* @{tf.estimator.LinearClassifier$`LinearClassifier`} 和
-  @{tf.estimator.LinearRegressor$`LinearRegressor`}: 接受所有类型特征列。
-* @{tf.estimator.DNNClassifier$`DNNClassifier`} 和
-  @{tf.estimator.DNNRegressor$`DNNRegressor`}: 只接受稠密列。其他类型的列必须被 `indicator_column` 或者 `embedding_column` 包装。
-* @{tf.estimator.DNNLinearCombinedClassifier$`DNNLinearCombinedClassifier`} 和
-  @{tf.estimator.DNNLinearCombinedRegressor$`DNNLinearCombinedRegressor`}:
+* @{tf.estimator.LinearClassifier$`LinearClassifier`} 和 @{tf.estimator.LinearRegressor$`LinearRegressor`}: 接受所有类型特征列。
+* @{tf.estimator.DNNClassifier$`DNNClassifier`} 和 @{tf.estimator.DNNRegressor$`DNNRegressor`}: 只接受稠密列。其他类型的列必须被 `indicator_column` 或者 `embedding_column` 包装。
+* @{tf.estimator.DNNLinearCombinedClassifier$`DNNLinearCombinedClassifier`} 和 @{tf.estimator.DNNLinearCombinedRegressor$`DNNLinearCombinedRegressor`}:
     * `linear_feature_columns` 参数接受所有特征列类型。
     * `dnn_feature_columns`参数只接受稠密列。
 
