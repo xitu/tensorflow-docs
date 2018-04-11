@@ -28,7 +28,7 @@
 
 如下图所示，您可以通过 Estimator（鸢尾花模型使用了 `DNNClassifier` ）的 `feature_columns` 参数指定模型的输入。特征列桥接输入数据（由 `input_fn` 返回的数据）和模型。
 
-<img style="width:100%" src="">
+<img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/inputs_to_model_bridge.jpg">
 
 特征列将原始数据和模型需要的数据桥接起来。
 
