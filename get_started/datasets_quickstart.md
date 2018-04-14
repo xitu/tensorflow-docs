@@ -254,12 +254,9 @@ def _parse_line(line):
 
 这个 `map` 方法接受一个 `map_func` 参数，这个参数描述了 `Dataset` 中的每一个元素应该如何被转化。
 
-<div style="width:80%; margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/datasets/map.png">
-</div>
-<div style="text-align: center">
+<img style="width:100%" src="https://www.tensorflow.org/images/datasets/map.png">
+
 @{tf.data.Dataset.map$`map`} 方法将会对 `Dataset` 中的每一个元素应用 `map_func` 来完成它们的转化。
-</div>
 
 因此，为了在多行数据被从 csv 文件中读取出来的时候解析它们，我们为 `map` 方法提供 `_parse_line` 函数：
 
