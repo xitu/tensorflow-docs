@@ -110,9 +110,7 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 
 如下图所示，TensorFlow 技术栈提供了多层 API
 
-<div style="margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/tensorflow_programming_environment.png">
-</div>
+<img style="width:100%" src="https://www.tensorflow.org/images/tensorflow_programming_environment.png">
 
 **TensorFlow 编程环境**
 <p>&nbsp;</p>
@@ -246,9 +244,7 @@ my_feature_columns = [
 *   第二次有 3 个神经元，
 *   第三层有 2 个神经元。
 
-<div style="margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%" src="../images/simple_dnn.svg">
-</div>
+<img style="width:100%" src="https://www.tensorflow.org/images/simple_dnn.svg">
 
 **包含 3 个隐藏层的神经网络**
 <p>&nbsp;</p>
