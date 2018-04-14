@@ -20,11 +20,7 @@
 *   virginica 类
 *   versicolor 类
 
-<div style="margin:auto; margin-bottom:10px; margin-top:20px;">
-<img style="width:100%"
-  alt="三种鸢尾花呈现出的不同花瓣花萼外形"
-  src="../images/iris_three_species.jpg">
-</div>
+<img style="width:100%" alt="三种鸢尾花呈现出的不同花瓣花萼外形" src="https://www.tensorflow.org/images/iris_three_species.jpg">
 
 **从左至右，[*Iris setosa*](https://commons.wikimedia.org/w/index.php?curid=170298) (by [Radomil](https://commons.wikimedia.org/wiki/User:Radomil), CC BY-SA 3.0)，[*Iris versicolor*](https://commons.wikimedia.org/w/index.php?curid=248095) (by [Dlanglois](https://commons.wikimedia.org/wiki/User:Dlanglois), CC BY-SA 3.0) 和 [*Iris virginica*](https://www.flickr.com/photos/33397993@N05/3352169862) (by [Frank Mayfield](https://www.flickr.com/photos/33397993@N05)，CC BY-SA 2.0)。**
 <p>&nbsp;</p>
