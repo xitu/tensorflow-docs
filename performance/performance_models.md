@@ -45,13 +45,9 @@ TensorFlow 允许一个设备上的张量被任意其他设备直接使用。Ten
 ### 软件管道
 
 因为所有的阶段能被不同的处理器执行，`data_flow_ops.StagingArea` 是其中用于并行执行，是类似 @{tf.FIFOQueue} 一样的队列操作，提供了能被 CPU 和 GPU 执行的简单函数。
-Before the model starts running all the stages, the input pipeline stages are
-warmed up to prime the staging buffers in between with one set of data.
-During each run step, one set of data is read from the staging buffers at
-the beginning of each stage, and one set is pushed at the end.
+在模型开始跑所有阶段之前，输入管道阶段被启动来将数据加载到运行时缓存中。每一个运行步骤在每个阶段开始前将从运行时缓存读取一段数据，并在最后写入一段数据
 
-For example: if there are three stages: A, B and C. There are two staging areas
-in between: S1 and S2. During the warm up, we run:
+比如，有 A、B、C 三个阶段。有两个运行区域： S1 和 S2。在启动时，我们运行：
 
 ```
 初始化:
@@ -64,45 +60,28 @@ in between: S1 and S2. During the warm up, we run:
 步骤 5: A4  B3  C2
 ```
 
-After the warm up, S1 and S2 each have one set of data in them. For each step of
-the actual execution, one set of data is consumed from each staging area, and
-one set is added to each.
+在初始化之后，S1 和 S2 拥有了一段收。在真正执行的每个步骤中，每个区域将消耗一段数据，然后又会有新的一段数据加入其中。
 
-Benefits of using this scheme:
+这种方案的好处是：
 
-*   All stages are non-blocking, since the staging areas always have one set of
-    data after the warm up.
-*   Each stage can run in parallel since they can all start immediately.
-*   The staging buffers have a fixed memory overhead. They will have at most one
-    extra set of data.
-*   Only a single`session.run()` call is needed to run all stages of the step,
-    which makes profiling and debugging much easier.
+*   所有阶段都不会被打断，因为每个区域都在热身之后都已经有一块数据
+*   每个阶段都能并行执行，因为他们可以马上开始执行
+*   运行时缓存是一个固定的额外内存开销。他们最多有一块额外的数据
+*   运行这个步骤的所有阶段只需要调用一次 `session.run()` ，这使得信息收集和调试更加简单
 
-## Best Practices in Building High-Performance Models
+## 架构高性能模型的最佳实践
 
-Collected below are a couple of additional best practices that can improve
-performance and increase the flexibility of models.
+下面这些额外的最佳时间能帮助提升性能和增强模型的灵活性。
 
-### Build the model with both NHWC and NCHW
+### 同时采用 NHWC 和 NCHW 来构建模型
 
-Most TensorFlow operations used by a CNN support both NHWC and NCHW data format.
-On GPU, NCHW is faster. But on CPU, NHWC is sometimes faster.
+大部分 CNN 采用的 TensorFlow 操作同时支持 NHWC 和 NCHW 数据格式。NCHW 在 GPU 上更快，而 NHWC 在 CPU 上有时候更快。
 
-Building a model to support both data formats keeps the model flexible and
-capable of operating optimally regardless of platform. Most TensorFlow
-operations used by a CNN support both NHWC and NCHW data formats. The benchmark
-script was written to support both NCHW and NHWC. NCHW should always be used
-when training with GPUs. NHWC is sometimes faster on CPU. A flexible model can
-be trained on GPUs using NCHW with inference done on CPU using NHWC with the
-weights obtained from training.
+架构同时支持这两种数据格式的模型能使得模型在不同的平台运行得更加灵活和高效。大部分 CNN 采用的 TensorFlow 操作同时支持 NHWC 和 NCHW 数据格式。基准脚本同时支持 NCHW 和 NHWC。 NCHW 在使用 GPU 来训练时应该被一直被采用。NHWC 在 CPU 上有时候更快。一个灵活的模型能在 GPU 上采用 NCHW 进行训练，同时利用在 CPU 上采用 NHWC 训练权重的结果。
 
-### Use Fused Batch-Normalization
+### 采用混合标准化
 
-The default batch-normalization in TensorFlow is implemented as composite
-operations. This is very general, but often leads to suboptimal performance. An
-alternative is to use fused batch-normalization which often has much better
-performance on GPU. Below is an example of using @{tf.contrib.layers.batch_norm}
-to implement fused batch-normalization.
+TensorFlow 采用的默认标准化是采用复合操作。这是很常见的，但它经常导致性能下降。一个替代方案是采用混合标准化，这在 GPU 上经常拥有更好的性能。下面是一个采用 @{tf.contrib.layers.batch_norm} 来实现复合标准化的实例。
 
 ```python
 bn = tf.contrib.layers.batch_norm(
@@ -110,7 +89,7 @@ bn = tf.contrib.layers.batch_norm(
           scope=scope)
 ```
 
-## Variable Distribution and Gradient Aggregation
+## 可变分布和梯度聚合
 
 During training, training variable values are updated using aggregated gradients
 and deltas. In the benchmark script, we demonstrate that with the flexible and
