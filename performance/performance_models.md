@@ -91,13 +91,9 @@ bn = tf.contrib.layers.batch_norm(
 
 ## 可变分布和梯度聚合
 
-During training, training variable values are updated using aggregated gradients
-and deltas. In the benchmark script, we demonstrate that with the flexible and
-general-purpose TensorFlow primitives, a diverse range of high-performance
-distribution and aggregation schemes can be built.
+在训练时，采用聚合梯度和差值来更新训练变量值。在基准脚本中，我们展示了采用灵活通用的 TensorFlow 元件构建了不同范围的高性能分布和聚合规则。
 
-Three examples of variable distribution and aggregation were included in the
-script:
+在这个脚本中包含了 3 个不同的分布和聚合方式：
 
 *   `parameter_server` where each replica of the training model reads the
     variables from a parameter server and updates the variable independently.
@@ -265,15 +261,10 @@ convergence by adjusting learning rate and other hyperparameters.
 *   **`model`**: 使用的模型，比如 `resnet50`, `inception3`, `vgg16`, 或
     `alexnet`
 *   **`num_gpus`**: 使用的 GPU 数量。
-*   **`data_dir`**: Path to data to process. If not set, synthetic data is used.
-    To use ImageNet data use these
-    [instructions](https://github.com/tensorflow/models/tree/master/research/inception#getting-started)
-    as a starting point.
-*   **`batch_size`**: Batch size for each GPU.
-*   **`variable_update`**: The method for managing variables: `parameter_server`
-    ,`replicated`, `distributed_replicated`, `independent`
-*   **`local_parameter_device`**: Device to use as parameter server: `cpu` or
-    `gpu`.
+*   **`data_dir`**: 待处理数据的路径。如未设置，人造数据将被使用。请参照 [使用说明](https://github.com/tensorflow/models/tree/master/research/inception#getting-started) 来使用 ImageNet 数据。
+*   **`batch_size`**: 每个 CPU 的位大小。
+*   **`variable_update`**: 变量管理方法： `parameter_server`,`replicated`, `distributed_replicated`, `independent`
+*   **`local_parameter_device`**: 参数服务器的使用设备：`cpu` 或 `gpu`
 
 #### 单一实例示例
 
@@ -297,24 +288,20 @@ python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 
 ```
 
-#### 分布式命令行参数
+#### 分布式命令参数
 
-*   **`ps_hosts`**: Comma separated list of hosts to use as parameter servers
-    in the format of ```<host>:port```, e.g. ```10.0.0.2:50000```.
-*   **`worker_hosts`**: Comma separated list of hosts to use as workers in the
-    format of ```<host>:port```, e.g. ```10.0.0.2:50001```.
-*   **`task_index`**: Index of the host in the list of `ps_hosts` or
-    `worker_hosts` being started.
-*   **`job_name`**: Type of job, e.g `ps` or `worker`
+*   **`ps_hosts`**: 以逗号分隔的参数服务器主机列表，格式为 ```<host>:port```，比如 ```10.0.0.2:50000```。
+*   **`worker_hosts`**: 以逗号分隔的参数工作站主机列表，格式为 ```<host>:port```，比如 ```10.0.0.2:50001```。
+*   **`task_index`**: 开始主机在 `ps_hosts` 或 `worker_hosts` 列表中的索引。
+*   **`job_name`**: 任务类型，比如 `ps` 或 `worker`
 
-#### Distributed examples
+#### 分布式示例
 
-Below is an example of training ResNet-50 on 2 hosts: host_0 (10.0.0.1) and
-host_1 (10.0.0.2). The example uses synthetic data. To use real data pass the
-`--data_dir` argument.
+以下是在 2 台主机上训练 ResNet-50的示例，主机分别为： host_0 (10.0.0.1) 和
+host_1 (10.0.0.2)。这个示例采用了人造数据。可以传入 `--data_dir` 参数来使用真实数据。
 
 ```bash
-# Run the following commands on host_0 (10.0.0.1):
+# 在 host_0 (10.0.0.1) 上运行以下命令:
 python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 --batch_size=64 --model=resnet50 --variable_update=distributed_replicated \
 --job_name=worker --ps_hosts=10.0.0.1:50000,10.0.0.2:50000 \
@@ -326,7 +313,7 @@ python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 --worker_hosts=10.0.0.1:50001,10.0.0.2:50001 --task_index=0
 
 
-# Run the following commands on host_1 (10.0.0.2):
+# 在 host_1 (10.0.0.2) 上运行以下命令:
 python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 --batch_size=64 --model=resnet50 --variable_update=distributed_replicated \
 --job_name=worker --ps_hosts=10.0.0.1:50000,10.0.0.2:50000 \
