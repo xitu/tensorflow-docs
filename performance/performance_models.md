@@ -167,30 +167,15 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 为了在同一主机的不同 GPU 间传递变量和聚合梯度，我们采用了默认的 TensorFlow 隐式复制机制。
 
 然而，我们也可以采用可选的 NCCL (@{tf.contrib.nccl}) 支持。NCCL
-是一个能在不同 GPU 间高效传播和聚合数据的 NVIDIA® 库。It schedules a cooperating kernel on each GPU that knows how to
-best utilize the underlying hardware topology; this kernel uses a single SM of
-the GPU.
+是一个能在不同 GPU 间高效传播和聚合数据的 NVIDIA® 库。它在每个 GPU 中安排一个协作内核来知道如何最好利用底层的硬件拓扑。这个内核使用了 GPU 的一个单一的 SM 。
 
-In our experiment, we demonstrate that although NCCL often leads to much faster
-data aggregation by itself, it doesn't necessarily lead to faster training. Our
-hypothesis is that the implicit copies are essentially free since they go to the
-copy engine on GPU, as long as its latency can be hidden by the main computation
-itself. Although NCCL can transfer data faster, it takes one SM away, and adds
-more pressure to the underlying L2 cache. Our results show that for 8-GPUs, NCCL
-often leads to better performance. However, for fewer GPUs, the implicit copies
-often perform better.
+在我们的实验中，我们展示了虽然 NCCL 经常自身能带来更快的数据聚合，它并不能带来更快的训练效果。我们假设隐式复制是无成本的，既然他们由 GPU 的复制引擎完成，并且它的延时能被主计算过程隐藏。虽然 NCCL 能更快地传输数据，它只使用了一个 SM，并且给依赖的 L2 缓存带来了更大的压力。我们的结果显示对于 8 核 GPU 来说，NCCL 经常能带来更好的性能。然而，对于更少的 GPU 来说，隐式复制反而表现更加出色。
 
-#### Staged Variables
+#### 状态变量
 
-We further introduce a staged-variable mode where we use staging areas for both
-the variable reads, and their updates. Similar to software pipelining of the
-input pipeline, this can hide the data copy latency. If the computation time
-takes longer than the copy and aggregation, the copy itself becomes essentially
-free.
+我们进一步引入了状态变量模式，我们使用状态区来用于变量读取和更新。与输入管道的软件管道类似，这能隐藏数据复制延时。只要计算时间比复制和聚合时间长，复制本身的延时就变得无需考虑了。
 
-The downside is that all the weights read are from the previous training step.
-So it is a different algorithm from SGD. But it is possible to improve its
-convergence by adjusting learning rate and other hyperparameters.
+它的缺点是所有的权重读取需要来自上一个训练步骤。所以它是与 SGD 不同的算法。但可以通过调整学习速率和其他参数来优化收敛性。
 
 ## 执行脚本
 
