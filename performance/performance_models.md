@@ -95,72 +95,39 @@ bn = tf.contrib.layers.batch_norm(
 
 在这个脚本中包含了 3 个不同的分布和聚合方式：
 
-*   `parameter_server` where each replica of the training model reads the
-    variables from a parameter server and updates the variable independently.
-    When each model needs the variables, they are copied over through the
-    standard implicit copies added by the TensorFlow runtime. The example
-    [script](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)
-    illustrates using this method for local training, distributed synchronous
-    training, and distributed asynchronous training.
-*   `replicated` places an identical copy of each training variable on each
-    GPU. The forward and backward computation can start immediately as the
-    variable data is immediately available. Gradients are accumulated across all
-    GPUs, and the aggregated total is applied to each GPU's copy of the
-    variables to keep them in sync.
-*   `distributed_replicated` places an identical copy of the training parameters
-    on each GPU along with a master copy on the parameter servers. The forward
-    and backward computation can start immediately as the variable data is
-    immediately available. Gradients are accumulated across all GPUs on each
-    server and then the per-server aggregated gradients are applied to the
-    master copy. After all workers do this, each worker updates its copy of the
-    variable from the master copy.
+*   `parameter_server` 训练模型副本从一个参数服务器读取变量和更新变量。当
+    模型需要变量时，TensorFlow 运行时会复制它们并添加到使用环境。示例[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)
+    阐释了采用这种方法来做本地训练、分布式同步训练和分布式异步训练。
+*   `replicated` 在每个 GPU 上放置了每个训练变量的独立副本。因为变量已经就绪，前向和后向计算可以马上开始。梯度在所有 GPU 中累积，汇总结果会被应用到每一个 GPU 副本中来保持他们同步。
+*   `distributed_replicated` 在每个 GPU 上放置了每个训练变量的独立副本，同时在参数服务器上放置一个主副本。因为变量已经就绪，前向和后向计算可以马上开始。梯度在每个服务器的所有 GPU 中累积，然后按服务器汇总后的梯度会被应用到主副本上。在所有处理器完成之后，每个处理器会从主副本上更新一份副本到自己的环境。
 
-Below are additional details about each approach.
+以下是每种方式的更多细节。
 
-### Parameter Server Variables
+### 参数服务器变量
 
-The most common way trainable variables are managed in TensorFlow models is
-parameter server mode.
+TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 
-In a distributed system, each worker process runs the same model, and parameter
-server processes own the master copies of the variables. When a worker needs a
-variable from a parameter server, it refers to it directly. The TensorFlow
-runtime adds implicit copies to the graph to make the variable value available
-on the computation device that needs it. When a gradient is computed on a
-worker, it is sent to the parameter server that owns the particular variable,
-and the corresponding optimizer is used to update the variable.
+在分布式系统中，每个处理器采用同一模型，由参数服务器处理变量的主副本。当处理器需要参数服务器的一个变量时，它可以直接使用。TensorFlow 运行时在图中添加了隐式副本来使得计算设备能在需要时使用变量值。当处理器计算完一个梯度后，这个梯度被发送给管理这个特殊变量的参数服务器，然后对应的最优控制器会更新这个变量。
 
-There are some techniques to improve throughput:
+有一些技术能优化吞吐量：
 
-*   The variables are spread among parameter servers based on their size, for
-    load balancing.
-*   When each worker has multiple GPUs, gradients are accumulated across the
-    GPUs and a single aggregated gradient is sent to the parameter server. This
-    reduces the network bandwidth and the amount of work done by the parameter
-    servers.
+*   按照变量大小来将变量分布在不同参数服务器上，来实现负载均衡。
+*   当每个处理器有多个 GPU 时，会将不同的 GPU 的梯度累积后统一发给参数服务器。这会减少网络带宽和参数服务器的工作量。
 
-For coordinating between workers, a very common mode is async updates, where
-each worker updates the master copy of the variables without synchronizing with
-other workers. In our model, we demonstrate that it is fairly easy to introduce
-synchronization across workers so updates for all workers are finished in one
-step before the next step can start.
+对于不同处理器的协同来说，一个常用方式是异步更新，每个处理器只更新主副本而不与其他处理器同步。在我们的模型中，我们展示在不同处理器间引入同步是很容易的，所以所有处理器能在一个步骤中在下一步骤开始前完成。
 
-The parameter server method can also be used for local training, In this case,
-instead of spreading the master copies of variables across parameters servers,
-they are either on the CPU or spread across the available GPUs.
+参数服务器方法也能被用来做本地训练。这种情况下，代替在不同参数服务期间传递变量的主副本，他们可以在 CPU 或 GPU 间传递。
 
-Due to the simple nature of this setup, this architecture has gained a lot of
-popularity within the community.
+因为这个配置非常简单，这个架构受到了社区广泛的欢迎。
 
-This mode can be used in the script by passing
-`--variable_update=parameter_server`.
+这个方式可以通过在脚本中传入参数 `--variable_update=parameter_server` 来使用。
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" alt="parameter_server mode in distributed training"
    src="../images/perf_parameter_server_mode_doc.png">
 </div>
 
-### Replicated Variables
+### 重复变量
 
 In this design, each GPU on the server has its own copy of each variable. The
 values are kept in sync across GPUs by applying the fully aggregated gradient to
