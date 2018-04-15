@@ -164,13 +164,10 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 
 #### NCCL
 
-In order to broadcast variables and aggregate gradients across different GPUs
-within the same host machine, we can use the default TensorFlow implicit copy
-mechanism.
+为了在同一主机的不同 GPU 间传递变量和聚合梯度，我们采用了默认的 TensorFlow 隐式复制机制。
 
-However, we can instead use the optional NCCL (@{tf.contrib.nccl}) support. NCCL
-is an NVIDIA® library that can efficiently broadcast and aggregate data across
-different GPUs. It schedules a cooperating kernel on each GPU that knows how to
+然而，我们也可以采用可选的 NCCL (@{tf.contrib.nccl}) 支持。NCCL
+是一个能在不同 GPU 间高效传播和聚合数据的 NVIDIA® 库。It schedules a cooperating kernel on each GPU that knows how to
 best utilize the underlying hardware topology; this kernel uses a single SM of
 the GPU.
 
