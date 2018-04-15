@@ -30,34 +30,21 @@
 
 256 条记录被独立并行地读取和处理。它起始于图中 256 个独立的 `RecordInput` 读操作。每个读操作之后是独立并行执行的一系列相同的图像前置处理操作。图像前置处理操作包括对于图像的解码、变形、大小缩放等操作。
 
-经过预处理之后，图像被连结成 8 个张量，每个张量有 32 位大小。完成这一操作使用的是 @{tf.parallel_stack} ，不使用 @{tf.concat} 则是因为它被实现成了单一操作需要等待所有输入就绪才能完成连接。@{tf.parallel_stack} 分配了一个未初始化的张量作为输出， 每个输入张量就绪时就写入到输出张量的置顶部分。
+经过预处理之后，图像被连结成 8 个张量，每个张量有 32 位。完成这一操作使用的是 @{tf.parallel_stack} ，不使用 @{tf.concat} 则是因为它被实现成了单一操作需要等待所有输入就绪才能完成连接。@{tf.parallel_stack} 分配了一个未初始化的张量作为输出， 每个输入张量就绪时就写入到输出张量的置顶部分。
 
 当所有输入张量完成后，输出张量被传递给图。这样有效地降低了生成所有输入张量带来的长尾内存延时。
 
 ### CPU 到 GPU 数据转移的并行处理
 
-Continuing with the assumption that the target is 8 GPUs with a batch size of
-256 (32 per GPU). Once the input images are processed and concatenated together
-by the CPU, we have 8 tensors each with a batch-size of 32.
+继续假设目标是采用 256 位的 8 个 CPU（每个 CPU 32 位）。一旦输入图片被 CPU 被处理和连接完成，我们将得到 8 个 32 位的张量。
 
-TensorFlow enables tensors from one device to be used on any other device
-directly. TensorFlow inserts implicit copies to make the tensors available on
-any devices where they are used. The runtime schedules the copy between devices
-to run before the tensors are actually used. However, if the copy cannot finish
-in time, the computation that needs those tensors will stall and result in
-decreased performance.
+TensorFlow 允许一个设备上的张量被任意其他设备直接使用。TensorFlow 使用隐式副本来使得张量能被任一设备使用。在张量被正式使用前，由运行时来安排在不同设备间完成复制。然而，如果复制不同及时完成，需要那些张量的计算会被暂停从而造成性能下降。
 
-In this implementation, `data_flow_ops.StagingArea` is used to explicitly
-schedule the copy in parallel. The end result is that when computation starts on
-the GPU, all the tensors are already available.
+在这个实现中， `data_flow_ops.StagingArea` 被用来显式定义并行执行复制操作。最终的结果是，在 GPU 开始执行计算任务时，所有的张量已经就绪。
 
 ### 软件管道
 
-With all the stages capable of being driven by different processors,
-`data_flow_ops.StagingArea` is used between them so they run in parallel.
-`StagingArea` is a queue-like operator similar to @{tf.FIFOQueue} that offers
-simpler functionalities that can be executed on both CPU and GPU.
-
+因为所有的阶段能被不同的处理器执行，`data_flow_ops.StagingArea` 是其中用于并行执行，是类似 @{tf.FIFOQueue} 一样的队列操作，提供了能被 CPU 和 GPU 执行的简单函数。
 Before the model starts running all the stages, the input pipeline stages are
 warmed up to prime the staging buffers in between with one set of data.
 During each run step, one set of data is read from the staging buffers at
