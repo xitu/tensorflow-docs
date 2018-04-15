@@ -129,55 +129,32 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 
 ### 重复变量
 
-In this design, each GPU on the server has its own copy of each variable. The
-values are kept in sync across GPUs by applying the fully aggregated gradient to
-each GPU's copy of the variable.
+在这个设计中，服务器上的每个 GPU 有每个变量的一个副本。这些值在 GPU 中通过将完整聚合后的梯度应用到每个 GPU 中来保持同步。
 
-The variables and data are available at the start of training, so the forward
-pass of training can start immediately. Gradients are aggregated across the
-devices and the fully aggregated gradient is then applied to each local copy.
+这些变量和数据在训练开始时就可用，所以训练的前向处理能马上开始。梯度在不同设备间聚合后再被引用到每个本地副本中。
 
-Gradient aggregation across the server can be done in different ways:
+跨服务器的梯度聚合可以通过不同的方式完成：
 
-*   Using standard TensorFlow operations to accumulate the total on a single
-    device (CPU or GPU) and then copy it back to all GPUs.
-*   Using NVIDIA® NCCL, described below in the NCCL section.
+*   采用标准 TensorFlow 操作来聚合每个 CPU 或 GPU 设备上的总和，然后复制回所有 GPU。
+*   采用下面 NCCL 章节中介绍的 NVIDIA® NCCL 方法。
 
-This mode can be used in the script by passing `--variable_update=replicated`.
+这种方式可以用过在脚本中传入参数 `--variable_update=replicated` 来使用。
 
-### Replicated Variables in Distributed Training
+### 分布式训练中的重复变量
 
-The replicated method for variables can be extended to distributed training. One
-way to do this like the replicated mode: aggregate the gradients fully across
-the cluster and apply them to each local copy of the variable. This may be shown
-in a future version of this scripts; the scripts do present a different
-variation, described here.
+变量的重复方法可以被扩展应用到分布式训练中。其中的一种方式是：就像重复模式一样，在集群中聚合所有梯度，然后在应用到每一个变量副本上。这个可能在脚本的某个后续版本中展示。这个脚本在这里展示了一种不同的变化。
 
-In this mode, in addition to each GPU's copy of the variables, a master copy is
-stored on the parameter servers. As with the replicated mode, training can start
-immediately using the local copies of the variables.
+在这种模式中，在每个 GPU 的变量副本之外，主副本被保存在参数服务器上。就像重复模式，训练可以使用本地变量副本马上开始。
 
-As the gradients of the weights become available, they are sent back to the
-parameter servers and all local copies are updated:
+随着权重的梯度变得可用，他们被发送回参数服务器，然后所有本地副本得到了更新：
 
-1.  All the gradients from the GPU on the same worker are aggregated together.
-2.  Aggregated gradients from each worker are sent to the parameter server that
-    owns the variable, where the specified optimizer is used to update the
-    master copy of the variable.
-3.  Each worker updates its local copy of the variable from the master. In the
-    example model, this is done with a cross-replica barrier that waits for all
-    the workers to finish updating the variables, and fetches the new variable
-    only after the barrier has been released by all replicas. Once the copy
-    finishes for all variables, this marks the end of a training step, and a new
-    step can start.
+1.  所有同一处理器上 GPU 的梯度会被聚合在一起。
+2.  每个处理器的聚合梯度会被发送给负责变量的参数服务器，在那里会采用特定的优化处理器来更新变量的主副本。
+3.  每个处理器根据主副本来更新它们的本地变量副本。在这个示例模型中，这是通过跨副本围栏来实现的，它等待所有处理器完成更新这些变量再在围栏释放了后获取新的变量。一旦所有变量的复制完成，一个训练步骤就完成了，一个新的步骤会开始。
 
-Although this sounds similar to the standard use of parameter servers, the
-performance is often better in many cases. This is largely due to the fact the
-computation can happen without any delay, and much of the copy latency of early
-gradients can be hidden by later computation layers.
+虽然这听起来和参数服务器的标准用法类似，在很多场景下性能会更好。这很大程度上是因为计算不需要延迟，很多早期梯度的复制延迟倍后续的计算层隐藏了。
 
-This mode can be used in the script by passing
-`--variable_update=distributed_replicated`.
+这个方式可以通过在脚本中传入参数 `--variable_update=distributed_replicated` 来使用。
 
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
