@@ -4,6 +4,9 @@
 [脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)
 说明了如何构建能应对多种系统类型及网络拓扑的高可用模型。本文的技术利用了一些 TensorFlow Python 的底层组件。其中的大部分技术将来将被整合进高层次的 API 里。
 
+
+
+
 ## 输入管道
 
 @{$performance_guide$Performance Guide} 解释了如何识别可能的输入管道问题和最佳实践。我们发现像类似采用 [AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 训练 ImageNet 这种使用大量输入并每秒处理大量采样的场景下，采用 @{tf.FIFOQueue} 和 @{tf.train.queue_runner} 不能充分利用目前的 GPU 计算资源。
@@ -18,11 +21,32 @@
 
 每个阶段的关键步骤可以采用 `data_flow_ops.StagingArea` 和其他阶段并行执行。 `StagingArea` 是类似于 @{tf.FIFOQueue} 的队列操作。不同之处在于 `StagingArea` 不保证先进先出的顺序，但提供了能在 CPU 和 GPU 上并行执行其他阶段的简单功能。将输入管道拆分为能并行执行的3个阶段是可扩展的，能充分发挥大量多核环境的优势。本章节后续将详细阐述这三个阶段以及使用 `data_flow_ops.StagingArea` 的细节。
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 并行 I/O 读取
 
 `data_flow_ops.RecordInput` 用于处理并行从磁盘读取。对于包含 TFRecords 记录的一系列输入文件，`RecordInput` 将持续使用后台进程去读取记录。这些记录将被放入它自身的内部空间；当载入超过它一半能力的数据量后，它将产生输出张量。
 
 这个操作有它自己的由 I/O 时间控制且消耗最少 CPU 的内部进程，这使它能平缓地与模型的其他部分并行执行。
+
+
+
+
+
+
 
 ### 并行镜像处理
 
@@ -34,6 +58,21 @@
 
 当所有输入张量完成后，输出张量被传递给图。这样有效地降低了生成所有输入张量带来的长尾内存延时。
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### CPU 到 GPU 数据转移的并行处理
 
 继续假设目标是采用 256 位的 8 个 CPU（每个 CPU 32 位）。一旦输入图片被 CPU 被处理和连接完成，我们将得到 8 个 32 位的张量。
@@ -41,6 +80,15 @@
 TensorFlow 允许一个设备上的张量被任意其他设备直接使用。TensorFlow 使用隐式副本来使得张量能被任一设备使用。在张量被正式使用前，由运行时来安排在不同设备间完成复制。然而，如果复制不同及时完成，需要那些张量的计算会被暂停从而造成性能下降。
 
 在这个实现中， `data_flow_ops.StagingArea` 被用来显式定义并行执行复制操作。最终的结果是，在 GPU 开始执行计算任务时，所有的张量已经就绪。
+
+
+
+
+
+
+
+
+
 
 ### 软件管道
 
@@ -69,15 +117,36 @@ TensorFlow 允许一个设备上的张量被任意其他设备直接使用。Ten
 *   运行时缓存是一个固定的额外内存开销。他们最多有一块额外的数据
 *   运行这个步骤的所有阶段只需要调用一次 `session.run()` ，这使得信息收集和调试更加简单
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 架构高性能模型的最佳实践
 
 下面这些额外的最佳时间能帮助提升性能和增强模型的灵活性。
+
 
 ### 同时采用 NHWC 和 NCHW 来构建模型
 
 大部分 CNN 采用的 TensorFlow 操作同时支持 NHWC 和 NCHW 数据格式。NCHW 在 GPU 上更快，而 NHWC 在 CPU 上有时候更快。
 
 架构同时支持这两种数据格式的模型能使得模型在不同的平台运行得更加灵活和高效。大部分 CNN 采用的 TensorFlow 操作同时支持 NHWC 和 NCHW 数据格式。基准脚本同时支持 NCHW 和 NHWC。 NCHW 在使用 GPU 来训练时应该被一直被采用。NHWC 在 CPU 上有时候更快。一个灵活的模型能在 GPU 上采用 NCHW 进行训练，同时利用在 CPU 上采用 NHWC 训练权重的结果。
+
+
+
+
+
+
+
 
 ### 采用混合标准化
 
@@ -88,6 +157,10 @@ bn = tf.contrib.layers.batch_norm(
           input_layer, fused=True, data_format='NCHW'
           scope=scope)
 ```
+
+
+
+
 
 ## 可变分布和梯度聚合
 
@@ -102,6 +175,24 @@ bn = tf.contrib.layers.batch_norm(
 *   `distributed_replicated` 在每个 GPU 上放置了每个训练变量的独立副本，同时在参数服务器上放置一个主副本。因为变量已经就绪，前向和后向计算可以马上开始。梯度在每个服务器的所有 GPU 中累积，然后按服务器汇总后的梯度会被应用到主副本上。在所有处理器完成之后，每个处理器会从主副本上更新一份副本到自己的环境。
 
 以下是每种方式的更多细节。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### 参数服务器变量
 
@@ -140,6 +231,12 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 
 这种方式可以用过在脚本中传入参数 `--variable_update=replicated` 来使用。
 
+
+
+
+
+
+
 ### 分布式训练中的重复变量
 
 变量的重复方法可以被扩展应用到分布式训练中。其中的一种方式是：就像重复模式一样，在集群中聚合所有梯度，然后在应用到每一个变量副本上。这个可能在脚本的某个后续版本中展示。这个脚本在这里展示了一种不同的变化。
@@ -161,6 +258,42 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
   <img style="width:100%" alt="distributed_replicated mode"
    src="../images/perf_distributed_replicated_mode_doc.png">
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #### NCCL
 
