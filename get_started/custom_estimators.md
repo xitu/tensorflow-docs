@@ -1,7 +1,7 @@
 
-# 创建定制化 Estimators
+# 创建定制化 Estimator
 
-本文档介绍定制化 Estimators。特别是，本文档将演示如何创建定制化 @{tf.estimator.Estimator$Estimator} ，@{tf.estimator.DNNClassifier$`DNNClassifier`} 在解决虹膜问题的行为中，它可以模拟预制的 Estimator。有关虹膜问题的详细信息，请参阅 @{$get_started/premade_estimators$Pre-Made Estimators chapter} 。
+本文档介绍定制化 Estimator。特别是，本文档将演示如何创建定制化 @{tf.estimator.Estimator$Estimator} ，@{tf.estimator.DNNClassifier$`DNNClassifier`} 在解决虹膜问题的行为中，它可以模拟预制的 Estimator。有关虹膜问题的详细信息，请参阅 @{$get_started/premade_estimators$Pre-Made Estimators chapter} 。
 
 下载及访问示例代码，请调用以下两个命令：
 
@@ -22,7 +22,7 @@ python custom_estimator.py
 
 ## 预制 vs. 定制化
 
-如下图所示，预制 Estimators 是 @{tf.estimator.Estimator} 基类的子类，而定制化 Estimators 则是 tf.estimator.Estimator 的实例：
+如下图所示，预制 Estimator 是 @{tf.estimator.Estimator} 基类的子类，而定制化 Estimators 则是 tf.estimator.Estimator 的实例：
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="display:block; margin: 0 auto"
@@ -30,15 +30,15 @@ python custom_estimator.py
   src="https://www.tensorflow.org/images/custom_estimators/estimator_types.png">
 </div>
 <div style="text-align: center">
-预制和定制化 Estimators 都是 Estimators.
+预制和定制化 Estimator 都是 Estimator.
 </div>
 
-预制 Estimators 更加成熟。有时候您需要更多地控制 Estimator 的行为。这就是定制化 Estimator 出现的场景。您可以创建一个定制化 Estimator 来做任何事情。如果希望以某种不寻常的方式连接隐藏层，请编写定制化 Estimator。如果想要计算模型的唯一[度量](https://developers.google.com/machine-learning/glossary/#metric)，请编写定制化 Estimator。基本上，如果想要针对特定问题优化的 Estimator，请编写定制化 Estimator。
+预制 Estimator 更加成熟。有时候您需要更多地控制 Estimator 的行为。这就是定制化 Estimator 出现的场景。您可以创建一个定制化 Estimator 来做任何事情。如果希望以某种不寻常的方式连接隐藏层，请编写定制化 Estimator。如果想要计算模型的唯一[度量](https://developers.google.com/machine-learning/glossary/#metric)，请编写定制化 Estimator。基本上，如果想要针对特定问题优化的 Estimator，请编写定制化 Estimator。
 
 一个函数模型（或者 `model_fn`）实现了 ML 算法，使用预制和定制化 Estimator 的唯一区别是：
 
-* 预制 Estimators，已经有人为您编写了函数模型。 
-* 定制化 Estimators，您必须自己写函数模型。
+* 预制 Estimator，已经有人为您编写了函数模型。 
+* 定制化 Estimator，您必须自己写函数模型。
 
 您的函数模型可以实现范围更广的算法，定义各种隐藏层和度量。与输入函数一样，所有函数模型都必须接受一组标准的输入参数，并返回一组标准的输出值。就像输入函数可以利用数据集 API 一样，函数模型可以利用层 API 和 度量 API。
 
@@ -70,7 +70,7 @@ def train_input_fn(features, labels, batch_size):
     return dataset.make_one_shot_iterator().get_next()
 ```
 
-这个输入函数建立一个输入流水线，产生一批 `(features, labels)` 对，其中 `features`是字典特征。
+这个输入函数建立一个输入流水线，产生一批 `(features, labels)` 对，其中 `features` 是字典特征。
 
 ## 创建功能列
 
@@ -271,7 +271,7 @@ if mode == tf.estimator.ModeKeys.PREDICT:
 
 对于 [training](#train) 和 [evaluation](#evaluate) 我们都需要计算模型的损失。这是将要被优化的[目标](https://developers.google.com/machine-learning/glossary/#objective)。
 
-我们可以通过调用 @{tf.losses.sparse_softmax_cross_entropy} _来计算损失。该函数值返回值最低，大约是 0，正确类的概率 (在`label` 索引处) 接近 1.0。当正确类别的概率降低时，返回的损失值会逐渐增大。
+我们可以通过调用 @{tf.losses.sparse_softmax_cross_entropy} 来计算损失。该函数值返回值最低，大约是 0，正确类的概率 (在 `label` 索引处) 接近 1.0。当正确类别的概率降低时，返回的损失值会逐渐增大。
 
 此函数返回整个批处理的平均值。
 
@@ -315,7 +315,7 @@ if mode == tf.estimator.ModeKeys.EVAL:
 
 当调用 Estimator 的 `train` 方法时，使用 `mode = ModeKeys.TRAIN` 调用 `model_fn`。在这种情况下，模型函数必须返回包含损失和培训操作的 `EstimatorSpec` 。
 
-构建培训操作将需要一个优化器。我们将使用 @{tf.tra.AdagradOptimizer}，因为我们正在模`DNNClassifier`，默认情况下也使用 `Adagrad`。 `tf.train`  包提供了许多其他优化器--可以随意使用它们。
+构建训练操作将需要一个优化器。我们将使用 @{tf.tra.AdagradOptimizer}，因为我们正在模`DNNClassifier`，默认情况下也使用 `Adagrad`。 `tf.train`  包提供了许多其他优化器--可以随意使用它们。
 
 以下是构建优化器的代码：
 
@@ -442,7 +442,7 @@ TensorBoard 显示三个图形。
 
 ## 总结
 
-尽管预制 Estimators 是快速创建新模型的高效方式，通常您需要提供定制化 Estimators 额外的灵活性。幸运的是，预制和定制化遵循相同的编程模型。唯一的实际区别是您必须写一个模型用于自定义 Estimators 的函数，其他的所有内容都是相同的。 
+尽管预制 Estimator 是快速创建新模型的高效方式，通常您需要提供定制化 Estimator 额外的灵活性。幸运的是，预制和定制化遵循相同的编程模型。唯一的实际区别是您必须写一个模型用于自定义 Estimators 的函数，其他的所有内容都是相同的。 
 
 了解更多细节，请务必查看：
 
