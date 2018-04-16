@@ -4,9 +4,6 @@
 [脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)
 说明了如何构建能应对多种系统类型及网络拓扑的高可用模型。本文的技术利用了一些 TensorFlow Python 的底层组件。其中的大部分技术将来将被整合进高层次的 API 里。
 
-
-
-
 ## 输入管道
 
 @{$performance_guide$Performance Guide} 解释了如何识别可能的输入管道问题和最佳实践。我们发现像类似采用 [AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 训练 ImageNet 这种使用大量输入并每秒处理大量采样的场景下，采用 @{tf.FIFOQueue} 和 @{tf.train.queue_runner} 不能充分利用目前的 GPU 计算资源。
@@ -15,38 +12,17 @@
 我们在
 [脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks) 中采用的另一种方式是采用 TensorFlow 原生的并行机制来构建的输入管道。我们的实现由3个阶段构成：
 
-*   I/O 读取： 从硬盘选择并读取图像。
-*   图像处理： 将图像记录解码成图像，预处理并组织成 mini-batch 。
-*   CPU-to-GPU 数据转移：将图像从 CPU 转移到 GPU。
+*   I/O 读取： 从硬盘选择并读取图像。
+*   图像处理： 将图像记录解码成图像，预处理并组织成 mini-batch 。
+*   CPU-to-GPU 数据转移：将图像从 CPU 转移到 GPU。
 
 每个阶段的关键步骤可以采用 `data_flow_ops.StagingArea` 和其他阶段并行执行。 `StagingArea` 是类似于 @{tf.FIFOQueue} 的队列操作。不同之处在于 `StagingArea` 不保证先进先出的顺序，但提供了能在 CPU 和 GPU 上并行执行其他阶段的简单功能。将输入管道拆分为能并行执行的3个阶段是可扩展的，能充分发挥大量多核环境的优势。本章节后续将详细阐述这三个阶段以及使用 `data_flow_ops.StagingArea` 的细节。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### 并行 I/O 读取
 
 `data_flow_ops.RecordInput` 用于处理并行从磁盘读取。对于包含 TFRecords 记录的一系列输入文件，`RecordInput` 将持续使用后台进程去读取记录。这些记录将被放入它自身的内部空间；当载入超过它一半能力的数据量后，它将产生输出张量。
 
 这个操作有它自己的由 I/O 时间控制且消耗最少 CPU 的内部进程，这使它能平缓地与模型的其他部分并行执行。
-
-
-
-
-
-
 
 ### 并行镜像处理
 
@@ -58,21 +34,6 @@
 
 当所有输入张量完成后，输出张量被传递给图。这样有效地降低了生成所有输入张量带来的长尾内存延时。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### CPU 到 GPU 数据转移的并行处理
 
 继续假设目标是采用 256 位的 8 个 CPU（每个 CPU 32 位）。一旦输入图片被 CPU 被处理和连接完成，我们将得到 8 个 32 位的张量。
@@ -80,15 +41,6 @@
 TensorFlow 允许一个设备上的张量被任意其他设备直接使用。TensorFlow 使用隐式副本来使得张量能被任一设备使用。在张量被正式使用前，由运行时来安排在不同设备间完成复制。然而，如果复制不同及时完成，需要那些张量的计算会被暂停从而造成性能下降。
 
 在这个实现中， `data_flow_ops.StagingArea` 被用来显式定义并行执行复制操作。最终的结果是，在 GPU 开始执行计算任务时，所有的张量已经就绪。
-
-
-
-
-
-
-
-
-
 
 ### 软件管道
 
@@ -112,41 +64,20 @@ TensorFlow 允许一个设备上的张量被任意其他设备直接使用。Ten
 
 这种方案的好处是：
 
-*   所有阶段都不会被打断，因为每个区域都在热身之后都已经有一块数据
-*   每个阶段都能并行执行，因为他们可以马上开始执行
-*   运行时缓存是一个固定的额外内存开销。他们最多有一块额外的数据
-*   运行这个步骤的所有阶段只需要调用一次 `session.run()` ，这使得信息收集和调试更加简单
-
-
-
-
-
-
-
-
-
-
-
-
-
+*   所有阶段都不会被打断，因为每个区域都在热身之后都已经有一块数据
+*   每个阶段都能并行执行，因为他们可以马上开始执行
+*   运行时缓存是一个固定的额外内存开销。他们最多有一块额外的数据
+*   运行这个步骤的所有阶段只需要调用一次 `session.run()` ，这使得信息收集和调试更加简单
 
 ## 架构高性能模型的最佳实践
 
 下面这些额外的最佳时间能帮助提升性能和增强模型的灵活性。
-
 
 ### 同时采用 NHWC 和 NCHW 来构建模型
 
 大部分 CNN 采用的 TensorFlow 操作同时支持 NHWC 和 NCHW 数据格式。NCHW 在 GPU 上更快，而 NHWC 在 CPU 上有时候更快。
 
 架构同时支持这两种数据格式的模型能使得模型在不同的平台运行得更加灵活和高效。大部分 CNN 采用的 TensorFlow 操作同时支持 NHWC 和 NCHW 数据格式。基准脚本同时支持 NCHW 和 NHWC。 NCHW 在使用 GPU 来训练时应该被一直被采用。NHWC 在 CPU 上有时候更快。一个灵活的模型能在 GPU 上采用 NCHW 进行训练，同时利用在 CPU 上采用 NHWC 训练权重的结果。
-
-
-
-
-
-
-
 
 ### 采用混合标准化
 
@@ -158,41 +89,19 @@ bn = tf.contrib.layers.batch_norm(
           scope=scope)
 ```
 
-
-
-
-
 ## 可变分布和梯度聚合
 
 在训练时，采用聚合梯度和差值来更新训练变量值。在基准脚本中，我们展示了采用灵活通用的 TensorFlow 元件构建了不同范围的高性能分布和聚合规则。
 
 在这个脚本中包含了 3 个不同的分布和聚合方式：
 
-*   `parameter_server` 训练模型副本从一个参数服务器读取变量和更新变量。当
-    模型需要变量时，TensorFlow 运行时会复制它们并添加到使用环境。示例[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)
-    阐释了采用这种方法来做本地训练、分布式同步训练和分布式异步训练。
-*   `replicated` 在每个 GPU 上放置了每个训练变量的独立副本。因为变量已经就绪，前向和后向计算可以马上开始。梯度在所有 GPU 中累积，汇总结果会被应用到每一个 GPU 副本中来保持他们同步。
-*   `distributed_replicated` 在每个 GPU 上放置了每个训练变量的独立副本，同时在参数服务器上放置一个主副本。因为变量已经就绪，前向和后向计算可以马上开始。梯度在每个服务器的所有 GPU 中累积，然后按服务器汇总后的梯度会被应用到主副本上。在所有处理器完成之后，每个处理器会从主副本上更新一份副本到自己的环境。
+*   `parameter_server` 训练模型副本从一个参数服务器读取变量和更新变量。当
+    模型需要变量时，TensorFlow 运行时会复制它们并添加到使用环境。示例[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)
+    阐释了采用这种方法来做本地训练、分布式同步训练和分布式异步训练。
+*   `replicated` 在每个 GPU 上放置了每个训练变量的独立副本。因为变量已经就绪，前向和后向计算可以马上开始。梯度在所有 GPU 中累积，汇总结果会被应用到每一个 GPU 副本中来保持他们同步。
+*   `distributed_replicated` 在每个 GPU 上放置了每个训练变量的独立副本，同时在参数服务器上放置一个主副本。因为变量已经就绪，前向和后向计算可以马上开始。梯度在每个服务器的所有 GPU 中累积，然后按服务器汇总后的梯度会被应用到主副本上。在所有处理器完成之后，每个处理器会从主副本上更新一份副本到自己的环境。
 
 以下是每种方式的更多细节。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### 参数服务器变量
 
@@ -202,8 +111,8 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 
 有一些技术能优化吞吐量：
 
-*   按照变量大小来将变量分布在不同参数服务器上，来实现负载均衡。
-*   当每个处理器有多个 GPU 时，会将不同的 GPU 的梯度累积后统一发给参数服务器。这会减少网络带宽和参数服务器的工作量。
+*   按照变量大小来将变量分布在不同参数服务器上，来实现负载均衡。
+*   当每个处理器有多个 GPU 时，会将不同的 GPU 的梯度累积后统一发给参数服务器。这会减少网络带宽和参数服务器的工作量。
 
 对于不同处理器的协同来说，一个常用方式是异步更新，每个处理器只更新主副本而不与其他处理器同步。在我们的模型中，我们展示在不同处理器间引入同步是很容易的，所以所有处理器能在一个步骤中在下一步骤开始前完成。
 
@@ -226,16 +135,10 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 
 跨服务器的梯度聚合可以通过不同的方式完成：
 
-*   采用标准 TensorFlow 操作来聚合每个 CPU 或 GPU 设备上的总和，然后复制回所有 GPU。
-*   采用下面 NCCL 章节中介绍的 NVIDIA® NCCL 方法。
+*   采用标准 TensorFlow 操作来聚合每个 CPU 或 GPU 设备上的总和，然后复制回所有 GPU。
+*   采用下面 NCCL 章节中介绍的 NVIDIA® NCCL 方法。
 
 这种方式可以用过在脚本中传入参数 `--variable_update=replicated` 来使用。
-
-
-
-
-
-
 
 ### 分布式训练中的重复变量
 
@@ -259,42 +162,6 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
    src="../images/perf_distributed_replicated_mode_doc.png">
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #### NCCL
 
 为了在同一主机的不同 GPU 间传递变量和聚合梯度，我们采用了默认的 TensorFlow 隐式复制机制。
@@ -317,13 +184,13 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 
 #### 基本命令行参数
 
-*   **`model`**: 使用的模型，比如 `resnet50`, `inception3`, `vgg16`, 或
-    `alexnet`
-*   **`num_gpus`**: 使用的 GPU 数量。
-*   **`data_dir`**: 待处理数据的路径。如未设置，人造数据将被使用。请参照 [使用说明](https://github.com/tensorflow/models/tree/master/research/inception#getting-started) 来使用 ImageNet 数据。
-*   **`batch_size`**: 每个 CPU 的位大小。
-*   **`variable_update`**: 变量管理方法： `parameter_server`,`replicated`, `distributed_replicated`, `independent`
-*   **`local_parameter_device`**: 参数服务器的使用设备：`cpu` 或 `gpu`
+*   **`model`**: 使用的模型，比如 `resnet50`, `inception3`, `vgg16`, 或
+    `alexnet`
+*   **`num_gpus`**: 使用的 GPU 数量。
+*   **`data_dir`**: 待处理数据的路径。如未设置，人造数据将被使用。请参照 [使用说明](https://github.com/tensorflow/models/tree/master/research/inception#getting-started) 来使用 ImageNet 数据。
+*   **`batch_size`**: 每个 CPU 的位大小。
+*   **`variable_update`**: 变量管理方法： `parameter_server`,`replicated`, `distributed_replicated`, `independent`
+*   **`local_parameter_device`**: 参数服务器的使用设备：`cpu` 或 `gpu`
 
 #### 单一实例示例
 
@@ -349,10 +216,10 @@ python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 
 #### 分布式命令参数
 
-*   **`ps_hosts`**: 以逗号分隔的参数服务器主机列表，格式为 ```<host>:port```，比如 ```10.0.0.2:50000```。
-*   **`worker_hosts`**: 以逗号分隔的参数工作站主机列表，格式为 ```<host>:port```，比如 ```10.0.0.2:50001```。
-*   **`task_index`**: 开始主机在 `ps_hosts` 或 `worker_hosts` 列表中的索引。
-*   **`job_name`**: 任务类型，比如 `ps` 或 `worker`
+*   **`ps_hosts`**: 以逗号分隔的参数服务器主机列表，格式为 ```<host>:port```，比如 ```10.0.0.2:50000```。
+*   **`worker_hosts`**: 以逗号分隔的参数工作站主机列表，格式为 ```<host>:port```，比如 ```10.0.0.2:50001```。
+*   **`task_index`**: 开始主机在 `ps_hosts` 或 `worker_hosts` 列表中的索引。
+*   **`job_name`**: 任务类型，比如 `ps` 或 `worker`
 
 #### 分布式示例
 
