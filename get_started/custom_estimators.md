@@ -3,7 +3,7 @@
 
 本文档介绍定制化 Estimators。特别是，
 本文档将演示如何创建定制化 @{tf.estimator.Estimator$Estimator} ，
-@{tf.estimator.DNNClassifier$`DNNClassifier`} 在解决 Iris 问题的行为中，
+@{tf.estimator.DNNClassifier$`DNNClassifier`} 在解决虹膜问题的行为中，
 它可以模拟预制的 Estimator。
 有关虹膜问题的详细信息，请参阅 
 @{$get_started/premade_estimators$Pre-Made Estimators chapter} 。
@@ -68,7 +68,7 @@ python custom_estimator.py
 函数模型可以利用层 API 和 度量 API。
 
 让我们看看如何使用定制化 Estimator 解决 Iris 问题。 
-快速提醒 --  这是我们尝试模仿虹膜模型的组织结构：
+快速提醒 —— 这是我们尝试模仿虹膜模型的组织结构：
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="display:block; margin: 0 auto"
