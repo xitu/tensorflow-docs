@@ -2,41 +2,41 @@
 
 本文及相关
 [脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)
-说明了如何构建能应对多种系统类型及网络拓扑的高可用模型。本文的技术利用了一些 TensorFlow Python 的底层组件。其中的大部分技术将来将被整合进高层次的 API 里。
+详细说明了如何构建能应对多种系统类型及网络拓扑的高可扩展模型。本文的技术利用了一些 TensorFlow Python 的底层组件。未来，其中的大部分技术将被整合进高层次的 API 里。
 
 ## 输入管道
 
-@{$performance_guide$Performance Guide} 解释了如何识别可能的输入管道问题和最佳实践。我们发现像类似采用 [AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 训练 ImageNet 这种使用大量输入并每秒处理大量采样的场景下，采用 @{tf.FIFOQueue} 和 @{tf.train.queue_runner} 不能充分利用目前的 GPU 计算资源。
-这是因为底层实现采用的 Python 进程引入的额外开销太大导致的。
+@{$performance_guide$性能指南} 解释了如何识别可能的输入管道问题和最佳实践。我们发现像类似采用 [AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 训练 ImageNet 这种使用大量输入并每秒处理大量采样的场景下，采用 @{tf.FIFOQueue} 和 @{tf.train.queue_runner} 不能充分利用目前的 GPU 计算资源。
+这是因为底层实现采用的 Python 线程引入的额外开销太大导致的。
 
 我们在
 [脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks) 中采用的另一种方式是采用 TensorFlow 原生的并行机制来构建的输入管道。我们的实现由3个阶段构成：
 
 *   I/O 读取： 从硬盘选择并读取图像。
-*   图像处理： 将图像记录解码成图像，预处理并组织成 mini-batch 。
+*   图像处理： 将图像记录解码成图像，预处理并组织成 小批量（mini-batch）。
 *   CPU-to-GPU 数据转移：将图像从 CPU 转移到 GPU。
 
 每个阶段的关键步骤可以采用 `data_flow_ops.StagingArea` 和其他阶段并行执行。 `StagingArea` 是类似于 @{tf.FIFOQueue} 的队列操作。不同之处在于 `StagingArea` 不保证先进先出的顺序，但提供了能在 CPU 和 GPU 上并行执行其他阶段的简单功能。将输入管道拆分为能并行执行的3个阶段是可扩展的，能充分发挥大量多核环境的优势。本章节后续将详细阐述这三个阶段以及使用 `data_flow_ops.StagingArea` 的细节。
 
 ### 并行 I/O 读取
 
-`data_flow_ops.RecordInput` 用于处理并行从磁盘读取。对于包含 TFRecords 记录的一系列输入文件，`RecordInput` 将持续使用后台进程去读取记录。这些记录将被放入它自身的内部空间；当载入超过它一半能力的数据量后，它将产生输出张量。
+`data_flow_ops.RecordInput` 用于处理并行从磁盘读取。对于包含 TFRecords 记录的一系列输入文件，`RecordInput` 将持续使用后台线程去读取记录。这些记录将被放入它自身的内部池；当载入超过它一半容量的数据量后，它将产生输出张量。
 
-这个操作有它自己的由 I/O 时间控制且消耗最少 CPU 的内部进程，这使它能平缓地与模型的其他部分并行执行。
+这个操作有它自己的由 I/O 时间控制且消耗最少 CPU 的内部线程，这使它能平缓地与模型的其他部分并行执行。
 
-### 并行镜像处理
+### 并行图像处理
 
-从 `RecordInput` 读取图像后，它们被当做张量传递给图像处理管道。为了更容易解释图像处理管道，假设输入管道是面向 256 个批处理大小的 8 核GPU（每个 GPU 32个批处理大小）。
+从 `RecordInput` 读取图像后，它们被当做张量传递给图像处理管道。为了更容易解释图像处理管道，假设输入管道是面向 256 个批量大小的 8 个 GPU（每个 GPU 批量大小为32）。
 
-256 条记录被独立并行地读取和处理。它起始于图中 256 个独立的 `RecordInput` 读操作。每个读操作之后是独立并行执行的一系列相同的图像前置处理操作。图像前置处理操作包括对于图像的解码、变形、大小缩放等操作。
+256 条记录被独立并行地读取和处理。它起始于图中 256 个独立的 `RecordInput` 读操作。每个读操作之后是独立并行执行的一系列相同的图像前置处理操作。图像预处理操作包括对于图像的解码、变形、大小缩放等操作。
 
-经过预处理之后，图像被连结成 8 个张量，每个张量有 32 位。完成这一操作使用的是 @{tf.parallel_stack} ，不使用 @{tf.concat} 则是因为它被实现成了单一操作需要等待所有输入就绪才能完成连接。@{tf.parallel_stack} 分配了一个未初始化的张量作为输出， 每个输入张量就绪时就写入到输出张量的置顶部分。
+经过预处理之后，图像被连结成 8 个批量大小为 32 的张量。完成这一操作使用的是 @{tf.parallel_stack} ，不使用 @{tf.concat} 则是因为它被实现成了单一操作需要等待所有输入就绪才能完成连接。@{tf.parallel_stack} 分配了一个未初始化的张量作为输出， 每个输入张量就绪时就写入到输出张量的指定部分。
 
-当所有输入张量完成后，输出张量被传递给图。这样有效地降低了生成所有输入张量带来的长尾内存延时。
+当所有输入张量完成后，输出张量在图中传递。这样有效地降低了生成所有输入张量带来的长尾内存延时。
 
 ### CPU 到 GPU 数据转移的并行处理
 
-继续假设目标是采用 256 位的 8 个 CPU（每个 CPU 32 位）。一旦输入图片被 CPU 被处理和连接完成，我们将得到 8 个 32 位的张量。
+继续假设目标是采用 8个CPU，批量大小为256（每个 CPU 批量大小为32）。一旦输入图片被 CPU 被处理和连接完成，我们将得到 8 个张量，每个批量大小 32 。
 
 TensorFlow 允许一个设备上的张量被任意其他设备直接使用。TensorFlow 使用隐式副本来使得张量能被任一设备使用。在张量被正式使用前，由运行时来安排在不同设备间完成复制。然而，如果复制不同及时完成，需要那些张量的计算会被暂停从而造成性能下降。
 
@@ -60,16 +60,16 @@ TensorFlow 允许一个设备上的张量被任意其他设备直接使用。Ten
 步骤 5: A4  B3  C2
 ```
 
-在初始化之后，S1 和 S2 拥有了一段收。在真正执行的每个步骤中，每个区域将消耗一段数据，然后又会有新的一段数据加入其中。
+在初始化之后，S1 和 S2 拥有了一组数据。在真正执行的每个步骤中，每个暂存区域将消耗一段数据，然后又会有新的一段数据加入其中。
 
 这种方案的好处是：
 
-*   所有阶段都不会被打断，因为每个区域都在热身之后都已经有一块数据
+*   所有阶段都不会被打断，因为每个区域都在预热之后都已经有一块数据
 *   每个阶段都能并行执行，因为他们可以马上开始执行
 *   运行时缓存是一个固定的额外内存开销。他们最多有一块额外的数据
 *   运行这个步骤的所有阶段只需要调用一次 `session.run()` ，这使得信息收集和调试更加简单
 
-## 架构高性能模型的最佳实践
+## 构建高性能模型的最佳实践
 
 下面这些额外的最佳时间能帮助提升性能和增强模型的灵活性。
 
@@ -169,7 +169,7 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 然而，我们也可以采用可选的 NCCL (@{tf.contrib.nccl}) 支持。NCCL
 是一个能在不同 GPU 间高效传播和聚合数据的 NVIDIA® 库。它在每个 GPU 中安排一个协作内核来知道如何最好利用底层的硬件拓扑。这个内核使用了 GPU 的一个单一的 SM 。
 
-在我们的实验中，我们展示了虽然 NCCL 经常自身能带来更快的数据聚合，它并不能带来更快的训练效果。我们假设隐式复制是无成本的，既然他们由 GPU 的复制引擎完成，并且它的延时能被主计算过程隐藏。虽然 NCCL 能更快地传输数据，它只使用了一个 SM，并且给依赖的 L2 缓存带来了更大的压力。我们的结果显示对于 8 核 GPU 来说，NCCL 经常能带来更好的性能。然而，对于更少的 GPU 来说，隐式复制反而表现更加出色。
+在我们的实验中，我们展示了虽然 NCCL 经常自身能带来更快的数据聚合，它并不能带来更快的训练效果。我们假设隐式复制是无成本的，既然他们由 GPU 的复制引擎完成，并且它的延时能被主计算过程隐藏。虽然 NCCL 能更快地传输数据，它只使用了一个 SM，并且给依赖的 L2 缓存带来了更大的压力。我们的结果显示对于 8 个 GPU 来说，NCCL 经常能带来更好的性能。然而，对于更少的 GPU 来说，隐式复制反而表现更加出色。
 
 #### 状态变量
 
@@ -195,20 +195,20 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 #### 单一实例示例
 
 ```bash
-# VGG16 使用 8 核 GPU 来训练 ImageNet，参数针对 Google 计算引擎进行了优化
+# VGG16 使用 8 个 GPU 来训练 ImageNet，参数针对 Google 计算引擎进行了优化
 python tf_cnn_benchmarks.py --local_parameter_device=cpu --num_gpus=8 \
 --batch_size=32 --model=vgg16 --data_dir=/home/ubuntu/imagenet/train \
 --variable_update=parameter_server --nodistortions
 
-# VGG16 使用 8 核 GPU 来训练合成 ImageNet 数据，参数针对 NVIDIA DGX-1 进行了优化
+# VGG16 使用 8 个 GPU 来训练合成 ImageNet 数据，参数针对 NVIDIA DGX-1 进行了优化
 python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 --batch_size=64 --model=vgg16 --variable_update=replicated --use_nccl=True
 
-# VGG16 使用 8 核 GPU 来训练合成 ImageNet 数据，参数针对 Amazon EC2 进行了优化
+# VGG16 使用 8 个 GPU 来训练合成 ImageNet 数据，参数针对 Amazon EC2 进行了优化
 python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 --batch_size=64 --model=vgg16 --variable_update=parameter_server
 
-# ResNet-50 使用 8 核 GPU 来训练 ImageNet，参数针对 Amazon EC2 进行了优化
+# ResNet-50 使用 8 个 GPU 来训练 ImageNet，参数针对 Amazon EC2 进行了优化
 python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 --batch_size=64 --model=resnet50 --variable_update=replicated --use_nccl=False
 
