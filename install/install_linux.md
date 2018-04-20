@@ -12,7 +12,6 @@ This guide explains how to install TensorFlow on Ubuntu. Although these instruct
   * **仅有 CPU 支持的 TensorFlow**。 如果你的系统中没有 NVIDIA® GPU，你必须安装这个版本。 需要注意的是，这个版本的 TensorFlow 通常要更易于安装（往往仅需 5 至 10 分钟），所以即使你有 英伟达（NVIDIA）的 GPU 显卡，我们仍然推荐你首先尝试安装这一版本。  
   * **含有 GPU 支持的 TensorFlow**。 TensorFlow 在 GPU上的运行速度要远大于相同程序在 CPU 上的运行速度。因此，如果你的系统中有符合以下要求的 NVIDIA® GPU 显卡，并且你的应用对性能有着严格的要求，你应该安装这一版本。
 
-
 <a name="英伟达要求标准"></a>
 ### NVIDIA 对于使用 GPU 运行 TensorFlow 的要求
 
@@ -52,7 +51,7 @@ This guide explains how to install TensorFlow on Ubuntu. Although these instruct
 ## 决定如何安装 TensorFlow
 你必须决定使用哪一种方法来安装 TensorFlow。有如下几种支持的方法：
 
-  * [Virtualenv](#InstallingVirtualenv)
+  * [Virtualenv](#InstallingVirtualenv)
   * ["native" pip](#InstallingNativePip)
   * [Docker](#InstallingDocker)
   * [Anaconda](#InstallingAnaconda)
@@ -120,10 +119,9 @@ Docker 完全地将 TensorFlow 的安装与其他之前安装于你机器上的�
      <code><em>tfBinaryURL</em></code> 
      [值](#the_url_of_the_tensorflow_python_package).  例如，如果你要在 Linux，Python 3.4，仅支持 CPU 的环境中安装 TensorFlow，在激活的 virtualenv 环境中运行如下命令：
      <pre>(tensorflow)$ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.4.0rc0-cp34-cp34m-linux_x86_64.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0rc1-cp34-cp34m-linux_x86_64.whl</b></pre>
 
-如果你遇见了安装问题，请见
-[常见安装问题](#common_installation_problems).
+如果你遇见了安装问题，请见：[常见安装问题](#common_installation_problems).
 
 
 ### 下一步
@@ -199,10 +197,9 @@ $ <b>sudo apt-get install python3-pip python3-dev</b> # for Python 3.n
      其中 <code><em>tfBinaryURL</em></code> 指明了 TensorFlow 的 Python 包的URL 路径。 <code><em>tfBinaryURL</em></code> 的值取决于操作系统，Python 版本和 GPU 支持。在[这里](#the_url_of_the_tensorflow_python_package)找到时候你的系统的
      <code><em>tfBinaryURL</em></code>值。  例如，如果你要在 Linux，Python 3.4，仅支持 CPU 的环境中安装 TensorFlow，在激活的 Virtualenv 环境中运行如下命令：
      <pre>(tensorflow)$ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.6.0-cp34-cp34m-linux_x86_64.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0rc1-cp34-cp34m-linux_x86_64.whl</b></pre>
 
-     如果该步骤失败了，见这里
-     [常见安装问题](#common_installation_problems).
+     如果该步骤失败了，见这里：[常见安装问题](#common_installation_problems).
 
 
 ### 下一步
@@ -231,7 +228,6 @@ $ <b>sudo pip3 uninstall tensorflow</b> # for Python 3.n
 
 剩下的部分解释了如何运行一个 Docker 容器。
 
-
 ### 仅 CPU 支持
 
 要运行一个仅支持 CPU 的 Docker 容器（即不带 GPU 支持），运行如下格式的命令：
@@ -249,10 +245,10 @@ $ docker run -it <i>-p hostPort:containerPort TensorFlowCPUImage</i>
     都设置为 <tt>8888</tt>.  如果你想在容器中运行 TensorBoard，加一个 `-p`，将<i>hostPort</i> 和 <i>containerPort</i>
     都设置为 6006.
   * <tt><i>TensorFlowCPUImage</i></tt> 是必需的。 它指定了 Docker。 选择声明其中的一个值：
-    * <tt>gcr.io/tensorflow/tensorflow</tt>， 这是 TensorFlow CPU 二进制镜像的值。
-    * <tt>gcr.io/tensorflow/tensorflow:latest-devel</tt>，这是最新的 TensorFlow CPU 二进制镜像加上源码，
-    * <tt>gcr.io/tensorflow/tensorflow:<i>version</i></tt>，是某一特定的版本（比如，1.1.0rc1）的 TensorFlow CPU 二进制镜像。
-    * <tt>gcr.io/tensorflow/tensorflow:<i>version</i>-devel</tt>，是某一特定的版本（比如，1.1.0rc1）的 TensorFlow CPU 二进制镜像加源码。
+    * <tt>tensorflow/tensorflow</tt>， 这是 TensorFlow CPU 二进制镜像的值。
+    * <tt>tensorflow/tensorflow:latest-devel</tt>，这是最新的 TensorFlow CPU 二进制镜像加上源码，
+    * <tt>tensorflow/tensorflow:<i>version</i></tt>，是某一特定的版本（比如，1.1.0rc1）的 TensorFlow CPU 二进制镜像。
+    * <tt>tensorflow/tensorflow:<i>version</i>-devel</tt>，是某一特定的版本（比如，1.1.0rc1）的 TensorFlow CPU 二进制镜像加源码。
 
     <tt>gcr.io</tt> 是 Google 容器注册（Google Container Registry）。注意一些 TensorFlow 的镜像也可以在
     [dockerhub](https://hub.docker.com/r/tensorflow/tensorflow/) 中找到.
@@ -260,13 +256,13 @@ $ docker run -it <i>-p hostPort:containerPort TensorFlowCPUImage</i>
 例如，如下命令在 Docker 容器中运行 TensorFlow CPU 二进制镜像，可以从 shell 命令行中运行 TensorFlow：
 
 <pre>
-$ <b>docker run -it gcr.io/tensorflow/tensorflow bash</b>
+$ <b>docker run -it tensorflow/tensorflow bash</b>
 </pre>
 
 如下命令也可以在 Docker 中运行最新的 TensorFlow CPU 二进制镜像。不同的是，在这个 Docker 镜像中，你可以在 Jupyter notebook 中运行 TensorFlow：
 
 <pre>
-$ <b>docker run -it -p 8888:8888 gcr.io/tensorflow/tensorflow</b>
+$ <b>docker run -it -p 8888:8888 tensorflow/tensorflow</b>
 </pre>
 
 Docker 将会在你第一次运行的时候下载 TensorFlow 二进制镜像。
@@ -285,27 +281,27 @@ $ <b>nvidia-docker run -it</b> <i>-p hostPort:containerPort TensorFlowGPUImage</
   * <tt><i>-p hostPort:containerPort</i></tt> 可选。如果你想要在 shell 命令行中运行 TensorFlow，忽略这个选项。如果你想要在 Jupyter notebooks 中运行这个程序，将
     <tt><i>hostPort</i></tt> 和 <code><em>containerPort</em></code> 都设置为 `8888`.
   * <i>TensorFlowGPUImage</i> 指定了 Docker 容器。 你必须声明其中一个值:
-    * <tt>gcr.io/tensorflow/tensorflow:latest-gpu</tt>， 是最新的 TensorFlow GPU 二进制镜像。
-    * <tt>gcr.io/tensorflow/tensorflow:latest-devel-gpu</tt>，是最新的 TensorFlow GPU 二进制镜像加源码。
-    * <tt>gcr.io/tensorflow/tensorflow:<i>version</i>-gpu</tt>，是特定的 TensorFlow GPU 二进制镜像版本（例如，0.12.1）。
-    * <tt>gcr.io/tensorflow/tensorflow:<i>version</i>-devel-gpu</tt>，是特定的 TensorFlow GPU 二进制镜像版本（例如，0.12.1）加源码。
+    * <tt>tensorflow/tensorflow:latest-gpu</tt>， 是最新的 TensorFlow GPU 二进制镜像。
+    * <tt>tensorflow/tensorflow:latest-devel-gpu</tt>，是最新的 TensorFlow GPU 二进制镜像加源码。
+    * <tt>tensorflow/tensorflow:<i>version</i>-gpu</tt>，是特定的 TensorFlow GPU 二进制镜像版本（例如，0.12.1）。
+    * <tt>tensorflow/tensorflow:<i>version</i>-devel-gpu</tt>，是特定的 TensorFlow GPU 二进制镜像版本（例如，0.12.1）加源码。
 
 我们推荐安装`最新`的版本。例如，下面的命令在 Docker 容器中运行了 TensorFlow GPU 二进制镜像，你可以在 shell 中运行 TensorFlow 程序：
 
 <pre>
-$ <b>nvidia-docker run -it gcr.io/tensorflow/tensorflow:latest-gpu bash</b>
+$ <b>nvidia-docker run -it tensorflow/tensorflow:latest-gpu bash</b>
 </pre>
 
 如下命令也在 Docker 容器中运行了最新的 TensorFlow GPU 二进制镜像。在这个 Docker 容器中，你可以在 Jupyter notebook 中运行程序：
 
 <pre>
-$ <b>nvidia-docker run -it -p 8888:8888 gcr.io/tensorflow/tensorflow:latest-gpu</b>
+$ <b>nvidia-docker run -it -p 8888:8888 tensorflow/tensorflow:latest-gpu</b>
 </pre>
 
 如下的命令可以安装一个较早的 TensorFlow 版本（0.12.1）：
 
 <pre>
-$ <b>nvidia-docker run -it -p 8888:8888 gcr.io/tensorflow/tensorflow:0.12.1-gpu</b>
+$ <b>nvidia-docker run -it -p 8888:8888 tensorflow/tensorflow:0.12.1-gpu</b>
 </pre>
 
 Docker 会在你第一次运行的时候下载 TensorFlow 二进制镜像。更多信息见
@@ -343,7 +339,7 @@ Docker 会在你第一次运行的时候下载 TensorFlow 二进制镜像。更�
 
      <pre>
      (tensorflow)$ <b>pip install --ignore-installed --upgrade \
-     https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.6.0-cp34-cp34m-linux_x86_64.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0rc1-cp34-cp34m-linux_x86_64.whl</b></pre>
 
 
 <a name="ValidateYourInstallation"></a>
@@ -363,7 +359,7 @@ Docker 会在你第一次运行的时候下载 TensorFlow 二进制镜像。更�
 如果你是通过 Docker 安装的，开启一个你可以使用 bush 的 Docker 容器，如：
 
 <pre>
-$ <b>docker run -it gcr.io/tensorflow/tensorflow bash</b>
+$ <b>docker run -it tensorflow/tensorflow bash</b>
 </pre>
 
 
@@ -492,13 +488,13 @@ print(sess.run(hello))
 仅支持 CPU:
 
 <pre>
-https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.6.0-cp27-none-linux_x86_64.whl
+https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0rc1-cp27-none-linux_x86_64.whl
 </pre>
 
 支持 GPU:
 
 <pre>
-https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.6.0-cp27-none-linux_x86_64.whl
+https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.7.0rc1-cp27-none-linux_x86_64.whl
 </pre>
 
 注意 GPU 支持需要符合[NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements)的软硬件要求。
@@ -509,13 +505,13 @@ https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.6.0-cp27-no
 仅支持 CPU：
 
 <pre>
-https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.6.0-cp34-cp34m-linux_x86_64.whl
+https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0rc1-cp34-cp34m-linux_x86_64.whl
 </pre>
 
 支持 GPU:
 
 <pre>
-https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.6.0-cp34-cp34m-linux_x86_64.whl
+https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.7.0rc1-cp34-cp34m-linux_x86_64.whl
 </pre>
 
 注意 GPU 支持需要符合[NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements)的软硬件要求。
@@ -526,13 +522,13 @@ https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.6.0-cp34-cp
 支持 CPU：
 
 <pre>
-https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.6.0-cp35-cp35m-linux_x86_64.whl
+https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0rc1-cp35-cp35m-linux_x86_64.whl
 </pre>
 
 GPU 支持：
 
 <pre>
-https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.6.0-cp35-cp35m-linux_x86_64.whl
+https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.7.0rc1-cp35-cp35m-linux_x86_64.whl
 </pre>
 
 
@@ -543,13 +539,13 @@ https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.6.0-cp35-cp
 仅支持 CPU：
 
 <pre>
-https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.6.0-cp36-cp36m-linux_x86_64.whl
+https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0rc1-cp36-cp36m-linux_x86_64.whl
 </pre>
 
 GPU 支持：
 
 <pre>
-https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.6.0-cp36-cp36m-linux_x86_64.whl
+https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.7.0rc1-cp36-cp36m-linux_x86_64.whl
 </pre>
 
 注意 GPU 支持需要符合[NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements)的软硬件要求。
@@ -559,7 +555,7 @@ https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.6.0-cp36-cp
 
 除非你遇到了与 protobuf pip package 相关的问题，否则你可以直接跳过该部分。
 
-**注意：**如果你的 TensorFlow 程序运行速度很慢，你可能有一个和 protobuf pip package 相关的问题。
+**注意：** 如果你的 TensorFlow 程序运行速度很慢，你可能有一个和 protobuf pip package 相关的问题。
 
 TensorFlow pip 包依赖于 3.1 版本的 protobuf pip package。从 PyPI 下载的 protobuf pip package （使用
 <tt>pip install protobuf</tt> 命令） 是一个含有序列化、反序列化实现的纯 Python 库，可能比 C++ 的实现慢 **10 到 50 倍**。Protobuf 同时也支持针对 Python 包的一个二进制扩展，基于快速的 C++ 解析。这个扩展在纯 Python 的标准 pip 包中是没有的。我们已经创建了一个自定义的二进制 pip 包给含有二进制扩展的 protobuf。要安装自定义的二进制 protobuf pip package, 执行如下的命令
