@@ -116,7 +116,7 @@ with tf.device("/device:GPU:0"):
   result = tf.matmul(weights, img)
 ```
 
-如果你要在 @{$deploy/distributed$typical distributed configuration} 中部署 TensorFlow，你可以通过指定 job 名称和 task ID 来实现将变量部署在参数服务器的 job（"/job:ps"）的 task 中，并将其他操作部署在工作机的 job（"/job/worker"）的 task 中：
+如果你要在 @{$deploy/distributed$typical distributed configuration} 中部署 TensorFlow，你可以通过指定 job 名称和 task ID 来实现将变量部署在参数服务器的 job（`"/job:ps"`）的 task 中，并将其他操作部署在工作机的 job（`"/job/worker"`）的 task 中：
 
 ```python
 with tf.device("/job:ps/task:0"):
@@ -191,13 +191,13 @@ with tf.Session("grpc://example.org:2222"):
 
 * **`config`.** 这个参数允许你指定一个控制会话行为的 @{tf.ConfigProto}。例如一些配置选项：
 
-  * `allow_soft_placement`. 将其设置为 `True` 以启用“软”设备分配算法，该算法将忽略 @{tf.device} 注解中尝试将仅在 CPU 上运行的操作分配到 GPU 的算法，直接将操作分配到 CPU 上。
+  * `allow_soft_placement`. 将其设置为 `True` 以启用“软”设备分配算法，该算法将忽略 @{tf.device} 注解中尝试将仅在 CPU 上运行的操作分配到 GPU 的算法，直接将操作分配到 CPU 上。
 
-  * `cluster_def` 使用分布式 TensorFlow 时，此选项能够指定在计算中使用的机器，并提供作业名称、任务索引和网络地址之间的映射关系。有关详细信息，请参阅 @{tf.train.ClusterSpec.as_cluster_def}。
+  * `cluster_def` 使用分布式 TensorFlow 时，此选项能够指定在计算中使用的机器，并提供作业名称、任务索引和网络地址之间的映射关系。有关详细信息，请参阅 @{tf.train.ClusterSpec.as_cluster_def}。
 
-  * `graph_options.optimizer_options` 提供对 TensorFlow 在执行流图前对其优化的控制。
+  * `graph_options.optimizer_options` 提供对 TensorFlow 在执行流图前对其优化的控制。
 
-  * `gpu_options.allow_growth` 将其设置为 `True` 来更改 GPU 内存分配器，以便逐渐增加分配的内存量，而不是在启动时分配大部分内存。
+  * `gpu_options.allow_growth` 将其设置为 `True` 来更改 GPU 内存分配器，以便逐渐增加分配的内存量，而不是在启动时分配大部分内存。
 
 
 ### 使用 @{tf.Session.run} 执行操作
