@@ -5,7 +5,13 @@ Tensorflow 做的一些计算是复杂和混乱，就像训练深度神经网络
 ![](https://camo.githubusercontent.com/f0f03739a6b2a0e312f929759fab857856b7cf0c/68747470733a2f2f7777772e74656e736f72666c6f772e6f72672f696d616765732f6d6e6973745f74656e736f72626f6172642e706e67)
 
 
-本教程的目的是让你掌握 TensorBoard 的简单用法。另外，你可以在 [TensorBoard's GitHub](https://github.com/tensorflow/tensorboard) 上找到 TensorBoard 详细用法，技巧和调试信息。
+[需要翻译]This 30-minute tutorial is intended to get you started with simple TensorBoard usage. It assumes a basic understanding of TensorFlow.
+
+There are other resources available as well! The [TensorBoard GitHub](https://github.com/tensorflow/tensorboard) has a lot more information on using individual dashboards within TensorBoard including tips & tricks and debugging information.
+
+## Setup
+
+[Install TensorFlow](https://www.tensorflow.org/install/). Installing TensorFlow via pip should also automatically install TensorBoard.
 
 ##数据序列化
 
