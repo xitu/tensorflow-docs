@@ -1,7 +1,7 @@
 # 安装 TensorFlow
 
 我们已经在以下便携式与桌面级 64 位操作系统中对 TensorFlow 进行了编译与测试：
-  * MacOS X 10.11 (El Capitan) 及以上版本
+  * macOS 10.12.6 (Sierra) 及以上版本
   * Ubuntu 16.04 及以上版本
   * Windows 7 及以上版本
 虽然您可能需要在其它便携式或桌面级系统中安装 TensorFlow，但我们仅会为上述配置环境提供支持（以及仅修复上述平台中的 issue）。
