@@ -4,6 +4,8 @@ TensorFlow 调试器（**tfdbg**）是 TensorFlow 的专用调试器。 它允�
 
 > 注意：TensorFlow 调试器使用基于 [curses](https://en.wikipedia.org/wiki/Curses_\(programming_library\) 的文本用户界面。在 Mac OS X，`ncurses` 库是必须的并可以使用 `brew install homebrew/dupes/ncurses` 命令安装。在 Windows 上，`ncurses` 不能完美支持。所以通过 pip 安装 `pyreadline` 来使用一个基于 [readline](https://en.wikipedia.org/wiki/GNU_Readline) 能够使用 tfdbg 的交互界面。如果你使用 Anaconda3，可以使用 `"C:\Program Files\Anaconda3\Scripts\pip.exe" install pyreadline` 这样的命令行。[这里](https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses)可以下载非官方的 Windows curses 安装包，但是不管怎样， curses 在 Windows 环境下没有在 Linux 或 Mac 运行稳定。
 
+> [需要翻译]NOTE: This guide focuses on the command-line interface (CLI) of tfdbg. For guide on how to use the graphical user interface (GUI) of tfdbg, i.e., the **TensorBoard Debugger Plugin**, please visit [its README](https://github.com/tensorflow/tensorboard/blob/master/tensorboard/plugins/debugger/README.md).
+
 本教程演示了如何使用 tfdbg 命令行界面（CLI）来调试 [`nan`s](https://en.wikipedia.org/wiki/NaN) 和 [`inf`s](https://en.wikipedia.org/wiki/Infinity) 错误，这是 TensorFlow 模型开发中经常遇到的错误类型。 以下示例适用于使用 TensorFlow 的底层 [`Session`](https://www.tensorflow.org/api_docs/python/tf/Session) API 的用户。 本文档的后续部分描述了如何在更高层次的 API（即 `tf-learn` 中的 `Estimator` 和 `Experiment`）中来使用 tfdbg。要**观察**这个问题，请运行以下命令而不使用调试器（源代码可以在[这里](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/debug/examples/debug_mnist.py)可找到）
 
 ```none
@@ -591,3 +593,7 @@ sess.run(b)
 ```
 
 则不会发生常数折叠，tfdbg 应该是会显示转储的中间张量的。
+
+**Q**: Is there a GUI for tfdbg?[需要翻译]
+
+**A**: Yes, the **TensorBoard Debugger Plugin** is the GUI of tfdbg. It offers features such as inspection of the computation graph, real-time visualization of tensor values, continuation to tensor and conditional breakpoints, and tying tensors to their graph-construction source code, all in the browser environment. To get started, please visit [its README](https://github.com/tensorflow/tensorboard/blob/master/tensorboard/plugins/debugger/README.md).
