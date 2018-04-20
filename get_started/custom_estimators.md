@@ -158,7 +158,7 @@ classifier = tf.estimator.Estimator(
 ```
 
 *  `units`  参数定义了给定层中输出神经元的数量。
-*  `activation` 参数定义[激活函数](https://developers.google.com/machine-learning/glossary/#a) — 在本例中为 [Relu](https://developers.google.com/machine-learning/glossary/#ReLU)。
+*  `activation` 参数定义[激活函数](https://developers.google.com/machine-learning/glossary/#activation_function) — 在本例中为 [Relu](https://developers.google.com/machine-learning/glossary/#ReLU)。
 
 这里的变量 `net` 表示网络中当前的顶层。第一次迭代时，`net` 表示输入层。在每次迭代循环中，`tf.layers.dense` 创建一个新层，它使用 `net` 将上一层的输出作为输入。
 
