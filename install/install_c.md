@@ -7,7 +7,7 @@ TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/
 本指南解释了如何安装 TensorFlow C 语言版。尽管本指南也可能适用于其它的安装环境，但我们仅测试（也仅确保）了本指南在以下环境机器中的适用性：
 
  * Linux, 64-bit, x86
- * Mac OS X, Version 10.11 (El Capitan) 或更高版本
+ * macOS X, Version 10.12.6 (Sierra) 或更高版本
 
 ## 安装
 
@@ -24,7 +24,7 @@ TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/
          OS="linux" # Change to "darwin" for macOS
          TARGET_DIRECTORY="/usr/local"
          curl -L \
-           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.6.0.tar.gz" |
+           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.7.0-rc1.tar.gz" |
            sudo tar -C $TARGET_DIRECTORY -xz
 
 `tar` 命令会将 TensorFlow C 语言库解压到 `TARGET_DIRECTORY` 的子目录 `lib` 中。例如，指定 `/usr/local` 作为 `TARGET_DIRECTORY`，那么 `tar` 就会将 TensorFlow C 语言库解压到 `/usr/local/lib` 中。
