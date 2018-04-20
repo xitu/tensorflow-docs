@@ -226,8 +226,6 @@ $ <b>pip3 uninstall tensorflow</b> </pre>
     * <code>tensorflow/tensorflow:latest-devel</code>: TensorFlow
       二进制镜像和源代码。
 
-<code>gcr.io</code> 是谷歌容器仓库。注意，TensorFlow 镜像同样在 [dockerhub](https://hub.docker.com/r/tensorflow/tensorflow/) 上可用。
-
 例如，下面的命令从 TensorFlow CPU 镜像启动了一个 Docker 容器，从而你可以在这个命令行里执行 TensorFlow 程序：
 
 <pre>$ <b>docker run -it tensorflow/tensorflow bash</b></pre>
