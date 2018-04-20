@@ -145,14 +145,7 @@ TensorFlow 支持多个 GPUs 和 CPUs。查看 how-to 文档（
 
 #### 为什么使用一个读取器或者队列的时候 `Session.run()` 会挂起？
 
-@{tf.ReaderBase} 和 @{tf.QueueBase} 类提供了一些可以 
-*阻塞* 进程直到输入可用（或者有界队列释放出空间）
-的特殊操作。这些操作可以让你建立复杂的 
-@{$reading_data$input pipelines}，当然了，这样做的代价
-就是 TensorFlow 的计算也会变的复杂。看看 how-to 文档吧：
-@{$reading_data#creating-threads-to-prefetch-using-queuerunner-objects$using 
-`QueueRunner` objects to drive queues and readers}，
-它会告诉你如何使用它们。
+@{tf.ReaderBase} 和 @{tf.QueueBase} 类提供了一些可以 **阻塞** 进程直到输入可用（或者有界队列释放出空间）的特殊操作。这些操作可以让你建立复杂的 @{$reading_data$input pipelines}，当然了，这样做的代价就是 TensorFlow 的计算也会变的复杂。看看 how-to 文档吧：@{$reading_data#creating-threads-to-prefetch-using-queuerunner-objects$using`QueueRunner` objects to drive queues and readers}，它会告诉你如何使用它们。
 
 ## 变量
 
