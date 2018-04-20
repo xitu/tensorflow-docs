@@ -2,7 +2,9 @@
 
 This guide explains how to install TensorFlow on macOS. Although these instructions might also work on other macOS variants, we have only tested (and we only support) these instructions on machines meeting the following requirements:
 
-  * macOS X 10.11 (El Capitan) or higher
+  * macOS 10.12.6 (Sierra) 或更高
+
+注意: There are known, accuracy-affecting numerical issues before macOS 10.12.6 (Sierra) that are described in [GitHub#15933](https://github.com/tensorflow/tensorflow/issues/15933#issuecomment-366331383).
 
 注意：从 v1.2 开始，TensorFlow 不再为 macOS 提供 GPU 支持。
 
@@ -87,7 +89,7 @@ Docker 容器包含 TensorFlow 及其所有依赖项。
      例如，如果你要在安装了 Python 2.7 的 macOS 上安装 TensorFlow，那么可以执行下面的命令：
 
      <pre> $ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.6.0-py3-none-any.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.7.0rc1-py3-none-any.whl</b></pre>
 
 如果你遇到了任何安装问题，请查看
 [常见安装问题](#common-installation-problems).
@@ -183,7 +185,7 @@ $ <b>sudo easy_install --upgrade six</b> </pre>
      例如，如果你要在安装了 Python 2.7 的 macOS 上安装 TensorFlow，那么可以执行下面的命令：
 
      <pre> $ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.6.0-py3-none-any.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.7.0rc1-py3-none-any.whl</b></pre>
 
 ### 下一步
 
@@ -220,20 +222,20 @@ $ <b>pip3 uninstall tensorflow</b> </pre>
     如果你想要运行包含 TensorBoard 的容器，增加第二个 `-p` 参数来指定宿主端口和容器端口为 6006。
 
   * <i>TensorFlowImage</i> 是必须的。它指定了你的 Docker 容器。你必须指定下面其中一个值：
-    * <code>gcr.io/tensorflow/tensorflow</code>: TensorFlow 二进制镜像。
-    * <code>gcr.io/tensorflow/tensorflow:latest-devel</code>: TensorFlow
+    * <code>tensorflow/tensorflow</code>: TensorFlow 二进制镜像。
+    * <code>tensorflow/tensorflow:latest-devel</code>: TensorFlow
       二进制镜像和源代码。
 
 <code>gcr.io</code> 是谷歌容器仓库。注意，TensorFlow 镜像同样在 [dockerhub](https://hub.docker.com/r/tensorflow/tensorflow/) 上可用。
 
 例如，下面的命令从 TensorFlow CPU 镜像启动了一个 Docker 容器，从而你可以在这个命令行里执行 TensorFlow 程序：
 
-<pre>$ <b>docker run -it gcr.io/tensorflow/tensorflow bash</b></pre>
+<pre>$ <b>docker run -it tensorflow/tensorflow bash</b></pre>
 
 下面的命令同样是从一个 TensorFlow CPU 的镜像启动的容器。然而在这个容器中，你还可以在 Jupyter notebook 里
 运行 TensorFlow 程序：
 
-<pre>$ <b>docker run -it -p 8888:8888 gcr.io/tensorflow/tensorflow</b></pre>
+<pre>$ <b>docker run -it -p 8888:8888 tensorflow/tensorflow</b></pre>
 
 Docker 会在第一次启动容器时下载对应的镜像。
 
@@ -266,7 +268,7 @@ Docker 会在第一次启动容器时下载对应的镜像。
      其中 <i>TF_PYTHON_URL</i>  是 [TensorFlow Python 包的 URL](#the_url_of_the_tensorflow_python_package)。例如，如下命令安装了仅支持 CPU 的 Python 2.7 版本下的 TensorFlow：
 
      <pre> (<i>targetDirectory</i>)$ <b>pip install --ignore-installed --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.6.0-py2-none-any.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.7.0rc1-py2-none-any.whl</b></pre>
 
 
 <a name="ValidateYourInstallation"></a>
@@ -288,7 +290,7 @@ Docker 会在第一次启动容器时下载对应的镜像。
 
 如果你使用 Docker 进行安装，启动一个运行 bash 的 Docker 容器，例如：
 
-<pre>$ <b>docker run -it gcr.io/tensorflow/tensorflow bash</b></pre>
+<pre>$ <b>docker run -it tensorflow/tensorflow bash</b></pre>
 
 
 
@@ -429,14 +431,14 @@ RuntimeError: Broken toolchain: cannot link a simple C program</pre>
 
 
 <pre>
-https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.6.0-py2-none-any.whl
+https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.7.0rc1-py2-none-any.whl
 </pre>
 
 ### Python 3.4、3.5 或 3.6
 
 
 <pre>
-https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.6.0-py3-none-any.whl
+https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.7.0rc1-py3-none-any.whl
 </pre>
 
 
