@@ -215,7 +215,7 @@ Pandas 是一个开源的 Python 库，被用于 TensorFlow 函数中。Pandas �
 
 **特征列** 可以看作是一个数据结构，为你的模型解释每一个特征的数据。在鸢尾花问题中，我们想让模型将每一特征按照字面浮点值解释。就是说，我们希望模型将 5.4 这样的输入值直接解析为，呃，5.4。而在某些机器学习问题中，我们喜欢将数据解析地不那么直接。特征列数据解释是一个很深的话题，我们在另一篇文档 @{$feature_columns$document} 中整篇描述。
 
-从代码中来看，通过调用 @{tf.feature_column} 模块函数创建了一个 `feature_column` 对象列表。每个对象描述了模型的一个输入。我们想要模型以浮点数值解释数据，可以调用 @{tf.feature_column.numeric_column) 函数。在 `premade_estimator.py`中，四列特征被直接解释为字面浮点数值，程序创建了特征列如下：
+从代码中来看，通过调用 @{tf.feature_column} 模块函数创建了一个 `feature_column` 对象列表。每个对象描述了模型的一个输入。我们想要模型以浮点数值解释数据，可以调用 @{tf.feature_column.numeric_column} 函数。在 `premade_estimator.py`中，四列特征被直接解释为字面浮点数值，程序创建了特征列如下：
 
 ```python
 # 为所有特征创建特征列
@@ -424,7 +424,9 @@ Test set accuracy: 0.967
 
 ```python
 predictions = classifier.predict(
-    input_fn=lambda:eval_input_fn(predict_x, batch_size=args.batch_size))
+    input_fn=lambda:eval_input_fn(predict_x,
+                              labels=None,
+                              batch_size=args.batch_size))
 ```
 
 同 `evaluate` 方法一样，`predict` 方法通过 `eval_input_fn` 收集样本。
@@ -461,7 +463,7 @@ for pred_dict, expec in zip(predictions, expected):
 
     class_id = pred_dict['class_ids'][0]
     probability = pred_dict['probabilities'][class_id]
-    print(template.format(SPECIES[class_id], 100 * probability, expec))
+    print(template.format(iris_data.SPECIES[class_id], 100 * probability, expec))
 ```
 
 程序输出如下：
