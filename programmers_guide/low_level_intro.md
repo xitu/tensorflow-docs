@@ -225,6 +225,22 @@ while True:
     break
 ```
 
+[需要翻译]If the `Dataset` depends on stateful operations you may need to initialize the iterator before using it, as shown below:
+
+``` python
+r = tf.random_normal([10,3])
+dataset = tf.data.Dataset.from_tensor_slices(r)
+iterator = dataset.make_initializable_iterator()
+next_row = iterator.get_next()
+
+sess.run(iterator.initializer)
+while True:
+  try:
+    print(sess.run(next_row))
+  except tf.errors.OutOfRangeError:
+    break
+```
+
 更多关于数据集和迭代器的内容请参考: @{$programmers_guide/datasets}。
 
 ## 网络层
