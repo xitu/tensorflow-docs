@@ -1,21 +1,16 @@
 # 保存和恢复
 
-本文介绍了如何保存、恢复
-@{$variables$variables} 和模型。
-
+[需要翻译]The @{tf.train.Saver} class provides methods to save and restore models. The @{tf.saved_model.simple_save} function is an easy way to build a @{tf.saved_model$saved model} suitable for serving. [Estimators](/programmers_guide/estimators) automatically save and restore variables in the `model_dir`.
 
 ## 保存和恢复变量
 
-TensorFlow 变量提供了表示程序所操作的共享、持续状态的最佳方式。（更多信息请查阅 @{$variables$Variables}。)
-该节阐述了如何保存和恢复变量。需注意 Estimators 会自动保存和恢复变量（在 `model_dir` 中）。
+[需要翻译]TensorFlow @{$variables} are the best way to represent shared, persistent state manipulated by your program. The `tf.train.Saver` constructor adds `save` and `restore` ops to the graph for all, or a specified list, of the variables in the graph. The `Saver` object provides methods to run these ops, specifying paths for the checkpoint files to write to or read from.
 
-`tf.train.Saver` 类提供了保存和恢复模型的方法。
-`tf.train.Saver` 构造器为计算图中所有或指定列表的变量添加 `save` 和 `restore` 操作（op, operation）。 该 `Saver` 对象提供了运行这些操作的方法，并指定了快照文件写入和读取的路径。
-
-保存程序可以恢复模型中已定义的所有变量。如果您在不知道如何构建计算图的情况下载入了一个模型（例如，您正编写一个载入模型的通用程序），那么请查阅本文后续章节[保存和恢复模型概述](#models)。
-
-TensorFlow 在二进制**快照文件**中保存变量，粗略地讲，就是将变量名映射到张量值。 
-
+`Saver` restores all variables already defined in your model. If you're loading a model without knowing how to build its graph (for example, if you're writing a generic program to load models), then read the [Overview of saving and restoring models](#models) section later in this document.
+ 
+TensorFlow saves variables in binary *checkpoint files* that map variable names to tensor values.
+ 
+Caution: TensorFlow model files are code. Be careful with untrusted code. See [Using TensorFlow Securely](https://github.com/tensorflow/tensorflow/blob/master/SECURITY.md) for details.
 
 ### 保存变量
 
@@ -70,9 +65,7 @@ with tf.Session() as sess:
   print("v2 : %s" % v2.eval())
 ```
 
-注意：
-
-*  这里没有一个叫做 "/tmp/model.ckpt" 的真实物理文件。它是为快照文件创建的文件名**前缀**。用户和前缀代替真实的快照文件进行交互。
+[需要翻译]Note: There is not a physical file called `/tmp/model.ckpt`. It is the **prefix** of filenames created for the checkpoint. Users only interact with the prefix instead of physical checkpoint files.
 
 ### 选择需要保存和恢复的变量
 
@@ -153,22 +146,31 @@ chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='v2', all_t
 
 
 <a name="models"></a>
-## 保存和恢复模型概览
+## 保存和恢复模型
 
-当您想要保存和加载变量、计算图和计算图元数据时--也就是说，当您想要保存和恢复模型时--推荐您使用 SavedModel。
-**SavedModel**  是一种独立于语言的，可恢复的，封闭的序列化格式。SavedModel 使更高级别的系统和工具能够生成、使用和转换 TensorFlow 模型。TensorFlow 提供了几种与 SavedModel 交互的途径，包括 tf.saved_model API, Estimator API 以及 CLI。
+[需要翻译]Use `SavedModel` to save and load your model—variables, the graph, and the graph's metadata. This is a language-neutral, recoverable, hermetic serialization format that enables higher-level systems and tools to produce, consume, and transform TensorFlow models. TensorFlow provides several ways to interact with `SavedModel`, including the @{tf.saved_model} APIs, @{tf.estimator.Estimator}, and a command-line interface.
 
+## 创建并加载一个 SavedModel
 
-## 用于创建和加载 SavedModel 的 API
+### Simple save[需要翻译]
 
-本节主要介绍用于创建和加载 SavedModel 的 API， 尤其是在低级 TensorFlow API 中的应用。
+The easiest way to create a `SavedModel` is to use the @{tf.saved_model.simple_save} function:
 
+```python
+simple_save(session,
+            export_dir,
+            inputs={"x": x, "y": y},
+            outputs={"z": z})
+```
 
-### 创建 SavedModel
+This configures the `SavedModel` so it can be loaded by [TensorFlow serving](/serving/serving_basic) and supports the [Predict API](https://github.com/tensorflow/serving/blob/master/tensorflow_serving/apis/predict.proto). To access the classify, regress, or multi-inference APIs, use the manual `SavedModel` builder APIs or an @{tf.estimator.Estimator}.
 
-我们提供了 SavedModel 的一个 Python 实现
-@{tf.saved_model.builder$builder}。
-`SavedModelBuilder` 类提供了保存多个 `MetaGraphDef` 的功能。 **MetaGraph** 是一个数据流图，和与其相关的变量、资源和签名。**MetaGraphDef** 是 **MetaGraph** 的 Protocol Buffer 形式。**签名**( Signature )是计算图输入和输出的集合。
+### Manually build a SavedModel
+
+If your use case isn't covered by @{tf.saved_model.simple_save}, use the manual
+@{tf.saved_model.builder$builder APIs} to create a `SavedModel`.
+
+The @{tf.saved_model.builder.SavedModelBuilder} class provides functionality to save multiple `MetaGraphDef`s.  A **MetaGraph** is a dataflow graph, plus its associated variables, assets, and signatures.  A **`MetaGraphDef`** is the protocol buffer representation of a MetaGraph.  A **signature** is the set of inputs to and outputs from a graph.
 
 如果需要将资源保存、写入或拷贝到磁盘，那么可以在添加第一个 `MetaGraphDef` 时提供这些资源。如果多个 `MetaGraphDef` 与同名资源相关联，则仅保留第一个版本。
 
@@ -194,7 +196,6 @@ with tf.Session(graph=tf.Graph()) as sess:
 ...
 builder.save()
 ```
-
 
 ### 在 Python 中加载 SavedModel
 
@@ -502,15 +503,15 @@ $ saved_model_cli show --dir /tmp/saved_model_dir --tag_set serve,gpu
 $ saved_model_cli show --dir \
 /tmp/saved_model_dir --tag_set serve --signature_def serving_default
 The given SavedModel SignatureDef contains the following input(s):
-inputs['x'] tensor_info:
-    dtype: DT_FLOAT
-    shape: (-1, 1)
-    name: x:0
+  inputs['x'] tensor_info:
+      dtype: DT_FLOAT
+      shape: (-1, 1)
+      name: x:0
 The given SavedModel SignatureDef contains the following output(s):
-outputs['y'] tensor_info:
-    dtype: DT_FLOAT
-    shape: (-1, 1)
-    name: y:0
+  outputs['y'] tensor_info:
+      dtype: DT_FLOAT
+      shape: (-1, 1)
+      name: y:0
 Method name is: tensorflow/serving/predict
 ```
 
@@ -521,32 +522,32 @@ $ saved_model_cli show --dir /tmp/saved_model_dir --all
 MetaGraphDef with tag-set: 'serve' contains the following SignatureDefs:
 
 signature_def['classify_x2_to_y3']:
-The given SavedModel SignatureDef contains the following input(s):
-inputs['inputs'] tensor_info:
-    dtype: DT_FLOAT
-    shape: (-1, 1)
-    name: x2
-The given SavedModel SignatureDef contains the following output(s):
-outputs['scores'] tensor_info:
-    dtype: DT_FLOAT
-    shape: (-1, 1)
-    name: y3:0
-Method name is: tensorflow/serving/classify
+  The given SavedModel SignatureDef contains the following input(s):
+    inputs['inputs'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 1)
+        name: x2
+  The given SavedModel SignatureDef contains the following output(s):
+    outputs['scores'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 1)
+        name: y3:0
+  Method name is: tensorflow/serving/classify
 
 ...
 
 signature_def['serving_default']:
-The given SavedModel SignatureDef contains the following input(s):
-inputs['x'] tensor_info:
-    dtype: DT_FLOAT
-    shape: (-1, 1)
-    name: x:0
-The given SavedModel SignatureDef contains the following output(s):
-outputs['y'] tensor_info:
-    dtype: DT_FLOAT
-    shape: (-1, 1)
-    name: y:0
-Method name is: tensorflow/serving/predict
+  The given SavedModel SignatureDef contains the following input(s):
+    inputs['x'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 1)
+        name: x:0
+  The given SavedModel SignatureDef contains the following output(s):
+    outputs['y'] tensor_info:
+        dtype: DT_FLOAT
+        shape: (-1, 1)
+        name: y:0
+  Method name is: tensorflow/serving/predict
 ```
 
 
