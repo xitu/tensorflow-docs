@@ -23,15 +23,15 @@ def train_input_fn(features, labels, batch_size):
     # 混排、重复、批处理样本。
     dataset = dataset.shuffle(1000).repeat().batch(batch_size)
 
-    # 建立迭代器，返回管道的读取结束点。
-    return dataset.make_one_shot_iterator().get_next()
+    # 返回数据集
+    return dataset
 ```
 
 下面我们来对这个函数做更仔细的分析。
 
 ### 参数
 
-这个函数一共需要三个参数。如果一个参数的期望类型是 “array” （数组），那么它将可以接受几乎所有可以用 `numpy.array` 来转化为数组的值。只有一个例外：[`tuple`](https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences)，它对 `Datasets` 有特殊的含义。
+这个函数一共需要三个参数。如果一个参数的期望类型是 “array” （数组），那么它将可以接受几乎所有可以用 `numpy.array` 来转化为数组的值。我们可以看到只有一个例外：[`tuple`](https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences)，它对 `Datasets` 有特殊的含义。
 
 * `features`：一个形如 `{'feature_name':array}` 的数据字典（或者是 [`DataFrame`](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html)），它包含了原始的输入特征。
 * `labels`：一个包含每个样本的 [label](https://developers.google.com/machine-learning/glossary/#label) 的数组。
@@ -59,7 +59,7 @@ iris_data.train_input_fn(features, labels, batch_size)
 
 ### （数组）片段
 
-在最简单的例子中，@{tf.data.Dataset.from_tensor_slices} 函数接受数组作为参数，并返回一个表示数组片段的 @{tf.data.Dataset}。例如，一个包含 @{$tutorials/layers$mnist training data} 的数组的格式为 `(60000, 28, 28)`。将这个数组作为参数传入 `from_tensor_slices` 将会返回一个包含了 60000 个切片，每个切片为一个 28x28 图像的 `Dataset` 对象。
+[需要翻译]The function starts by using the @{tf.data.Dataset.from_tensor_slices} function to create a @{tf.data.Dataset} representing slices of the array. The array is sliced across the first dimension. For example, an array containing the @{$tutorials/layers$mnist training data} has a shape of `(60000, 28, 28)`. Passing this to `from_tensor_slices` returns a `Dataset` object containing 60000 slices, each one a 28x28 image.
 
 返回这个 `Dataset` 的代码如下所示：
 
@@ -71,13 +71,15 @@ mnist_ds = tf.data.Dataset.from_tensor_slices(mnist_x)
 print(mnist_ds)
 ```
 
-这段代码将打印出下面这行内容，并展现出数据集内元素的 @{$programmers_guide/tensors#shapes$shapes} 和 @{$programmers_guide/tensors#data_types$types}。注意，`Dataset` 并不知道它自己包含多少个元素。
+[需要翻译]This will print the following line, showing the @{$programmers_guide/tensors#shapes$shapes} and @{$programmers_guide/tensors#data_types$types} of the items in the dataset. Note that a `Dataset` does not know how many items it contains.
 
 ``` None
 <TensorSliceDataset shapes: (28,28), types: tf.uint8>
 ```
 
-上文的 `Dataset` 代表了一个简单的数组集合，但是数据集比这要强大的多。数据集能够透明地处理任何字典或元组的嵌套组合。例如，确保 `features` 是一个标准字典后，你可以用如下方式将数组字典转化为字典 `Dataset`：
+The `Dataset` above represents a simple collection of arrays, but datasets are much more powerful than this. A `Dataset` can transparently handle any nested combination of dictionaries or tuples (or [`namedtuple`](https://docs.python.org/2/library/collections.html#collections.namedtuple)).
+
+For example after converting the iris `features` to a standard python dictionary, you can then convert the dictionary of arrays to a `Dataset` of dictionaries as follows:
 
 ``` python
 dataset = tf.data.Dataset.from_tensor_slices(dict(features))
@@ -98,7 +100,7 @@ print(dataset)
 
 这里我们可以发现，当 `Dataset` 包含了结构化的元素时，`Dataset` 的 `shapes` 和 `types` 就会采用相同结构。这个数据集包含了 @{$programmers_guide/tensors#rank$scalars} 字典，并且都是 `tf.float64` 类型。
 
-`train_input_fn` 的第一行代码使用了相同的功能，但是增加了一层结构。它创建了一个包含 `(features_dict, label)` 数据对的数据集。
+[需要翻译]The first line of the iris `train_input_fn` uses the same functionality，但是增加了一层结构。它创建了一个包含 `(features_dict, label)` 数据对的数据集。
 
 以下代码表明，标签是类型为 `int64` 的标量：
 
@@ -131,7 +133,7 @@ print(dataset)
 dataset = dataset.shuffle(1000).repeat().batch(batch_size)
 ```
 
-@{tf.data.Dataset.shuffle$`shuffle`} 方法使用了一个大小固定的缓冲区，当元素通过的时候，会被打乱顺序。在这种情况下，`buffer_size` 就会比 `Dataset` 中的样本数大很多，保证了所有数据能被充分地打乱。Iris 数据集仅包含了 150 个样本。
+[需要翻译]The @{tf.data.Dataset.shuffle$`shuffle`} method uses a fixed-size buffer to shuffle the items as they pass through. In this case the `buffer_size` is greater than the number of examples in the `Dataset`, ensuring that the data is completely shuffled (The Iris data set only contains 150 examples).
 
 @{tf.data.Dataset.repeat$`repeat`} 方法在 `Dataset` 结束的时将它重启。如果要限制重复的次数，设置 `count` 参数。
 
@@ -171,30 +173,13 @@ print(dataset)
 
 ### 返回
 
-<!-- TODO(markdaoust) This line can be simplified to "return dataset" -->
+[需要翻译]At this point the `Dataset` contains `(features_dict, labels)` pairs. This is the format expected by the `train` and `evaluate` methods, so the `input_fn` returns the dataset.
 
-每一个 Estimator 的 `train`, `evaluate`, 和 `predict` 方法都需要输入函数返回一个包含 @{$programmers_guide/tensors$tensorflow tensors} 的 `(features, label)` 数据对。`train_input_fn` 使用下面一行代码将数据集转化为希望的格式：
+The `labels` can/should be omitted when using the `predict` method.
 
-```python
-# 建立迭代器，返回管道的读取结束点。
-features_result, labels_result = dataset.make_one_shot_iterator().get_next()
-```
-
-结果是 @{$programmers_guide/tensors$TensorFlow tensors} 结构的，匹配 `Dataset` 中的项目的布局。
-查看 @{$programmers_guide/low_level_intro} 可以获取到这些对象是什么以及他们是如何工作的介绍。
-
-``` python
-print((features_result, labels_result))
-```
-
-```None
-({
-    'SepalLength': <tf.Tensor 'IteratorGetNext:2' shape=(?,) dtype=float64>,
-    'PetalWidth': <tf.Tensor 'IteratorGetNext:1' shape=(?,) dtype=float64>,
-    'PetalLength': <tf.Tensor 'IteratorGetNext:0' shape=(?,) dtype=float64>,
-    'SepalWidth': <tf.Tensor 'IteratorGetNext:3' shape=(?,) dtype=float64>},
-Tensor("IteratorGetNext_1:4", shape=(?,), dtype=int64))
-```
+<!--
+  TODO(markdaoust): link to `input_fn` doc when it exists
+-->
 
 ## 读取 CSV 文件
 
@@ -220,8 +205,6 @@ ds = tf.data.TextLineDataset(train_path).skip(1)
 ```
 
 ### 建立一个 csv 行解析器
-
-最终我们需要解析数据集中的每一行，来生成必要的 `(features, label)` 数据对。
 
 我们从建立一个可以解析一行的函数开始。
 
