@@ -122,7 +122,7 @@ classifier = tf.estimator.DNNClassifier(
 
 ## 恢复你的模型
 
-当第一次调用一个 Estimator 的 `train` 方法时，TensorFlow 会在 `model_dir` 目录中保存一个检查点。后续每调用一次 Estimator 的 `train` 、 `eval` 或 `predict` 方法，都会发生如下的行为：
+当第一次调用一个 Estimator 的 `train` 方法时，TensorFlow 会在 `model_dir` 目录中保存一个检查点。后续每调用一次 Estimator 的 `train` 、 `evaluate` 或 `predict` 方法，都会发生如下的行为：
 
 1.  这个 Estimator 会用过运行 `model_fn()` 函数来构建模型的[计算图](https://developers.google.com/machine-learning/glossary/#graph)。 (`model_fn()` 的细节参见 @{$custom_estimators$生成定制的 Estimator})
 2.  这个 Estimator 从最近的检查点中恢复出数据，用于初始化新模型的权重值。
