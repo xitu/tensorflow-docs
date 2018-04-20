@@ -4,7 +4,7 @@
 
 > [TensorFlow Docs](https://github.com/xitu/tensorflow-docs) 是由[掘金翻译计划](https://github.com/xitu/gold-miner)实时维护的 TensorFlow 官方文档中文版，维护者为全球各大公司开发人员和各著名高校研究者及学生。欢迎大家加入维护团队，欢迎提 Issue 和 PR，参与之前请阅读[文档维护说明](https://github.com/xitu/tensorflow-docs/wiki#%E6%96%87%E6%A1%A3%E7%BB%B4%E6%8A%A4%E8%A7%84%E8%8C%83)。
 >
-> - 译者团队正在向 [TensorFlow V1.7 官方中文文档](https://github.com/xitu/tensorflow-docs)更新
+> - 译者团队正在向 [TensorFlow V1.8 官方中文文档](https://github.com/xitu/tensorflow-docs)更新
 > - 推荐学习顺序等更多内容详见：[TensorFlow Docs WIKI](https://github.com/xitu/tensorflow-docs/wiki)
 > - 相关术语表：[TensorFlow 术语表](https://github.com/xitu/tensorflow-docs/wiki/TensorFlow-%E6%9C%AF%E8%AF%AD%E8%A1%A8)，[人工智能术语表](https://github.com/xitu/tensorflow-docs/wiki#%E6%9C%AF%E8%AF%AD%E8%A1%A8)
 > - 掘金翻译计划欢迎大家的加入，详见 👉 [加入我们](https://github.com/xitu/gold-miner)
