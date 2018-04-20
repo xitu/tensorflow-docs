@@ -181,7 +181,7 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 *   **`num_gpus`**: 使用的 GPU 数量。
 *   **`data_dir`**: 待处理数据的路径。如未设置，人造数据将被使用。请参照 [使用说明](https://github.com/tensorflow/models/tree/master/research/inception#getting-started) 来使用 ImageNet 数据。
 *   **`batch_size`**: 每个 CPU 的位大小。
-*   **`variable_update`**: 变量管理方法： `parameter_server`,`replicated`, `distributed_replicated`, `independent`
+*   **`variable_update`**: 变量管理方法：`parameter_server`,`replicated`, `distributed_replicated`, `independent`
 *   **`local_parameter_device`**: 参数服务器的使用设备：`cpu` 或 `gpu`
 
 #### 单一实例示例
