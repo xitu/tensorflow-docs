@@ -1,9 +1,6 @@
 # 通过源码安装 TensorFlow
 
-本文将解释如何将 TensorFlow 源代码编译为二进制文件，并通过它安装 TensorFlow。
-需要注意的是，我们已经为 Ubuntu、macOS 和 Windows 用户提供过测试良好、预构建好的二进制 Tensorflow 文件，
-除此之外还提供 TensorFlow 的 [docker 镜像](https://hub.docker.com/r/tensorflow/tensorflow/)。
-所以，除非你能熟练通过源码构建复杂程序包，并且可以解决一些在文档中没有提到的不可预测的情况，建议不要自己尝试构建二进制 TensorFlow 代码。
+本文将解释如何将 TensorFlow 源代码编译为二进制文件，并通过它安装 TensorFlow。需要注意的是，我们已经为 Ubuntu、macOS 和 Windows 用户提供过测试良好、预构建好的二进制 Tensorflow 文件，除此之外还提供 TensorFlow 的 [docker 镜像](https://hub.docker.com/r/tensorflow/tensorflow/)。所以，除非你能熟练通过源码构建复杂程序包，并且可以解决一些在文档中没有提到的不可预测的情况，建议不要自己尝试构建二进制 TensorFlow 代码。
 
 如果上一段话没有吓退你，那么欢迎你。这份指南将解释如何在 64-bit 的台式机和笔记本电脑上构建 TensorFlow，支持的操作系统如下：
 
@@ -176,7 +173,7 @@ Note: These are just the minimum requirements to _build_ tensorflow. Installing 
   * 更新 CUDA 到 8.0
   * 下载 Xcode 7.2 并执行以下命令，设置其作为默认的编辑器:
 
-    <pre> $ <b>sudo xcode-select -s /Application/Xcode-7.2/Xcode.app</b></pre>
+    <pre> $ <b>sudo xcode-select -s /Applications/Xcode-7.2/Xcode.app</b></pre>
 
 **注意:** 你的系统需要满足 NVIDIA 软件的需求，具体参考以下文档：
 
@@ -190,7 +187,7 @@ Note: These are just the minimum requirements to _build_ tensorflow. Installing 
 
 在文件夹根目录里有一个命名为 <code>configure</code> 的 bash 脚本。
 这个脚本会要求你定义与 TensorFlow 相关依赖路径以及指定其他相关的配置选项，例如编译器标记。
-你必须在创建 pip 包以及安装 TensorFlow *之前*运行这个脚本。
+你必须在创建 pip 包以及安装 TensorFlow **之前**运行这个脚本。
 
 如果你希望构建的 TensorFlow 支持 GPU，`configure` 将会要求你指明安装在系统上的 Cuda 以及 cuDNN 的版本，
 指明需要安装的版本替代默认选项。
@@ -269,29 +266,24 @@ $ <b>bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package</
 <pre>$ <b>bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_package</b> </pre>
 
 **注意需要在 gcc 5 或者更高版本上：** 
-这个二进制 pip 包适用在用 gcc 4 构建的 TensorFlow 网站，这个二进制包使用的是老的 ABI（应用程序二进制接口），为了能兼容旧的 ABI，你需要在 `bazel build`命令后添加 `--cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0"`。
-ABI 兼容性允许针对 TensorFlow pip 包进行自定义操作，从而使你构建的包能继续运行。
+这个二进制 pip 包适用在用 gcc 4 构建的 TensorFlow 网站，这个二进制包使用的是老的 ABI（应用程序二进制接口），为了能兼容旧的 ABI，你需要在 `bazel build`命令后添加 `--cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0"`。ABI 兼容性允许针对 TensorFlow pip 包进行自定义操作，从而使你构建的包能继续运行。
 
 
-<b>提示:</b> 
-通常情况下，源代码构建 TensorFlow 会占用大量内存，如果你的系统内存紧张，
-可以在调用`bazel`时指明 <code>--local_resources 2048,.5,1.0</code> 限制使用内存范围
+<b>提示：</b> 
+通常情况下，源代码构建 TensorFlow 会占用大量内存，如果你的系统内存紧张，可以在调用`bazel`时指明 <code>--local_resources 2048,.5,1.0</code> 限制使用内存范围
 
- <code>bazel build</code> 命令执行一个叫
- `build_pip_package`
- 的脚本，执行这个脚本将会在 `/tmp/tensorflow_pkg` 目录下构建一个 `.whl` 文件。
+ <code>bazel build</code> 命令执行一个叫 `build_pip_package` 的脚本，执行这个脚本将会在 `/tmp/tensorflow_pkg` 目录下构建一个 `.whl` 文件。
  
 <pre>
 $ <b>bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg</b>
 </pre>
 
-
 ## 安装 pip 包
 
-调用 `pip install` 安装 pip 包。`.whl` 的文件名与你的平台有关，例如下面的命令将会在 Linux 上安装 TensorFlow 1.6.0。
+调用 `pip install` 安装 pip 包。`.whl` 的文件名与你的平台有关，例如下面的命令将会在 Linux 上安装 TensorFlow 1.7.0rc1。
 
 <pre>
-$ <b>sudo pip install /tmp/tensorflow_pkg/tensorflow-1.6.0-py2-none-any.whl</b>
+$ <b>sudo pip install /tmp/tensorflow_pkg/tensorflow-1.7.0rc1-py2-none-any.whl</b>
 </pre>
 
 ## 验证安装是否成功 
@@ -300,8 +292,8 @@ $ <b>sudo pip install /tmp/tensorflow_pkg/tensorflow-1.6.0-py2-none-any.whl</b>
 
 启动终端。
 
-通过 `cd` 改变当前所在目录，在任意文件夹下（除之前调用 `configure` 命令的 `tensorflow` 子目录）
-调用 python：
+通过 `cd` 改变当前所在目录，在任意文件夹下（除之前调用 `configure` 命令的 `tensorflow` 子目录）调用 python：
+
 <pre>$ <b>python</b></pre>
 
 在 python 交互式 shell 中输入以下代码：
@@ -318,8 +310,7 @@ print(sess.run(hello))
 
 <pre>Hello, TensorFlow!</pre>
 
-如果你是 TensorFlow 新手，可以参考 @{$get_started/get_started$Getting Started with
-TensorFlow}。
+如果你是 TensorFlow 新手，可以参考 @{$get_started/premade_estimators$Getting Started with TensorFlow}。
 
 如果系统输出错误信息, 参考 [常见安装问题](#common_installation_problems)。
 
@@ -332,10 +323,7 @@ TensorFlow}。
   * @{$install_windows#CommonInstallationProblems$Installing TensorFlow on Windows}
 
 
-除了这两个指南中记录的错误之外，下面的表中还记录了其他一些在构建 TensorFlow 时遇到的错误。 
-请注意，我们在 Stack Overflow 回答关于构建和安装问题时遇到的问题。
-如果遇到前面的指南中以及下表未提及的错误消息，在 Stack Overflow 搜索。如果
-Stack Overflow 没有相关回答，在 Stack Overflow 上提一个新的问题并指定 `tensorflow` 标签。
+除了这两个指南中记录的错误之外，下面的表中还记录了其他一些在构建 TensorFlow 时遇到的错误。 请注意，我们在 Stack Overflow 回答关于构建和安装问题时遇到的问题。如果遇到前面的指南中以及下表未提及的错误消息，在 Stack Overflow 搜索。如果Stack Overflow 没有相关回答，在 Stack Overflow 上提一个新的问题并指定 `tensorflow` 标签。
 
 <table>
 <tr> <th>Stack Overflow 链接</th> <th> 错误信息 </th> </tr>
@@ -377,9 +365,12 @@ Stack Overflow 没有相关回答，在 Stack Overflow 上提一个新的问题�
 </table>
 
 ## 经过测试的源配置
+
 **Linux**
 <table>
 <tr><th>Version:</th><th>CPU/GPU:</th><th>Python Version:</th><th>Compiler:</th><th>Build Tools:</th><th>cuDNN:</th><th>CUDA:</th></tr>
+<tr><td>tensorflow-1.7.0rc1</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.10.0</td><td>N/A</td><td>N/A</td></tr>
+<tr><td>tensorflow_gpu-1.7.0rc1</td><td>GPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.9.0</td><td>7</td><td>9</td></tr>
 <tr><td>tensorflow-1.6.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.9.0</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow_gpu-1.6.0</td><td>GPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.9.0</td><td>7</td><td>9</td></tr>
 <tr><td>tensorflow-1.5.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.8.0</td><td>N/A</td><td>N/A</td></tr>
@@ -399,6 +390,7 @@ Stack Overflow 没有相关回答，在 Stack Overflow 上提一个新的问题�
 **Mac**
 <table>
 <tr><th>Version:</th><th>CPU/GPU:</th><th>Python Version:</th><th>Compiler:</th><th>Build Tools:</th><th>cuDNN:</th><th>CUDA:</th></tr>
+<tr><td>tensorflow-1.7.0rc1</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.10.1</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow-1.6.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.8.1</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow-1.5.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.8.1</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow-1.4.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.5.4</td><td>N/A</td><td>N/A</td></tr>
@@ -413,6 +405,8 @@ Stack Overflow 没有相关回答，在 Stack Overflow 上提一个新的问题�
 **Windows**
 <table>
 <tr><th>Version:</th><th>CPU/GPU:</th><th>Python Version:</th><th>Compiler:</th><th>Build Tools:</th><th>cuDNN:</th><th>CUDA:</th></tr>
+<tr><td>tensorflow-1.7.0rc1</td><td>CPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>N/A</td><td>N/A</td></tr>
+<tr><td>tensorflow_gpu-1.7.0rc1</td><td>GPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>7</td><td>9</td></tr>
 <tr><td>tensorflow-1.6.0</td><td>CPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow_gpu-1.6.0</td><td>GPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>7</td><td>9</td></tr>
 <tr><td>tensorflow-1.5.0</td><td>CPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>N/A</td><td>N/A</td></tr>
