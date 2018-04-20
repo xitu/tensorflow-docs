@@ -15,6 +15,9 @@
 * @{$programmers_guide/graphs}，解释了：
   * 数据流图，将计算表示为操作间的依赖关系的 TensorFlow 中的表现方式。
   * 会话，用于跨一个或多个本地或远程设备运行数据流图的 TensorFlow 中的机制。如果你是使用 TensorFlow 底层 API 编程，这一单元是必不可少的。如果你是使用 TensorFlow 顶层 API（比如 Estimators or Keras）编程，顶层 API 会创建和管理流图和会话，但是理解流图和会话仍然有益于你。
+
+## Accelerators
+
 * @{$programmers_guide/saved_model}，解释了如何保存和恢复变量和模型。
 * @{$using_gpu} 解释了 TensorFlow 如何将操作分配分配给各个设备和如何手动改变编排。
 
