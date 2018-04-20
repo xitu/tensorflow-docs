@@ -1,16 +1,12 @@
 # 高性能模型
 
-本文及相关
-[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)
-详细说明了如何构建能应对多种系统类型及网络拓扑的高可扩展模型。本文的技术利用了一些 TensorFlow Python 的底层组件。未来，其中的大部分技术将被整合进高层次的 API 里。
+本文及相关[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)详细说明了如何构建能应对多种系统类型及网络拓扑的高可扩展模型。本文的技术利用了一些 TensorFlow Python 的底层组件。未来，其中的大部分技术将被整合进高层次的 API 里。
 
 ## 输入管道
 
-@{$performance_guide$性能指南} 解释了如何识别可能的输入管道问题和最佳实践。我们发现像类似采用 [AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 训练 ImageNet 这种使用大量输入并每秒处理大量采样的场景下，采用 @{tf.FIFOQueue} 和 @{tf.train.queue_runner} 不能充分利用目前的 GPU 计算资源。
-这是因为底层实现采用的 Python 线程引入的额外开销太大导致的。
+@{$performance_guide$性能指南} 解释了如何识别可能的输入管道问题和最佳实践。我们发现像类似采用 [AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 训练 ImageNet 这种使用大量输入并每秒处理大量采样的场景下，采用 @{tf.FIFOQueue} 和 @{tf.train.queue_runner} 不能充分利用目前的 GPU 计算资源。这是因为底层实现采用的 Python 线程引入的额外开销太大导致的。
 
-我们在
-[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks) 中采用的另一种方式是采用 TensorFlow 原生的并行机制来构建的输入管道。我们的实现由3个阶段构成：
+我们在[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)中采用的另一种方式是采用 TensorFlow 原生的并行机制来构建的输入管道。我们的实现由3个阶段构成：
 
 *   I/O 读取： 从硬盘选择并读取图像。
 *   图像处理： 将图像记录解码成图像，预处理并组织成 小批量（mini-batch）。
@@ -44,8 +40,7 @@ TensorFlow 允许一个设备上的张量被任意其他设备直接使用。Ten
 
 ### 软件管道
 
-因为所有的阶段能被不同的处理器执行，`data_flow_ops.StagingArea` 是其中用于并行执行，是类似 @{tf.FIFOQueue} 一样的队列操作，提供了能被 CPU 和 GPU 执行的简单函数。
-在模型开始跑所有阶段之前，输入管道阶段被启动来将数据加载到运行时缓存中。每一个运行步骤在每个阶段开始前将从运行时缓存读取一段数据，并在最后写入一段数据
+因为所有的阶段能被不同的处理器执行，`data_flow_ops.StagingArea` 是其中用于并行执行，是类似 @{tf.FIFOQueue} 一样的队列操作，提供了能被 CPU 和 GPU 执行的简单函数。在模型开始跑所有阶段之前，输入管道阶段被启动来将数据加载到运行时缓存中。每一个运行步骤在每个阶段开始前将从运行时缓存读取一段数据，并在最后写入一段数据
 
 比如，有 A、B、C 三个阶段。有两个运行区域： S1 和 S2。在启动时，我们运行：
 
@@ -95,9 +90,7 @@ bn = tf.contrib.layers.batch_norm(
 
 在这个脚本中包含了 3 个不同的分布和聚合方式：
 
-*   `parameter_server` 训练模型副本从一个参数服务器读取变量和更新变量。当
-    模型需要变量时，TensorFlow 运行时会复制它们并添加到使用环境。示例[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)
-    阐释了采用这种方法来做本地训练、分布式同步训练和分布式异步训练。
+*   `parameter_server` 训练模型副本从一个参数服务器读取变量和更新变量。当模型需要变量时，TensorFlow 运行时会复制它们并添加到使用环境。示例[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)阐释了采用这种方法来做本地训练、分布式同步训练和分布式异步训练。
 *   `replicated` 在每个 GPU 上放置了每个训练变量的独立副本。因为变量已经就绪，前向和后向计算可以马上开始。梯度在所有 GPU 中累积，汇总结果会被应用到每一个 GPU 副本中来保持他们同步。
 *   `distributed_replicated` 在每个 GPU 上放置了每个训练变量的独立副本，同时在参数服务器上放置一个主副本。因为变量已经就绪，前向和后向计算可以马上开始。梯度在每个服务器的所有 GPU 中累积，然后按服务器汇总后的梯度会被应用到主副本上。在所有处理器完成之后，每个处理器会从主副本上更新一份副本到自己的环境。
 
@@ -166,8 +159,7 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 
 为了在同一主机的不同 GPU 间传递变量和聚合梯度，我们采用了默认的 TensorFlow 隐式复制机制。
 
-然而，我们也可以采用可选的 NCCL (@{tf.contrib.nccl}) 支持。NCCL
-是一个能在不同 GPU 间高效传播和聚合数据的 NVIDIA® 库。它在每个 GPU 中安排一个协作内核来知道如何最好利用底层的硬件拓扑。这个内核使用了 GPU 的一个单一的 SM 。
+然而，我们也可以采用可选的 NCCL (@{tf.contrib.nccl}) 支持。NCCL 是一个能在不同 GPU 间高效传播和聚合数据的 NVIDIA® 库。它在每个 GPU 中安排一个协作内核来知道如何最好利用底层的硬件拓扑。这个内核使用了 GPU 的一个单一的 SM 。
 
 在我们的实验中，我们展示了虽然 NCCL 经常自身能带来更快的数据聚合，它并不能带来更快的训练效果。我们假设隐式复制是无成本的，既然他们由 GPU 的复制引擎完成，并且它的延时能被主计算过程隐藏。虽然 NCCL 能更快地传输数据，它只使用了一个 SM，并且给依赖的 L2 缓存带来了更大的压力。我们的结果显示对于 8 个 GPU 来说，NCCL 经常能带来更好的性能。然而，对于更少的 GPU 来说，隐式复制反而表现更加出色。
 
@@ -180,12 +172,12 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 ## 执行脚本
 
 这一部分将列出核心的命令行参数和主要脚本([tf_cnn_benchmarks.py](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks/tf_cnn_benchmarks.py))的一些基本用法示例。
+
 > 说明： `tf_cnn_benchmarks.py` 采用 TensorFlow 1.1 后引入的 `force_gpu_compatible` 配置。直到 TensorFlow 1.2 之后，才建议从源码进行编译。
 
 #### 基本命令行参数
 
-*   **`model`**: 使用的模型，比如 `resnet50`, `inception3`, `vgg16`, 或
-    `alexnet`
+*   **`model`**: 使用的模型，比如 `resnet50`, `inception3`, `vgg16`, 或 `alexnet`
 *   **`num_gpus`**: 使用的 GPU 数量。
 *   **`data_dir`**: 待处理数据的路径。如未设置，人造数据将被使用。请参照 [使用说明](https://github.com/tensorflow/models/tree/master/research/inception#getting-started) 来使用 ImageNet 数据。
 *   **`batch_size`**: 每个 CPU 的位大小。
@@ -211,7 +203,6 @@ python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 # ResNet-50 使用 8 个 GPU 来训练 ImageNet，参数针对 Amazon EC2 进行了优化
 python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 --batch_size=64 --model=resnet50 --variable_update=replicated --use_nccl=False
-
 ```
 
 #### 分布式命令参数
@@ -223,8 +214,7 @@ python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 
 #### 分布式示例
 
-以下是在 2 台主机上训练 ResNet-50的示例，主机分别为： host_0 (10.0.0.1) 和
-host_1 (10.0.0.2)。这个示例采用了人造数据。可以传入 `--data_dir` 参数来使用真实数据。
+以下是在 2 台主机上训练 ResNet-50的示例，主机分别为： host_0 (10.0.0.1) 和 host_1 (10.0.0.2)。这个示例采用了人造数据。可以传入 `--data_dir` 参数来使用真实数据。
 
 ```bash
 # 在 host_0 (10.0.0.1) 上运行以下命令:
