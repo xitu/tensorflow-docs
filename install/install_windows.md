@@ -13,6 +13,7 @@ This guide explains how to install TensorFlow on Windows. Although these instruc
 - **支持 GPU 的 TensorFlow。** 一般而言，TensorFlow 程序在 GPU 上的运行速度要明显高于在 CPU 上的。因此，如果您的系统含符合以下先决条件的 NVIDIA ® GPU，且需要运行性能关键型应用程序，那么您最终需要安装此版本的 TensorFlow。
 
 ### 运行支持 GPU 版本 TensorFlow 的要求
+
 若使用本指南中介绍的任一方式来安装支持 GPU 的 TensorFlow，那么您必须在系统中安装如下 NVIDIA 软件：
 
 - CUDA® Toolkit 9.0。详细说明请查看[ NVIDIA 官方文档](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/)。请确保您已按照 NVIDIA 官方文档描述将相关的 Cuda 路径名称添加到 %PATH% 环境变量中。
@@ -23,6 +24,7 @@ This guide explains how to install TensorFlow on Windows. Although these instruc
 如果您使用的版本与上述要求不一致，请更新为规定的版本。特别说明的是，cuDNN 的版本必须与要求的一致：如果无法找到 cuDNN64_7.dll，那么 TensorFlow 将无法加载。如果您想使用其他版本的 cuDNN，您需要从源代码开始重新编译。
 
 ## 选择安装 TensorFlow 的方式
+
 您需要选择安装 TensorFlow 的方式。当前的可选方式如下：
 - 原生的 pip 
 - 使用 Anaconda
@@ -34,11 +36,14 @@ This guide explains how to install TensorFlow on Windows. Although these instruc
 **注意：** conda 包是由社区提供的，而不是官方。也就是说，TensorFlow 团队并不会测试也不会维护 conda 包。使用 conda 包需要您自己承担风险。
 
 ## 使用原生pip安装
+
 如果您的机器上没有安装以下版本的Python，请立刻安装：
+
 - [Python 3.5.x 64-bit from python.org](https://www.python.org/downloads/release/python-352/)
 - [Python 3.6.x 64-bit from python.org](https://www.python.org/downloads/release/python-362/)
 
 在 Windows 上，TensorFlow 支持 Python3.5.x 版本和 Python 3.6.x 版本。需要注意的是， Python 3 使用的是 pip3 包管理， 这也是您用来安装 TensorFlow 的程序。
+
 打开一个终端，开始安装 TensorFlow。然后在终端上运行正确的 pip3 安装命令。 安装仅支持 CPU 版本的 TensorFlow，请输入下面的命令：
 `C:\> pip3 install --upgrade tensorflow`
 
@@ -46,34 +51,49 @@ This guide explains how to install TensorFlow on Windows. Although these instruc
 `C:\> pip3 install --upgrade tensorflow-gpu`
 
 ## 使用 Anaconda 进行安装
+
 **Anaconda 的安装包是由社区提供，非官方提供的。**
+
 在 Anaconda 的环境下，按照以下步骤进行 TensorFlow 的安装：
+
 1.根据网页 [Anaconda 下载站点]（https://www.anaconda.com/download/）说明下载并安装 Anaconda。 
 2.请通过使用以下命令来创建一个名为 tensorflow 的 conda 环境：
+
 `C:\> conda create -n tensorflow pip python=3.5`
+
 3.通过输入以下命令来激活一个 conda 环境：
+
 `C:\> activate tensorflow`
 `(tensorflow)C:\>  # Your prompt should change `
+
 4.在 conda 环境里输入正确的命令来安装 TensorFlow。 安装仅支持 CPU 版本的 TensorFlow，请输入下面的命令：
+
 `(tensorflow)C:\> pip install --ignore-installed --upgrade tensorflow `
+
 如果是安装 GPU 版本的 TensorFlow，请输入下面的命令：
+
 `(tensorflow)C:\> pip install --ignore-installed --upgrade tensorflow-gpu `
 
 ## 安装验证
-打开一个终端。
-如果您采用 Anaconda 方式安装，则进入 Anaconda 环境。
-采用下列方式从你的 shell 激活 python:
+
+打开一个终端。如果您采用 Anaconda 方式安装，则进入 Anaconda 环境。采用下列方式从你的 shell 激活 python：
+
 `$python`
+
 在 python 交互 shell 中输入下列代码：
+
 ```python
 >>> import tensorflow as tf
 >>> hello = tf.constant('Hello, TensorFlow!')
 >>> sess = tf.Session()
 >>> print(sess.run(hello))
 ```
+
 如果系统的输出如下所示，那就说明您可以开始在上面撰写 TensorFlow 的程序了：
+
 <pre>Hello, TensorFlow!</pre>
-如果您刚刚接触 TensorFlow，请参考文档[TensorFlow 入门指南](https://github.com/xitu/tensorflow/blob/zh-hans/tensorflow/docs_src/get_started/get_started.md)。
+
+如果您刚刚接触 TensorFlow，请看 @{$get_started/premade_estimators$Getting Started with TensorFlow}。
 
 如果系统输出了一个错误信息而不是一个打招呼提示，请查看[常见安装问题](#常见安装问题)。
 
