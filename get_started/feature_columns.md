@@ -94,7 +94,7 @@ matrix_feature_column = tf.feature_column.numeric_column(key="MyMatrix",
 |>= 1980 but < 2000   | [0, 0, 1, 0] |
 |> 2000               | [0, 0, 0, 1] |
 
-为什么要把可以完美输入到模型中的数值分散到表示不同范围的类别呢？我们注意到，分类后，数值变成了一个四元素向量，因此现在模型可以学习**四个独立的权值**而不是从前的一个；四个权值能比一个权值创建出更丰富的模型。更重要的是，分桶操作让模型能更清晰的区分不同的年份类，因为向量中仅有一个元素置 (1) 而其他都是 (0)。当只用一个年份数值作为输入的时候，模型只能学习线性关系。这样看来，分桶操作为模型提供了附加的灵活性，模型可以基于此进行学习。
+为什么要把可以完美输入到模型中的数值分散到表示不同范围的类别呢？我们注意到，分类后，数值变成了一个四元素向量，因此现在模型可以学习**四个独立的权值**而不是从前的一个；四个权值能比一个权值创建出更丰富的模型。更重要的是，分桶操作让模型能更清晰的区分不同的年份类，因为向量中仅有一个元素置 (1) 而其他都是 (0)。例如，当我们只用一个年份数值作为输入的时候，一个线性模型只能学习线性关系。这样看来，分桶操作为模型提供了附加的灵活性，模型可以基于此进行学习。
 
 下面的代码详述了如何创建 bucketized 特征。
 
@@ -161,7 +161,7 @@ def input_fn():
 # 给定输入 "feature_name_from_input_fn" 是一个字符串，通过将输入映射为词典列表的一个元素可以创建一个分类特征。
 vocabulary_feature_column =
     tf.feature_column.categorical_column_with_vocabulary_list(
-        key="a feature returned by input_fn()",
+        key=feature_name_from_input_fn,
         vocabulary_list=["kitchenware", "electronics", "sports"])
 ```
 
@@ -172,7 +172,7 @@ vocabulary_feature_column =
 # 给定输入 "feature_name_from_input_fn" 是一个字符串，通过将输入映射为词汇文件里的一个元素可以为模型创建一个分类特征。
 vocabulary_feature_column =
     tf.feature_column.categorical_column_with_vocabulary_file(
-        key="a feature returned by input_fn()",
+        key=feature_name_from_input_fn,
         vocabulary_file="product_class.txt",
         vocabulary_size=3)
 ```
