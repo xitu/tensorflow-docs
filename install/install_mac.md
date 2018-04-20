@@ -2,7 +2,7 @@
 
 This guide explains how to install TensorFlow on macOS. Although these instructions might also work on other macOS variants, we have only tested (and we only support) these instructions on machines meeting the following requirements:
 
-  * macOS 10.12.6 (Sierra) 或更高
+  * macOS 10.12.6 (Sierra) 或更高
 
 注意: There are known, accuracy-affecting numerical issues before macOS 10.12.6 (Sierra) that are described in [GitHub#15933](https://github.com/tensorflow/tensorflow/issues/15933#issuecomment-366331383).
 
