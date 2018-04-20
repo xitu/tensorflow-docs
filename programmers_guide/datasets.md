@@ -6,9 +6,9 @@
 
 * `tf.data.Dataset` 是一个基本元素的序列，每一个基本元素中包含了一个或者多个 `Tensor` 对象。例如，在一个图像输入总线中，一个基本元素可能是一个单独的训练样本，它包含了一对 Tensor 对象，分别代表图像数据和一个标签。创建一个数据集有两种不同的方法：
 
-  * 根据一个或者多个 `tf.Tensor` 对象创建一个 **source** （例如  `Dataset.from_tensor_slices()`）方法来构造一个数据集。
+  * 根据一个或者多个 `tf.Tensor` 对象创建一个 **source** （例如 `Dataset.from_tensor_slices()`）方法来构造一个数据集。
   
-  * 根据一个或多个 `tf.data.Dataset` 对象应用一种 **transformation** （例如 `Dataset.batch()`）来构造一个数据集。
+  * 根据一个或多个 `tf.data.Dataset` 对象应用一种 **transformation** （例如 `Dataset.batch()`）来构造一个数据集。
 
 * `tf.data.Iterator` 提供了从一个数据集中提取基本元素的主要方法。由 `Iterator.get_next()` 返回的操作在执行时会给予 `DataSet` 的下一个基本元素，它通常作为输入总线代码和模型之间的接口。这个最简单的迭代器是 "one-shot iterator"，它关联到一个 `Dataset` 并遍历它一次。在更复杂的情况下，`Iterator.initializer` 操作能够将一个迭代器根据不同的数据集重新初始化并设定参数，所以举例来说，你可以在同样一个程序中多次迭代训练数据和验证数据。
 
@@ -228,7 +228,29 @@ sess.run(iterator.initializer)
 next1, (next2, next3) = iterator.get_next()
 ```
 
-需要注意的是评估**任何**的 `next1`, `next2` 或者`next3` 都会使所有组件的迭代器前行，一个典型的迭代器消费者（例如，另一段调用该迭代器数据的代码）会把所有组件（迭代进入下一步需要的信息）封装进一个表达式中。
+Note that `next1`, `next2`, and `next3` are tensors produced by the same op/node (created by `Iterator.get_next()`). Therefore,  evaluating **any** of these tensors will advance the iterator for all components. A typical consumer of an iterator will include all components in a single expression.
+
+### Saving iterator state[需要翻译]
+
+The @{tf.contrib.data.make_saveable_from_iterator} function creates a `SaveableObject` from an iterator, which can be used to save and restore the current state of the iterator (and, effectively, the whole input pipeline). A saveable object thus created can be added to @{tf.train.Saver} variables list or the `tf.GraphKeys.SAVEABLE_OBJECTS` collection for saving and restoring in the same manner as a @{tf.Variable}. Refer to @{$saved_model$Saving and Restoring} for details on how to save and restore variables.
+
+```python
+# Create saveable object from iterator.
+saveable = tf.contrib.data.make_saveable_from_iterator(iterator)
+
+# Save the iterator state by adding it to the saveable objects collection.
+tf.add_to_collection(tf.GraphKeys.SAVEABLE_OBJECTS, saveable)
+saver = tf.train.Saver()
+
+with tf.Session() as sess:
+
+  if should_checkpoint:
+    saver.save(path_to_checkpoint)
+
+# Restore the iterator state.
+with tf.Session() as sess:
+  saver.restore(sess, path_to_checkpoint)
+```
 
 ## 读取输入数据
 
