@@ -6,9 +6,7 @@
 
 ## BatchNormGrad
 
-算法详情参见 
-[`ComputationBuilder::BatchNormGrad`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)
-和 [batch normalization 原始论文](https://arxiv.org/abs/1502.03167)。
+算法详情参见 [`ComputationBuilder::BatchNormGrad`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 和 [batch normalization 原始论文](https://arxiv.org/abs/1502.03167)。
 
 计算 batch norm 的梯度
 
@@ -26,13 +24,15 @@
 
 对于特征维数中的每一个特征（`feature_index` 即 `operand` 中特征维度的索引），此操作计算 `operand` 的梯度、在所有其他维度上的 `offset` 和 `scale`。`feature_index` 必须是 `operand` 中特征维度的合法索引。
 
-如下公式定义了三个渐变：
+[需要翻译]：The three gradients are defined by the following formulas (Assuming a 4-dimensional tensor as `operand` and (l) is the index for feature dimension):
 
-\\( \nabla x = \nabla y * \gamma * \sqrt{\sigma^2+\epsilon} \\)
+\\( coef_l = \frac{1}{mwh}\sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h (\nabla y_{ijkl} * (x_{ijkl} - \mu_l) / (\sigma^2_{l}+\epsilon)) \\)
 
-\\( \nabla \gamma = sum(\nabla y * (x - \mu) * \sqrt{\sigma^2 + \epsilon}) \\)
+\\( \nabla x_{ijkl} = \gamma_{l} * (1/\sqrt{\sigma^2_{l}+\epsilon}) * [\nabla y_{ijkl} - mean(\nabla y) - (x_{ijkl} - \mu_{l}) * coef_l] \\)
 
-\\( \nabla \beta = sum(\nabla y) \\)
+\\( \nabla \beta_l = \sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h \nabla y_{ijkl} \\)
+
+\\( \nabla \gamma_l = \sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h \nabla y_{ijkl} * ((x_{ijkl} - \mu_l) / \sqrt{\sigma^2_{l}+\epsilon}) \\)
 
 输入 `mean` 和 `variance` 表示在批处理和空间维度上的矩值。
 
@@ -40,16 +40,14 @@
 
 |输出           | 类型                    | 语义                                 |
 |------------- | ----------------------- | ------------------------------------|
-|`grad_operand`| `ComputationDataHandle` | 输入 `operand` 的梯度                 |
-|`grad_scale`  | `ComputationDataHandle` | 输入 `scale` 的梯度                   |
-|`grad_offset` | `ComputationDataHandle` | 输入 `offset` 的梯度                  |
+|`grad_operand`| `ComputationDataHandle` | 输入 `operand` 的梯度 (\\( \nabla x\\)) |
+|`grad_scale`  | `ComputationDataHandle` | 输入 `scale` 的梯度 (\\( \nabla \gamma\\)) |
+|`grad_offset` | `ComputationDataHandle` | 输入 `offset` 的梯度 (\\( \nabla \beta\\)) |
 
 
 ## BatchNormInference
 
-算法详情参见
-[`ComputationBuilder::BatchNormInference`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) and
-[batch normalization 原始论文](https://arxiv.org/abs/1502.03167)。
+算法详情参见 [`ComputationBuilder::BatchNormInference`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 和 [batch normalization 原始论文](https://arxiv.org/abs/1502.03167)。
 
 在批处理和空间维度上归一化数组。
 
@@ -73,9 +71,7 @@
 
 ## BatchNormTraining
 
-算法详情参见
-[`ComputationBuilder::BatchNormTraining`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 和
-[`batch normalization 原始论文`](https://arxiv.org/abs/1502.03167)。
+算法详情参见 [`ComputationBuilder::BatchNormTraining`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 和 [`batch normalization 原始论文`](https://arxiv.org/abs/1502.03167)。
 
 在批处理和空间维度上归一化数组。
 
@@ -83,10 +79,10 @@
 
 | 参数             | 类型                    | 语义                              |
 | --------------- | ----------------------- | -------------------------------- |
-| `operand`       | `ComputationDataHandle` | 待归一化的 N 维数组                 |
+| `operand`       | `ComputationDataHandle` | 待归一化的 N 维数组 normalized (x) |
 | `scale`         | `ComputationDataHandle` | 1 维数组 (\\(\gamma\\))           |
-| `offset`        | `ComputationDataHandle` | 1 维数组 (\\(\beta\\ )            |
-| `epsilon`       | `float`                 | ε 值 (\\(\epsilon\\))            |
+| `offset`        | `ComputationDataHandle` | 1 维数组 (\\(\beta\\))            |
+| `epsilon`       | `float`                 | Epsilon 值 (\\(\epsilon\\))       |
 | `feature_index` | `int64`                 | `operand` 中的特征维数索引         |
 
 对于特征维数中的每一个特征（`feature_index` 即 `operand` 中特征维度的索引），此操作计算在所有其他维度上的均值和方差，以及使用均值和方差归一化 `operand` 中的每个元素。`feature_index` 必须是 `operand` 中特征维度的合法索引。
@@ -183,7 +179,7 @@ output[i0, ..., iN, j0, ..., jM] = operand[j0, ..., jM]
 | `operand`     | `ComputationDataHandle` | 类型为 T 的数组 |
 | `max`         | `ComputationDataHandle` | 类型为 T 的数组 |
 
-给定操作数，最小和最大值，如果操作数位于最小值和最大值之间，则返回操作数，否则，如果操作数小于最小值，则返回最小值，如果操作数大于最大值，则返回最大值。即 `clamp(a, x, b) =  max(min(a, x), b)`。
+给定操作数，最小和最大值，如果操作数位于最小值和最大值之间，则返回操作数，否则，如果操作数小于最小值，则返回最小值，如果操作数大于最大值，则返回最大值。即 `clamp(a, x, b) =  min(max(a, x), b)`。
 
 输入的三个数组的维度形状必须是一样的。不过，也可以采用一种严格的[广播](broadcasting.md)形式，即 `min` 和/或 `max` 可以是类型为 `T` 的一个标量。
 
@@ -523,7 +519,7 @@ extern "C" void myfunc(void* out, void** in) {
 
 DotGeneral 根据 'dimension_numbers' 指定的维数进行转换操作，然后计算点积和。 
 
-与 'lhs' 和 'rhs' 有关的转换维数不需要相同，但是在 'lhs_contracting_dimensions' 和 'rhs_contracting_dimensions' 数组必须按照相同的顺序列出，同时具有相同的维数大小。
+与 'lhs' 和 'rhs' 有关的转换维数不需要相同，但是在 'lhs_contracting_dimensions' 和 'rhs_contracting_dimensions' 数组必须按照相同的顺序列出，同时具有相同的维数大小。且需要同时与 'lhs' 和 'rhs' 在同一个维度上。
 
 以转换维数为例：
 
@@ -542,7 +538,7 @@ DotGeneral(lhs, rhs, dnums) -> { {6.0, 12.0},
                                  {15.0, 30.0} }
 ```
 
-'lhs' 和 'rhs' 的批处理维数必须相同，在两个数组中必须以相同的顺序列出，同时维数大小必须相同。
+'lhs' 和 'rhs' 的批处理维数必须相同，在两个数组中必须以相同的顺序列出，同时维数大小必须相同。[需要翻译]and must be ordered before contracting and non-contracting/non-batch dimension numbers。
 
 批处理维数的例子（批处理大小为 2，2x2 矩阵）：
 
@@ -574,10 +570,11 @@ DotGeneral(lhs, rhs, dnums) -> { { {1.0, 2.0},
 | [b0, m, k] `dot` [b0, k, n]         | [b0, m, n]        |  batch matmul    |
 | [b0, b1, m, k] `dot` [b0, b1, k, n] | [b0, b1, m, n]    |  batch matmul    |
 
+[需要翻译]It follows that the resulting dimension number starts with the batch dimension, then the 'lhs' non-contracting/non-batch dimension, and finally the 'rhs' non-contracting/non-batch dimension.
+
 ## DynamicSlice
 
-另请参阅
-[`ComputationBuilder::DynamicSlice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
+另请参阅 [`ComputationBuilder::DynamicSlice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h).
 
 DynamicSlice从动态 `start_indices` 输入数组中提取子数组。`size_indices` 为每个维度的切片大小，它在每个维度上指定了切片范围：[start, start + size)。`start_indices` 的秩必须为 1，且维数大小等于 `operand` 的秩。
 
@@ -754,6 +751,101 @@ $$\text{sgn}(x) = \begin{cases} -1 & x < 0\\ 0 & x = 0\\ 1 & x > 0 \end{cases}$$
 
 该函数应用于 `operand` 数组的每个元素，从而形成具有相同形状的数组。它允许操作数为标量（秩 0 ）
 
+## Gather[需要翻译]
+
+The XLA gather operation stitches together several slices (each slice at a potentially different runtime offset) of an input tensor into an output tensor.
+
+### General Semantics
+
+See also [`ComputationBuilder::Gather`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h). For a more intuitive description, see the "Informal Description" section below.
+
+<b> `gather(operand, gather_indices, output_window_dims, elided_window_dims, window_bounds, gather_dims_to_operand_dims)` </b>
+
+|Arguments         | Type                    | Semantics                       |
+|----------------- | ----------------------- | --------------------------------|
+|`operand`         | `ComputationDataHandle` | The tensor we’re gathering from. |
+|`gather_indices`  | `ComputationDataHandle` | Tensor containing the starting indices of the slices we're we're stitching together into the output tensor. |
+|`index_vector_dim`  | `int64`               | The dimension in `gather_indices` that contains the starting indices.              |
+|`output_window_dims` | `ArraySlice<int64>`  | The set of dimensions in the  output shape that are _window dimensions_ (defined below). Not all window dimensions may be present in the output shape. |
+|`elided_window_dims` | `ArraySlice<int64>`  | The set of _window dimensions_ that are not present in the output shape. `window_bounds[i]` must be `1` for all `i` in `elided_window_dims`. |
+|`window_bounds`   | `ArraySlice<int64>`    | `window_bounds[i]` is the bounds for  window dimension `i`. This includes both the window dimensions that are explicitly part of the output shape (via `output_window_dims`) and the window dimensions that are elided (via `elided_window_dims`).|
+|`gather_dims_to_operand_dims` | `ArraySlice<int64>` | A dimension map (the array is interpreted as mapping `i` to `gather_dims_to_operand_dims[i]`)  from the gather indices in `gather_indices` to the operand index space.  It has to be one-to-one and total. |
+
+For every index `Out` in the output tensor, we compute two things (more precisely described later):
+
+  - An index into `gather_indices.rank` - `1` dimensions of `gather_indices`, which gives us a starting index of a slice, _operand slice_, in the operand tensor.  These `gather_indices.rank` - `1` dimensions are all the dimensions in `gather_indices` except `index_vector_dim`.
+
+  - A _window index_ that has the same rank as the operand.  This index is composed of the values in `Out` at dimensions `output_window_dims`, embedded with zeroes according to `elided_window_dims`.
+
+The _window index_ is the relative index of the element in _operand slice_ that should be present in the output at index `Out`.
+
+The output is a tensor of rank `output_window_dims.size` + `gather_indices.rank` - `1`.  Additionally, as a shorthand, we define `output_gather_dims` of type `ArraySlice<int64>` as the set of dimensions in the output shape but not in `output_window_dims`, in ascending order.  E.g. if the output tensor has rank `5`, `output_window_dims` is {`2`, `4`} then `output_gather_dims` is {`0`, `1`, `3`}
+
+If `index_vector_dim` is equal to `gather_indices.rank` we implicitly consider `gather_indices` to have a trailing `1` dimension (i.e. if `gather_indices` was of shape `[6,7]` and `index_vector_dim` is `2` then we implicitly consider the shape of `gather_indices` to be `[6,7,1]`).
+
+The bounds for the output tensor along dimension `i` is computed as follows:
+
+  1. If `i` is present in `output_gather_dims` (i.e. is equal to `output_gather_dims[k]` for some `k`) then we pick the corresponding dimension bounds out of `gather_indices.shape`, skipping `index_vector_dim` (i.e. pick `gather_indices.shape.dims`[`k`] if `k` < `index_vector_dim` and `gather_indices.shape.dims`[`k`+`1`] otherwise).
+  2. If `i` is present in `output_window_dims` (i.e. equal to `output_window_dims`[`k`] for some `k`) then we pick the corresponding bound out of `window_bounds` after accounting for `elided_window_dims` (i.e. we pick `adjusted_window_bounds`[`k`] where `adjusted_window_bounds` is `window_bounds` with the bounds at indices `elided_window_dims` removed).
+
+The operand index `In` corresponding to an output index `Out` is computed as follows:
+
+  1. Let `G` = { `Out`[`k`] for `k` in `output_gather_dims` }.  Use `G` to slice out vector `S` such that `S`[`i`] = `gather_indices`[Combine(`G`, `i`)] where Combine(A, b) inserts b at position `index_vector_dim` into A. Note that this is well defined even if `G` is empty -- if `G` is empty then `S` = `gather_indices`.
+  2. Create an index, `S`<sub>`in`</sub>, into `operand` using `S` by scattering `S` using the `gather_dims_to_operand_dims` map (`S`<sub>`in`</sub> is the starting indices for _operand slice_ mentioned above).  More precisely:
+       1. `S`<sub>`in`</sub>[`gather_dims_to_operand_dims`[`k`]] = `S`[`k`] if `k` < `gather_dims_to_operand_dims.size`.
+       2. `S`<sub>`in`</sub>[`_`] = `0` otherwise.
+  3. Create an index `W`<sub>`in`</sub> into `operand` by scattering the indices at the output window dimensions in `Out` according to the `elided_window_dims` set (`W`<sub>`in`</sub> is the _window index_ mentioned above).  More precisely:
+       1. `W`<sub>`in`</sub>[`window_dims_to_operand_dims`(`k`)] = `Out`[`k`] if `k` < `output_window_dims.size` (`window_dims_to_operand_dims` is defined below).
+       2. `W`<sub>`in`</sub>[`_`] = `0` otherwise.
+  4. `In` is `W`<sub>`in`</sub> + `S`<sub>`in`</sub> where + is element-wise addition.
+
+`window_dims_to_operand_dims` is the monotonic function with domain [`0`, `output_window_dims.size`) and range [`0`, `operand.rank`) \ `elided_window_dims`.  So if, e.g., `output_window_dims.size` is `4`, `operand.rank` is `6` and `elided_window_dims` is {`0`, `2`} then `window_dims_to_operand_dims` is {`0`→`1`, `1`→`3`, `2`→`4`, `3`→`5`}.
+
+### Informal Description and Examples
+
+`index_vector_dim` is set to `gather_indices.rank` - `1` in all of the examples that follow.  More interesting values for `index_vector_dim` does not change the operation fundamentally, but makes the visual representation more cumbersome.
+
+To get an intuition on how all of the above fits together, let's look at an example that gathers 5 slices of shape `[8,6]` from a `[16,11]` tensor.  The position of a slice into the `[16,11]` tensor can be represented as an index vector of shape `S64[2]`, so the set of 5 positions can be represented as a `S64[5,2]` tensor.
+
+The behavior of the gather operation can then be depicted as an index transformation that takes [`G`,`W`<sub>`0`</sub>,`W`<sub>`1`</sub>], an index in the output shape, and maps it to an element in the input tensor in the following way:
+
+<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
+  <img style="width:100%" src="../../images/ops_xla_gather_0.svg">
+</div>
+
+We first select an (`X`,`Y`) vector from the gather indices tensor using `G`. The element in the output tensor at index [`G`,`W`<sub>`0`</sub>,`W`<sub>`1`</sub>] is then the element in the input tensor at index [`X`+`W`<sub>`0`</sub>,`Y`+`W`<sub>`1`</sub>].
+
+`window_bounds` is `[8,6]`, which decides the range of W<sub>`0`</sub> and W<sub>`1`</sub>, and this in turn decides the bounds of the slice.
+
+This gather operation acts as a batch dynamic slice with `G` as the batch dimension.
+
+The gather indices may be multidimensional.  For instance, a more general version of the example above using a "gather indices" tensor of shape `[4,5,2]`
+would translate indices like this:
+
+<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
+  <img style="width:100%" src="../../images/ops_xla_gather_1.svg">
+</div>
+
+Again, this acts as a batch dynamic slice `G`<sub>`0`</sub> and `G`<sub>`1`</sub> as the batch dimensions.  The window bounds are still `[8,6]`.
+
+The gather operation in XLA generalizes the informal semantics outlined above in the following ways:
+
+ 1. We can configure which dimensions in the output shape are the window dimensions (dimensions containing `W`<sub>`0`</sub>, `W`<sub>`1`</sub> in the last example).  The output gather dimensions (dimensions containing `G`<sub>`0`</sub>, `G`<sub>`1`</sub> in the last example) are defined to be the output dimensions that are not window dimensions.
+
+ 2. The number of output window dimensions explicitly present in the output shape may be smaller than the input rank.  These "missing" dimensions, which are listed explicitly as `elided_window_dims`, must have a window bound of `1`.  Since they have a window bound of `1` the only valid index for them is `0` and eliding them does not introduce ambiguity.
+
+ 3. The slice extracted from the "Gather Indices" tensor ((`X`, `Y`) in the last example) may have fewer elements than the input tensor rank, and an explicit mapping dictates how the index should be expanded to have the same rank as the input.
+
+As a final example, we use (2) and (3) to implement `tf.gather_nd`:
+
+<div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
+  <img style="width:100%" src="../../images/ops_xla_gather_2.svg">
+</div>
+
+`G`<sub>`0`</sub> and `G`<sub>`1`</sub> are used to slice out a starting index from the gather indices tensor as usual, except the starting index has only one element, `X`.  Similarly, there is only one output window index with the value `W`<sub>`0`</sub>.  However, before being used as indices into the input tensor, these are expanded in accordance to "Gather Index Mapping" (`gather_dims_to_operand_dims` in the formal description) and "Window Mapping" (`window_dims_to_operand_dims` in the formal description) into [`0`,`W`<sub>`0`</sub>] and [`X`,`0`] respectively, adding up to [`X`,`W`<sub>`0`</sub>].  In other words, the output index [`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`W`<sub>`0`</sub>] maps to the input index [`GatherIndices`[`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`0`],`X`] which gives us the semantics for `tf.gather_nd`.
+
+`window_bounds` for this case is `[1,11]`.  Intuitively this means that every index `X` in the gather indices tensor picks an entire row and the result is the concatenation of all these rows.
+
 ## GetTupleElement
 
 另请参阅 [`ComputationBuilder::GetTupleElement`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h)。
@@ -795,7 +887,7 @@ result2 = while (condition, init = result1) {
 }
 ```
 
-不支持嵌套的元组形状。对于一个空的元组形状，Infeed 操作通常是一个 nop，因而不会从设备的 Infeed 中读取任何数据。
+不支持嵌套的元组形状。对于一个空的元组形状，Infeed 操作通常是一个 no-op，因而不会从设备的 Infeed 中读取任何数据。
 
 > 注意：我们计划允许支持没有全序的多个 Infeed 操作，在这种情况下，编译器将提供信息，确定这些 Infeed 操作在编译后的程序中如何串行化。
 
@@ -834,7 +926,7 @@ computation(elem1, elem2, elem3, par1)` 将输入数组中的每个（多维）�
 
 通过在数组周围和数组之间进行填充，可以将给定的 `operand` 数组扩大，其中 `padding_value` 和 `padding_config` 用于配置每个维度的边缘填充和内部填充的数目。
 
-`PaddingConfig` 是 `PaddingConfigDimension` 的一个重复字段，它对于每个维度都包含有三个字段：`edge_padding_low`, `edge_padding_high` 和 `interior_padding`。`edge_padding_low` 和 `edge_padding_high` 分别指定了该维度上低端（指标为 0 那端）和高端（最高指标那端）上的填充数目。边缘填充数目可以是负值 -- 负的填充数目的绝对值表示从指定维度移除元素的数目。`interior_padding` 指定了在每个维度的任意两个相邻元素之间的填充数目。逻辑上，内部填充应发生在边缘填充之前，所有在负边缘填充时，会从经过内部填充的操作数之上再移除边缘元素。如果边缘填充配置为 (0, 0)，且内部填充值都是 0，则此操作是一个 no-op。下图展示的是二维数组上不同 `edge_padding` 和 `interior_padding` 值的示例。
+`PaddingConfig` 是 `PaddingConfigDimension` 的一个重复字段，它对于每个维度都包含有三个字段：`edge_padding_low`, `edge_padding_high` 和 `interior_padding`。`edge_padding_low` 和 `edge_padding_high` 分别指定了该维度上低端（指标为 0 那端）和高端（最高指标那端）上的填充数目。边缘填充数目可以是负值 — 负的填充数目的绝对值表示从指定维度移除元素的数目。`interior_padding` 指定了在每个维度的任意两个相邻元素之间的填充数目。逻辑上，内部填充应发生在边缘填充之前，所有在负边缘填充时，会从经过内部填充的操作数之上再移除边缘元素。如果边缘填充配置为 (0, 0)，且内部填充值都是 0，则此操作是一个 no-op。下图展示的是二维数组上不同 `edge_padding` 和 `interior_padding` 值的示例。
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="https://www.tensorflow.org/images/ops_pad.png">
