@@ -43,7 +43,7 @@ other_variable = tf.get_variable("other_variable", dtype=tf.int32,
 
  * `tf.GraphKeys.GLOBAL_VARIABLES` --- 可以在多个设备间共享的变量
 
- * `tf.GraphKeys.TRAINABLE_VARIABLES`--- TensorFlow 梯度计算的变量
+ * `tf.GraphKeys.TRAINABLE_VARIABLES` --- TensorFlow 梯度计算的变量
 
 如果你不想让变量在训练中出现，你可以将它加入到 `tf.GraphKeys.LOCAL_VARIABLES` 集合中。比如，下面这个例子示范了如何将一个名为 `my_local` 的变量加入到这个集合中：
 
