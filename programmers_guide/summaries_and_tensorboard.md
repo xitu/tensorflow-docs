@@ -30,7 +30,7 @@ FileWriter 的构造函数需要包含 logdir，logdir 目录是非常重要的
 
 现在已经修改了你的图并且有一个 FileWriter，准备开始你的神经网络吧！如果您愿意，您可以单步运行合并汇总操作，并记录大量的训练数据。不过，这可能比你需要的数据更多。你可以每 n 步执行一次汇总。
 
-下面的代码示例是基于 @{$layers$simple MNIST tutorial} 更改的，其中我们额外每十步执行一次总结。如果你运行这个然后启动 Tensorboard—logdir=/tmp/tensorflow/mnist，你将能够可视化统计数据，例如在训练过程中权重或精确度是如何变化的。下面的代码是一个摘录，完整的资料在 [这里](https://www.tensorflow.org/code/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py)。
+下面的代码示例是基于 [简单 MNIST 教程](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutorials/mnist/mnist.py), 更改的，其中我们额外每十步执行一次总结。如果你运行这个然后启动 Tensorboard—logdir=/tmp/tensorflow/mnist，你将能够可视化统计数据，例如在训练过程中权重或精确度是如何变化的。下面的代码是一个摘录，完整的资料在 [这里](https://www.tensorflow.org/code/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py)。
 
 ```python
 def variable_summaries(var):
