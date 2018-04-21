@@ -1,6 +1,6 @@
 # 保存和恢复
 
-[需要翻译]The @{tf.train.Saver} class provides methods to save and restore models. The @{tf.saved_model.simple_save} function is an easy way to build a @{tf.saved_model$saved model} suitable for serving. [Estimators](/programmers_guide/estimators) automatically save and restore variables in the `model_dir`.
+[需要翻译]The @{tf.train.Saver} class provides methods to save and restore models. The @{tf.saved_model.simple_save} function is an easy way to build a @{tf.saved_model$saved model} suitable for serving. [Estimators](@{$programmers_guide/estimators}) automatically save and restore variables in the `model_dir`.
 
 ## 保存和恢复变量
 
@@ -187,15 +187,32 @@ with tf.Session(graph=tf.Graph()) as sess:
   builder.add_meta_graph_and_variables(sess,
                                        [tag_constants.TRAINING],
                                        signature_def_map=foo_signatures,
-                                       assets_collection=foo_assets)
+                                       assets_collection=foo_assets,
+                                       strip_default_attrs=True)
 ...
 # 为推理添加一秒的 MetaGraphDef
 with tf.Session(graph=tf.Graph()) as sess:
   ...
-  builder.add_meta_graph([tag_constants.SERVING])
+  builder.add_meta_graph([tag_constants.SERVING], strip_default_attrs=True)
 ...
 builder.save()
 ```
+
+<a name="forward_compatibility"></a>
+#### [需要翻译]Forward compatibility via `strip_default_attrs=True`
+
+Following the guidance below gives you forward compatibility only if the set of Ops has not changed.
+
+The @{tf.saved_model.builder.SavedModelBuilder$`SavedModelBuilder`} class allows users to control whether default-valued attributes must be stripped from the @{$extend/tool_developers#nodes$`NodeDefs`} while adding a meta graph to the SavedModel bundle. Both @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph_and_variables$`SavedModelBuilder.add_meta_graph_and_variables`} and @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph$`SavedModelBuilder.add_meta_graph`} methods accept a Boolean flag `strip_default_attrs` that controls this behavior.
+
+If `strip_default_attrs` is `False`, the exported @{tf.MetaGraphDef} will have the default valued attributes in all its @{tf.NodeDef} instances. This can break forward compatibility with a sequence of events such as the following:
+
+*  An existing Op (`Foo`) is updated to include a new attribute (`T`) with a default (`bool`) at version 101.
+*  A model producer such as a "trainer binary" picks up this change (version 101) to the `OpDef` and re-exports an existing model that uses Op `Foo`.
+*  A model consumer (such as [Tensorflow Serving](/serving)) running an older binary (version 100) doesn't have attribute `T` for Op `Foo`, but tries to import this model. The model consumer doesn't recognize attribute `T` in a `NodeDef` that uses Op `Foo` and therefore fails to load the model.
+*  By setting `strip_default_attrs` to True, the model producers can strip away any default valued attributes in the `NodeDefs`. This helps ensure that newly added attributes with defaults don't cause older model consumers to fail loading models regenerated with newer training binaries.
+
+See [compatibility guidance](https://www.tensorflow.org/programmers_guide/version_compat) for more information.
 
 ### 在 Python 中加载 SavedModel
 
@@ -272,7 +289,7 @@ SaveModel 为多种使用案例提供了创建和加载 TensorFlow 计算图的�
 
 ## 配合 Estimators 使用 SavedModel
 
-训练好 `Estimator` 模型之后，您可能想要从这个模型创建一个执行请求并返回结果的服务。您可以在您的设备上本地运行该服务，或者在云上动态部署。
+训练好 `Estimator` 模型之后，您可能想要从这个模型创建一个执行请求并返回结果的服务。您可以在您的设备上本地运行该服务，或者部署在云端。
 
 要为服务准备一个训练好的 Estimator，您必须以标准的 SavedModel 格式输出它。本节介绍了如何：
 
@@ -329,7 +346,8 @@ def serving_input_receiver_fn():
 @{tf.estimator.Estimator.export_savedmodel}，从而输出训练的Estimator。
 
 ```py
-estimator.export_savedmodel(export_dir_base, serving_input_receiver_fn)
+estimator.export_savedmodel(export_dir_base, serving_input_receiver_fn,
+                            strip_default_attrs=True)
 ```
 
 这种方法在第一次调用 `serving_input_receiver_fn()` 时创建一个新的计算图，以获取特征 `Tensor`，然后调用 `Estimator` 的 `model_fn()` 去生成基于这些特征的模型图。它创建了一个新的会话，并将最近的快照文件恢复到会话里。（如果需要，可以传递不同的快照文件。）最后，它会在给定的`export_dir_base` (即 `export_dir_base/<timestamp>`)下创建一个有时间戳的输出目录，并将一个包含了会话中的 `MetaGraphDef` 的 SavedModel 写入其中。
