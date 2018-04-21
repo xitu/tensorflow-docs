@@ -73,7 +73,6 @@ TensorFlow 中只有公共 APIs 在副版本和补丁版本之间兼容。公共
 
 许多 TensorFlow 使用者将图和训练好的模型保存到磁盘以期为后续评估或另外的训练所使用，最终却在后续发布版本中运行它们。遵从语义版本的约定，TensorFlow 生成的任何图或检验点能够被后续相同主版本号的 TensorFlow 加载和评估。然而，如果可能的话，我们甚至会在不同主版本号之间尽力保留向后兼容性，以使序列化文件能够长期使用。
 
-
 图形可以通过 `GraphDef` protocol buffer 序列化。为了推进图的向后不兼容改变的实行（极少出现这种情况），每个 `GraphDef` 都有一个独立于 TensorFlow 版本的版本号。例如，`GraphDef` 版本 17 不推荐使用 `inv` 操作，而推荐使用 `reciprocal`。它有以下语义：
 
 * 每个 TensorFlow 版本支持 GraphDef 间隔版本。间隔版本不随补丁版本发布而改变，只有副版本发布时才会改变。在 TensorFlow 主版本发布时，才会发生放弃对某个 `GraphDef` 版本的支持这种情况。
@@ -130,6 +129,14 @@ versions`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/
 
 * 对于 `GraphDef` 版本，我们使用 `TF_GRAPH_DEF_VERSION`、	`TF_GRAPH_DEF_VERSION_MIN_CONSUMER`，以及 `TF_GRAPH_DEF_VERSION_MIN_PRODUCER` 标识。
 * 对于检验点版本，我们使用 `TF_CHECKPOINT_VERSION`、`TF_CHECKPOINT_VERSION_MIN_CONSUMER`，以及 `TF_CHECKPOINT_VERSION_MIN_PRODUCER` 标识。
+
+### Add a new attribute with default to an existing op[需要翻译]
+
+Following the guidance below gives you forward compatibility only if the set of ops has not changed:
+
+1. If forward compatibility is desired,  set `strip_default_attrs` to `True` while exporting the model using either the @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph_and_variables$`add_meta_graph_and_variables`} and @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph$`add_meta_graph`} methods of the `SavedModelBuilder` class, or @{tf.estimator.Estimator.export_savedmodel$`Estimator.export_savedmodel`}
+2. This strips off the default valued attributes at the time of producing/exporting the models. This makes sure that the exported @{tf.MetaGraphDef} does not contain the new op-attribute when the default value is used.
+3. Having this control could allow out-of-date consumers (for example, serving binaries that lag behind training binaries) to continue loading the models and prevent interruptions in model serving.
 
 ### GraphDef 版本更迭
 
