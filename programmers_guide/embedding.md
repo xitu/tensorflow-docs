@@ -2,6 +2,8 @@
 
 本文档介绍了 embeddings 的概念，给出了如何在 TensorFlow 中对 embedding 进行训练的简单示例，并解释了如何使用 TensorBoard Embedding Projector ([live example](http://projector.tensorflow.org)) 查看 embeddings。前两部分是针对机器学习和 TensorFlow 的新手，而 Embedding Projector 则是针对所有水平的用户。
 
+有关这些概念的另一个教程可以在[机器学习速成课程的 Embeddings 部分](https://developers.google.com/machine-learning/crash-course/embeddings/video-lecture)中找到。
+
 [TOC]
 
 **Embedding** 是从离散对象（如单词）到实数向量的映射。例如，英文单词的 300 维 embedding 可以如下所示：
