@@ -89,11 +89,10 @@ Docker 容器包含 TensorFlow 及其所有依赖项。
      例如，如果你要在安装了 Python 2.7 的 macOS 上安装 TensorFlow，那么可以执行下面的命令：
 
      <pre> $ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.7.0rc1-py3-none-any.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py3-none-any.whl</b></pre>
 
 如果你遇到了任何安装问题，请查看
-[常见安装问题](#common-installation-problems).
-
+[常见安装问题](#常见安装问题).
 
 ### 下一步
 
@@ -120,13 +119,11 @@ $ <b>source ./bin/activate.csh</b>  # csh 或 tcsh </pre>
 
 这时命令行提示将会变回你激活虚拟环境之前的样子。
 
-
 ### 卸载 TensorFlow
 
 如果你希望卸载 TensorFlow，只需要简单的删除你创建的目录树即可。例如：
 
 <pre> $ <b>rm -r ~/tensorflow</b> </pre>
-
 
 ## 通过本地 pip 安装
 
@@ -185,12 +182,11 @@ $ <b>sudo easy_install --upgrade six</b> </pre>
      例如，如果你要在安装了 Python 2.7 的 macOS 上安装 TensorFlow，那么可以执行下面的命令：
 
      <pre> $ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.7.0rc1-py3-none-any.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py3-none-any.whl</b></pre>
 
 ### 下一步
 
 TensorFlow 安装完成后，你应该[验证安装](#ValidateYourInstallation)是否能使 TensorFlow 正确工作。
-
 
 ### 卸载 TensorFlow
 
@@ -198,7 +194,6 @@ TensorFlow 安装完成后，你应该[验证安装](#ValidateYourInstallation)�
 
 <pre>$ <b>pip uninstall tensorflow</b>
 $ <b>pip3 uninstall tensorflow</b> </pre>
-
 
 ## 通过 Docker 安装
 
@@ -241,7 +236,6 @@ Docker 会在第一次启动容器时下载对应的镜像。
 
 现在你应该[验证安装](#ValidateYourInstallation)。
 
-
 ## 通过 Anaconda 安装
 
 **Anaconda 的安装由社区提供，而非官方支持。**
@@ -266,8 +260,7 @@ Docker 会在第一次启动容器时下载对应的镜像。
      其中 <i>TF_PYTHON_URL</i>  是 [TensorFlow Python 包的 URL](#the_url_of_the_tensorflow_python_package)。例如，如下命令安装了仅支持 CPU 的 Python 2.7 版本下的 TensorFlow：
 
      <pre> (<i>targetDirectory</i>)$ <b>pip install --ignore-installed --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.7.0rc1-py2-none-any.whl</b></pre>
-
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py2-none-any.whl</b></pre>
 
 <a name="ValidateYourInstallation"></a>
 ## 验证安装
@@ -276,7 +269,6 @@ Docker 会在第一次启动容器时下载对应的镜像。
 
     1. 确定你已经具备了运行 TensorFlow 程序的运行环境。
     2. 运行一个简短的 TensorFlow 程序。
-
 
 ### 准备环境
 
@@ -289,8 +281,6 @@ Docker 会在第一次启动容器时下载对应的镜像。
 如果你使用 Docker 进行安装，启动一个运行 bash 的 Docker 容器，例如：
 
 <pre>$ <b>docker run -it tensorflow/tensorflow bash</b></pre>
-
-
 
 ### 运行一个简短的 TensorFlow 程序
 
@@ -312,20 +302,21 @@ print(sess.run(hello))
 
 <pre>Hello, TensorFlow!</pre>
 
-如果你是 TensorFlow 新手，请参看
-@{$get_started/premade_estimators$$Getting Started with TensorFlow}.
+如果安装过程出现了错误，请看[常见安装问题](#常见安装问题)
 
-如果安装过程出现了错误，请看[常见安装问题](#common_installation_problems)
+如果你是机器学习的新手，我们推荐以下内容：
+
+*  [机器学习速成课程](https://developers.google.com/machine-learning/crash-course)
+*  @{$get_started/get_started_for_beginners$Getting Started for ML Beginners}
+
+如果你有机器学习的经验，但刚刚接触 TensorFlow 请看 @{$get_started/premade_estimators$Getting Started with TensorFlow}。
 
 ## 常见安装问题
 
-我们使用 Stack Overflow 来记录 TensorFlow 的安装问题及其解决方案。
-下表列出了一些常见安装问题的 Stack Overflow 答案的链接。
-如果你遇到下表中未列出的错误信息或其他安装问题，请在 Stack Overflow 中进行搜索。如果 Stack Overflow 没有相应的解决方案，请在 Stack Overflow 上询问一个有关它的新问题，并指定 `tensorflow` 标签。
+我们使用 Stack Overflow 来记录 TensorFlow 的安装问题及其解决方案。下表列出了一些常见安装问题的 Stack Overflow 答案的链接。如果你遇到下表中未列出的错误信息或其他安装问题，请在 Stack Overflow 中进行搜索。如果 Stack Overflow 没有相应的解决方案，请在 Stack Overflow 上询问一个有关它的新问题，并指定 `tensorflow` 标签。
 
 <table>
 <tr> <th>Stack Overflow 链接</th> <th>错误消息</th> </tr>
-
 
 <tr>
   <td><a href="http://stackoverflow.com/q/42006320">42006320</a></td>
@@ -391,7 +382,6 @@ ImportError: cannot import name 'descriptor'</pre>
   </td>
 </tr>
 
-
 <tr>
   <td><a href="http://stackoverflow.com/q/42075397">42075397</a></td>
   <td>A <tt>pip install</tt> command triggers the following error:
@@ -408,11 +398,7 @@ Terminal window to review and agree to the Xcode license agreements.
 RuntimeError: Broken toolchain: cannot link a simple C program</pre>
 </td>
 
-
 </table>
-
-
-
 
 <a name="TF_PYTHON_URL"></a>
 
@@ -427,19 +413,15 @@ RuntimeError: Broken toolchain: cannot link a simple C program</pre>
 
 ### Python 2.7
 
-
 <pre>
-https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.7.0rc1-py2-none-any.whl
+https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py2-none-any.whl
 </pre>
 
 ### Python 3.4、3.5 或 3.6
 
-
 <pre>
-https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.7.0rc1-py3-none-any.whl
+https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py3-none-any.whl
 </pre>
-
-
 
 <a name="Protobuf31"></a>
 ## Protobuf 3.1 的 pip 包
