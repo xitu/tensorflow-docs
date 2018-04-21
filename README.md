@@ -4,7 +4,8 @@
 
 > [TensorFlow Docs](https://github.com/xitu/tensorflow-docs) 是由[掘金翻译计划](https://github.com/xitu/gold-miner)实时维护的 TensorFlow 官方文档中文版，维护者为全球各大公司开发人员和各著名高校研究者及学生。欢迎大家加入维护团队，欢迎提 Issue 和 PR，参与之前请阅读[文档维护说明](https://github.com/xitu/tensorflow-docs/wiki#%E6%96%87%E6%A1%A3%E7%BB%B4%E6%8A%A4%E8%A7%84%E8%8C%83)。
 >
-> - 译者团队正在向 [TensorFlow V1.8 官方中文文档](https://github.com/xitu/tensorflow-docs)更新
+> - [TensorFlow 中文文档已更新至 V1.8](https://github.com/xitu/tensorflow-docs)
+> - 阅读文档请到 👉 https://tensorflow.juejin.im
 > - 推荐学习顺序等更多内容详见：[TensorFlow Docs WIKI](https://github.com/xitu/tensorflow-docs/wiki)
 > - 相关术语表：[TensorFlow 术语表](https://github.com/xitu/tensorflow-docs/wiki/TensorFlow-%E6%9C%AF%E8%AF%AD%E8%A1%A8)，[人工智能术语表](https://github.com/xitu/tensorflow-docs/wiki#%E6%9C%AF%E8%AF%AD%E8%A1%A8)
 > - 掘金翻译计划欢迎大家的加入，详见 👉 [加入我们](https://github.com/xitu/gold-miner)
@@ -13,16 +14,13 @@
 
 | **`Documentation`** | **`Linux CPU`** | **`Linux GPU`** | **`Mac OS CPU`** | **`Windows CPU`** | **`Android`** |
 |-----------------|---------------------|------------------|-------------------|---------------|---------------|
-| [![Documentation](https://img.shields.io/badge/api-reference-blue.svg)](https://www.tensorflow.org/api_docs/) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-cpu)](https://ci.tensorflow.org/job/tensorflow-master-cpu) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-linux-gpu)](https://ci.tensorflow.org/job/tensorflow-master-linux-gpu) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-mac)](https://ci.tensorflow.org/job/tensorflow-master-mac) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-win-cmake-py)](https://ci.tensorflow.org/job/tensorflow-master-win-cmake-py) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-android)](https://ci.tensorflow.org/job/tensorflow-master-android) [ ![Download](https://api.bintray.com/packages/google/tensorflow/tensorflow/images/download.svg) ](https://bintray.com/google/tensorflow/tensorflow/_latestVersion)
+| [![Documentation](https://img.shields.io/badge/api-reference-blue.svg)](https://www.tensorflow.org/api_docs/) | ![Build Status](https://storage.googleapis.com/tensorflow-kokoro-build-badges/ubuntu-cc.png) | ![Build Status](https://storage.googleapis.com/tensorflow-kokoro-build-badges/ubuntu-gpu-cc.png) | ![Build Status](https://storage.googleapis.com/tensorflow-kokoro-build-badges/macos-py2-cc.png) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-win-cmake-py)](https://ci.tensorflow.org/job/tensorflow-master-win-cmake-py) | [![Build Status](https://ci.tensorflow.org/buildStatus/icon?job=tensorflow-master-android)](https://ci.tensorflow.org/job/tensorflow-master-android) [ ![Download](https://api.bintray.com/packages/google/tensorflow/tensorflow/images/download.svg) ](https://bintray.com/google/tensorflow/tensorflow/_latestVersion)
 
-**TensorFlow** 是一个使用数据流图进行数值计算开源软件库。
-图的节点表示数学运算，节点之间的边表示流动的多维数据数组（张量）。
-这种灵活的架构允许你在无需重写代码的情况下，将计算在桌面端、服务端或移动端部署到一个或多个 CPU 和 GPU 中。
-TensorFlow 还包含 TensorBoard，它是一个数据可视化工具包。
+**TensorFlow** 是一个使用数据流图进行数值计算开源软件库。图的节点表示数学运算，节点之间的边表示流动的多维数据数组（张量）。这种灵活的架构使你能在无需重写代码的情况下，将计算在桌面端、服务端或移动端部署到一个或多个 CPU 和 GPU 中。TensorFlow 还包含 TensorBoard，它是一个数据可视化工具包。
 
-TensorFlow 最初由 Google 机器智能研究机构内的 
-Google Brain 团队的研究人员和工程师开发，用于进行机器学习和深度神经网络研究。
-此系统一般足以适用于各种其他领域。
+TensorFlow 最初由 Google 机器智能研究机构内的 Google Brain 团队的研究人员和工程师开发，用于进行机器学习和深度神经网络研究。此系统一般足以适用于各种其他领域。
+
+你可以通过订阅 [announce@tensorflow.org](https://groups.google.com/a/tensorflow.org/forum/#!forum/announce) 来及时获得 TensorFlow 最新的公告及更新等信息。
 
 ## 安装
 
@@ -78,6 +76,7 @@ TensorFlow 项目致力于遵守开源软件开发中普遍接受的最佳实践
 
 * [TensorFlow 网站](https://www.tensorflow.org)
 * [TensorFlow 白皮书](https://www.tensorflow.org/about/bib)
+* [TensorFlow YouTube 频道](https://www.youtube.com/channel/UC0rqucBdTuFTjJiefW5t-IQ)
 * [TensorFlow 模型](https://github.com/tensorflow/models)
 * [TensorFlow MOOC 教程](https://www.udacity.com/course/deep-learning--ud730)
 * [TensorFlow Stanford 教程](https://web.stanford.edu/class/cs20si)
