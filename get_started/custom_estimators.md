@@ -410,7 +410,7 @@ TensorBoard 显示三个图形。
 
 * 准确性：准确性由以下两行记录： 
 
-  * `eval_metric_ops={'my_accuracy': accuracy})`，在评估期间
+  * `eval_metric_ops={'my_accuracy': accuracy}`，在评估期间
   * `tf.summary.scalar('accuracy', accuracy[1])`，在训练期间
 
 这些 tensorboard 是向优化的 `minimize` 方法传递 `global_step` 的主要原因之一。没有它，模型就不能记录这些图的 x 坐标。
