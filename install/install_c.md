@@ -24,7 +24,7 @@ TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/
          OS="linux" # Change to "darwin" for macOS
          TARGET_DIRECTORY="/usr/local"
          curl -L \
-           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.7.0-rc1.tar.gz" |
+           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-${OS}-x86_64-1.8.0-rc1.tar.gz" |
            sudo tar -C $TARGET_DIRECTORY -xz
 
 `tar` 命令会将 TensorFlow C 语言库解压到 `TARGET_DIRECTORY` 的子目录 `lib` 中。例如，指定 `/usr/local` 作为 `TARGET_DIRECTORY`，那么 `tar` 就会将 TensorFlow C 语言库解压到 `/usr/local/lib` 中。
@@ -78,6 +78,6 @@ Hello from TensorFlow C library version <i>number</i></pre>
   * 是否按本指南第三步“[安装](#安装)”指定了正确的环境变量的目录？
   * 是否正确地 `export` 了环境变量？
 
-如果你仍然在编译或者运行时看到了错误信息，请访问 [StackOverflow](www.stackoverflow.com/questions/tagged/tensorflow) 寻求解决方案.
+如果你仍然在编译或者运行时看到了错误信息，请访问 [StackOverflow](https://stackoverflow.com/questions/tagged/tensorflow) 寻求解决方案.
 
 
