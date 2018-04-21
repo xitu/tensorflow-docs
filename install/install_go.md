@@ -27,7 +27,7 @@ Go 版本 TensorFlow 依赖于 TensorFlow C 语言库。按照下面的步骤安
          TF_TYPE="cpu" # Change to "gpu" for GPU support
          TARGET_DIRECTORY='/usr/local'
          curl -L \
-           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-$(go env GOOS)-x86_64-1.7.0-rc1.tar.gz" |
+           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-$(go env GOOS)-x86_64-1.8.0-rc1.tar.gz" |
          sudo tar -C $TARGET_DIRECTORY -xz
 
      `tar` 命令会解压 TensorFlow C 语言库到 `TARGET_DIRECTORY` 的子目录 `lib`。比如，指定 `/usr/local` 作为 `TARGET_DIRECTORY` 使得 `tar` 命令可以将 TensorFlow C 语言库解压到 `/usr/local/lib`。
