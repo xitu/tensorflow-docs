@@ -6,7 +6,7 @@
 
 * 熟悉 TensorFlow 的 `Estimator` 和 `Dataset` APIs
 * 使用一个已有模型[尝试使用过 Cloud TPU](https://cloud.google.com/tpu/docs/quickstart)
-* 浏览过 TPU 模型的样例代码 [[1]](https://github.com/tensorflow/models/blob/master/official/mnist/mnist_tpu.py) [[2]](https://github.com/tensorflow/tpu-demos/tree/master/cloud_tpu/models)
+* 浏览过 TPU 模型的样例代码 [[1]](https://github.com/tensorflow/models/blob/master/official/mnist/mnist_tpu.py) [[2]](https://github.com/tensorflow/tpu/tree/master/models)
 * 对将一个现有的 `Estimator` 模型移植到 Cloud TPU 上运行感兴趣
 
 ## TPUEstimator
@@ -102,10 +102,9 @@ my_tpu_estimator = tf.contrib.tpu.TPUEstimator(
 
 通常，`FLAGS` 将由命令行参数设置。要从本地训练转换为 Cloud TPU 训练，你需要：
 
-  1) 设置 `FLAGS.use_tpu` 为 `True`
-  1) 设置 `FLAGS.tpu_name`，以便 `tf.contrib.cluster_resolver.TPUClusterResolver` 可以找到它
-  1) 设置 `FLAGS.model_dir` 为一个 Google Cloud Storage 容器地址（`gs://`）。
-
+* 设置 `FLAGS.use_tpu` 为 `True`
+* 设置 `FLAGS.tpu_name`，以便 `tf.contrib.cluster_resolver.TPUClusterResolver` 可以找到它
+* 设置 `FLAGS.model_dir` 为一个 Google Cloud Storage 容器地址（`gs://`）。
 
 ## 优化器
 
@@ -273,9 +272,9 @@ TensorShape([Dimension(None), Dimension(None), Dimension(None)])
 
 同样重要的是，无论使用哪种类型的读取器，都要使用构造函数的 `buffer_size` 参数启用缓冲。此参数以字节为单位指定。建议使用几 MB（`buffer_size=8*1024*1024`），以便在需要时提供数据。
 
-TPU 示例仓库下包含一个用于下载 ImageNet 数据集并将其转换为适当格式的[脚本](https://github.com/tensorflow/tpu-demos/blob/master/cloud_tpu/datasets/imagenet_to_gcs.py)。
+TPU 示例仓库下包含一个用于下载 ImageNet 数据集并将其转换为适当格式的[脚本](https://github.com/tensorflow/tpu/blob/master/tools/datasets/imagenet_to_gcs.py)。
 
-这与仓库中包含的 ImageNet [模型](https://github.com/tensorflow/tpu-demos/tree/master/cloud_tpu/models)一起演示了所有的最佳实践。
+这与仓库中包含的 ImageNet [模型](https://github.com/tensorflow/tpu/tree/master/models)一起演示了所有的最佳实践。
 
 ## 下一步
 
@@ -285,7 +284,7 @@ TPU 示例仓库下包含一个用于下载 ImageNet 数据集并将其转换为
 
 这篇文章也不能包含所有。关于如何使 Cloud TPU 兼容模型的更多细节的最佳来源是发布在以下文章中的实例模型：
 
- * [TPU 示例仓库](https://github.com/tensorflow/tpu-demos/)
+ * [TPU 示例仓库](https://github.com/tensorflow/tpu)
 
 有关优化 TensorFlow 代码以提高性能的更多信息，请参看：
 
