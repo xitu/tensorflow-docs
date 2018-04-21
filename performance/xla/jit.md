@@ -110,8 +110,7 @@ pipeline start, before inline]: /tmp/hlo_graph_0.dot
 
 控制台显示了包含 XLA 创建的图模型信息的 `hlo_graph_xx.dot` 文件位置。XLA 融合操作的过程可以从 `hlo_graph_0.dot` 开始逐个查看分析图了解。
 
-为了将 .dot 文件渲染成 png 格式，需安装
-[GraphViz](http://www.graphviz.org/Download..php) 并运行:
+为了将 .dot 文件渲染成 png 格式，需安装 [GraphViz](https://www.graphviz.org/download/) 并运行:
 
 ```shell
 dot -Tpng hlo_graph_80.dot -o hlo_graph_80.png
