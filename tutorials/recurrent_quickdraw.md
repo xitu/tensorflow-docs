@@ -21,9 +21,9 @@
 
 运行这个教程的代码：
 
-1.  如果你还没有安装 TensorFlow，那么请@{$install$安装 TensorFlow}。
-2.  下载[教程代码](https://github.com/tensorflow/models/tree/master/tutorials/rnn/quickdraw/train_model.py).
-3.  [下载](http://download.tensorflow.org/data/quickdraw_tutorial_dataset_v1.tar.gz) `TFRecord` 格式的[数据](#下载数据) 并解压。更多细节请参考[可选：下载整个 Quick Draw 数据](#可选：下载整个 Quick Draw 数据) 以及[如何转换原始 Quick, Draw! 数据](可选：数据转换)。
+1.  如果你还没有安装 TensorFlow，那么请 @{$install$Install TensorFlow}。
+2.  下载[教程代码](https://github.com/tensorflow/models/tree/master/tutorials/rnn/quickdraw/train_model.py)。
+3.  [下载](http://download.tensorflow.org/data/quickdraw_tutorial_dataset_v1.tar.gz) `TFRecord` 格式的[数据](#下载数据) 并解压。更多细节请参考[可选：下载整个 Quick Draw 数据](#可选下载整个-quick-draw-数据) 以及[如何转换原始 Quick, Draw! 数据](#可选数据转换)。
 
 4.  使用一下命令可以执行教程代码，并训练教程中描述的 RNN 模型。请自行填写在第三步中放置的解压好的数据路径。
 
@@ -78,15 +78,14 @@ gsutil -m cp "gs://quickdraw_dataset/full/simplified/*" .
 
 ### 可选：数据转换
 
-把 `ndjson` 文件转换为 @{$python/python_io#tfrecords_format_details$TFRecord} 格式，其中含有 ${tf.train.Example} ，请运行下列的命令：
-
+把 `ndjson` 文件转换为 @{$python/python_io#TFRecords_Format_Details$TFRecord} 格式，其中含有 [`tf.train.Example`](https://www.tensorflow.org/code/tensorflow/core/example/example.proto)，请运行下列的命令：
 
 ```shell
    python create_dataset.py --ndjson_path rnn_tutorial_data \
       --output_path rnn_tutorial_data
 ```
 
-这个命令会将数据作为十个分片存储在 @{$python/python_io#tfrecords_format_details$TFRecord} 文件，数据的每个类别包含 10000 个训练样本，以及 1000 个测试样本
+这个命令会将数据作为十个分片存储在 @{$python/python_io#TFRecords_Format_Details$TFRecord} 文件，数据的每个类别包含 10000 个训练样本，以及 1000 个测试样本
 
 下面描述更为详细的转换过程。
 
