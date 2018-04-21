@@ -42,14 +42,14 @@
 | education_num  | 连续型  | 最高学历数值表示。 |
 | marital_status | 类别型 | 婚姻状态。 |
 | occupation     | 类别型 | 职业。 |
-| relationship   | 类别型 | 家庭关系：Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried。         |
-| race           | 类别型 | 种族：White, Asian-Pac-Islander, Amer-Indian-Eskimo, Other, Black。  |
+| relationship   | 类别型 | 家庭关系：Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried。 |
+| race           | 类别型 | 种族：Amer-Indian-Eskimo, Asian-Pac-Islander, Black, White, Other。 |
 | gender         | 类别型 | 性别：Female, Male。                     |
 | capital_gain   | 连续型  | 登记资本增值。         |
 | capital_loss   | 连续型  | 登记资本亏损。         |
 | hours_per_week | 连续型  | 每周工作时长。  |
 | native_country | 类别型 | 原国籍。  |
-| income_bracket | 类别型 | 年收入分类：">5万" 或 "<=5万"，即此人年收入是否高于 5 万。       |
+| income_bracket | 类别型 | 年收入分类：">5万" 或 "<=5万"，即此人年收入是否高于 5 万。 |
 
 ## 将数据转化为张量
 
