@@ -1,4 +1,4 @@
-# TensorFlow Lite 演示（iOS）
+# iOS 演示 APP
 
 TensorFlow Lite 示例程序是一款相机应用，通过量子化的 MobileNet 模型来对摄像头后置摄像头所看到的内容进行分类。下面的说明想你展示了如何在 iOS 上构建和运行这个程序。
 
