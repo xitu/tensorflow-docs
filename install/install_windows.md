@@ -93,12 +93,14 @@ This guide explains how to install TensorFlow on Windows. Although these instruc
 
 <pre>Hello, TensorFlow!</pre>
 
-如果您刚刚接触 TensorFlow，请看 @{$get_started/premade_estimators$Getting Started with TensorFlow}。
-
 如果系统输出了一个错误信息而不是一个打招呼提示，请查看[常见安装问题](#常见安装问题)。
 
-这里也有一个关于 Windows 上 TensorFlow 安装很有用的[文档](https://gist.github.com/mrry/ee5dbcfdd045fa48a27d56664411d41c)。
+如果你是机器学习的新手，我们推荐以下内容：
 
+*  [机器学习速成教程](https://developers.google.com/machine-learning/crash-course)
+*  @{$get_started/get_started_for_beginners$Getting Started for ML Beginners}
+
+如果你有机器学习的经验，但刚刚接触 TensorFlow 请看 @{$get_started/premade_estimators$Getting Started with TensorFlow}。
 
 ## 常见安装问题
 我们使用 Stack Overflow 来记录 TensorFlow 的安装问题和修正方法。下表中包含有一些常见安装问题在 Stack Overflow 上的回答链接。如果您遇到的错误消息或安装问题不在下表中，请在 Stack Overflow 上搜索它的答案。如果 Stack Overflow 上并没有显示这个错误消息或者安装问题的答案，请在 Stack Overflow 上提一个关于这个错误消息或者安装问题的新问题，并给这个问题指定一个 `tensorflow` 的标签。
