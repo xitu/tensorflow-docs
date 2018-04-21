@@ -131,17 +131,17 @@ def cnn_model_fn(features, labels, mode):
       mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 ```
 
-接下来会分章节解释上述 `tf.layers` 的代码，内容包括每一层是如何创建的，损失值是如何计算出来的，训练操作是如何配置的，预测是如何生成的。如果你已经使用过 CNNs 和 @{$get_started/custom_estimators$TensorFlow `Estimator`s}，觉得上述的代码已经很直观明了了，你可以跳过这些章节直接看["训练和评估 CNN MNIST 分类器"](#training-and-evaluating-the-cnn-mnist-classifier)。
+接下来会分章节解释上述 `tf.layers` 的代码，内容包括每一层是如何创建的，损失值是如何计算出来的，训练操作是如何配置的，预测是如何生成的。如果你已经使用过 CNNs 和 @{$get_started/custom_estimators$TensorFlow `Estimator`s}，觉得上述的代码已经很直观明了了，你可以跳过这些章节直接看["训练和评估 CNN MNIST 分类器"](#training_and_evaluating_the_cnn_mnist_classifier)。
 
 ### 输入层
 
-在 `layer` 模块中，用于二维图像数据的卷积层和池化层期望输入的张量维度为`[**batch_size**, **image_width**, **image_height**, **channels**]`，含义如下：
-
+在 `layer` 模块中，用于二维图像数据的卷积层和池化层期望输入的张量维度默认为`[batch_size, image_height, image_width, channels]`。可以通过修改 `data_format` 的参数改变这种行为，定义如下：
 
 *   _`batch_size`_：在训练过中，每次执行梯度下降时使用的样本子集大小。
-*   _`image_width`_：样本图片的宽度。
 *   _`image_height`_：样本图片的高度。
-*   _`channels`_：样本图片的通道数。对于彩色图片，通道数为 3 （红，绿，蓝）。对于灰度图片，就只有一个通道（黑）。
+*   _`image_width`_：样本图片的宽度。
+*   _`channels`_：样本图片的通道数。对于彩色图片，通道数为 3（红，绿，蓝）。对于灰度图片，就只有一个通道（黑）。
+*   _`data_format`_：字符串，`channels_last`（default）或 `channels_first`。`channels_last` 对应于具有 `(batch, ..., channels)` 形状的输入，而 `channels_first` 对应于 具有 `(batch, channels, ...)` 形状的输入。
 
 在这里，我们的 MNIST 数据集图片是灰度图片，每张图片的大小是 28x28 像素，因此我们输入层数据的维度为`[batch_size, 28, 28, 1]`
 
@@ -166,19 +166,19 @@ conv1 = tf.layers.conv2d(
     activation=tf.nn.relu)
 ```
 
-`inputs` 参数指定了我们的输入张量，这个张量的形状必须为 `[batch_size, image_width, inage_height, channels]`。在这里，我们将 `input_layer` 连接到第一个卷积层，它的形状是 `[**batch_size**, 28, 28, 1]`。
+`inputs` 参数指定了我们的输入张量，这个张量的形状必须为 `[batch_size, image_height, inage_width, channels]`。在这里，我们将 `input_layer` 连接到第一个卷积层，它的形状是 `[batch_size, 28, 28, 1]`。
 
-> 注意：如果你传入了参数 `data_format=channels_first`，那么 `conv2d()` 所接受的维数是 `[channels, batchsize, imagewidth, imageheight]`。
+> 注意：如果你传入了参数 `data_format=channels_first`，那么 `conv2d()` 所接受的维数是 `[batch_size, channels, image_height, image_width]`。
 
-参数 `filters` 指定的是具体应用的卷积核的数量（在这里，数量为 32），`kernel_size` 指定的是卷积核的尺寸 `[width, height]`（在这里，尺寸为 `[5, 5]`）
+参数 `filters` 指定的是具体应用的卷积核的数量（在这里，数量为 32），`kernel_size` 指定的是卷积核的尺寸 `[height, width]`（在这里，尺寸为 `[5, 5]`）
 
-**小建议：**如果卷积核的宽高度一致的话，你可以传递一个单独整数给参数 `kernel_size`，譬如 `kernel_size=5`。
+**小建议：**如果卷积核的高度和宽度一致的话，你可以传递一个单独整数给参数 `kernel_size`，譬如 `kernel_size=5`。
 
 参数 `padding` 的输入值是两个枚举值中的一个（值不区分大小写）：`valid` （默认值）或 `same`。当你设置 `padding=same` 的时候，TensorFlow 将会在边界填充 0 值从而让输出的张量和输入的张量有相同的宽高，也即 28x28。（如果没有填充，那么 5x5 的卷积核会产生一个 24x24 形状的张量）
 
 参数 `activation` 指定在每层输出时要应用的激活函数。在这里，我们使用的是 ReLU 激活函数 @{tf.nn.relu}。
 
-函数 `conv2d()` 的输出张量的形状为 `[batch_size, 28, 28, 32]`：宽高与输入是一致的，但是有 32 个通道，每个通道对应着一个卷积核的输出。
+函数 `conv2d()` 的输出张量的形状为 `[batch_size, 28, 28, 32]`：以相同的高度和宽度作为输入，但是有 32 个通道，每个通道对应着一个卷积核的输出。
 
 ### 第一个池化层
 
@@ -188,15 +188,15 @@ conv1 = tf.layers.conv2d(
 pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
 ```
 
-再次说明，`inputs` 指定了输入的张量，它的形状为 `[batch_size, image_width, image_height, channels]`。在这里，我们的输入的张量是 `conv1`，也就是第一个卷积层的输出，它的形状是 `[batch_size, 28, 28, 32]`。
+再次说明，`inputs` 指定了输入的张量，它的形状为 `[batch_size, image_height, image_width, channels]`。在这里，我们的输入的张量是 `conv1`，也就是第一个卷积层的输出，它的形状是 `[batch_size, 28, 28, 32]`。
 
-> 注意：如果你传入了参数 `data_format=channels_first`，那么 `conv2d()` 所接受的形状是`[channels, batchsize, imagewidth, imageheight]`。
+> 注意：如果你传入了参数 `data_format=channels_first`，那么 `conv2d()` 所接受的形状是`[batch_size, channels, image_height, image_width]`。
 
-参数 `pool_size` 指定了最大池化过滤器的维度（在这里，维度值为 [2, 2]），该参数也可以接受一个单独的数字（譬如 `pool_size=2`）
+参数 `pool_size` 指定了最大池化过滤器的维度 `[height, width]`（在这里维度值为 [2, 2]），该参数也可以接受一个单独的数字（譬如 `pool_size=2`）
 
-参数 `strides` 指定了滑动步长的大小。在这里，我们设置步长的值为 2，它的含义是过滤器提取的子区域在高度和宽度上都间隔有 2 个像素（对于 2x2 的过滤器，我们所提取的子区域都不会重叠）。如果你要为宽度和高度设置不同的步长值，你可以传入一个类型为元组或列表的值（e.g., `stride=[3, 6]`）。
+参数 `strides` 指定了滑动步长的大小。在这里，我们设置步长的值为 2，它的含义是过滤器提取的子区域在高度和宽度上都间隔有 2 个像素（对于 2x2 的过滤器，我们所提取的子区域都不会重叠）。如果你要为高度和宽度设置不同的步长值，你可以传入一个类型为元组或列表的值（e.g., `stride=[3, 6]`）。
 
-方法 `max_pooling2d()` 输出的张量（`pool1`）的形状为 `[batch_size, 14, 14, 32]`：2x2 的过滤器让宽和高分别减少了 50%。
+方法 `max_pooling2d()` 输出的张量（`pool1`）的形状为 `[batch_size, 14, 14, 32]`：2x2 的过滤器让高和宽分别减少了 50%。
 
 ### 第二个卷积层和池化层
 
@@ -213,9 +213,9 @@ conv2 = tf.layers.conv2d(
 pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
 ```
 
-注意第二个卷积层将第一个池化层的输出（`pool1`）作为输入，然后得到的输出张量为 `conv2`。张量 `conv2` 的形状为 `[batch_size, 14, 14, 62]`，宽和高与第一个池化层（`pool1`）相同，64 个通道表示应用的 64 个卷积核。
+注意第二个卷积层将第一个池化层的输出（`pool1`）作为输入，然后得到的输出张量为 `conv2`。张量 `conv2` 的形状为 `[batch_size, 14, 14, 62]`，高和宽与第一个池化层（`pool1`）相同，64 个通道表示应用的 64 个卷积核。
 
-第二个池化层拿 `conv2` 作为输入，然后得到的 `pool2` 作为输出。`pool2` 的形状为 `[batch_size, 7, 7, 64]`（将宽和高的长度分别减少了 50%）
+第二个池化层拿 `conv2` 作为输入，然后得到的 `pool2` 作为输出。`pool2` 的形状为 `[batch_size, 7, 7, 64]`（将高和宽的长度分别减少了 50%）
 
 ### 全连接层
 
@@ -225,7 +225,7 @@ pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
 pool2_flat = tf.reshape(pool2, [-1, 7 * 7 * 64])
 ```
 
-在上面 `reshape()` 操作中，`-1` 表示 **`batch_size`** 的维数，它会根据输入的数据样本数动态的计算出来。每一个样本有 7 (`pool2` 的宽) * 7 (`pool2` 的高) * 64 (`pool2` 的通道数) 个特征，因此我们的特征维数为 7 * 7 * 64（总共 3136 个）。输出的张量 `pool2_flat` 的形状是 `[batch_size, 3136]`
+在上面 `reshape()` 操作中，`-1` 表示 **`batch_size`** 的维数，它会根据输入的数据样本数动态的计算出来。每一个样本有 7 (`pool2` 的 height) * 7 (`pool2` 的 width) * 64 (`pool2` 的通道数) 个特征，因此我们的特征维数为 7 * 7 * 64（总共 3136 个）。输出的张量 `pool2_flat` 的形状是 `[batch_size, 3136]`
 
 现在，我们可以使用 `layers` 模块中的 `dense()` 方法连接全连接层了。
 
@@ -281,7 +281,7 @@ tf.argmax(input=logits, axis=1)
 tf.nn.softmax(logits, name="softmax_tensor")
 ```
 
-> 注意：我们使用参数 `name` 给这个操作命名为 `softmax_tensor`，这样的话我们就可以在后面引用他。（我们将在[“设置日志钩”](#set-up-a-logging-hook)中为softmax值设置日志记录）
+> 注意：我们使用参数 `name` 给这个操作命名为 `softmax_tensor`，这样的话我们就可以在后面引用他。（我们将在[“设置日志钩”](#set-up-a-logging-hook)中为 softmax 值设置日志记录）。
 
 我们用一个字典数据结构来表示预测，然后生成一个 `EstimatorSpec` 对象：
 
@@ -347,7 +347,7 @@ if mode == tf.estimator.ModeKeys.TRAIN:
   return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 ```
 
-> 注意：为评估器模型函数配置训练操作的更多细节，请参考 @{$get_started/custom_estimators$"Creating Estimations in tf.estimator"} 指南中的 @{$get_started/custom_estimators#defining-the-training-op-for-the-model$"Defining the training op for the model"} 小节。
+> 注意：为评估器模型函数配置训练操作的更多细节，请参考 @{$get_started/custom_estimators$"Creating Estimations in tf.estimator"} 指南中的 @{$get_started/custom_estimators#defining_the_training_op_for_the_model$"Defining the training op for the model"} 小节。
 
 ### 添加评价指标
 
@@ -408,7 +408,7 @@ mnist_classifier = tf.estimator.Estimator(
 
 我们可以用字典储存想要打印的张量 `tensors_to_log`。每个键值只不过是用于日志输出的一个别名，它的值则是 TensorFlow 计算图中的某个张量的名称。这里的的 `softmax_tensor` 是前面 `cnn_model_fn` 中创建的一个用于生成概率的张量的名称，而 `probabilities` 是这里给它取的别名。
 
-> 注意：如果你没有通过 `name` 参数显式的给操作分配一个名称，那么 TensorFlow 将分配一个默认名称。有两种简单的方式可以查看到操作的名称，第一种方法是用 @{$graph_viz$TensorBoard} 可视化计算图，另外一种方法是启用 @{$debugger$TensorFlow Debugger (tfdbg)}。
+> 注意：如果你没有通过 `name` 参数显式的给操作分配一个名称，那么 TensorFlow 将分配一个默认名称。有两种简单的方式可以查看到操作的名称，第一种方法是用 @{$graph_viz$TensorBoard} 可视化计算图，另外一种方法是启用 @{$programmers_guide/debugger$TensorFlow Debugger (tfdbg)}。
 
 接下来，通过给 `tensors` 参数传递 `tensor_to_log` 变量来创建 `LoggingTensorHook` 对象，并且设置 `every_n_iter` 的值为 50，每训练 50 步后在日志中输出概率。
 
