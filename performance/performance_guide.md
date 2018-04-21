@@ -42,10 +42,9 @@ with tf.device('/cpu:0'):
 
 #### 使用 tf.data API
 
-@{$datasets$tf.data API} 正在取代 `queue_runner` 作为构建输入管道的推荐 API。训练示例[ResNet example](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10_estimator/cifar10_main.py)
-([arXiv:1512.03385](https://arxiv.org/abs/1512.03385)) 说明了使用 `tf.estimator.Estimator` 时 `tf.data` 的 API 调用。
+@{$datasets$tf.data API} 正在取代 `queue_runner` 作为构建输入管道的推荐 API。训练示例[ResNet example](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10_estimator/cifar10_main.py) ([arXiv:1512.03385](https://arxiv.org/abs/1512.03385)) 说明了使用 `tf.estimator.Estimator` 时 `tf.data` 的 API 调用。
 
-`tf.data` API 使用 C++ 多线程，相比于 Python 的 `queue_runner`，由于 `queue_runner` 受限于 Python 的多性能，所以 `tf.data` API 具有较低的开销。
+`tf.data` API 使用 C++ 多线程，相比于 Python 的 `queue_runner`，由于 `queue_runner` 受限于 Python 的多性能，`tf.data` API 则具有较低的开销。`tf.data` API 详细的性能指南请见[这儿](@{$datasets_performance})。
 
 虽然使用 `feed_dict` 的流数据提供了很高的灵活性，但是通常 `feed_dict` 并没有提供可伸缩的解决方案。如果只使用单个 GPU，则 `tf.data` API 和 `feed_dict` 之间的性能差异可以忽略不计。我们建议避免使用 `feed_dict` 来处理琐碎的示例。特别是，避免使用大量输入的 `feed_dict`：
 
