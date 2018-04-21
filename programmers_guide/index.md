@@ -4,8 +4,9 @@
 
 ## 顶层 API
 
-* @{$programmers_guide/estimators}，介绍了一种能够大大简化机器学习（ML）编程的 TensorFlow API。
-* @{$programmers_guide/datasets}，说明了如何设置读取数据送入 TensorFlow 程序的数据管道。
+* @{$programmers_guide/eager} 介绍了使用 TensorFlow 最简单的方法。
+* @{$programmers_guide/estimators} 介绍了一种能够大大简化机器学习（ML）编程的 TensorFlow API。
+* @{$programmers_guide/datasets} 说明了如何设置读取数据送入 TensorFlow 程序的数据管道。
 
 ## 底层 API
 
