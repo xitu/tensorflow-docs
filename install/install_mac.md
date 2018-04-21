@@ -403,12 +403,7 @@ RuntimeError: Broken toolchain: cannot link a simple C program</pre>
 
 ## TensorFlow 的 Python 包的 URL
 
-一些安装方法中需要 TensorFlow Python 包的 URL，你所声明的值取决下面两个因素：
-
-  * 操作系统
-  * Python 版本
-
-这个部分记录了 maxOS 相关安装的 URL 值
+一些安装方法中需要 TensorFlow Python 包的 URL，你所声明的量取决于你的 Python 版本。
 
 ### Python 2.7
 
@@ -421,29 +416,3 @@ https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py2-none-a
 <pre>
 https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py3-none-any.whl
 </pre>
-
-<a name="Protobuf31"></a>
-## Protobuf 3.1 的 pip 包
-
-除非你遇到了与 protobuf pip package 相关的问题，否则你可以直接跳过该部分。
-
-**注意**：如果你的 TensorFlow 程序运行速度很慢，你可能有一个和 protobuf pip package 相关的问题。
-
-TensorFlow pip 包依赖于 3.1 版本的 protobuf pip package。从 PyPI 下载的 protobuf pip package （使用<tt>pip install protobuf</tt> 命令） 是一个含有序列化、反序列化实现的纯 Python 库，可能比 C++ 的实现慢 **10 到 50 倍**。Protobuf 同时也支持针对 Python 包的一个二进制扩展，基于快速的 C++ 解析。这个扩展在纯 Python 的标准 pip 包中是没有的。我们已经创建了一个自定义的二进制 pip 包给含有二进制扩展的 protobuf。要安装自定义的二进制 protobuf pip package，执行如下的命令
-
-  * 对应 Python 2.7：
-
-    <pre>$ <b>pip install --upgrade \
-    https://storage.googleapis.com/tensorflow/mac/cpu/protobuf-3.1.0-cp27-none-macosx_10_11_x86_64.whl</b></pre>
-
-  * 对应 Python 3.n：
-
-    <pre>$ <b>pip3 install --upgrade \
-    https://storage.googleapis.com/tensorflow/mac/cpu/protobuf-3.1.0-cp35-none-macosx_10_11_x86_64.whl</b></pre>
-
-安装此 protobuf 包将覆盖现有的 protobuf 包，能够修复下面的错误（注意，二进制 pip 包已经支持大于 64MB 的 protobufs）：
-
-<pre>[libprotobuf ERROR google/protobuf/src/google/protobuf/io/coded_stream.cc:207]
-A protocol message was rejected because it was too big (more than 67108864 bytes).
-To increase the limit (or to disable these warnings), see
-CodedInputStream::SetTotalBytesLimit() in google/protobuf/io/coded_stream.h.</pre>
