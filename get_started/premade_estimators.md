@@ -1,4 +1,4 @@
-# TensorFlow 入门教程
+# Premade Estimators
 
 该文档将介绍 TensorFlow 的编程环境，并会向你展示如何使用 TensorFlow 解决 Iris 分类问题。
 
@@ -312,9 +312,9 @@ predictions = classifier.predict(
 
 
 ``` python
-for pred_dict, expec in zip(predictions, expected):
-    template = ('\nPrediction is "{}" ({:.1f}%), expected "{}"')
+template = ('\nPrediction is "{}" ({:.1f}%), expected "{}"')
 
+for pred_dict, expec in zip(predictions, expected):
     class_id = pred_dict['class_ids'][0]
     probability = pred_dict['probabilities'][class_id]
 
