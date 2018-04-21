@@ -162,7 +162,7 @@ Filling queue with 20000 CIFAR images before starting to train. This will take a
 
 > **练习：** 在实验时，第一阶段训练时间会很长，长到让人厌烦。可以尝试减少初始化时填充到队列中的图片数量来改变这样的长期等待的情况。在 `cifar10_input.py` 脚本中搜索 `min_fraction_of_examples_in_queue` 来进行修改。
 
-`cifar10_train.py` 脚本会周期性的在 @{$variables#saving-and-restoring$checkpoint files} 中 @{tf.train.Saver$saves} 模型的所有参数，但是**不会**对于模型进行评估。`cifar10_eval.py` 脚本会使用该检查点文件来测试预测的性能（详见下面：评估模型）。
+`cifar10_train.py` 脚本会周期性的在 @{$programmers_guide/saved_model$checkpoint files} 中 @{tf.train.Saver$saves} 模型的所有参数，但是**不会**对于模型进行评估。`cifar10_eval.py` 脚本会使用该检查点文件来测试预测的性能（详见下面：评估模型）。
 
 如果你根据上面的步骤做下来，那么你已经开始训练一个 CIFAR-10 模型了。[恭喜！](https://www.youtube.com/watch?v=9bZkp7q19f0)
 
