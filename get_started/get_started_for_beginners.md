@@ -1,4 +1,4 @@
-# 机器学习新手入门
+# Graph Execution 入门
 
 该文档阐述了如何使用机器学习，对鸢尾花的种属（Iris flowers Dataset）进行分类，深入 TensorFlow 源码，阐述机器学习基本原理。
 
@@ -8,7 +8,9 @@
 *   想学习编写 TensorFlow 程序
 *   会使用 Python 编程
 
-如果你已经熟悉基础的机器学习概念，只是 TensorFlow 新手，建议移步 @{$premade_estimators$Getting Started with TensorFlow: for ML Experts}。
+如果你已经熟悉基础的机器学习概念，但刚刚接触 TensorFlow，建议移步 @{$premade_estimators$Getting Started with TensorFlow: for ML Experts}。
+
+如果你想了解很多关于机器学习的基础知识，建议学习下[机器学习速成教程](https://developers.google.com/machine-learning/crash-course/)。
 
 ## 鸢尾花分类问题
 
@@ -48,6 +50,8 @@ Iris 数据集的前 5 行如下：
 * 0 对应 setosa
 * 1 对应 versicolor
 * 2 对应 virginica
+
+更多标签和示例样本请见 [机器学习速成课程的 ML 术语部分](https://developers.google.com/machine-learning/crash-course/framing/ml-terminology)。
 
 ## 模型训练
 
@@ -249,6 +253,8 @@ my_feature_columns = [
 **包含 3 个隐藏层的神经网络**
 <p>&nbsp;</p>
 
+有关神经网络的更详细介绍请见[机器学习速成课程之神经网络介绍](https://developers.google.com/machine-learning/crash-course/introduction-to-neural-networks/anatomy)。
+
 我们通过实例化一个 [**Estimator**](https://developers.google.com/machine-learning/glossary/#Estimators) 类来指定模型类型。TensorFlow 提供两类 Estimator：
 
 *   [**预定义 Estimator**](https://developers.google.com/machine-learning/glossary/#pre-made_Estimator)，代码已经由他人写好。
@@ -405,6 +411,8 @@ Test set accuracy: 0.967
 
 准确率 0.967 意味着：我们训练出的模型能将测试集里 30 个鸢尾花样本中的 29 个正确分类。
 
+更深入地了解评估模型的不同指标请看[机器学习速成课程的分类部分](https://developers.google.com/machine-learning/crash-course/classification)。
+
 ### 预测
 
 现在我们训练好模型，而且“证明”了在鸢尾花分类问题中它还不错，虽然并不完美。现在我们用训练的模型在[**无标记样本**](https://developers.google.com/machine-learning/glossary/#unlabeled_example)（没有标记仅有特征的样本）上做预测；
@@ -479,8 +487,7 @@ Prediction is "Virginica" (97.9%), expected "Virginica"
 
 ## 小结
 
-<!--TODO(barryr): When MLCC is released, add pointers to relevant sections.-->
-此文档提供一个机器学习的简短介绍。
+此文档简要的介绍了机器学习。
 
 由于 `premade_estimators.py` 依赖于高层 API，机器学习中大部分的复杂数学被隐藏。如果你想要深入学习机器学习，我们推荐学习[**梯度下降**](https://developers.google.com/machine-learning/glossary/#gradient_descent)，批量，还有神经网络。
 
