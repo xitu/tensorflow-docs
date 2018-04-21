@@ -91,8 +91,7 @@ Docker 容器包含 TensorFlow 及其所有依赖项。
      <pre> $ <b>pip3 install --upgrade \
      https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py3-none-any.whl</b></pre>
 
-如果你遇到了任何安装问题，请查看
-[常见安装问题](#常见安装问题).
+如果你遇到了任何安装问题，请查看[常见安装问题](#常见安装问题).
 
 ### 下一步
 
