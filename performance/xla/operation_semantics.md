@@ -170,18 +170,17 @@ output[i0, ..., iN, j0, ..., jM] = operand[j0, ..., jM]
 
 将一个操作数钳制在最小值和最大值之间的范围内。
 
-<b> `Clamp(computation, args...)` </b>
+<b> `Clamp(min, operand, max)` </b>
 
 | 参数           | 类型                    | 语义                              |
 | ------------- | ----------------------- | -------------------------------- |
-| `computation` | `Computation`           | 类型为 `T_0, T_1,..., T_N -> S` 的计算，它有 N 个任意类型的参数 |
 | `min`         | `ComputationDataHandle` | 类型为 T 的数组 |
 | `operand`     | `ComputationDataHandle` | 类型为 T 的数组 |
 | `max`         | `ComputationDataHandle` | 类型为 T 的数组 |
 
 给定操作数，最小和最大值，如果操作数位于最小值和最大值之间，则返回操作数，否则，如果操作数小于最小值，则返回最小值，如果操作数大于最大值，则返回最大值。即 `clamp(a, x, b) =  min(max(a, x), b)`。
 
-输入的三个数组的维度形状必须是一样的。不过，也可以采用一种严格的[广播](broadcasting.md)形式，即 `min` 和/或 `max` 可以是类型为 `T` 的一个标量。
+输入的三个数组的维度形状必须是一样的。另外，也可以采用一种严格的[广播](broadcasting.md)形式，即 `min` 和/或 `max` 可以是类型为 `T` 的一个标量。
 
 `min` 和 `max` 为标量的示例如下：
 
@@ -578,7 +577,7 @@ DotGeneral(lhs, rhs, dnums) -> { { {1.0, 2.0},
 
 DynamicSlice从动态 `start_indices` 输入数组中提取子数组。`size_indices` 为每个维度的切片大小，它在每个维度上指定了切片范围：[start, start + size)。`start_indices` 的秩必须为 1，且维数大小等于 `operand` 的秩。
 
-注意：当前实现未定义切片索引越界（错误的运行时生成的'start_indices'）的情况。当前，切片索引通过对输入维数大小做模运算来防止越界访问，但是这个机制在未来的实现中可能会修改。
+注意：当前实现未定义切片索引越界（错误的运行时生成的'start_indices'）的情况。
 
 <b> `DynamicSlice(operand, start_indices, size_indices)` </b>
 
@@ -619,7 +618,7 @@ DynamicSlice(b, s, {2, 2}) produces:
 
 DynamicUpdateSlice 是在输入数组 `operand` 上，通过切片 `update` 操作覆盖 `start_indices` 后生成的结果。`update` 的形状决定了更新后结果的子数组的形状。 `start_indices` 的秩必须为 1，且维数大小等于 `operand` 的秩。
 
-注意：当前实现未定义切片索引越界（错误的运行时生成的'start_indices'）的情况。当前，切片索引通过对输入维数大小做模运算来防止越界访问，但是这个机制在未来的实现中可能会修改。
+注意：当前实现未定义切片索引越界（错误的运行时生成的'start_indices'）的情况。
 
 <b> `DynamicUpdateSlice(operand, update, start_indices)` </b>
 
