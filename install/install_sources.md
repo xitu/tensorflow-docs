@@ -103,23 +103,12 @@ $ <b>sudo apt-get install python3-numpy python3-dev python3-pip python3-wheel</b
 
 必须在你的系统中安装以下 NVIDIA <i>软件</i>：
 
-  * NVIDIA's Cuda Toolkit (>= 7.0)。推荐 9.0 版本。详细可参考 [NVIDIA 文档](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/#axzz4VZnqTJ2A)。确保按照文档要求添加 Cuda 相对路径 “LD_LIBRARY_PATH” 到环境变量。
-  * 与 NVIDIA 的 Cuda 工具包匹配的驱动程序
-  * cuDNN (>= v3)。推荐 6.0 版本。细节参考 [NVIDIA 文档](https://developer.nvidia.com/cudnn)，注意将路径添加到 `LD_LIBRARY_PATH` 环境变量。
+  * [CUDA Toolkit](http://nvidia.com/cuda) (>= 7.0)。我们建议使用 9.0 版本。。详见 [NVIDIA 文档](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/)。确保按照文档要求添加 CUDA 相对路径 “LD_LIBRARY_PATH” 到环境变量。
+  * [GPU drivers](http://nvidia.com/driver) supporting your version of the CUDA Toolkit.
+  * [cuDNN SDK](http://developer.nvidia.com/cudnn) (>= v3). We recommend version 7.0. For details, see [NVIDIA's documentation](http://docs.nvidia.com/deeplearning/sdk/cudnn-install/).
+  * [CUPTI](http://docs.nvidia.com/cuda/cupti/) ships with the CUDA Toolkit, but you also need to append its path to the `LD_LIBRARY_PATH` environment variable:
 
-最后,你还必须安装Cuda工具包的 `libcupti> = 8.0`。
-
-[NVIDIA's documentation](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/#axzz4VZnqTJ2A).
-<pre> $ <b>sudo apt-get install cuda-command-line-tools</b> </pre>
-
-添加路径到 `LD_LIBRARY_PATH` 环境变量:
-
-<pre> $ <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64</b> </pre>
-
-如果 Cuda Toolkit <= 7.5, 通过调用下面的命令安装 `libcupti-dev`:
-
-<pre> $ <b>sudo apt-get install libcupti-dev</b> </pre>
-
+    <pre> $ <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64</b> </pre>
 
 ### 接下来
 
@@ -185,12 +174,9 @@ Note: These are just the minimum requirements to _build_ tensorflow. Installing 
 <a name="ConfigureInstallation"></a>
 ## 配置安装
 
-在文件夹根目录里有一个命名为 <code>configure</code> 的 bash 脚本。
-这个脚本会要求你定义与 TensorFlow 相关依赖路径以及指定其他相关的配置选项，例如编译器标记。
-你必须在创建 pip 包以及安装 TensorFlow **之前**运行这个脚本。
+在文件夹根目录里有一个命名为 <code>configure</code> 的 bash 脚本。这个脚本会要求你定义与 TensorFlow 相关依赖路径以及指定其他相关的配置选项，例如编译器标记。你必须在创建 pip 包以及安装 TensorFlow **之前**运行这个脚本。
 
-如果你希望构建的 TensorFlow 支持 GPU，`configure` 将会要求你指明安装在系统上的 Cuda 以及 cuDNN 的版本，
-指明需要安装的版本替代默认选项。
+如果你希望构建的 TensorFlow 支持 GPU，`configure` 将会要求你指明安装在系统上的 CUDA 以及 cuDNN 的版本。如果你安装了 CUDA 和 cuDNN 的好几个版本，则需要你明确选择所需的版本而不是依靠默认值。
 
 `configure` 将会询问以下内容:
 
@@ -230,12 +216,12 @@ Do you wish to build TensorFlow with CUDA support? [y/N] <b>Y</b>
 CUDA support will be enabled for TensorFlow
 Do you want to use clang as CUDA compiler? [y/N]
 nvcc will be used as CUDA compiler
-Please specify the Cuda SDK version you want to use, e.g. 7.0. [Leave empty to default to CUDA 9.0]: <b>9.0</b>
+Please specify the CUDA SDK version you want to use, e.g. 7.0. [Leave empty to default to CUDA 9.0]: <b>9.0</b>
 Please specify the location where CUDA 9.0 toolkit is installed. Refer to README.md for more details. [Default is /usr/local/cuda]:
 Please specify which gcc should be used by nvcc as the host compiler. [Default is /usr/bin/gcc]:
 Please specify the cuDNN version you want to use. [Leave empty to default to cuDNN 7.0]: <b>7</b>
 Please specify the location where cuDNN 7 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda]:
-Please specify a list of comma-separated Cuda compute capabilities you want to build with.
+Please specify a list of comma-separated CUDA compute capabilities you want to build with.
 You can find the compute capability of your device at: https://developer.nvidia.com/cuda-gpus.
 Please note that each additional compute capability significantly increases your build time and binary size.
 [Default is: "3.5,5.2"]: <b>3.0</b>
@@ -244,12 +230,11 @@ MPI support will not be enabled for TensorFlow
 Configuration finished
 </pre>
 
-如果你告知 `configure` 支持 GPU ，`configure` 将会创建一个固定的链接指定你系统上的 Cuda 库路径，
-因此每次你改变 Cuda 库路径时候你必须在重新执行 `configure` 脚本，在你调用 <code>bazel build</code> 命令之前。
+如果你告知 `configure` 支持 GPU ，`configure` 将会创建一个固定的链接指定你系统上的 CUDA 库路径，因此每次你改变 CUDA 库路径时候你必须在重新执行 `configure` 脚本，在你调用 <code>bazel build</code> 命令之前。
 
 注意以下几点:
 
-  * 虽然可以在同样的源代码树构建 Cuda 和 non-Cuda 的配置,我们还是建议在相同的源代码树运行时，使用 bazel clean 切换这两个配置。
+  * 虽然可以在同样的源代码树构建 CUDA 和 non-CUDA 的配置,我们还是建议在相同的源代码树运行时，使用 bazel clean 切换这两个配置。
   * 如果你在运行 `bazel build` 命令 *之前* 没有运行 `configure` 脚本* *, `bazel build` 命令将会失败。
 
 
@@ -280,10 +265,10 @@ $ <b>bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pk
 
 ## 安装 pip 包
 
-调用 `pip install` 安装 pip 包。`.whl` 的文件名与你的平台有关，例如下面的命令将会在 Linux 上安装 TensorFlow 1.7.0rc1。
+调用 `pip install` 安装 pip 包。`.whl` 的文件名与你的平台有关，例如下面的命令将会在 Linux 上安装 TensorFlow 1.8.0rc1。
 
 <pre>
-$ <b>sudo pip install /tmp/tensorflow_pkg/tensorflow-1.7.0rc1-py2-none-any.whl</b>
+$ <b>sudo pip install /tmp/tensorflow_pkg/tensorflow-1.8.0rc1-py2-none-any.whl</b>
 </pre>
 
 ## 验证安装是否成功 
@@ -369,8 +354,10 @@ print(sess.run(hello))
 **Linux**
 <table>
 <tr><th>Version:</th><th>CPU/GPU:</th><th>Python Version:</th><th>Compiler:</th><th>Build Tools:</th><th>cuDNN:</th><th>CUDA:</th></tr>
-<tr><td>tensorflow-1.7.0rc1</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.10.0</td><td>N/A</td><td>N/A</td></tr>
-<tr><td>tensorflow_gpu-1.7.0rc1</td><td>GPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.9.0</td><td>7</td><td>9</td></tr>
+<tr><td>tensorflow-1.8.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.10.0</td><td>N/A</td><td>N/A</td></tr>
+<tr><td>tensorflow_gpu-1.8.0</td><td>GPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.9.0</td><td>7</td><td>9</td></tr>
+<tr><td>tensorflow-1.7.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.10.0</td><td>N/A</td><td>N/A</td></tr>
+<tr><td>tensorflow_gpu-1.7.0</td><td>GPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.9.0</td><td>7</td><td>9</td></tr>
 <tr><td>tensorflow-1.6.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.9.0</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow_gpu-1.6.0</td><td>GPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.9.0</td><td>7</td><td>9</td></tr>
 <tr><td>tensorflow-1.5.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.8.0</td><td>N/A</td><td>N/A</td></tr>
@@ -390,7 +377,8 @@ print(sess.run(hello))
 **Mac**
 <table>
 <tr><th>Version:</th><th>CPU/GPU:</th><th>Python Version:</th><th>Compiler:</th><th>Build Tools:</th><th>cuDNN:</th><th>CUDA:</th></tr>
-<tr><td>tensorflow-1.7.0rc1</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.10.1</td><td>N/A</td><td>N/A</td></tr>
+<tr><td>tensorflow-1.8.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.10.1</td><td>N/A</td><td>N/A</td></tr>
+<tr><td>tensorflow-1.7.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.10.1</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow-1.6.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.8.1</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow-1.5.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.8.1</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow-1.4.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.5.4</td><td>N/A</td><td>N/A</td></tr>
@@ -405,8 +393,10 @@ print(sess.run(hello))
 **Windows**
 <table>
 <tr><th>Version:</th><th>CPU/GPU:</th><th>Python Version:</th><th>Compiler:</th><th>Build Tools:</th><th>cuDNN:</th><th>CUDA:</th></tr>
-<tr><td>tensorflow-1.7.0rc1</td><td>CPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>N/A</td><td>N/A</td></tr>
-<tr><td>tensorflow_gpu-1.7.0rc1</td><td>GPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>7</td><td>9</td></tr>
+<tr><td>tensorflow-1.8.0</td><td>CPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>N/A</td><td>N/A</td></tr>
+<tr><td>tensorflow_gpu-1.8.0</td><td>GPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>7</td><td>9</td></tr>
+<tr><td>tensorflow-1.7.0</td><td>CPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>N/A</td><td>N/A</td></tr>
+<tr><td>tensorflow_gpu-1.7.0</td><td>GPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>7</td><td>9</td></tr>
 <tr><td>tensorflow-1.6.0</td><td>CPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow_gpu-1.6.0</td><td>GPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>7</td><td>9</td></tr>
 <tr><td>tensorflow-1.5.0</td><td>CPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>N/A</td><td>N/A</td></tr>
