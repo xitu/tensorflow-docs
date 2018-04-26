@@ -1,64 +1,64 @@
-# Android Demo App
+# Android 示例应用
 
-An example Android application using TensorFLow Lite is available [on GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app). The demo is a sample camera app that classifies images continuously using either a quantized Mobilenet model or a floating point Inception-v3 model. To run the demo, a device running Android 5.0 ( API 21) or higher is required.
+该 TensorFLow Lite 示例可以在 [GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app) 上被找到。 这是一个使用量子化的 MobileNet 模型或是浮点 Inception-v3 模型对图片进行持续分类的相机应用。示例的最低运行要求是 Android 5.0（API 21）。
 
-In the demo app, inference is done using the TensorFlow Lite Java API. The demo app classifies frames in real-time, displaying the top most probable classifications. It also displays the time taken to detect the object.
+在示例中，应用会使用 TensorFlow Lite Java API 来预测。应用会实时地将帧分类，并将可能性最高的类别和检测对象的时间一同显示出来。
 
-There are three ways to get the demo app to your device:
+有三种方式获取示例应用：
 
-* Download the [prebuilt binary APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk).
-* Use Android Studio to build the application.
-* Download the source code for TensorFlow Lite and the demo and build it using
-  bazel.
-
-
-## Download the pre-built binary
-
-The easiest way to try the demo is to download the [pre-built binary APK](https://storage.googleapis.com/download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk)
-
-Once the APK is installed, click the app icon to start the program. The first time the app is opened, it asks for runtime permissions to access the device camera. The demo app opens the back-camera of the device and recognizes objects in the camera's field of view. At the bottom of the image (or at the left of the image if the device is in landscape mode), it displays top three objects classified and the classification latency.
+* 下载[预编译 APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk)。
+* 使用 Android Studio 编译应用。
+* 下载 TensorFlow Lite 和这个示例应用的源码，然后用
+  bazel 编译。
 
 
-## Build in Android Studio with TensorFlow Lite AAR from JCenter
+## 下载预编译版本
 
-Use Android Studio to try out changes in the project code and compile the demo app:
+尝试这个示例最简单的方法是下载[预编译 APK](https://storage.googleapis.com/download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk)。
 
-* Install the latest version of [Android Studio](https://developer.android.com/studio/index.html).
-* Make sure the Android SDK version is greater than 26 and NDK version is greater than 14 (in the Android Studio settings).
-* Import the `tensorflow/contrib/lite/java/demo` directory as a new Android Studio project.
-* Install all the Gradle extensions it requests.
+安装完 APK 后，双击应用图标启动程序。当程序第一次运行时，会请求运行时获取设备摄像头的权限。程序会打开设备的后摄像头，并识别视野内的物体。在图像的底部（如果是全景模式则是图像的左边）会展示可能性最高的三个物体和其可能的分类。
 
-To get a model, either:
 
-* Download the quantized [Mobilenet TensorFlow Lite model](https://storage.googleapis.com/download.tensorflow.org/models/tflite/mobilenet_v1_224_android_quant_2017_11_08.zip) and unzip and copy `mobilenet_quant_v1_224.tflite` to the assets directory: `tensorflow/contrib/lite/java/demo/app/src/main/assets/`.
-* Or, download the floating point [Inception-v3 model](https://storage.googleapis.com/download.tensorflow.org/models/tflite/inception_v3_slim_2016_android_2017_11_10.zip) and unzip and copy `inceptionv3_non_slim_2015.tflite` to the assets directory. Change the chosen classifier in [Camera2BasicFragment.java](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/java/demo/app/src/main/java/com/example/android/tflitecamerademo/Camera2BasicFragment.java)<br>
-  from: `classifier = new ImageClassifierQuantizedMobileNet(getActivity());`<br>
-  to: `classifier = new ImageClassifierFloatInception(getActivity());`.
+## 在 Android Studio 中用 JCenter源的 TensorFlow Lite AAR 编译
 
-Now you can build and run the demo app.
+使用 Android Studio 来尝试修改代码并编译：
 
-## Build TensorFlow Lite and the demo app from source
+* 安装最新版本的 [Android Studio](https://developer.android.com/studio/index.html)。
+* 确保你的 Android SDK 版本高于 26 且 NDK 版本高于 14（在 Android Studio 设置里面）。
+* 将 `tensorflow/contrib/lite/java/demo` 目录作为一个新的 Android Studio 项目导入。
+* 安装需求的 Gradle 插件。
 
-### Clone the TensorFlow repo
+想要获取一个模型，你可以：
+
+* 下载量子化的 [Mobilenet TensorFlow Lite 模型](https://storage.googleapis.com/download.tensorflow.org/models/tflite/mobilenet_v1_224_android_quant_2017_11_08.zip)，解压并将 `mobilenet_quant_v1_224.tflite` 拷贝到资源目录： `tensorflow/contrib/lite/java/demo/app/src/main/assets/`下。
+* 或者，下载浮点 [Inception-v3 模型](https://storage.googleapis.com/download.tensorflow.org/models/tflite/inception_v3_slim_2016_android_2017_11_10.zip)，解压并将 `inceptionv3_non_slim_2015.tflite` 拷贝到资源目录下。修改 [Camera2BasicFragment.java](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/java/demo/app/src/main/java/com/example/android/tflitecamerademo/Camera2BasicFragment.java) 中的分类器：<br>
+  把： `classifier = new ImageClassifierQuantizedMobileNet(getActivity());`<br>
+  改成： `classifier = new ImageClassifierFloatInception(getActivity());`。
+
+现在你可以编译并运行程序了。
+
+## 使用源码编译 TensorFlow Lite 和示例应用
+
+### 克隆 TensorFlow 仓库
 
 ```sh
 git clone https://github.com/tensorflow/tensorflow
 ```
 
-### Install Bazel
+### 安装 Bazel
 
-If `bazel` is not installed on your system, see [Installing Bazel](https://bazel.build/versions/master/docs/install.html).
+如果你的电脑上没有安装 `bazel`，查看 [安装 Bazel](https://bazel.build/versions/master/docs/install.html)。
 
-Note: Bazel does not currently support Android builds on Windows. Windows users should download the [prebuilt binary](https://storage.googleapis.com/download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk).
+注意：Bazel 现在并不支持在 Windows 上编译 Android 版本。Windows 用户可以下载 [预编译版本](https://storage.googleapis.com/download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk)。
 
-### Install Android NDK and SDK
+### 安装 Android NDK 和 SDK
 
-The Android NDK is required to build the native (C/C++) TensorFlow Lite code. The current recommended version is *14b* and can be found on the [NDK Archives](https://developer.android.com/ndk/downloads/older_releases.html#ndk-14b-downloads)
-page.
+编译 TensorFlow Lite 的原生（C/C++）代码需要用到 Android NDK。当前推荐版本为 *14b*，可以在 [NDK 存档](https://developer.android.com/ndk/downloads/older_releases.html#ndk-14b-downloads)
+上找到。
 
-The Android SDK and build tools can be [downloaded separately](https://developer.android.com/tools/revisions/build-tools.html) or used as part of [Android Studio](https://developer.android.com/studio/index.html). To build the TensorFlow Lite Android demo, build tools require API >= 23 (but it will run on devices with API >= 21).
+Android SDK 和编译工具可以[单独下载](https://developer.android.com/tools/revisions/build-tools.html) 或者配合 [Android Studio](https://developer.android.com/studio/index.html) 使用。编译 TensorFlow Lite Android 示例应用推荐使用 API >= 23 的编译工具（但是在 API >= 21 的版本上均可运行）。
 
-In the root of the TensorFlow repository, update the `WORKSPACE` file with the `api_level` and location of the SDK and NDK. If you installed it with Android Studio, the SDK path can be found in the SDK manager. The default NDK path is:`{SDK path}/ndk-bundle.` For example:
+在 TensorFlow 仓库的根目录下，更新 `WORKSPACE` 文件中的 `api_level` 以及 SDK 和 NDK 的位置。如果你是通过 Android Studio 安装的，可以在 SDK 管理器中查看 SDK 路径。默认的 NDK 路径为：`{SDK path}/ndk-bundle`。如下所示：
 
 ```
 android_sdk_repository (
@@ -75,21 +75,21 @@ android_ndk_repository(
 )
 ```
 
-Some additional details are available on the [TF Lite Android App page](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/README.md).
+在 [TF Lite Android 应用页面](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/README.md)中可以找到更多信息。
 
-### Build the source code
+### 编译源码
 
-To build the demo app, run `bazel`:
+运行 `bazel` 来编译源码：
 
 ```
 bazel build --cxxopt=--std=c++11 //tensorflow/contrib/lite/java/demo/app/src/main:TfLiteCameraDemo
 ```
 
-Caution: Because of an bazel bug, we only support building the Android demo app within a Python 2 environment.
+警告：因为一个已知的 bazel 的 bug，我们只能在 Python 2 环境下编译 Android 示例应用。
 
 
-## About the demo
+## 关于示例
 
-The demo app is resizing each camera image frame (224 width * 224 height) to match the quantized MobileNets model (299 * 299 for Inception-v3). The resized image is converted—row by row—into a [ByteBuffer](https://developer.android.com/reference/java/nio/ByteBuffer.html). Its size is  1 * 224 * 224 * 3 bytes, where 1 is the number of images in a batch. 224 * 224 (299 * 299) is the width and height of the image. 3 bytes represents the 3 colors of a pixel.
+示例应用会缩放每一帧相机获取的图像（224 宽 * 224 高）来匹配量子化的 MobileNets 模型（Inception-v3 是 299 * 299）。缩放后的图像被逐行放进[缓冲区](https://developer.android.com/reference/java/nio/ByteBuffer.html)。它的大小是 1 * 224 * 224 * 3 字节，其中 1 代表该批次中图像的数量。224 * 224（299 * 299）是图像的宽和高。3 字节代表一个像素有 3 种颜色。
 
-This demo uses the TensorFlow Lite Java inference API for models which take a single input and provide a single output. This outputs a two-dimensional array, with the first dimension being the category index and the second dimension being the confidence of classification. Both models have 1001 unique categories and the app sorts the probabilities of all the categories and displays the top three. The model file must be downloaded and bundled within the assets directory of the app.
+示例中使用了单进单出的 TensorFlow Lite Java inference API。它输出一个二维数组，第一个维度表示类别索引，第二个维度表示分类的置信度。 两种模型都有 1001 种不同的类别，应用将所有目录的可能性排序，并显示可能性最高的三种。模型文件必须被下载下来并绑定到应用的资源目录。
