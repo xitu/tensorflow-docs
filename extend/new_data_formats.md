@@ -1,44 +1,44 @@
-# Reading custom file and record formats
+# 读取自定义文件和记录格式
 
-PREREQUISITES:
+前提：
 
-*   Some familiarity with C++.
-*   Must have @{$install_sources$downloaded TensorFlow source}, and be able to build it.
+*   对 C++ 有一定程度的了解。
+*   装有 @{$install_sources$downloaded TensorFlow source}，并能够运行。
 
-We divide the task of supporting a file format into two pieces:
+我们将支持自定义文件格式分为两个任务：
 
-*   File formats: We use a reader `tf.data.Dataset` to read raw *records* (which are typically represented by scalar string tensors, but can have more structure) from a file.
-*   Record formats: We use decoder or parsing ops to turn a string record into tensors usable by TensorFlow.
+*   文件格式： 使用 `tf.data.Dataset` 阅读器来从文件中读取原始 **记录**（通常以零阶字符串张量（scalar string tensors）表示，也可能有其他结构）。
+*   记录格式：使用解码器或者解析操作将一个字符串记录转换成 TensorFlow 可用的张量（tensor）。
 
-For example, to read a [CSV file](https://en.wikipedia.org/wiki/Comma-separated_values), we use @{tf.data.TextLineDataset$a dataset for reading text files line-by-line} and then @{tf.data.Dataset.map$map} an @{tf.decode_csv$op} that parses CSV data from each line of text in the dataset.
+比方说，要读取一个 [CSV 文件](https://en.wikipedia.org/wiki/Comma-separated_values)，我们可以使用 @{tf.data.TextLineDataset$a dataset for reading text files line-by-line}，然后 @{tf.data.Dataset.map$map} 一个从数据集中的文本逐行解析 CSV 数据的 @{tf.decode_csv$op}。
 
-[TOC]
+【目录】
 
-## Writing a `Dataset` for a file format
+## 为文件格式编写一个`数据集`
 
-A @{tf.data.Dataset} represents a sequence of *elements*, which can be the individual records in a file. There are several examples of "reader" datasets that are already built into TensorFlow:
+@{tf.data.Dataset} 表示一系列 **元素**，即文件中独立的记录。TensorFlow中内置了几种『阅读器』：
 
-*   @{tf.data.TFRecordDataset} ([source in `kernels/data/reader_dataset_ops.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/data/reader_dataset_ops.cc))
-*   @{tf.data.FixedLengthRecordDataset} ([source in `kernels/data/reader_dataset_ops.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/data/reader_dataset_ops.cc))
-*   @{tf.data.TextLineDataset} ([source in `kernels/data/reader_dataset_ops.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/data/reader_dataset_ops.cc))
+*   @{tf.data.TFRecordDataset} ([源自 `kernels/data/reader_dataset_ops.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/data/reader_dataset_ops.cc))
+*   @{tf.data.FixedLengthRecordDataset} ([源自 `kernels/data/reader_dataset_ops.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/data/reader_dataset_ops.cc))
+*   @{tf.data.TextLineDataset} ([源自 `kernels/data/reader_dataset_ops.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/data/reader_dataset_ops.cc))
 
-Each of these implementations comprises three related classes:
+每个实现包含了三个相关的类：
 
-* A `tensorflow::DatasetOpKernel` subclass (e.g. `TextLineDatasetOp`), which tells TensorFlow how to construct a dataset object from the inputs to and attrs of an op, in its `MakeDataset()` method.
+* 一个 `tensorflow::DatasetOpKernel` 的子类 （如 `TextLineDatasetOp`），这个类的 `MakeDataset()` 方法告诉 TensorFlow 怎样根据一个操作的输入和属性生成一个数据集的对象。
 
-* A `tensorflow::GraphDatasetBase` subclass (e.g. `TextLineDatasetOp::Dataset`), which represents the *immutable* definition of the dataset itself, and tells TensorFlow how to construct an iterator object over that dataset, in its `MakeIterator()` method.
+* 一个 `tensorflow::GraphDatasetBase` 的子类（如 `TextLineDatasetOp::Dataset`），表示数据集的**不可变性**定义，这个类的 `MakeIterator()` 方法告诉 TensorFlow 怎样在数据集上生成迭代器对象。
 
-* A `tensorflow::DatasetIterator<Dataset>` subclass (e.g. `TextLineDatasetOp::Dataset::Iterator`), which represents the *mutable* state of an iterator over a particular dataset, and tells TensorFlow how to get the next element from the iterator, in its `GetNextInternal()` method.
+* 一个 `tensorflow::DatasetIterator<Dataset>` 的子类（如 `TextLineDatasetOp::Dataset::Iterator`），表示特定数据集上的迭代器的**可变性**，这个类的 `GetNextInternal()` 方法告诉 TensorFlow 怎样获取迭代器的下一个元素。
 
-The most important method is the `GetNextInternal()` method, since it defines how to actually read records from the file and represent them as one or more `Tensor` objects.
+其中最重要的方法是 `GetNextInternal()` ，因为它定义了怎样从文件中实际读取记录，并用一个或多个 `Tensor` 对象来表示它们。
 
-To create a new reader dataset called (for example) `MyReaderDataset`, you will need to:
+创建一个新的阅读器数据集叫做（比方说） `MyReaderDataset`，你需要：
 
-1. In C++, define subclasses of `tensorflow::DatasetOpKernel`, `tensorflow::GraphDatasetBase`, and `tensorflow::DatasetIterator<Dataset>` that implement the reading logic.
-2. In C++, register a new reader op and kernel with the name `"MyReaderDataset"`.
-3. In Python, define a subclass of @{tf.data.Dataset} called `MyReaderDataset`.
+1. 在 C++ 中定义 `tensorflow::DatasetOpKernel`、`tensorflow::GraphDatasetBase` 和 `tensorflow::DatasetIterator<Dataset>` 的子类来实现读取逻辑。
+2. 在 C++ 中注册一个新的名叫 `"MyReaderDataset"` 的阅读器操作和内核。
+3. 在 Python 中定义一个名叫 `MyReaderDataset` 的 @{tf.data.Dataset} 的子类。
 
-You can put all the C++ code in a single file, such as `my_reader_dataset_op.cc`. It will help if you are familiar with @{$adding_an_op$the adding an op how-to}. The following skeleton can be used as a starting point for your implementation:
+你可以把所有 C++ 代码放到一个文件里面，比如 `my_reader_dataset_op.cc`。并且你最好熟读 @{$adding_an_op$the adding an op how-to}。下文的框架可以给你提供一点参考：
 
 ```c++
 #include "tensorflow/core/framework/common_shape_fns.h"
@@ -53,13 +53,13 @@ class MyReaderDatasetOp : public DatasetOpKernel {
  public:
 
   MyReaderDatasetOp(OpKernelConstruction* ctx) : DatasetOpKernel(ctx) {
-    // Parse and validate any attrs that define the dataset using `ctx->GetAttr()`, and store them in member variables.
+    // 用 `ctx->GetAttr()` 解析并验证定义数据集的属性，并把它们存在成员变量中。
   }
 
   void MakeDataset(OpKernelContext* ctx, DatasetBase** output) override {
-    // Parse and validate any input tensors 0that define the dataset using `ctx->input()` or the utility function `ParseScalarArgument<T>(ctx, &arg)`.
+    // 用 `ctx->input()` 或者通用函数 `ParseScalarArgument<T>(ctx, &arg)` 解析并验证定义数据集的输入张量。
 
-    // Create the dataset object, passing any (already-validated) arguments from attrs or input tensors.
+    // 创建数据集对象，并根据属性或输入张量传入（已经验证的）参数。
     *output = new Dataset(ctx);
   }
 
@@ -74,9 +74,9 @@ class MyReaderDatasetOp : public DatasetOpKernel {
           new Iterator({this, strings::StrCat(prefix, "::MyReader")}));
     }
 
-    // Record structure: Each record is represented by a scalar string tensor.
+    // 记录结构：一个记录用一个零阶字符串张量表示。
     //
-    // Dataset elements can have a fixed number of components of different types and shapes; replace the following two methods to customize this aspect of the dataset.
+    // 数据集的元素有固定数量的组件，每个组件有不同的类型和形状；重写以下两个方法来自定义数据集的这方面的设置。
     const DataTypeVector& output_dtypes() const override {
       static DataTypeVector* dtypes = new DataTypeVector({DT_STRING});
       return *dtypes;
@@ -90,12 +90,12 @@ class MyReaderDatasetOp : public DatasetOpKernel {
     string DebugString() override { return "MyReaderDatasetOp::Dataset"; }
 
    protected:
-    // Optional: Implementation of `GraphDef` serialization for this dataset.
+    // 可选：为这个数据集实现 `GraphDef` 序列化。
     //
-    // Implement this method if you want to be able to save and restore instances of this dataset (and any iterators over it).
+    // 如果你想保存这个数据集（和它上面的所有迭代器）的实例，实现以下这个方法。
     Status AsGraphDefInternal(DatasetGraphDefBuilder* b,
                               Node** output) const override {
-      // Construct nodes to represent any of the input tensors from this object's member variables using `b->AddScalar()` and `b->AddVector()`.
+      // 使用 `b->AddScalar()` 和 `b->AddVector()` 来从这个对象的成员变量构建代表输入张量的节点。
       std::vector<Node*> input_tensors;
       TF_RETURN_IF_ERROR(b->AddDataset(this, input_tensors, output));
       return Status::OK();
@@ -107,19 +107,19 @@ class MyReaderDatasetOp : public DatasetOpKernel {
       explicit Iterator(const Params& params)
           : DatasetIterator<Dataset>(params), i_(0) {}
 
-      // Implementation of the reading logic.
+      // 读取逻辑的实现。
       //
-      // The example implementation in this file yields the string "MyReader!" ten times. In general there are three cases:
-      // 1. If an element is successfully read, store it as one or more tensors in `*out_tensors`, set `*end_of_sequence = false` and return `Status::OK()`.
-      // 2. If the end of input is reached, set `*end_of_sequence = true` and return `Status::OK()`.
-      // 3. If an error occurs, return an error status using one of the helper functions from "tensorflow/core/lib/core/errors.h".
+      // 这个文件中的示例实现产生十次 『MyReader!』 字符串。总的来讲有以下三种情况：
+      // 1. 如果成功读取一个元素，在 `*out_tensors` 中将它储存为一个或多个张量，设置 `*end_of_sequence = false` 并返回 `Status::OK()`。
+      // 2. 如果到达输入的结尾，设置 `*end_of_sequence = true` 并返回 `Status::OK()`。
+      // 3. 如果发生了一个错误，通过 "tensorflow/core/lib/core/errors.h" 中的帮助函数返回一个错误状态。
       Status GetNextInternal(IteratorContext* ctx,
                              std::vector<Tensor>* out_tensors,
                              bool* end_of_sequence) override {
-        // NOTE: `GetNextInternal()` may be called concurrently, so it is recommended that you protect the iterator state with a mutex.
+        // 注意：`GetNextInternal()` 可能会被并发调用，所以推荐用一个互斥量来保护迭代器的状态。
         mutex_lock l(mu_);
         if (i_ < 10) {
-          // Create a scalar string tensor and add it to the output.
+          // 创建一个零阶字符串张量并把它添加到输出中。
           Tensor record_tensor(ctx->allocator({}), DT_STRING, {});
           record_tensor.scalar<string>()() = "MyReader!";
           out_tensors->emplace_back(std::move(record_tensor));
@@ -132,9 +132,9 @@ class MyReaderDatasetOp : public DatasetOpKernel {
       }
 
      protected:
-      // Optional: Implementation of iterator state serialization for this iterator.
+      // 可选：为这个迭代器实现状态序列化。
       //
-      // Implement these two methods if you want to be able to save and restore instances of this iterator.
+      // 如果你想保存这个迭代器的实例，实现以下两个方法。
       Status SaveInternal(IteratorStateWriter* writer) override {
         mutex_lock l(mu_);
         TF_RETURN_IF_ERROR(writer->WriteScalar(full_name("i"), i_));
@@ -154,53 +154,53 @@ class MyReaderDatasetOp : public DatasetOpKernel {
   };
 };
 
-// Register the op definition for MyReaderDataset.
+// 为 MyReaderDataset 注册操作定义。
 //
-// Dataset ops always have a single output, of type `variant`, which represents the constructed `Dataset` object.
+// 数据集操作通常只有一个类型为 `variant` 的输出，代表结构化的 `Dataset` 对象。
 //
-// Add any attrs and input tensors that define the dataset here.
+// 在这里添加定义数据集的属性和输入张量。
 REGISTER_OP("MyReaderDataset")
     .Output("handle: variant")
     .SetIsStateful()
     .SetShapeFn(shape_inference::ScalarShape);
 
-// Register the kernel implementation for MyReaderDataset.
+// 为 MyReaderDataset 注册核心实现。
 REGISTER_KERNEL_BUILDER(Name("MyReaderDataset").Device(DEVICE_CPU),
                         MyReaderDatasetOp);
 
-}  // namespace
-}  // namespace tensorflow
+}  // 命名空间
+}  // 命名空间 tensorflow
 ```
 
-The last step is to build the C++ code and add a Python wrapper. The easiest way
-to do this is by @{$adding_an_op#build_the_op_library$compiling a dynamic
-library} (e.g. called `"my_reader_dataset_op.so"`), and adding a Python class
-that subclasses @{tf.data.Dataset} to wrap it. An example Python program is
-given here:
+最后一步是编译 C++ 代码并添加一个 Python 封装器。完成这一步最简单的方法
+是 @{$adding_an_op#build_the_op_library$compiling a dynamic
+library} （比方说叫做 `"my_reader_dataset_op.so"`），然后创建一个
+继承 @{tf.data.Dataset} 的 Python 子类来封装它。以下是一个 Python 示例
+程序：
 
 ```python
 import tensorflow as tf
 
-# Assumes the file is in the current working directory.
+# 假设文件在当前工作目录下。
 my_reader_dataset_module = tf.load_op_library("./my_reader_dataset_op.so")
 
 class MyReaderDataset(tf.data.Dataset):
 
   def __init__(self):
     super(MyReaderDataset, self).__init__()
-    # Create any input attrs or tensors as members of this class.
+    # 将输入属性或张量作为类的成员变量创建。
 
   def _as_variant_tensor(self):
-    # Actually construct the graph node for the dataset op.
+    # 为数据集操作构建图形节点
     #
-    # This method will be invoked when you create an iterator on this dataset
-    # or a dataset derived from it.
+    # 当你在这个数据集或者由它衍生出来的数据集上创建一个迭代器时，
+    # 这个函数会被调用。
     return my_reader_dataset_module.my_reader_dataset()
 
-  # The following properties define the structure of each element: a scalar
-  # `tf.string` tensor. Change these properties to match the `output_dtypes()`
-  # and `output_shapes()` methods of `MyReaderDataset::Dataset` if you modify
-  # the structure of each element.
+  # 以下属性定义了元素的结构：一个
+  # 零阶 `tf.string` 张量。如果你修改了元素的结构，
+  # 修改这些属性来与 `MyReaderDataset::Dataset` 中
+  # 的 `output_dtypes()` 和 `output_shapes()` 匹配。
   @property
   def output_types(self):
     return tf.string
@@ -214,27 +214,27 @@ class MyReaderDataset(tf.data.Dataset):
     return tf.Tensor
 
 if __name__ == "__main__":
-  # Create a MyReaderDataset and print its elements.
+  # 创建一个 MyReaderDataset 并打印它的元素。
   with tf.Session() as sess:
     iterator = MyReaderDataset().make_one_shot_iterator()
     next_element = iterator.get_next()
     try:
       while True:
-        print(sess.run(next_element))  # Prints "MyReader!" ten times.
+        print(sess.run(next_element))  # 打印十次 『MyReader!』。
     except tf.errors.OutOfRangeError:
       pass
 ```
 
-You can see some examples of `Dataset` wrapper classes in [`tensorflow/python/data/ops/dataset_ops.py`](https://www.tensorflow.org/code/tensorflow/python/data/ops/dataset_ops.py).
+你可以在 [`tensorflow/python/data/ops/dataset_ops.py`](https://www.tensorflow.org/code/tensorflow/python/data/ops/dataset_ops.py) 中找到一些 `Dataset` 封装类的例子。
 
-## Writing an Op for a record format
+## 为记录格式写一个操作
 
-Generally this is an ordinary op that takes a scalar string record as input, and so follow @{$adding_an_op$the instructions to add an Op}. You may optionally take a scalar string key as input, and include that in error messages reporting improperly formatted data.  That way users can more easily track down where the bad data came from.
+通常来说这就是一个普通的以一个零阶字符串记录作为输入的操作，所以照着 @{$adding_an_op$the instructions to add an Op} 做就行了。你可以选择一个零阶字符串键作为输入，并加入到错误信息中，用来报告格式非法的数据。这样用户可以轻而易举地找出脏数据来源于哪里。
 
-Examples of Ops useful for decoding records:
+列几个对解码记录有帮助的操作：
 
-*   @{tf.parse_single_example} (and @{tf.parse_example})
+*   @{tf.parse_single_example} （和 @{tf.parse_example}）
 *   @{tf.decode_csv}
 *   @{tf.decode_raw}
 
-Note that it can be useful to use multiple Ops to decode a particular record format.  For example, you may have an image saved as a string in [a `tf.train.Example` protocol buffer](https://www.tensorflow.org/code/tensorflow/core/example/example.proto). Depending on the format of that image, you might take the corresponding output from a @{tf.parse_single_example} op and call @{tf.image.decode_jpeg}, @{tf.image.decode_png}, or @{tf.decode_raw}.  It is common to take the output of `tf.decode_raw` and use @{tf.slice} and @{tf.reshape} to extract pieces.
+注意：使用多个操作来解码一个特定的记录格式很有效。举个例子，你可能有一张图片以字符串的形式存在[一个 `tf.train.Example` 的 protocol buffer](https://www.tensorflow.org/code/tensorflow/core/example/example.proto) 中。根据图像格式的不同，你可以从一个 @{tf.parse_single_example} 操作选择对应的输出，然后调用 @{tf.image.decode_jpeg}、 @{tf.image.decode_png} 或者 @{tf.decode_raw}。常见的做法是获取 `tf.decode_raw` 的输出，然后用 @{tf.slice} 和 @{tf.reshape} 来提取切片。
