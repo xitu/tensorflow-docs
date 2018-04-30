@@ -2,7 +2,7 @@
 
 该 TensorFLow Lite 示例可以在 [GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app) 上被找到。 这是一个使用量子化的 MobileNet 模型或是浮点 Inception-v3 模型对图片进行持续分类的相机应用。示例的最低运行要求是 Android 5.0（API 21）。
 
-在示例中，应用会使用 TensorFlow Lite Java API 来预测。应用会实时地将帧分类，并将可能性最高的类别和检测对象的时间一同显示出来。
+在示例中，应用会使用 TensorFlow Lite Java API 来预测。应用会为每一帧都进行实时分类，并将可能性最高的类别和检测对象的时间一同显示出来。
 
 有三种方式获取示例应用：
 
@@ -26,7 +26,7 @@
 * 安装最新版本的 [Android Studio](https://developer.android.com/studio/index.html)。
 * 确保你的 Android SDK 版本高于 26 且 NDK 版本高于 14（在 Android Studio 设置里面）。
 * 将 `tensorflow/contrib/lite/java/demo` 目录作为一个新的 Android Studio 项目导入。
-* 安装需求的 Gradle 插件。
+* 安装需要的 Gradle 插件。
 
 想要获取一个模型，你可以：
 
@@ -49,7 +49,7 @@ git clone https://github.com/tensorflow/tensorflow
 
 如果你的电脑上没有安装 `bazel`，查看 [安装 Bazel](https://bazel.build/versions/master/docs/install.html)。
 
-注意：Bazel 现在并不支持在 Windows 上编译 Android 版本。Windows 用户可以下载 [预编译版本](https://storage.googleapis.com/download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk)。
+注意：Bazel 现在并不支持在 Windows 上进行 Android 编译。Windows 用户可以下载 [预编译版本](https://storage.googleapis.com/download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk)。
 
 ### 安装 Android NDK 和 SDK
 
@@ -92,4 +92,4 @@ bazel build --cxxopt=--std=c++11 //tensorflow/contrib/lite/java/demo/app/src/mai
 
 示例应用会缩放每一帧相机获取的图像（224 宽 * 224 高）来匹配量子化的 MobileNets 模型（Inception-v3 是 299 * 299）。缩放后的图像被逐行放进[缓冲区](https://developer.android.com/reference/java/nio/ByteBuffer.html)。它的大小是 1 * 224 * 224 * 3 字节，其中 1 代表该批次中图像的数量。224 * 224（299 * 299）是图像的宽和高。3 字节代表一个像素有 3 种颜色。
 
-示例中使用了单进单出的 TensorFlow Lite Java inference API。它输出一个二维数组，第一个维度表示类别索引，第二个维度表示分类的置信度。 两种模型都有 1001 种不同的类别，应用将所有目录的可能性排序，并显示可能性最高的三种。模型文件必须被下载下来并绑定到应用的资源目录。
+示例中使用了单进单出的 TensorFlow Lite Java inference API。它输出一个二维数组，第一个维度表示类别索引，第二个维度表示分类的置信度。 两种模型都有 1001 种不同的类别，应用将所有目录的可能性排序，并显示可能性最高的三种。模型文件必须被下载下来并打包到应用的资源目录。
