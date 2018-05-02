@@ -7,23 +7,22 @@
 *   Ubuntu
 *   macOS X
 
-Note: Some users have successfully built and installed TensorFlow from sources on non-supported systems.  Please remember that we do not fix issues stemming from these attempts.
+注意：有些用户已经成功地在我们不提供支持的系统上从源代码开始构建并安装 TensorFlow。但请注意，我们不会解决因这类尝试而产生的问题。
 
-We **do not support** building TensorFlow on Windows. That said, if you'd like to try to build TensorFlow on Windows anyway, use either of the following:
+我们**不支持**在 Windows 上构建 TensorFlow。不过，如果您无论如何想要尝试在 Windows 上构建 TensorFlow，可使用以下两种方法中的任何一种：
 
-*   [Bazel on Windows](https://bazel.build/versions/master/docs/windows.html)
-*   [TensorFlow CMake build](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/cmake)
+*   [Windows 上的 Bazel](https://bazel.build/versions/master/docs/windows.html)
+*   [TensorFlow CMake 构建](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/cmake)
 
-Note: Starting from 1.6 release, our prebuilt binaries will use AVX instructions. Older CPUs may not be able to execute these binaries.
+注意：从 1.6 版开始，我们预先构建的二进制文件将使用 AVX 指令。早期的 CPU 可能无法执行这些二进制文件。
 
 ## 决定安装哪种类型的 TensorFlow 
 
 你需要从以下几种类型的 TensorFlow 中选择一个构建并安装：
-* **仅支持 CPU 的TensorFlow**. 如果你的系统不支持 NVIDIVA 的 GPU，需要安装这个版本。
-  值得注意的是，这个版本的 TensorFlow 通常容易安装构建，所以即使你有 NVIDIA 的 GPU，我们仍然推荐你先安装这个版本。
+
+* **仅支持 CPU 的TensorFlow**. 如果你的系统不支持 NVIDIVA 的 GPU，需要安装这个版本。值得注意的是，这个版本的 TensorFlow 通常容易安装构建，所以即使你有 NVIDIA 的 GPU，我们仍然推荐你先安装这个版本。
   
-* **支持 GPU 的 TensorFlow**. TensorFlow 程序在 GPU 上运行会明显比在 CPU 上快。
-  因此，如果你的系统有 NVIDIA 的 GPU，同时你需要运行对性能要求苛刻的程序时，你就需要安装这个版本的 TensorFlow，不仅需要 NVIDIA 的 GPU，你的系统还需要满足 NVIDIA 软件的要求，具体描述参考以下文档：
+* **支持 GPU 的 TensorFlow**. TensorFlow 程序在 GPU 上运行会明显比在 CPU 上快。因此，如果你的系统有 NVIDIA 的 GPU，同时你需要运行对性能要求苛刻的程序时，你就需要安装这个版本的 TensorFlow，不仅需要 NVIDIA 的 GPU，你的系统还需要满足 NVIDIA 软件的要求，具体描述参考以下文档：
 
   * @{$install_linux#NVIDIARequirements$Installing TensorFlow on Ubuntu}
   * @{$install_mac#NVIDIARequirements$Installing TensorFlow on macOS}
@@ -33,13 +32,11 @@ Note: Starting from 1.6 release, our prebuilt binaries will use AVX instructions
 
 首先从克隆 TensorFlow 仓库开始
 
-执行以下命令，克隆 **最新** TensorFlow 仓库:
+执行以下命令，克隆 **最新** TensorFlow 仓库：
 
 <pre>$ <b>git clone https://github.com/tensorflow/tensorflow</b> </pre>
 
-<code>git clone</code> 命令创建一个命名为 “tensorflow”
- 的子目录。克隆完成后，你可以执行下面的命令，创建一个**特定**的分支（例如一个发布分支):
-
+<code>git clone</code> 命令创建一个命名为 “tensorflow” 的子目录。克隆完成后，你可以执行下面的命令，创建一个**特定**的分支（例如一个发布分支):
 
 <pre>
 $ <b>cd tensorflow</b>
@@ -50,10 +47,7 @@ $ <b>git checkout</b> <i>Branch</i> # 这里 <i>Branch</i> 就是创建的分�
 
 <pre>$ <b>git checkout r1.0</b></pre>
 
-接下来你需要准备为
-[Linux](#PrepareLinux)
-或者
-[macOS](#PrepareMac) 准备环境。
+接下来你需要准备为 [Linux](#PrepareLinux) 或者 [macOS](#PrepareMac) 准备环境。
 
 <a name="#PrepareLinux"></a>
 ## 为 Linux 准备环境
@@ -64,9 +58,7 @@ $ <b>git checkout</b> <i>Branch</i> # 这里 <i>Branch</i> 就是创建的分�
   * TensorFlow Python 依赖
   * 可选, 为了支持 GPU 而安装的 NVIDIA 软件包
 
-如果系统之前未安装 Bazel，需要按照以下说明安装
-[安装 Bazel](https://bazel.build/versions/master/docs/install.html)。
-
+如果系统之前未安装 Bazel，需要按照以下说明[安装 Bazel](https://bazel.build/versions/master/docs/install.html)。
 
 ### 安装 TensorFlow Python 依赖
 
@@ -89,21 +81,18 @@ $ <b>sudo apt-get install python-numpy python-dev python-pip python-wheel</b>
 $ <b>sudo apt-get install python3-numpy python3-dev python3-pip python3-wheel</b>
 </pre>
 
-
 ### 可选: 安装支持 GPU 的 TensorFlow 之前的一些准备条件：
 
 如果你构建的 TensorFlow 不支持 GPU，跳过以下步骤。
 
 必须在你的系统中安装以下 NVIDIA <i>硬件</i>：
 
-  * 支持 CUDA 3.0或以上的 GPU。 具体参考
-    [NVIDIA 文档](https://developer.nvidia.com/cuda-gpus)
-    查看支持的 GPU 列表。
+  * 支持 CUDA 3.0或以上的 GPU。 具体参考 [NVIDIA 文档](https://developer.nvidia.com/cuda-gpus)查看支持的 GPU 列表。
 
 
 必须在你的系统中安装以下 NVIDIA <i>软件</i>：
 
-  * [CUDA Toolkit](http://nvidia.com/cuda) (>= 7.0)。我们建议使用 9.0 版本。。详见 [NVIDIA 文档](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/)。确保按照文档要求添加 CUDA 相对路径 “LD_LIBRARY_PATH” 到环境变量。
+  * [CUDA Toolkit](http://nvidia.com/cuda) (>= 7.0)。我们建议使用 9.0 版本。。详见 [NVIDIA 文档](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/)。确保按照文档要求添加 CUDA 相对路径 “LD_LIBRARY_PATH” 到环境变量。
   * [GPU drivers](http://nvidia.com/driver) supporting your version of the CUDA Toolkit.
   * [cuDNN SDK](http://developer.nvidia.com/cudnn) (>= v3). We recommend version 7.0. For details, see [NVIDIA's documentation](http://docs.nvidia.com/deeplearning/sdk/cudnn-install/).
   * [CUPTI](http://docs.nvidia.com/cuda/cupti/) ships with the CUDA Toolkit, but you also need to append its path to the `LD_LIBRARY_PATH` environment variable:
@@ -128,8 +117,7 @@ $ <b>sudo apt-get install python3-numpy python3-dev python3-pip python3-wheel</b
 
 ### 安装 bazel
 
-如果系统没有安装 Bazel ，参考
-[安装 Bazel](https://bazel.build/versions/master/docs/install.html#mac-os-x)
+如果系统没有安装 Bazel ，参考[安装 Bazel](https://bazel.build/versions/master/docs/install.html#mac-os-x)
 
 
 ### 安装 python 依赖
@@ -146,7 +134,7 @@ $ <b>sudo apt-get install python3-numpy python3-dev python3-pip python3-wheel</b
 
 <pre> $ <b>sudo pip install six numpy wheel</b> </pre>
 
-Note: These are just the minimum requirements to _build_ tensorflow. Installing the pip package will download additional packages required to _run_ it. If you plan on executing tasks directly with `bazel` , without the pip installation, you may need to install additional python packages. For example, you should `pip install mock enum34` before running TensorFlow's tests with bazel.
+注意：这些只是构建 TensorFlow 的最低要求。安装 pip 软件包时还将下载运行该 pip 所需的其他软件包。如果您计划不安装 pip，直接使用 bazel 执行任务，则可能需要安装其他 Python 软件包。例如，在使用 `bazel` 运行 TensorFlow 的测试之前，您应该先执行 `pip install mock enum34`。
 
 ### 可选项: 安装支持 GPU 的 TensorFlow 时需要的前提条件 
 
