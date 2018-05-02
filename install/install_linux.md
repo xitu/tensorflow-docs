@@ -73,15 +73,15 @@ Docker 完全地将 TensorFlow 的安装与其他之前安装于你机器上的�
 
   1. 选择下面的一条命令来安装 pip 和 Virtualenv：
 
-     $ <b>sudo apt-get install python-pip python-dev python-virtualenv</b> # for Python 2.7
-     $ <b>sudo apt-get install python3-pip python3-dev python-virtualenv</b> # for Python 3.n
+      <pre>$ <b>sudo apt-get install python-pip python-dev python-virtualenv</b> # for Python 2.7
+     $ <b>sudo apt-get install python3-pip python3-dev python-virtualenv</b> # for Python 3.n</pre>
 
   2. 挑选其中的一条命令来创建一个 Virtualenv 的虚拟环境:
 
       <pre>$ <b>virtualenv --system-site-packages</b> <i>targetDirectory</i> # for Python 2.7
      $ <b>virtualenv --system-site-packages -p python3</b> <i>targetDirectory</i> # for Python 3.n</pre>
 
-     其中<code><em>targetDirectory</em></code> 指明了 Virtualenv 树中根部位置。我们的命令中假设了<code><em>targetDirectory</em></code> 是 `~/tensorflow`, 但你也可以指定任意目录。
+     其中 <code><em>targetDirectory</em></code> 指明了 Virtualenv 树中根部位置。我们的命令中假设了 <code><em>targetDirectory</em></code> 是 `~/tensorflow`，但你也可以指定任意目录。
 
   3. 通过以下任意一条命令激活 Virtualenv 的虚拟环境:
 
@@ -112,19 +112,15 @@ Docker 完全地将 TensorFlow 的安装与其他之前安装于你机器上的�
      <pre>(tensorflow)$ <b>pip install --upgrade</b> <i>tfBinaryURL</i>   # Python 2.7
     (tensorflow)$ <b>pip3 install --upgrade</b> <i>tfBinaryURL</i>  # Python 3.n </pre>
 
-     其中 <code><em>tfBinaryURL</em></code> 指明了 TensorFlow 的 Python 包的URL 路径。 <code><em>tfBinaryURL</em></code> 的值取决于操作系统，Python 版本和 GPU 支持。在这里找到时候你的系统的
-     <code><em>tfBinaryURL</em></code> 
-     [值](#the_url_of_the_tensorflow_python_package).  例如，如果你要在 Linux，Python 3.4，仅支持 CPU 的环境中安装 TensorFlow，在激活的 virtualenv 环境中运行如下命令：
+     其中 <code><em>tfBinaryURL</em></code> 指明了 TensorFlow 的 Python 包的URL 路径。 <code><em>tfBinaryURL</em></code> 的值取决于操作系统，Python 版本和 GPU 支持。在这里找到时候你的系统的 <code><em>tfBinaryURL</em></code> [值](#the_url_of_the_tensorflow_python_package)。例如，如果你要在 Linux，Python 3.4，仅支持 CPU 的环境中安装 TensorFlow，在激活的 virtualenv 环境中运行如下命令：
      <pre>(tensorflow)$ <b>pip3 install --upgrade \
      https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.8.0rc1-cp34-cp34m-linux_x86_64.whl</b></pre>
 
-如果你遇见了安装问题，请见：[常见安装问题](#common_installation_problems).
-
+如果你遇见了安装问题，请见：[常见安装问题](#common_installation_problems)。
 
 ### 下一步
 
-在安装了 TensorFlow 之后，
-需要[验证你的安装](#ValidateYourInstallation).
+在安装了 TensorFlow 之后，需要[验证你的安装](#ValidateYourInstallation)。
 
 请注意你必须在每次运行 TensorFlow 之前都要激活你的 Virtualenv 环境。如果 Virtualenv 环境当前并没有激活，运行以下其中一条命令：
 
@@ -148,12 +144,10 @@ $ <b>source ~/tensorflow/bin/activate.csh</b>  # csh or tcsh</pre>
 
 <pre>$ <b>rm -r</b> <i>targetDirectory</i> </pre>
 
-
 <a name="InstallingNativePip"></a>
 ## 使用原生 pip 安装
-You may install TensorFlow through pip, choosing between a simple
-installation procedure or a more complex one.
-你可能会需要通过 pip 来安装 TensorFlow，在一个简单的安装过程和一个更复杂的中选择其一：
+
+[需要翻译]You may install TensorFlow through pip, choosing between a simple installation procedure or a more complex one. 你可能会需要通过 pip 来安装 TensorFlow，在一个简单的安装过程和一个更复杂的中选择其一：
 
 **注意：**[setup.py 中的 REQUIRED_PACKAGES 部分](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/pip_package/setup.py)
 列出了 TensorFlow 安装时 pip 会安装或升级的所有的包
@@ -166,7 +160,6 @@ Python 是自动安装于 Ubuntu 中的。花一秒的时间来确认一下系�
   * Python 3.4+
 
 pip 或 pip3 包管理**通常**会安装在 Ubuntu 系统上。通过 `pip -V` 或 `pip3 -V` 命令来确认下是否有安装。我们强烈建议安装 8.1 或更高版本的 pip 或 pip3。如果没有安装，运行如下命令来安装或更新到最新的 pip 版本：
-
 
 <pre>$ <b>sudo apt-get install python-pip python-dev</b>   # for Python 2.7
 $ <b>sudo apt-get install python3-pip python3-dev</b> # for Python 3.n
@@ -183,27 +176,26 @@ $ <b>sudo apt-get install python3-pip python3-dev</b> # for Python 3.n
     $ <b>pip install tensorflow-gpu</b>  # Python 2.7;  GPU support
     $ <b>pip3 install tensorflow-gpu</b> # Python 3.n; GPU support </pre>
 
-     如果命令完成了安装，你现在应该
-     [对你的安装进行验证](#ValidateYourInstallation).
+     如果命令完成了安装，你现在应该[对你的安装进行验证](#ValidateYourInstallation)。
 
   2. (可选) 如果步骤 1 失败了，安装如下格式执行命令进行安装:
 
      <pre>$ <b>sudo pip  install --upgrade</b> <i>tfBinaryURL</i>   # Python 2.7
     $ <b>sudo pip3 install --upgrade</b> <i>tfBinaryURL</i>   # Python 3.n </pre>
 
-     其中 <code><em>tfBinaryURL</em></code> 指明了 TensorFlow 的 Python 包的URL 路径。 <code><em>tfBinaryURL</em></code> 的值取决于操作系统，Python 版本和 GPU 支持。在[这里](#the_url_of_the_tensorflow_python_package)找到时候你的系统的
-     <code><em>tfBinaryURL</em></code>值。  例如，如果你要在 Linux，Python 3.4，仅支持 CPU 的环境中安装 TensorFlow，在激活的 Virtualenv 环境中运行如下命令：
+     其中 <code><em>tfBinaryURL</em></code> 指明了 TensorFlow 的 Python 包的URL 路径。<code><em>tfBinaryURL</em></code> 的值取决于操作系统，Python 版本和 GPU 支持。在[这里](#the_url_of_the_tensorflow_python_package)找到时候你的系统的 <code><em>tfBinaryURL</em></code> 值。例如，如果你要在 Linux，Python 3.4，仅支持 CPU 的环境中安装 TensorFlow，在激活的 Virtualenv 环境中运行如下命令：
+
      <pre>(tensorflow)$ <b>pip3 install --upgrade \
      https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.8.0rc1-cp34-cp34m-linux_x86_64.whl</b></pre>
 
      如果该步骤失败了，见这里：[常见安装问题](#common_installation_problems).
 
-
 ### 下一步
+
 安装完毕 TensorFlow 之后，[验证你的安装](#ValidateYourInstallation).
 
-
 ### 卸载
+
 要卸载 TensorFlow，运行如下命令：
 
 <pre>
@@ -211,9 +203,9 @@ $ <b>sudo pip uninstall tensorflow</b>  # for Python 2.7
 $ <b>sudo pip3 uninstall tensorflow</b> # for Python 3.n
 </pre>
 
-
 <a name="InstallingDocker"></a>
 ## 使用 Docker 安装
+
 通过以下几步来使用 Docker 安装 TensorFlow：
 
   1. 如 [Docker 文档](http://docs.docker.com/engine/installation/)中所描述安装 Docker。
@@ -235,12 +227,7 @@ $ docker run -it <i>-p hostPort:containerPort TensorFlowCPUImage</i>
 
 其中:
 
-  * <tt><i>-p hostPort:containerPort</i></tt> 是可选的
-    如果你准备从 shell 命令行中运行 TensorFlow 程序，那么忽略该选项。
-	如果你准备在如 Jupyter notebooks 中运行 TensorFlow，把
-	<tt><i>hostPort</i></tt> 和 <tt><i>containerPort</i></tt>
-    都设置为 <tt>8888</tt>.  如果你想在容器中运行 TensorBoard，加一个 `-p`，将<i>hostPort</i> 和 <i>containerPort</i>
-    都设置为 6006.
+  * <tt><i>-p hostPort:containerPort</i></tt> 是可选的如果你准备从 shell 命令行中运行 TensorFlow 程序，那么忽略该选项。如果你准备在如 Jupyter notebooks 中运行 TensorFlow，把 <tt><i>hostPort</i></tt> 和 <tt><i>containerPort</i></tt> 都设置为 <tt>8888</tt>。如果你想在容器中运行 TensorBoard，加一个 `-p`，将<i>hostPort</i> 和 <i>containerPort</i> 都设置为 6006。
   * <tt><i>TensorFlowCPUImage</i></tt> 是必需的。 它指定了 Docker。 选择声明其中的一个值：
     * <tt>tensorflow/tensorflow</tt>， 这是 TensorFlow CPU 二进制镜像的值。
     * <tt>tensorflow/tensorflow:latest-devel</tt>，这是最新的 TensorFlow CPU 二进制镜像加上源码，
@@ -301,21 +288,18 @@ $ <b>nvidia-docker run -it -p 8888:8888 tensorflow/tensorflow:latest-gpu</b>
 $ <b>nvidia-docker run -it -p 8888:8888 tensorflow/tensorflow:0.12.1-gpu</b>
 </pre>
 
-Docker 会在你第一次运行的时候下载 TensorFlow 二进制镜像。更多信息见
-[TensorFlow docker readme](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/tools/docker).
+Docker 会在你第一次运行的时候下载 TensorFlow 二进制镜像。更多信息见 [TensorFlow docker readme](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/tools/docker)。
 
 ### 下一步
 
 你应该[验证你的安装](#ValidateYourInstallation).
 
-
 <a name="InstallingAnaconda"></a>
 ## 使用 Anaconda 安装
+
 按照如下步骤在 Anaconda 环境中按照 TensorFlow：
 
-  1. 按照
-     [Anaconda 下载网站](https://www.continuum.io/downloads)
-     中的指导来下载并安装 Anaconda。
+  1. 按照 [Anaconda 下载网站](https://www.continuum.io/downloads)中的指导来下载并安装 Anaconda。
  
   2. 通过以下命令建立一个叫做<tt>tensorflow</tt> 的 conda 环境来运行某一版本的 Python:
 
@@ -330,9 +314,7 @@ Docker 会在你第一次运行的时候下载 TensorFlow 二进制镜像。更�
 
      <pre>(tensorflow)$ <b>pip install --ignore-installed --upgrade</b> <i>tfBinaryURL</i></pre>
 
-     其中 <code><em>tfBinaryURL</em></code> 是
-     [TensorFlow Python 包的 URL](#the_url_of_the_tensorflow_python_package).
-    例如，如下命令安装了仅支持 CPU 的 Python 3.4 版本下的 TensorFlow：
+     其中 <code><em>tfBinaryURL</em></code> 是 [TensorFlow Python 包的 URL](#the_url_of_the_tensorflow_python_package)。例如，如下命令安装了仅支持 CPU 的 Python 3.4 版本下的 TensorFlow：
 
      <pre>
      (tensorflow)$ <b>pip install --ignore-installed --upgrade \
@@ -340,12 +322,15 @@ Docker 会在你第一次运行的时候下载 TensorFlow 二进制镜像。更�
 
 <a name="ValidateYourInstallation"></a>
 ## 验证你的安装
+
 按照如下步骤验证你的 TensorFlow 安装：
+
   1. 确保你的环境可以运行 TensorFlow （即若有虚拟环境应激活它）
   2. 执行一个简短的 TensorFlow 程序
 
 
 ### 准备你的环境
+
 如果你是使用原生 pip，Virtualenv 或者 Anaconda 安装的，那么进行如下步骤：
 
   1. 开启一个终端。
@@ -389,6 +374,7 @@ print(sess.run(hello))
 如果你有机器学习的经验，但刚接触 TensorFlow 请看 @{$get_started/premade_estimators$Getting Started with TensorFlow}。
 
 ## 常见安装错误
+
 我们依赖于 Stack Overflow 来编写 TensorFlow 的安装问题和它们的解决方案。下面的表格包含了 Stack Overflow 关于常见安装问题的回答。如果你遇见了其他的错误信息或者没有在表格中列出的安装问题，请在 Stack Overflow 上搜索。如果 Stack Overflow 中没有显示相关的错误信息，创建一个新的问题并加上 `tensorflow` 标签。
 
 <table>
@@ -476,6 +462,7 @@ print(sess.run(hello))
 
 <a name="TF_PYTHON_URL"></a>
 ## TensorFlow 的 Python 包 URL
+
 一些安装方法中需要 TensorFlow Python 包的 URL，你所声明的值取决下面三个因素：
 
   * 操作系统
@@ -500,7 +487,6 @@ https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.8.0rc1-cp27
 
 注意 GPU 支持需要符合[NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements)的软硬件要求。
 
-
 ### Python 3.4
 
 仅支持 CPU：
@@ -517,7 +503,6 @@ https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.8.0rc1-cp34
 
 注意 GPU 支持需要符合[NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements)的软硬件要求。
 
-
 ### Python 3.5
 
 支持 CPU：
@@ -531,7 +516,6 @@ GPU 支持：
 <pre>
 https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.8.0rc1-cp35-cp35m-linux_x86_64.whl
 </pre>
-
 
 注意 GPU 支持需要符合[NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements)的软硬件要求。
 
@@ -573,10 +557,6 @@ TensorFlow pip 包依赖于 3.1 版本的 protobuf pip package。从 PyPI 下载
   $ <b>pip3 install --upgrade \
   https://storage.googleapis.com/tensorflow/linux/cpu/protobuf-3.1.0-cp35-none-linux_x86_64.whl</b></pre>
 
-安装这个 protobuf 包会覆盖掉存在的 protobuf 包。
-注意二进制 pip 包已经支持大于 64 MB 的 protobuf了，因此可以解决如下的错误：
+安装这个 protobuf 包会覆盖掉存在的 protobuf 包。注意二进制 pip 包已经支持大于 64 MB 的 protobuf了，因此可以解决如下的错误：
 
-<pre>[libprotobuf ERROR google/protobuf/src/google/protobuf/io/coded_stream.cc:207]
-一个 Protocol 信息由于过大而被拒绝（大于 67108864 字节).
-若想增加限制（或者关掉警告），详见
-CodedInputStream::SetTotalBytesLimit() in google/protobuf/io/coded_stream.h.</pre>
+请注意，GPU 版本需要[运行支持 GPU 的 TensorFlow 所需满足的 NVIDIA 要求](#NVIDIARequirements)中所述的 NVIDIA 硬件和软件。
