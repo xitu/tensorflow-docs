@@ -6,8 +6,6 @@ This guide explains how to install TensorFlow on macOS. Although these instructi
 
 注意: There are known, accuracy-affecting numerical issues before macOS 10.12.6 (Sierra) that are described in [GitHub#15933](https://github.com/tensorflow/tensorflow/issues/15933#issuecomment-366331383).
 
-注意：从 v1.2 开始，TensorFlow 不再为 macOS 提供 GPU 支持。
-
 ## 选择安装 TensorFlow 的方式
 
 你必须选择使用哪种方式来安装 TensorFlow。有以下方式：
