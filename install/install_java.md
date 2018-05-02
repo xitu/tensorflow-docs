@@ -59,10 +59,9 @@ Android 上的安装说明在单独的 [Android TensorFlow 支持页面](https:/
              </dependencies>
          </project>
 
-
   2. 创建源文件（`src/main/java/HelloTF.java`）：
 
-
+        ```
         import org.tensorflow.Graph;
         import org.tensorflow.Session;
         import org.tensorflow.Tensor;
@@ -87,6 +86,7 @@ Android 上的安装说明在单独的 [Android TensorFlow 支持页面](https:/
             }
           }
         }
+        ```
 
   3. 编译并执行：
 
