@@ -5,7 +5,7 @@
 如果上一段话没有吓退你，那么欢迎你。这份指南将解释如何在 64-bit 的台式机和笔记本电脑上构建 TensorFlow，支持的操作系统如下：
 
 *   Ubuntu
-*   macOS X
+*   macOS X
 
 注意：有些用户已经成功地在我们不提供支持的系统上从源代码开始构建并安装 TensorFlow。但请注意，我们不会解决因这类尝试而产生的问题。
 
@@ -125,8 +125,8 @@ $ <b>sudo apt-get install python3-numpy python3-dev python3-pip python3-wheel</b
 安装 TensorFlow，需要安装以下依赖包：
 
   * six
-  * numpy：一个 TensorFlow 需要的用于数值处理的包。
-  * wheel：能够让你管理 Python 的 wheel 格式的压缩包。
+  * numpy：一个 TensorFlow 需要的用于数值处理的包。
+  * wheel：能够让你管理 Python 的 wheel 格式的压缩包。
 
 你可以通过 pip 安装 Python 依赖，如果机器上没有 pip，我们推荐使用 homebrew 去安装 Python 以及 pip，参考[文档](http://docs.python-guide.org/en/latest/starting/install/osx/)进行安装。如果按照以上介绍安装，将不需要禁用 SIP。
 
