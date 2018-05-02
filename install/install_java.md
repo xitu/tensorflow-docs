@@ -4,7 +4,7 @@ TensorFlow 为 Java 程序提供了 API 。这些 API 是在 Java 应用中专�
 [TensorFlow for Java](https://www.tensorflow.org/api_docs/java/reference/org/tensorflow/package-summary)
 。
 
-警告：TensorFlow 的 Java API **不**包含在 [TensorFlow API 稳定性保证](https://www.tensorflow.org/programmers_guide/version_semantics)中。
+警告：TensorFlow 的 Java API 不包含在 [TensorFlow API 稳定性保证](https://www.tensorflow.org/programmers_guide/version_semantics)中。
 
 ## 支持平台
 
