@@ -461,7 +461,7 @@ print(sess.run(hello))
 
 
 <a name="TF_PYTHON_URL"></a>
-## TensorFlow 的 Python 包 URL
+## TensorFlow Python 软件包的网址
 
 一些安装方法中需要 TensorFlow Python 包的 URL，你所声明的值取决下面三个因素：
 
@@ -534,29 +534,3 @@ https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.8.0rc1-cp36
 </pre>
 
 注意 GPU 支持需要符合[NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements)的软硬件要求。
-
-<a name="Protobuf31"></a>
-## Protobuf pip package 3.1
-
-除非你遇到了与 protobuf pip package 相关的问题，否则你可以直接跳过该部分。
-
-**注意：** 如果你的 TensorFlow 程序运行速度很慢，你可能有一个和 protobuf pip package 相关的问题。
-
-TensorFlow pip 包依赖于 3.1 版本的 protobuf pip package。从 PyPI 下载的 protobuf pip package （使用
-<tt>pip install protobuf</tt> 命令） 是一个含有序列化、反序列化实现的纯 Python 库，可能比 C++ 的实现慢 **10 到 50 倍**。Protobuf 同时也支持针对 Python 包的一个二进制扩展，基于快速的 C++ 解析。这个扩展在纯 Python 的标准 pip 包中是没有的。我们已经创建了一个自定义的二进制 pip 包给含有二进制扩展的 protobuf。要安装自定义的二进制 protobuf pip package, 执行如下的命令
-
-  * for Python 2.7:
-
-  <pre>
-  $ <b>pip install --upgrade \
-  https://storage.googleapis.com/tensorflow/linux/cpu/protobuf-3.1.0-cp27-none-linux_x86_64.whl</b></pre>
-
-  * for Python 3.5:
-
-  <pre>
-  $ <b>pip3 install --upgrade \
-  https://storage.googleapis.com/tensorflow/linux/cpu/protobuf-3.1.0-cp35-none-linux_x86_64.whl</b></pre>
-
-安装这个 protobuf 包会覆盖掉存在的 protobuf 包。注意二进制 pip 包已经支持大于 64 MB 的 protobuf了，因此可以解决如下的错误：
-
-请注意，GPU 版本需要[运行支持 GPU 的 TensorFlow 所需满足的 NVIDIA 要求](#NVIDIARequirements)中所述的 NVIDIA 硬件和软件。
