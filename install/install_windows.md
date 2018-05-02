@@ -1,9 +1,9 @@
 # 在 Windows 上安装 TensorFlow
 
-This guide explains how to install TensorFlow on Windows. Although these instructions might also work on other Windows variants, we have only tested (and we only support) these instructions on machines meeting the following requirements:
+本指南将介绍如何在 Windows 上安装 TensorFlow。虽然这些说明可能也适用于其他 Windows 版本，但我们只在满足以下要求的计算机上验证过这些说明（而且我们只支持在此类计算机上按这些说明操作）：
 
-  * 64-bit, x86 desktops or laptops
-  * Windows 7 or later
+  * 64 位、x86 台式机或笔记本电脑
+  * Windows 7 或更高版本
 
 ## 选择准备安装的 TensorFlow 类型
 
