@@ -1,4 +1,4 @@
-# 安装 TensorFlow C 语言版
+# 安装适用于 C 的 TensorFlow
 
 TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/c/c_api.h) 中定义了一套 C 语言 API，用于[构建其它语言的封装](https://www.tensorflow.org/extend/language_bindings)。这套 API 除了使用方便外，还将保持易用性与一致性。
 
@@ -37,7 +37,8 @@ TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/
   
   如果你指定了一个非系统目录作为 `TARGET_DIRECTORY`（比如，`~/mydir`），那么你必须将你的解压目录（比如，`~/mydir/lib`）添加到以下两个环境变量中。例如：
   
-  <pre> <b>export LIBRARY_PATH=$LIBRARY_PATH:~/mydir/lib</b> # For both Linux and macOS X
+  <pre>
+  <b>export LIBRARY_PATH=$LIBRARY_PATH:~/mydir/lib</b> # For both Linux and macOS X
   <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/mydir/lib</b> # For Linux only
   <b>export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:~/mydir/lib</b> # For macOS X only</pre>
 
@@ -72,12 +73,10 @@ Hello from TensorFlow C library version <i>number</i></pre>
 
 <pre><b>gcc -I/usr/local/include -L/usr/local/lib hello_tf.c -ltensorflow</b></pre>
 
-如果执行 `a.out` 失败，请确认以下几个问题：
+如果 `a.out` 执行失败，请思考下列问题：：
 
-  * 这个程序编译是否出错？
-  * 是否按本指南第三步“[安装](#安装)”指定了正确的环境变量的目录？
-  * 是否正确地 `export` 了环境变量？
+  * 这个程序编译是否出错？
+  * 是否按本指南第三步“[安装](#安装)”指定了正确的环境变量的目录？
+  * 是否正确地 `export` 了环境变量？
 
-如果你仍然在编译或者运行时看到了错误信息，请访问 [StackOverflow](https://stackoverflow.com/questions/tagged/tensorflow) 寻求解决方案.
-
-
+如果你仍然在编译或者运行时看到了错误信息，请访问 [StackOverflow](https://stackoverflow.com/questions/tagged/tensorflow) 寻求解决方案。
