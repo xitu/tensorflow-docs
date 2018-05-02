@@ -20,8 +20,8 @@
   * [CUDA Toolkit 9.0](http://nvidia.com/cuda)。详见 [NVIDIA 的文档](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/)。请保证你将 CUDA 相关的路径像 NVIDIA 文档中所描述的那样附在 `LD_LIBRARY_PATH` 环境变量中。
   * [cuDNN SDK v7](http://developer.nvidia.com/cudnn). 详见 [NVIDIA 的文档](http://docs.nvidia.com/deeplearning/sdk/cudnn-install/)，请保证你如 NVIDIA 文档中描述的那样创建了 `CUDA_HOME` 环境变量。
   * [需要翻译]GPU card with CUDA Compute Capability 3.0 or higher for building from source and 3.5 or higher for our binaries。 详见 [NVIDIA 英伟达的文档](https://developer.nvidia.com/cuda-gpus) 中支持的 GPU 列表。
-  * [GPU drivers](http://nvidia.com/driver) 支持你的 CUDA Toolkit 版本.
-  * NVIDIA CUDA 解析工具的接口，libcupti-dev 库。该库提供了更高级的分析工具支持。要安装这个库，对 CUDA Toolkit 8.0 以上的版本运行如下命令：
+  * [GPU drivers](http://nvidia.com/driver) 支持你的 CUDA Toolkit 版本。
+  * NVIDIA CUDA 解析工具的接口，libcupti-dev 库。该库提供了更高级的分析工具支持。要安装这个库，对 CUDA Toolkit 8.0 以上的版本运行如下命令：
 
     <pre>
     $ <b>sudo apt-get install cuda-command-line-tools</b>
@@ -42,13 +42,7 @@
 
     **IMPORTANT:** For compatibility with the pre-built `tensorflow-gpu` package, please use the Ubuntu **14.04** tar file package of TensorRT even when installing onto an Ubuntu 16.04 system.   
 
-如果您已安装前述软件包的旧版本，请升级到指定版本。如果升级不可行，您仍然可以运行支持 GPU 的 TensorFlow，但前提是您需要执行以下操作：
-
-  * 从源代码安装 TensorFlow（参阅 @{$install_sources$install TensorFlow from Sources} 中的说明）。
-  * 安装或升级到至少以下 NVIDIA 产品版本：
-    * CUDA 工具包 7.0 或更高版本
-    * cuDNN v3 或更高版本
-    * CUDA 计算能力为 3.0 或更高的 GPU 卡
+如果您已安装前述软件包的旧版本，请升级到指定版本。如果升级不可行，如果你 @{$install_sources$install TensorFlow from Sources}，那你仍然可以运行支持 GPU 的 TensorFlow。
 
 ## 决定如何安装 TensorFlow
 
@@ -75,16 +69,16 @@ Docker 完全地将 TensorFlow 的安装与其他之前安装于你机器上的�
 <a name="InstallingVirtualenv"></a>
 ## 使用 Virtualenv 安装
 
-按照如下步骤来使用 virtualenv 安装 TensorFlow：  
+按照如下步骤来使用 virtualenv 安装 TensorFlow：
+
   1. 选择下面的一条命令来安装 pip 和 Virtualenv：
-   
-     <pre> $ <b>sudo apt-get install python-pip python-dev python-virtualenv</b> # for Python 2.7
-     $ <b>sudo apt-get install python3-pip python3-dev python-virtualenv</b> # for Python 3.n </pre>
+
+     $ <b>sudo apt-get install python-pip python-dev python-virtualenv</b> # for Python 2.7
+     $ <b>sudo apt-get install python3-pip python3-dev python-virtualenv</b> # for Python 3.n
 
   2. 挑选其中的一条命令来创建一个 Virtualenv 的虚拟环境:
 
-     <pre>
-     $ <b>virtualenv --system-site-packages</b> <i>targetDirectory</i> # for Python 2.7
+      <pre>$ <b>virtualenv --system-site-packages</b> <i>targetDirectory</i> # for Python 2.7
      $ <b>virtualenv --system-site-packages -p python3</b> <i>targetDirectory</i> # for Python 3.n</pre>
 
      其中<code><em>targetDirectory</em></code> 指明了 Virtualenv 树中根部位置。我们的命令中假设了<code><em>targetDirectory</em></code> 是 `~/tensorflow`, 但你也可以指定任意目录。
