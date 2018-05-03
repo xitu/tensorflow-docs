@@ -1,11 +1,10 @@
 # 路线图
 **最近一次更新：2018.02.15**
 
-TensorFlow 是一个频繁更新且社区活跃的项目。这份文档旨在提供关于 TensorFlow 高优先级领域以及核心开发成员专注领域的指南，以及未来 TensorFlow 发行版期望的功能。这里很多部分是靠社区内部的测试用例驱动开发的，此外我们也欢迎对 TensorFlow 更进一步的 
+TensorFlow 是一个频繁更新并且有社区活跃支持的项目。这份文档旨在提供关于 TensorFlow 高优先级领域以及核心开发成员专注领域信息的指南，以及未来的 TensorFlow 期望发行的功能。很多部分是靠社区内部的测试用例驱动开发的，此外我们也欢迎对 TensorFlow 更进一步的 
 [讨论](https://github.com/tensorflow/tensorflow/blob/master/CONTRIBUTING.md) 。
 
-The features below do not have concrete release dates. However, the majority can be 
-expected in the next one to two releases. 
+以下的功能并没有具体计划的发行日期，但是大部分功能会在未来的一两个发行版发行。
 
 ### APIs
 #### High Level APIs:
