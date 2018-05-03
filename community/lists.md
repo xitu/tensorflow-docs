@@ -1,51 +1,39 @@
-# Google Group 邮件群组清单
+# 关于邮件组
 
-As a community, we do much of our collaboration on public mailing lists.
-Please note that if you're looking for help using TensorFlow, [Stack
-Overflow](https://stackoverflow.com/questions/tagged/tensorflow) and
-[GitHub issues](https://github.com/tensorflow/tensorflow/issues)
-are the best initial places to look. For more information,
-see [how to get help](/community/#get_help).
+作为一个社会组织，我们与很多开放的邮件组进行合作。如果你正在学习 TensorFlow 那你可要留意这几个邮件组, 最适合入门学习的邮件组就是 [Stack
+Overflow](https://stackoverflow.com/questions/tagged/tensorflow) 和
+[GitHub issues](https://github.com/tensorflow/tensorflow/issues) 。还想要了解更多请查看 [how to get help](/community/#get_help) 。
 
-## TensorFlow 通项邮件群组清单
+## 有关 TensorFlow 综合邮件组
 
-* [announce](https://groups.google.com/a/tensorflow.org/d/forum/announce) - Low-volume announcements of new releases.
-* [discuss](https://groups.google.com/a/tensorflow.org/d/forum/discuss) - General community discussion around TensorFlow.
-* [developers](https://groups.google.com/a/tensorflow.org/d/forum/developers) - Discussion for developers contributing to TensorFlow.
+* [announce](https://groups.google.com/a/tensorflow.org/d/forum/announce) - TensorFlow 发版公报邮件组
+* [discuss](https://groups.google.com/a/tensorflow.org/d/forum/discuss) - TensorFlow 综合讨论邮件组
+* [developers](https://groups.google.com/a/tensorflow.org/d/forum/developers) - TensorFlow 开发者贡献讨论邮件组
 
-## 专项邮件群组清单
+## 有关 TensorFlow 专项邮件组
 
-These projects inside the TensorFlow GitHub organization have lists dedicated to their communities:
+TensorFlow 的 GitHub 组织内有很多项目是靠专项邮件组交流的:
 
 * [hub](https://groups.google.com/a/tensorflow.org/d/forum/hub) -
-  Discussion and collaboration around [TensorFlow Hub](https://github.com/tensorflow/hub).
+  [TensorFlow Hub](https://github.com/tensorflow/hub) 交流合作邮件组
 * [magenta-discuss](https://groups.google.com/a/tensorflow.org/d/forum/magenta-discuss) -
-  General discussion about [Magenta](https://magenta.tensorflow.org/)
-  development and directions.
+  [Magenta](https://magenta.tensorflow.org/) 发展方向讨论邮件组
 * [swift](https://groups.google.com/a/tensorflow.org/d/forum/swift) -
-  Community and collaboration around Swift for TensorFlow.
-* [tensor2tensor](https://groups.google.com/d/forum/tensor2tensor) - Discussion
-  and peer support for Tensor2Tensor.
+  TensorFlow Swift 交流合作邮件组
+* [tensor2tensor](https://groups.google.com/d/forum/tensor2tensor) - Tensor2Tensor 交流与相关支持邮件组
 * [tfjs-announce](https://groups.google.com/a/tensorflow.org/d/forum/tfjs-announce) -
-  Announcements of new TensorFlow.js releases.
-* [tfjs](https://groups.google.com/a/tensorflow.org/d/forum/tfjs) - Discussion
-  and peer support for TensorFlow.js.
-* [tflite](https://groups.google.com/a/tensorflow.org/d/forum/tflite) - Discussion and
-  peer support for TensorFlow Lite.
-* [tpu-users](https://groups.google.com/a/tensorflow.org/d/forum/tpu-users) - Community discussion
-  and support for TPU users.
+  TensorFlow.js 发版公告邮件组
+* [tfjs](https://groups.google.com/a/tensorflow.org/d/forum/tfjs) - TensorFlow.js 交流与相关支持邮件组
+* [tflite](https://groups.google.com/a/tensorflow.org/d/forum/tflite) - TensorFlow Lite 交流与相关支持邮件组
+* [tpu-users](https://groups.google.com/a/tensorflow.org/d/forum/tpu-users) - TPU 用户交流与相关支持邮件组
 
 ## 专项兴趣小组
 
-TensorFlow's [Special Interest
-Groups](/community/contributing#special_interest_groups) (SIGs) support
-community collaboration on particular project focuses. Members of these groups
-work together to build and support TensorFlow related projects. While their
-archives are public, different SIGs have their own membership policies.
+TensorFlow [专项兴趣小组](/community/contributing#special_interest_groups) (SIGs) 对专注于重点项目的社区讨论做相关支持。项目成员会一起为 TensorFlow 相关项目的技术开发及支持做相关工作。而他们的档案资料都是公开的，不同的 SIGs 小组有各自的成员政策。
 
 * [build](https://groups.google.com/a/tensorflow.org/d/forum/build) -
-  Supporting SIG Build, for build, distribution and packaging of TensorFlow.
+  工程开发兴趣小组，为 TensorFlow 的工程开发、代码拆分、项目打包提供相关支持。
 * [sig-tensorboard](https://groups.google.com/a/tensorflow.org/d/forum/sig-tensorboard) -
-  Supporting SIG TensorBoard, for plugin development and other contribution.
+  tensorboard 兴趣小组，为插件开发及其他社区贡献提供相关支持。
 * [rust](https://groups.google.com/a/tensorflow.org/d/forum/rust) -
-  Supporting SIG Rust, for the Rust language bindings.
+  Rust 兴趣小组，为 Rust 语言开发者提供相关支持。
