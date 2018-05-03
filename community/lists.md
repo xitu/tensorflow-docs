@@ -1,4 +1,4 @@
-# Mailing Lists
+# Google Group 邮件群组清单
 
 As a community, we do much of our collaboration on public mailing lists.
 Please note that if you're looking for help using TensorFlow, [Stack
@@ -7,13 +7,13 @@ Overflow](https://stackoverflow.com/questions/tagged/tensorflow) and
 are the best initial places to look. For more information,
 see [how to get help](/community/#get_help).
 
-## General TensorFlow lists
+## TensorFlow 通项邮件群组清单
 
 * [announce](https://groups.google.com/a/tensorflow.org/d/forum/announce) - Low-volume announcements of new releases.
 * [discuss](https://groups.google.com/a/tensorflow.org/d/forum/discuss) - General community discussion around TensorFlow.
 * [developers](https://groups.google.com/a/tensorflow.org/d/forum/developers) - Discussion for developers contributing to TensorFlow.
 
-## Project-specific lists
+## 专项邮件群组清单
 
 These projects inside the TensorFlow GitHub organization have lists dedicated to their communities:
 
@@ -35,7 +35,7 @@ These projects inside the TensorFlow GitHub organization have lists dedicated to
 * [tpu-users](https://groups.google.com/a/tensorflow.org/d/forum/tpu-users) - Community discussion
   and support for TPU users.
 
-## Special Interest Groups
+## 专项兴趣小组
 
 TensorFlow's [Special Interest
 Groups](/community/contributing#special_interest_groups) (SIGs) support
