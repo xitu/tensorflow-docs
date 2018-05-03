@@ -6,7 +6,7 @@ Overflow](https://stackoverflow.com/questions/tagged/tensorflow) 和
 
 ## 有关 TensorFlow 综合邮件组
 
-* [announce](https://groups.google.com/a/tensorflow.org/d/forum/announce) - TensorFlow 发版公报邮件组
+* [announce](https://groups.google.com/a/tensorflow.org/d/forum/announce) - TensorFlow 发版公告邮件组
 * [discuss](https://groups.google.com/a/tensorflow.org/d/forum/discuss) - TensorFlow 综合讨论邮件组
 * [developers](https://groups.google.com/a/tensorflow.org/d/forum/developers) - TensorFlow 开发者贡献讨论邮件组
 
