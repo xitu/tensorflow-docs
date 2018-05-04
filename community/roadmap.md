@@ -6,21 +6,20 @@ TensorFlow 是一个频繁更新并且社区活跃的项目。这份文档旨在
 以下功能并没有具体计划的发行日期，但是大部分功能会在未来的一两个发行版中发行。
 
 ### APIs
-#### High Level APIs:
-* Easy multi-GPU utilization with Estimators
-* Easy-to-use high-level pre-made estimators for Gradient Boosted Trees, Time Series, and other models
+#### 高阶 APIs:
+* 基于 Estimators 的友好型 multi-GPU 接口
+* Boosted Trees, Time Series 及其他模型的友好型高阶预制 estimators
 
 #### Eager Execution:
-* Efficient utilization of multiple GPUs
-* Distributed training (multi-machine)
-* Performance improvements
-* Simpler export to a GraphDef/SavedModel 
+* multiple GPUs 的高效使用接口
+* 分布式训练 (多机器训练)
+* 性能提升
+* 更友好地将模型导出到 GraphDef/SavedModel 
 
 #### Keras API:
-* Better integration with tf.data (ability to call `model.fit` with data tensors)
-* Full support for Eager Execution (both Eager support for the regular Keras API, and ability 
-to create Keras models Eager- style via Model subclassing)
-* Better distribution/multi-GPU support and TPU support (including a smoother model-to-estimator workflow)
+* 更好的整合 tf.data (让数据张量有能力直接调用 `model.fit` )
+* 完全支持 Eager Execution (包括对常规的 Keras API 的 Eager support 支持，以及通过模型子类创建 Eager 风格的 Keras 模型的能力)
+* 更好的支持 distribution/multi-GPU 和 TPU (包括更平滑的 model-to-estimator 工作流)
 
 #### Official Models:
 * A set of 
