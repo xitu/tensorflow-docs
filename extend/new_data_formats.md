@@ -3,11 +3,11 @@
 前提：
 
 *   对 C++ 有一定程度的了解。
-*   装有 @{$install_sources$downloaded TensorFlow source}，并能够运行。
+*   已经 @{$install_sources$downloaded TensorFlow source}，并能够运行。
 
 我们将支持自定义文件格式分为两个任务：
 
-*   文件格式： 使用 `tf.data.Dataset` 阅读器来从文件中读取原始 **记录**（通常以零阶字符串张量（scalar string tensors）表示，也可能有其他结构）。
+*   文件格式：使用 `tf.data.Dataset` 阅读器来从文件中读取原始**记录**（通常以零阶字符串张量（scalar string tensors）表示，也可能有其他结构）。
 *   记录格式：使用解码器或者解析操作将一个字符串记录转换成 TensorFlow 可用的张量（tensor）。
 
 比方说，要读取一个 [CSV 文件](https://en.wikipedia.org/wiki/Comma-separated_values)，我们可以使用 @{tf.data.TextLineDataset$a dataset for reading text files line-by-line}，然后 @{tf.data.Dataset.map$map} 一个从数据集中的文本逐行解析 CSV 数据的 @{tf.decode_csv$op}。
@@ -16,7 +16,7 @@
 
 ## 为文件格式编写一个`数据集`
 
-@{tf.data.Dataset} 表示一系列 **元素**，即文件中独立的记录。TensorFlow中内置了几种『阅读器』：
+@{tf.data.Dataset} 表示一系列**元素**，即文件中独立的记录。TensorFlow中内置了几种『阅读器』数据集：
 
 *   @{tf.data.TFRecordDataset} ([源自 `kernels/data/reader_dataset_ops.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/data/reader_dataset_ops.cc))
 *   @{tf.data.FixedLengthRecordDataset} ([源自 `kernels/data/reader_dataset_ops.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/data/reader_dataset_ops.cc))
@@ -30,9 +30,9 @@
 
 * 一个 `tensorflow::DatasetIterator<Dataset>` 的子类（如 `TextLineDatasetOp::Dataset::Iterator`），表示特定数据集上的迭代器的**可变性**，这个类的 `GetNextInternal()` 方法告诉 TensorFlow 怎样获取迭代器的下一个元素。
 
-其中最重要的方法是 `GetNextInternal()` ，因为它定义了怎样从文件中实际读取记录，并用一个或多个 `Tensor` 对象来表示它们。
+其中最重要的方法是 `GetNextInternal()`，因为它定义了怎样从文件中实际读取记录，并用一个或多个 `Tensor` 对象来表示它们。
 
-创建一个新的阅读器数据集叫做（比方说） `MyReaderDataset`，你需要：
+创建一个新的阅读器数据集叫做（比方说）`MyReaderDataset`，你需要：
 
 1. 在 C++ 中定义 `tensorflow::DatasetOpKernel`、`tensorflow::GraphDatasetBase` 和 `tensorflow::DatasetIterator<Dataset>` 的子类来实现读取逻辑。
 2. 在 C++ 中注册一个新的名叫 `"MyReaderDataset"` 的阅读器操作和内核。
@@ -74,7 +74,7 @@ class MyReaderDatasetOp : public DatasetOpKernel {
           new Iterator({this, strings::StrCat(prefix, "::MyReader")}));
     }
 
-    // 记录结构：一个记录用一个零阶字符串张量表示。
+    // 记录结构：每个记录用一个零阶字符串张量表示。
     //
     // 数据集的元素有固定数量的组件，每个组件有不同的类型和形状；重写以下两个方法来自定义数据集的这方面的设置。
     const DataTypeVector& output_dtypes() const override {
@@ -134,7 +134,7 @@ class MyReaderDatasetOp : public DatasetOpKernel {
      protected:
       // 可选：为这个迭代器实现状态序列化。
       //
-      // 如果你想保存这个迭代器的实例，实现以下两个方法。
+      // 如果你想保存和恢复这个迭代器的实例，实现以下两个方法。
       Status SaveInternal(IteratorStateWriter* writer) override {
         mutex_lock l(mu_);
         TF_RETURN_IF_ERROR(writer->WriteScalar(full_name("i"), i_));
@@ -194,12 +194,12 @@ class MyReaderDataset(tf.data.Dataset):
     # 为数据集操作构建图形节点
     #
     # 当你在这个数据集或者由它衍生出来的数据集上创建一个迭代器时，
-    # 这个函数会被调用。
+    # 这个方法会被调用。
     return my_reader_dataset_module.my_reader_dataset()
 
-  # 以下属性定义了元素的结构：一个
-  # 零阶 `tf.string` 张量。如果你修改了元素的结构，
-  # 修改这些属性来与 `MyReaderDataset::Dataset` 中
+  # 以下属性定义了元素的结构：一个零阶 `tf.string` 张量。
+  # 如果你修改了元素的结构，也需要修改这些属性
+  # 来与 `MyReaderDataset::Dataset` 中
   # 的 `output_dtypes()` 和 `output_shapes()` 匹配。
   @property
   def output_types(self):
