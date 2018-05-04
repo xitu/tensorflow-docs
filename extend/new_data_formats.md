@@ -90,7 +90,7 @@ class MyReaderDatasetOp : public DatasetOpKernel {
     string DebugString() override { return "MyReaderDatasetOp::Dataset"; }
 
    protected:
-    // 可选：为这个数据集实现 `GraphDef` 序列化。
+    // 可选：数据集的 `GraphDef` 序列化。
     //
     // 如果你想保存这个数据集（和它上面的所有迭代器）的实例，实现以下这个方法。
     Status AsGraphDefInternal(DatasetGraphDefBuilder* b,
@@ -132,7 +132,7 @@ class MyReaderDatasetOp : public DatasetOpKernel {
       }
 
      protected:
-      // 可选：为这个迭代器实现状态序列化。
+      // 可选：迭代器的状态序列化。
       //
       // 如果你想保存和恢复这个迭代器的实例，实现以下两个方法。
       Status SaveInternal(IteratorStateWriter* writer) override {
