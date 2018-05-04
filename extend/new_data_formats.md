@@ -12,7 +12,7 @@
 
 比方说，要读取一个 [CSV 文件](https://en.wikipedia.org/wiki/Comma-separated_values)，我们可以使用 @{tf.data.TextLineDataset$a dataset for reading text files line-by-line}，然后 @{tf.data.Dataset.map$map} 一个从数据集中的文本逐行解析 CSV 数据的 @{tf.decode_csv$op}。
 
-【目录】
+[TOC]
 
 ## 为文件格式编写一个`数据集`
 
