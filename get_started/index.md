@@ -2,7 +2,7 @@
 
 如果你不熟悉机器学习，我们建议你在深入研究 TensorFlow 文档之前参加下面这个在线课程：
 
-  * [机器学习速成课程](https://developers.google.com/machine-learning/crash-course/)：引入了机器学习概念并鼓励用现有的 TensorFlow 代码进行实验。
+  * [机器学习速成课程](https://developers.google.com/machine-learning/crash-course/)：引入了机器学习概念并鼓励用现有的 TensorFlow 代码进行实验。
 
 TensorFlow 是一个机器学习工具，主要为深度神经网络模型设计，同时也包含了大量的其它功能。
 
