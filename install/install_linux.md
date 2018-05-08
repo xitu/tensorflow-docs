@@ -261,15 +261,17 @@ $ <b>nvidia-docker run -it</b> <i>-p hostPort:containerPort TensorFlowGPUImage</
 
 其中:
 
-  * <tt><i>-p hostPort:containerPort</i></tt> 可选。如果你想要在 shell 命令行中运行 TensorFlow，忽略这个选项。如果你想要在 Jupyter notebooks 中运行这个程序，将
-    <tt><i>hostPort</i></tt> 和 <code><em>containerPort</em></code> 都设置为 `8888`.
-  * <i>TensorFlowGPUImage</i> 指定了 Docker 容器。 你必须声明其中一个值:
-    * <tt>tensorflow/tensorflow:latest-gpu</tt>， 是最新的 TensorFlow GPU 二进制镜像。
-    * <tt>tensorflow/tensorflow:latest-devel-gpu</tt>，是最新的 TensorFlow GPU 二进制镜像加源码。
-    * <tt>tensorflow/tensorflow:<i>version</i>-gpu</tt>，是特定的 TensorFlow GPU 二进制镜像版本（例如，0.12.1）。
-    * <tt>tensorflow/tensorflow:<i>version</i>-devel-gpu</tt>，是特定的 TensorFlow GPU 二进制镜像版本（例如，0.12.1）加源码。
+  * <tt><i>-p hostPort:containerPort</i></tt> 是可选的如果你准备从 shell 命令行中运行 TensorFlow 程序，那么忽略该选项。如果你准备在如 Jupyter notebooks 中运行 TensorFlow，把 <tt><i>hostPort</i></tt> 和 <tt><i>containerPort</i></tt> 都设置为 <tt>8888</tt>。如果你想在容器中运行 TensorBoard，加一个 `-p`，将<i>hostPort</i> 和 <i>containerPort</i> 都设置为 6006。
+  * <tt><i>TensorFlowCPUImage</i></tt> 是必需的。 它指定了 Docker。 选择声明其中的一个值：
+    * <tt>tensorflow/tensorflow</tt>， 这是 TensorFlow CPU 二进制镜像的值。
+    * <tt>tensorflow/tensorflow:latest-devel</tt>，这是最新的 TensorFlow CPU 二进制镜像加上源码，
+    * <tt>tensorflow/tensorflow:<i>version</i></tt>，是某一特定的版本（比如，1.1.0rc1）的 TensorFlow CPU 二进制镜像。
+    * <tt>tensorflow/tensorflow:<i>version</i>-devel</tt>，是某一特定的版本（比如，1.1.0rc1）的 TensorFlow CPU 二进制镜像加源码。
 
-我们推荐安装`最新`的版本。例如，下面的命令在 Docker 容器中运行了 TensorFlow GPU 二进制镜像，你可以在 shell 中运行 TensorFlow 程序：
+    <tt>gcr.io</tt> 是 Google 容器注册（Google Container Registry）。注意一些 TensorFlow 的镜像也可以在
+    [dockerhub](https://hub.docker.com/r/tensorflow/tensorflow/) 中找到.
+
+例如，如下命令在 Docker 容器中运行 TensorFlow CPU 二进制镜像，可以从 shell 命令行中运行 TensorFlow：
 
 <pre>
 $ <b>nvidia-docker run -it tensorflow/tensorflow:latest-gpu bash</b>
