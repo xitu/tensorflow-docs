@@ -40,7 +40,7 @@
     </pre>
    * **[可选]** 为了优化推论性能，你也可以安装 NVIDIA TensorRT 3.0。更多细节，请参阅 [NVIDIA's TensorRT documentation](http://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html#installing-tar)。为了兼容 Tensorflow，只需要 TensorRT Tar 问文件中关于安装说明的步骤 1-4；Python 包安装说明的步骤 5 和 6 可以忽略。详细的安装说明可以在 [package documentataion](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/tensorrt#installing-tensorrt-304) 进行查阅。
 
-   * **重要**：为了与预构建包 `tensorflow-gpu` 进行兼容，即使你在 Ubuntu 16.04 系统上进行安装，我们也建议你使用 TensorRT 的 Ubuntu **14.04** tar 文件包。  
+   * **重要** 为了与预构建包 `tensorflow-gpu` 进行兼容，即使你在 Ubuntu 16.04 系统上进行安装，我们也建议你使用 TensorRT 的 Ubuntu **14.04** tar 文件包。  
 
 如果您已安装前述软件包的旧版本，请升级到指定版本。如果升级失败，那么你可以使用 @{$install_sources$install TensorFlow from Sources}，此时你仍然可以运行支持 GPU 的 TensorFlow。
 
@@ -72,13 +72,13 @@ Docker 完全地将 TensorFlow 的安装与其他之前安装于你机器上的�
 
   1. 选择下面的一条命令来安装 pip 和 Virtualenv：
 
-      <pre>$ <b>sudo apt-get install python-pip python-dev python-virtualenv</b> # for Python 2.7
+       <pre>$ <b>sudo apt-get install python-pip python-dev python-virtualenv</b> # for Python 2.7
       
      $ <b>sudo apt-get install python3-pip python3-dev python-virtualenv</b> # for Python 3.n</pre>
 
   2. 挑选其中的一条命令来创建一个 Virtualenv 的虚拟环境:
 
-      <pre>$ <b>virtualenv --system-site-packages</b> <i>targetDirectory</i> # for Python 2.7
+       <pre>$ <b>virtualenv --system-site-packages</b> <i>targetDirectory</i> # for Python 2.7
       
      $ <b>virtualenv --system-site-packages -p python3</b> <i>targetDirectory</i> # for Python 3.n</pre>
 
@@ -86,7 +86,7 @@ Docker 完全地将 TensorFlow 的安装与其他之前安装于你机器上的�
 
   3. 通过以下任意一条命令激活 Virtualenv 的虚拟环境:
 
-     <pre>$ <b>source ~/tensorflow/bin/activate</b> # bash, sh, ksh, or zsh
+      <pre>$ <b>source ~/tensorflow/bin/activate</b> # bash, sh, ksh, or zsh
      
     $ <b>source ~/tensorflow/bin/activate.csh</b>  # csh or tcsh
     $ <b>. ~/tensorflow/bin/activate.fish</b>  # fish</pre>
@@ -102,7 +102,7 @@ Docker 完全地将 TensorFlow 的安装与其他之前安装于你机器上的�
   5. 运行下列其中的一条命令来在激活的 Virtualenv 环境中安装 TensorFlow:
 	
 
-     <pre>(tensorflow)$ <b>pip install --upgrade tensorflow</b>      # for Python 2.7
+      <pre>(tensorflow)$ <b>pip install --upgrade tensorflow</b>      # for Python 2.7
      
     (tensorflow)$ <b>pip3 install --upgrade tensorflow</b>     # for Python 3.n
     (tensorflow)$ <b>pip install --upgrade tensorflow-gpu</b>  # for Python 2.7 and GPU
@@ -112,7 +112,7 @@ Docker 完全地将 TensorFlow 的安装与其他之前安装于你机器上的�
 
   6. （可选）如果步骤 5 失败了（通常是由于你运行了一个低于 8.1 的 pip 版本），通过以下命令来在激活的 Virtualenv 环境中安装 TensorFlow：
   
-     <pre>(tensorflow)$ <b>pip install --upgrade</b> <i>tfBinaryURL</i>   # Python 2.7
+      <pre>(tensorflow)$ <b>pip install --upgrade</b> <i>tfBinaryURL</i>   # Python 2.7
      
     (tensorflow)$ <b>pip3 install --upgrade</b> <i>tfBinaryURL</i>  # Python 3.n </pre>
 
@@ -235,8 +235,8 @@ $ docker run -it <i>-p hostPort:containerPort TensorFlowCPUImage</i>
 其中:
 
   * <tt><i>-p hostPort:containerPort</i></tt> 是可选的如果你准备从 shell 命令行中运行 TensorFlow 程序，那么忽略该选项。如果你准备在如 Jupyter notebooks 中运行 TensorFlow，把 <tt><i>hostPort</i></tt> 和 <tt><i>containerPort</i></tt> 都设置为 <tt>8888</tt>。如果你想在容器中运行 TensorBoard，加一个 `-p`，将<i>hostPort</i> 和 <i>containerPort</i> 都设置为 6006。
-  * <tt><i>TensorFlowCPUImage</i></tt> 是必需的。 它指定了 Docker。 选择声明其中的一个值：
-    * <tt>tensorflow/tensorflow</tt>， 这是 TensorFlow CPU 二进制镜像的值。
+  * <tt><i>TensorFlowCPUImage</i></tt> 是必需的。它指定了 Docker。选择声明其中的一个值：
+    * <tt>tensorflow/tensorflow</tt>，这是 TensorFlow CPU 二进制镜像的值。
     * <tt>tensorflow/tensorflow:latest-devel</tt>，这是在最新的 TensorFlow CPU 二进制镜像加上源码，
     * <tt>tensorflow/tensorflow:<i>version</i></tt>，是某一特定的版本（比如，1.1.0rc1）的 TensorFlow CPU 二进制镜像。
     * <tt>tensorflow/tensorflow:<i>version</i>-devel</tt>，是在某一特定的版本（比如，1.1.0rc1）的 TensorFlow CPU 二进制镜像加源码。
