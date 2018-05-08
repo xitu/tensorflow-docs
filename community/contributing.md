@@ -1,13 +1,11 @@
-# Contributing to TensorFlow
+# 贡献 TensorFlow
 
-TensorFlow is an open-source project, and we welcome your participation
-and contribution. This page describes how to get involved.
+TensorFlow 是一个开源项目，我们欢迎您的参与以及贡献，本页将会介绍如何参与贡献 Tensorflow
 
-## Repositories
+## 仓库
 
-The code for TensorFlow is hosted in the [TensorFlow GitHub
-organization](https://github.com/tensorflow). Multiple projects are located
-inside the organization, including:
+TensorFlow 代码托管在 [TensorFlow GitHub
+organization](https://github.com/tensorflow)中。 在这个仓库结构中中有多个项目， 其中包括:
 
 * [TensorFlow](https://github.com/tensorflow/tensorflow)
 * [Models](https://github.com/tensorflow/models)
@@ -16,34 +14,28 @@ inside the organization, including:
 * [TensorFlow Serving](https://github.com/tensorflow/serving)
 * [TensorFlow Documentation](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/docs_src)
 
-## Contributor checklist
+## 贡献者清单
 
-* Before contributing to TensorFlow source code, please review the [contribution
-guidelines](https://github.com/tensorflow/tensorflow/blob/master/CONTRIBUTING.md).
+* 在贡献 TensorFlow 的源代码之前，请查看[贡献指导
+](https://github.com/tensorflow/tensorflow/blob/master/CONTRIBUTING.md)。
 
-* Join the
-[developers@tensorflow.org](https://groups.google.com/a/tensorflow.org/d/forum/developers)
-mailing list, to coordinate and discuss with others contributing to TensorFlow.
+* 将[developers@tensorflow.org](https://groups.google.com/a/tensorflow.org/d/forum/developers)
+加入邮件列表, 用来协调联系其他参与贡献TensorFlow 的人，进行讨论。.
 
-* For coding style conventions, read the @{$style_guide$TensorFlow Style Guide}.
+* 对于代码规范约定, 请看 @{$style_guide$TensorFlow Style Guide}.
 
-* Finally, review @{$documentation$Writing TensorFlow Documentation}, which
-  explains documentation conventions.
+* 最后, 请查阅 @{$documentation$Writing TensorFlow Documentation}, 这里解释了文档的内容.
 
-You may also wish to review our guide to @{$benchmarks$defining and running benchmarks}.
+你也可能想查看我们的指南 @{$benchmarks$defining and running benchmarks}.
 
-## Special Interest Groups
+## 特殊兴趣小组
 
-To enable focused collaboration on particular areas of TensorFlow, we host
-Special Interest Groups (SIGs). SIGs do their work in public: if you want to
-join and contribute, review the work of the group, and get in touch with the
-relevant SIG leader.  Membership policies vary on a per-SIG basis.
+为了能够在 TensorFlow 的特定领域实现专注的协作，我们组织了特殊兴趣小组（SIGs）。 SIGs 公开了他们的工作: 如果你有兴趣加入他们并作出贡献，审查小组的工作，请与 SIG 的领导取得联系。成员的政策依据每个 SIG 的不同而不同.
 
-* **SIG Build** focuses on issues surrounding building, packaging, and
-  distribution of TensorFlow. [Mailing list](https://groups.google.com/a/tensorflow.org/d/forum/build).
+* **SIG Build** 专注于TensorFlow构建，包装和设计等问题。 [Mailing list](https://groups.google.com/a/tensorflow.org/d/forum/build).
 
-* **SIG TensorBoard** furthers the development and direction of TensorBoard and its plugins.
+* **SIG TensorBoard** 进一步推动了 TensorBoart 及其插件的发展方向。
   [Mailing list](https://groups.google.com/a/tensorflow.org/d/forum/sig-tensorboard).
 
-* **SIG Rust** collaborates on the development of TensorFlow's Rust bindings.
+* **SIG Rust** 协同开发 TensorFlow 的 Rust 绑定问题
   [Mailing list](https://groups.google.com/a/tensorflow.org/d/forum/rust).
