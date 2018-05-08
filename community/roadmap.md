@@ -21,24 +21,21 @@ TensorFlow 是一个频繁更新并且社区活跃的项目。这份文档旨在
 * 完全支持 Eager Execution (包括对常规的 Keras API 的 Eager support 支持，以及通过模型子类创建 Eager 风格的 Keras 模型的能力)
 * 更好的支持 distribution/multi-GPU 和 TPU (包括更平滑的 model-to-estimator 工作流)
 
-#### Official Models:
-* A set of 
-[reference models](https://github.com/tensorflow/models/tree/master/official) 
-across image recognition, speech, object detection, and 
-  translation that demonstrate best practices and serve as a starting point for 
-  high-performance model development.
+#### 官方模型：
+* 这一系列的
+[参考模型](https://github.com/tensorflow/models/tree/master/official)
+包含了图像识别、自然语言处理、物体检测、机器翻译等领域，这些都算得上是最佳的练习选择以及学习构建高性能模型训练的理想切入点。
 
 #### Contrib:
-* Deprecation notices added to parts of tf.contrib where preferred implementations exist outside of tf.contrib.
-* As much as possible, large projects inside tf.contrib moved to separate repositories.
-* The tf.contrib module will eventually be discontinued in its current form, experimental development will in future happen in other repositories.
+* 为 tf.contrib 增加弃用声明，目前 tf.contrib 更倾向于在外部实现该功能。
+* 尽可能地将 tf.contrib 的大工程迁移到多个不同的仓库。
+* 目前这种形式的 tf.contrib 模块最终会停止开发，将来会在其他的仓库进行试验性开发。
 
 
-#### Probabilistic Reasoning and Statistical Analysis:
-* Rich set of tools for probabilistic and statistical analysis in tf.distributions 
-  and tf.probability. These include new samplers, layers, optimizers, losses, and structured models
-* Statistical tools for hypothesis testing, convergence diagnostics, and sample statistics
-* Edward 2.0: High-level API for probabilistic programming
+#### 概率推理与统计分析：
+* 在 tf.distributions 和 tf.probability 当中有大量的概率推理与统计分析工具可供使用。包括新的采样器、层、优化器、损失和结构化模型。
+* 用于假设检验、收敛诊断、样本统计的统计工具。
+* Edward 2.0: probabilistic programming 的 高阶 API
 
 ### Platforms
 #### TensorFlow Lite:
