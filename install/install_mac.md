@@ -4,11 +4,11 @@
 
   * macOS 10.12.6 (Sierra) 或更高
 
-注意: There are known, accuracy-affecting numerical issues before macOS 10.12.6 (Sierra) that are described in [GitHub#15933](https://github.com/tensorflow/tensorflow/issues/15933#issuecomment-366331383).
+注意: 在 [GitHub#15933](https://github.com/tensorflow/tensorflow/issues/15933#issuecomment-366331383) 中已经描述了在 macOS 10.12.6 (Sierra) 之前已知会影响数值准确性的问题。
 
 ## 选择安装 TensorFlow 的方式
 
-你必须选择使用哪种方式来安装 TensorFlow。有以下方式：
+你必须选择使用哪种方式来安装 TensorFlow。支持的方式有如下几种：
 
   * Virtualenv
   * 原生 pip
@@ -104,7 +104,7 @@ Docker 容器包含 TensorFlow 及其所有依赖项。
 $ <b>source ./bin/activate</b>      # bash、sh、ksh 或 zsh
 $ <b>source ./bin/activate.csh</b>  # csh 或 tcsh </pre>
 
-如果你的终端提示变成下面的样子，证明 TensorFlow 的环境已经激活：
+如果你的终端提示出现如下内容，证明 TensorFlow 的环境已经激活：
 
 <pre> (<i>targetDirectory</i>)$ </pre>
 
@@ -126,7 +126,7 @@ $ <b>source ./bin/activate.csh</b>  # csh 或 tcsh </pre>
 
 我们已经将 TensorFlow 的二进制编译版上传到了 PyPI 中。因此你可以直接使用 pip 进行安装。[setup.py 里要求的包](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/pip_package/setup.py) 列出了 pip 需要安装或升级的包。
 
-### 前置要求：Python
+### 环境要求：Python
 
 要安装 TensorFlow，你的系统必须至少包含一个以下版本的 Python：
 
@@ -137,7 +137,7 @@ $ <b>source ./bin/activate.csh</b>  # csh 或 tcsh </pre>
 
 在安装 Python 时，你可能需要关闭系统完整性保护（SIP）来允许安装非 Mac App Store 的程序。
 
-### 前置要求：pip
+### 环境要求：pip
 
 [Pip](https://en.wikipedia.org/wiki/Pip_(package_manager)) 能安装并管理 Python 编写的软件包。如果你想要通过本地 pip 进行安装，你的系统至少应该有包含下面命令中的一个：
 
@@ -201,7 +201,7 @@ $ <b>pip3 uninstall tensorflow</b> </pre>
     
     2. 从包含 TensorFlow 的镜像中创建并启动 Docker 容器。
 
-本节的其余部分将介绍如何启动Docker容器。
+本节的其余部分将介绍如何启动 Docker容器。
 
 要启动包含 TensorFlow 镜像的 Docker 容器，请输入以下指令：
 
