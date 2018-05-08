@@ -52,7 +52,8 @@
   * ["native" pip](#InstallingNativePip)
   * [Docker](#InstallingDocker)
   * [Anaconda](#InstallingAnaconda)
-  * 使用文档中的资源安装[另一个帮助文档](https://www.tensorflow.org/install/install_sources)。
+  * 使用文档中的资源安装
+  [另一个帮助文档](https://www.tensorflow.org/install/install_sources)。
 
 **我们推荐使用 Virtualenv 安装方法** [Virtualenv](https://virtualenv.pypa.io/en/stable/) 是一个 Python 的虚拟环境，独立于其他的 Python 部署，不会与同一台机器上的其他 Python 程序互相影响。在安装 Virtualenv 的过程中，你需要安装 TensorFlow 及其依赖的所有包（实际上这很简单）。要开始使用 TensorFlow 工作的时候，你只需要激活("activate")虚拟环境。总而言之，Virtualenv 提供了一种安全可靠的方法来安装并运行 TensorFlow。
 
@@ -72,8 +73,7 @@ Docker 完全地将 TensorFlow 的安装与其他之前安装于你机器上的�
 
   1. 选择下面的一条命令来安装 pip 和 Virtualenv：
 
-       <pre>$ <b>sudo apt-get install python-pip python-dev python-virtualenv</b> # for Python 2.7
-      
+      <pre>$ <b>sudo apt-get install python-pip python-dev python-virtualenv</b> # for Python 2.7   
      $ <b>sudo apt-get install python3-pip python3-dev python-virtualenv</b> # for Python 3.n</pre>
 
   2. 挑选其中的一条命令来创建一个 Virtualenv 的虚拟环境:
