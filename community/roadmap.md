@@ -37,38 +37,38 @@ TensorFlow 是一个频繁更新并且社区活跃的项目。这份文档旨在
 * 用于假设检验、收敛诊断、样本统计的统计工具。
 * Edward 2.0: 用于 probabilistic programming 的高阶 API
 
-### Platforms
+### 跨平台
 #### TensorFlow Lite:
-* Increased coverage of supported ops in TensorFlow Lite
-* Easier conversion of a trained TensorFlow graph for use on TensorFlow Lite
-* Support for GPU acceleration in TensorFlow Lite (iOS and Android)
-* Support for hardware accelerators via Android NeuralNets API 
-* Improved CPU performance by quantization and other network optimizations (eg. pruning, distillation)
-* Increased support for devices beyond Android and iOS (eg. RPi, Cortex-M)
+* 增加 TensorFlow Lite 可支持操作的覆盖率
+* 为 TensorFlow Lite 提供更易转换的已训练模型
+* 为 TensorFlow Lite 提供 GPU 加速 (包括 iOS 和 Android)
+* 通过 Android NeuralNets API 提供硬件加速支持
+* 通过量化和其他网络优化提升 CPU 性能 (例如 pruning, distillation)
+* 为 Android 和 iOS 以外的设备提升支持 (例如 树莓派, Cortex-M)
 
-### Performance
-#### Distributed TensorFlow:
-* Multi-GPU support optimized for a variety of GPU topologies
-* Improved mechanisms for distributing computations on several machines
+### 性能
+#### 分布式 TensorFlow:
+* 为多种 GPU 拓扑结构提供 Multi-GPU 优化支持
+* 为多机器分布式计算改进实现机制
 
-#### Optimizations:
-* Mixed precision training support with initial example model and guide
-* Native TensorRT support
-* Int8 support for SkyLake via MKL
-* Dynamic loading of SIMD-optimized kernels
+#### 优化：
+* 为混合精度的训练提供支持，并且提供基本的示例模型和操作指南
+* 原生的 TensorRT 支持
+* 通过 MKY 为 SkyLake 提供 Int8 支持
+* 动态加载 SIMD-optimized 内核
 
-### Documentation and Usability:
-* Updated documentation, tutorials and Getting Started guides
-* Process to enable external contributions to tutorials, documentation, and blogs showcasing best practice use-cases of TensorFlow and high-impact applications
+### 文档与可用性：
+* 更新文档、教程以及快速上手指南
+* 允许外部为 TensorFlow 提供支持，包括教程、文档以及用博客展示最佳的 TensorFlow 练习用例或者酷炫应用
 
-### Community and Partner Engagement
-#### Special Interest Groups: 
-* Mobilizing the community to work together in focused domains
-* [tf-distribute](https://groups.google.com/a/tensorflow.org/forum/#!forum/tf-distribute): build and packaging of TensorFlow
-* More to be identified and launched
+### 社区以及合作伙伴
+#### 特别兴趣小组： 
+* 动员社区成员一起为重要领域相互协作
+* [tf-distribute](https://groups.google.com/a/tensorflow.org/forum/#!forum/tf-distribute): TensorFlow 工程构建以及打包
+* 更多待定的以及急需开展计划
 
-#### Community:
-* Incorporate public feedback on significant design decisions via a Request-for-Comment (RFC) process
-* Formalize process for external contributions to land in TensorFlow and associated projects 
-* Grow global TensorFlow communities and user groups
-* Collaborate with partners to co-develop and publish research papers
+#### 社区:
+* 通过 Request-for-Comment (RFC) 集合关于重大设计决策的公众意见
+* 为 TensorFlow 以及相关项目的外部贡献制定程序流程
+* 为 TensorFlow 培育全球性的社区以及用户群体
+* 与行业伙伴合作以联合发展并对外发表论文研究成果

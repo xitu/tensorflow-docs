@@ -29,10 +29,10 @@ TensorFlow 的 GitHub 组织内有很多项目是靠专项邮件组交流的：
 
 ## 专项兴趣小组
 
-TensorFlow [专项兴趣小组](/community/contributing#special_interest_groups) (SIGs) 会对那些专注于重点项目的社区做相关支持。项目成员会为 TensorFlow 相关项目的工程开发及相关支持来一起协同工作。而他们的档案资料都是公开的，不同的 SIGs 小组会有各自的成员政策。
+TensorFlow [专项兴趣小组](/community/contributing#special_interest_groups) (SIGs) 会对那些专注于重点项目的社区做相关支持。项目成员会为 TensorFlow 相关项目的工程构建及相关支持来一起协同工作。而他们的档案资料都是公开的，不同的 SIGs 小组会有各自的成员政策。
 
 * [build](https://groups.google.com/a/tensorflow.org/d/forum/build) -
-  工程开发兴趣小组，为 TensorFlow 的工程开发、代码拆分、项目打包提供相关支持。
+  工程兴趣小组，为 TensorFlow 的工程构建、代码拆分、项目打包提供相关支持。
 * [sig-tensorboard](https://groups.google.com/a/tensorflow.org/d/forum/sig-tensorboard) -
   tensorboard 兴趣小组，为插件开发及其他社区贡献提供相关支持。
 * [rust](https://groups.google.com/a/tensorflow.org/d/forum/rust) -
