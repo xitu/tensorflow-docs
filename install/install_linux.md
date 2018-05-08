@@ -40,7 +40,7 @@
     </pre>
    * **[可选]** 为了优化推论性能，你也可以安装 NVIDIA TensorRT 3.0。更多细节，请参阅 [NVIDIA's TensorRT documentation](http://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html#installing-tar)。为了兼容 Tensorflow，只需要 TensorRT Tar 问文件中关于安装说明的步骤 1-4；Python 包安装说明的步骤 5 和 6 可以忽略。详细的安装说明可以在 [package documentataion](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/tensorrt#installing-tensorrt-304) 进行查阅。
 
-   **重要** 为了与预构建包 `tensorflow-gpu` 进行兼容，即使你在 Ubuntu 16.04 系统上进行安装，我们也建议你使用 TensorRT 的 Ubuntu **14.04** tar 文件包。  
+    **重要** 为了与预构建包 `tensorflow-gpu` 进行兼容，即使你在 Ubuntu 16.04 系统上进行安装，我们也建议你使用 TensorRT 的 Ubuntu **14.04** tar 文件包。  
 
 如果您已安装前述软件包的旧版本，请升级到指定版本。如果升级失败，那么你可以使用 @{$install_sources$install TensorFlow from Sources}，此时你仍然可以运行支持 GPU 的 TensorFlow。
 
@@ -231,9 +231,9 @@ $ docker run -it <i>-p hostPort:containerPort TensorFlowCPUImage</i>
   * <tt><i>-p hostPort:containerPort</i></tt> 是可选的如果你准备从 shell 命令行中运行 TensorFlow 程序，那么忽略该选项。如果你准备在如 Jupyter notebooks 中运行 TensorFlow，把 <tt><i>hostPort</i></tt> 和 <tt><i>containerPort</i></tt> 都设置为 <tt>8888</tt>。如果你想在容器中运行 TensorBoard，加一个 `-p`，将<i>hostPort</i> 和 <i>containerPort</i> 都设置为 6006。
   * <tt><i>TensorFlowCPUImage</i></tt> 是必需的。它指定了 Docker。选择声明其中的一个值：
     * <tt>tensorflow/tensorflow</tt>，这是 TensorFlow CPU 二进制镜像的值。
-    * <tt>tensorflow/tensorflow:latest-devel</tt>，这是在最新的 TensorFlow CPU 二进制镜像加上源码，
+    * <tt>tensorflow/tensorflow:latest-devel</tt>，这是最新的 TensorFlow CPU 二进制镜像加上源码，
     * <tt>tensorflow/tensorflow:<i>version</i></tt>，是某一特定的版本（比如，1.1.0rc1）的 TensorFlow CPU 二进制镜像。
-    * <tt>tensorflow/tensorflow:<i>version</i>-devel</tt>，是在某一特定的版本（比如，1.1.0rc1）的 TensorFlow CPU 二进制镜像加源码。
+    * <tt>tensorflow/tensorflow:<i>version</i>-devel</tt>，是某一特定的版本（比如，1.1.0rc1）的 TensorFlow CPU 二进制镜像加源码。
 
     <tt>gcr.io</tt> 是 Google 容器注册（Google Container Registry）。注意一些 TensorFlow 的镜像也可以在
     [dockerhub](https://hub.docker.com/r/tensorflow/tensorflow/) 中找到.
