@@ -35,7 +35,7 @@ TensorFlow 是一个频繁更新并且社区活跃的项目。这份文档旨在
 #### 概率推理与统计分析：
 * 在 tf.distributions 和 tf.probability 当中有大量的概率推理与统计分析工具可供使用。包括新的采样器、层、优化器、损失和结构化模型。
 * 用于假设检验、收敛诊断、样本统计的统计工具。
-* Edward 2.0: probabilistic programming 的 高阶 API
+* Edward 2.0: 用于 probabilistic programming 的高阶 API
 
 ### Platforms
 #### TensorFlow Lite:
