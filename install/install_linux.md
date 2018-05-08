@@ -40,7 +40,7 @@
     </pre>
    * **[可选]** 为了优化推论性能，你也可以安装 NVIDIA TensorRT 3.0。更多细节，请参阅 [NVIDIA's TensorRT documentation](http://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html#installing-tar)。为了兼容 Tensorflow，只需要 TensorRT Tar 问文件中关于安装说明的步骤 1-4；Python 包安装说明的步骤 5 和 6 可以忽略。详细的安装说明可以在 [package documentataion](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/tensorrt#installing-tensorrt-304) 进行查阅。
 
-   **重要：**为了与预构建包 `tensorflow-gpu` 进行兼容，即使你在 Ubuntu 16.04 系统上进行安装，我们也建议你使用 TensorRT 的 Ubuntu **14.04** tar 文件包。  
+   **重要**：为了与预构建包 `tensorflow-gpu` 进行兼容，即使你在 Ubuntu 16.04 系统上进行安装，我们也建议你使用 TensorRT 的 Ubuntu **14.04** tar 文件包。  
 
 如果您已安装前述软件包的旧版本，请升级到指定版本。如果升级失败，那么你可以使用 @{$install_sources$install TensorFlow from Sources}，此时你仍然可以运行支持 GPU 的 TensorFlow。
 
