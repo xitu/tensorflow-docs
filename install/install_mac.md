@@ -4,7 +4,7 @@
 
   * macOS 10.12.6 (Sierra) 或更高
 
-注意: 在 [GitHub#15933](https://github.com/tensorflow/tensorflow/issues/15933#issuecomment-366331383) 中已经描述了在 macOS 10.12.6 (Sierra) 之前已知会影响数值准确性的问题。
+注意: 在 [GitHub #15933](https://github.com/tensorflow/tensorflow/issues/15933#issuecomment-366331383) 中已经描述了在 macOS 10.12.6 (Sierra) 之前已知会影响数值准确性的问题。
 
 ## 选择安装 TensorFlow 的方式
 
