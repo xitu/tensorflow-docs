@@ -15,26 +15,15 @@
   * Docker
   * 通过源码进行安装，详见[这篇文档](https://www.tensorflow.org/install/install_sources)。
 
-**我们推荐使用 Virtualenv 进行安装。**
-[Virtualenv](https://virtualenv.pypa.io/en/stable) 
-是与其他 Python 开发隔离的虚拟 Python 环境，使得在同一台机器上不受其他 Python 程序的干扰。
-在 Virtualenv 安装过程中，你不仅要安装 TensorFlow，还需安装 TensorFlow 所需的软件包（其实很简单）。
-要开始使用 TensorFlow，只需要『激活』虚拟环境。
-总而言之，Virtualenv 为安装和运行 TensorFlow 提供了一个安全可靠的机制。
+**我们推荐使用 Virtualenv 进行安装。**[Virtualenv](https://virtualenv.pypa.io/en/stable) 是与其他 Python 开发隔离的虚拟 Python 环境，使得在同一台机器上不受其他 Python 程序的干扰。在 Virtualenv 安装过程中，你不仅要安装 TensorFlow，还需安装 TensorFlow 所需的软件包（其实很简单）。要开始使用 TensorFlow，只需要「激活」虚拟环境。总而言之，Virtualenv 为安装和运行 TensorFlow 提供了一个安全可靠的机制。
 
-使用本地的 pip 会在系统里直接安装 TensorFlow，无需任何容器或虚拟环境系统。然而由于本地安装并不是完全封闭的，因此本地安装可能会受到系统上其他基于 Python 安装软件的干扰，或者影响到这类软件。
-此外，你可能还需要禁用系统完整性保护（SIP）才能进行本地安装。
-但是，如果你了解 SIP、pip 和你本地的 Python 环境，那么使用本地 pip 安装会相对容易一些。
+使用本地的 pip 会在系统里直接安装 TensorFlow，无需任何容器或虚拟环境系统。然而由于本地安装并不是完全封闭的，因此本地安装可能会受到系统上其他基于 Python 安装软件的干扰，或者影响到这类软件。此外，你可能还需要禁用系统完整性保护（SIP）才能进行本地安装。但是，如果你了解 SIP、pip 和你本地的 Python 环境，那么使用本地 pip 安装会相对容易一些。
 
-[Docker](http://docker.com) 则会将 TensorFlow 安装与机器上的现有软件包完全隔离。
-Docker 容器包含 TensorFlow 及其所有依赖项。
-请注意，Docker 镜像可能非常大（几百 MB）。
-如果你将 TensorFlow 集成到已经使用 Docker 的较大应用程序体系结构中，则可以选择 Docker 安装。
+[Docker](http://docker.com) 则会将 TensorFlow 安装与机器上的现有软件包完全隔离。Docker 容器包含 TensorFlow 及其所有依赖项。请注意，Docker 镜像可能非常大（几百 MB）。如果你将 TensorFlow 集成到已经使用 Docker 的较大应用程序体系结构中，则可以选择 Docker 安装。
 
 在 Anaconda 中，你可以使用 conda 来创建虚拟环境。但是，在 Anaconda 中，我们建议使用 `pip install` 而不是 `conda install` 命令来安装 TensorFlow。
 
-**注意：** conda 包由社区提供支持，而非正式支持。也就是说，TensorFlow 团队既不测试也不维护 conda 包。
-使用此包请自行承担相关风险。
+**注意：** conda 包由社区提供支持，而非正式支持。也就是说，TensorFlow 团队既不测试也不维护 conda 包。使用此包请自行承担相关风险。
 
 ## 通过 Virtualenv 安装
 
@@ -44,41 +33,44 @@ Docker 容器包含 TensorFlow 及其所有依赖项。
 
   2. 通过下面的命令安装 pip 和 Virtualenv：
 
-     <pre> $ <b>sudo easy_install pip</b>
+     <pre>
+     $ <b>sudo easy_install pip</b>
      $ <b>pip install --upgrade virtualenv</b> </pre>
 
   3. 通过执行下面的命令来创建 Virtualenv 环境：
 
-     <pre> $ <b>virtualenv --system-site-packages</b> <i>targetDirectory</i> # 对应 Python 2.7
+     <pre>
+     $ <b>virtualenv --system-site-packages</b> <i>targetDirectory</i> # 对应 Python 2.7
      $ <b>virtualenv --system-site-packages -p python3</b> <i>targetDirectory</i> # 对应 Python 3.n
      </pre>
 
-     其中 <i>targetDirectory</i> 表示 Virtualenv 目录树所在的顶层路径。
-     我们假设 <i>targetDirectory</i>
-     为 `~/tensorflow`，但你也可以选择任何你喜欢的路径。
+     其中 <i>targetDirectory</i> 表示 Virtualenv 目录树所在的顶层路径。我们假设 <i>targetDirectory</i> 为 `~/tensorflow`，但你也可以选择任何你喜欢的路径。
 
   4. 通过执行下面的命令来激活 Virtualenv 环境：
 
-      <pre>$ <b>cd <i>targetDirectory</i></b>
-     $ <b>source ./bin/activate</b>      # 如果是使用 bash、sh、ksh、或 zsh
-     $ <b>source ./bin/activate.csh</b>  # 如果是使用 csh 或 tcsh </pre>
+     <pre>
+     $ <b>cd <i>targetDirectory</i></b>
+     $ <b>source ./bin/activate</b> # 如果是使用 bash、sh、ksh、或 zsh
+     $ <b>source ./bin/activate.csh</b> # 如果是使用 csh 或 tcsh </pre>
 
      前面的 `source` 命令会将你的命令行提示更改为以下内容：
 
-     <pre> (<i>targetDirectory</i>)$ </pre>
+     <pre>(<i>targetDirectory</i>)$</pre>
 
   5. 确保安装的 pip 版本大于或等于 8.1：
 
-     <pre> (<i>targetDirectory</i>)$ <b>easy_install -U pip</b></pre>
+     <pre>(<i>targetDirectory</i>)$ <b>easy_install -U pip</b></pre>
 
   6. 执行下面的命令会将 TensorFlow 及其全部依赖安装至 Virtualenv 环境中：
 
-     <pre> (<i>targetDirectory</i>)$ <b>pip install --upgrade tensorflow</b>      # 对应 Python 2.7
-     (<i>targetDirectory</i>)$ <b>pip3 install --upgrade tensorflow</b>     # 对应 Python 3.n
+     <pre>
+     (<i>targetDirectory</i>)$ <b>pip install --upgrade tensorflow</b>      # 对应 Python 2.7
+     (<i>targetDirectory</i>)$ <b>pip3 install --upgrade tensorflow</b>     # 对应 Python 3.n </pre>
 
   7. （可选）如果第 6 步失败了（通常可能是因为你使用的 pip 版本小于 8.1），你还可以在激活的 Virtualenv 环境下，通过下面的命令安装 TensorFlow：
 
-     <pre> $ <b>pip install --upgrade</b> <i>tfBinaryURL</i>   # Python 2.7
+     <pre>
+     $ <b>pip install --upgrade</b> <i>tfBinaryURL</i>   # Python 2.7
      $ <b>pip3 install --upgrade</b> <i>tfBinaryURL</i>  # Python 3.n </pre>
 
      其中 <i>tfBinaryURL</i> 指向 TensorFlow Python 软件包所在的 URL。
@@ -86,7 +78,8 @@ Docker 容器包含 TensorFlow 及其所有依赖项。
      找到你系统所对应的 <i>tfBinaryURL</i>。
      例如，如果你要在安装了 Python 2.7 的 macOS 上安装 TensorFlow，那么可以执行下面的命令：
 
-     <pre> $ <b>pip3 install --upgrade \
+     <pre>
+     $ <b>pip3 install --upgrade \
      https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py3-none-any.whl</b></pre>
 
 如果你遇到了任何安装问题，请查看[常见安装问题](#常见安装问题).
