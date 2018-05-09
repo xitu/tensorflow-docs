@@ -201,7 +201,7 @@ $ <b>pip3 uninstall tensorflow</b> </pre>
     
     2. 从包含 TensorFlow 的镜像中创建并启动 Docker 容器。
 
-本节的其余部分将介绍如何启动 Docker容器。
+本节的其余部分将介绍如何启动 Docker 容器。
 
 要启动包含 TensorFlow 镜像的 Docker 容器，请输入以下指令：
 
