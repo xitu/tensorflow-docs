@@ -1,6 +1,6 @@
-# Swift Community
+# Swift 社区
 
-Welcome to the Swift for TensorFlow development community!
+欢迎来到 TensorFlow Swift 开发者社区！
 
 Swift for TensorFlow is a result of first-principles thinking applied to machine
 learning frameworks, and works quite differently than existing TensorFlow

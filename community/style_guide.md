@@ -1,23 +1,20 @@
-# TensorFlow Style Guide
+# TensorFlow 代码风格指南
 
-This page contains style decisions that both developers and users of TensorFlow
-should follow to increase the readability of their code, reduce the number of
-errors, and promote consistency.
+为了 TensorFlow 用户以及开发者能够提高代码可读性、减少报错并且提升一致性，我们为此提供了这份 TensorFlow 的代码风格指南。
 
 [TOC]
 
-## Python style
+## Python 代码风格指南
 
-Generally follow
-[PEP8 Python style guide](https://www.python.org/dev/peps/pep-0008/),
-except for using 2 spaces.
+除了要使用两空格缩进这一点，通常就遵循
+[PEP8 Python 代码风格指南](https://www.python.org/dev/peps/pep-0008/) 即可。
 
 
-## Python 2 and 3 compatible
+## Python 2 以及 Python 3 的兼容
 
-* All code needs to be compatible with Python 2 and 3.
+* 所有代码都必须兼容 Python 2 和 Python 3 。
 
-* Next lines should be present in all Python files:
+* 每个 Python 文件都应该包含如下几行代码：
 
 ```
 from __future__ import absolute_import
@@ -25,10 +22,10 @@ from __future__ import division
 from __future__ import print_function
 ```
 
-* Use `six` to write compatible code (for example `six.moves.range`).
+* 使用 `six` 来编写可兼容的代码 (例如 `six.moves.range`).
 
 
-## Bazel BUILD rules
+## Bazel 构建规则
 
 TensorFlow uses Bazel build system and enforces next requirements:
 
