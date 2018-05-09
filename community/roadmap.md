@@ -59,16 +59,16 @@ TensorFlow 是一个频繁更新并且社区活跃的项目。这份文档旨在
 
 ### 文档与可用性：
 * 更新文档、教程以及快速上手指南
-* 允许外部为 TensorFlow 提供支持，包括教程、文档以及用博客展示最佳的 TensorFlow 练习用例或者酷炫应用
+* 允许外部为 TensorFlow 提供支持，其中包括教程、文档以及用博客展示最佳的 TensorFlow 练习用例或者酷炫应用
 
 ### 社区以及合作伙伴
 #### 特别兴趣小组： 
 * 动员社区成员一起为重要领域相互协作
-* [tf-distribute](https://groups.google.com/a/tensorflow.org/forum/#!forum/tf-distribute): TensorFlow 工程构建以及打包
-* 更多待定的以及急需开展计划
+* [tf-distribute](https://groups.google.com/a/tensorflow.org/forum/#!forum/tf-distribute): 用于 TensorFlow 工程构建以及打包
+* 更多待定的以及急需开展的计划
 
 #### 社区:
-* 通过 Request-for-Comment (RFC) 集合关于重大设计决策的公众意见
+* 通过 Request-for-Comment (RFC) 来集合公众对于重大设计决策的意见
 * 为 TensorFlow 以及相关项目的外部贡献制定程序流程
 * 为 TensorFlow 培育全球性的社区以及用户群体
 * 与行业伙伴合作以联合发展并对外发表论文研究成果
