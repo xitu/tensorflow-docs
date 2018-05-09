@@ -1,85 +1,65 @@
-# Community
+# 社区
 
-Welcome to the TensorFlow community! This page explains where to get help, and
-different ways to be part of the community. We are committed to fostering an
-open and welcoming environment, and request that you review our [code of
-conduct](https://github.com/tensorflow/tensorflow/blob/master/CODE_OF_CONDUCT.md).
+欢迎来到 TensorFlow 社区！这个页面将说明可以在哪里寻求帮助，以及如何成为社区的一份子。我们致力于创建一个开放和友好的社区，请您查看我们的[代码引导](https://github.com/tensorflow/tensorflow/blob/master/CODE_OF_CONDUCT.md)。
 
-## Get Help
+## 获取帮助
 
-### Technical Questions
+### 技术问题
 
-To ask or answer technical questions about TensorFlow, use [Stack
-Overflow](https://stackoverflow.com/questions/tagged/tensorflow). For example,
-ask or search about a particular error message you encountered during
-installation.
+如果要问或者回答关于 TensorFlow 的技术问题，请使用 [Stack Overflow](https://stackoverflow.com/questions/tagged/tensorflow)。例如，询问或者搜索关于您安装 TensorFlow 时发生的错误信息。
 
-### Bugs and Feature Requests
+### Bugs 和 功能需求
 
-To report bugs or make feature requests, file an issue on GitHub. Please choose
-the appropriate repository for the project. Major repositories include:
+如果有报告 bugs 或者功能的需求，请在 Github 上提出问题。请选择该项目的适当仓库。 主要仓库包括：
 
   * [TensorFlow](https://github.com/tensorflow/tensorflow/issues)
   * [TensorBoard](https://github.com/tensorflow/tensorboard/issues)
   * [TensorFlow models](https://github.com/tensorflow/models/issues)
-  
-### Security
 
-Before using TensorFlow, please take a look at our security model, list of
-recent security announcements, and ways you can report security issues to the
-TensorFlow team at the
-[Using TensorFlow Securely](https://github.com/tensorflow/tensorflow/blob/master/SECURITY.md) page on GitHub.
+### 安全性
 
-## Stay Informed
+在使用 TensorFlow 之前，请关注我们的安全模块，这里有我们的最近关于安全的报告，以及您可以报告给 TensorFLow 团队关于安全的问题在 [Using TensorFlow Securely](https://github.com/tensorflow/tensorflow/blob/master/SECURITY.md) GitHub 页面。
 
-### Announcements Mailing List
+## 随时了解最近消息
 
-All major releases and important announcements are sent to
-[announce@tensorflow.org](https://groups.google.com/a/tensorflow.org/forum/#!forum/announce).
-We recommend that you join this list if you depend on TensorFlow in any way.
+### 公告邮件列表
 
-### Development Roadmap
+所有主要版本和重要的通知都会发送到 [announce@tensorflow.org](https://groups.google.com/a/tensorflow.org/forum/#!forum/announce)。如果您以任何方式需要使用 TensorFlow ，我们建议您加入此列表。
 
-The @{$roadmap$Roadmap} summarizes plans for upcoming additions to TensorFlow.
+### TensorFlow 发展路线图
 
-### Social Media
+ @{$roadmap$Roadmap} 概述了即将加入 TensorFlow 的功能计划。
 
-For news and updates from around the universe of TensorFlow projects, follow
-[@tensorflow](https://twitter.com/tensorflow) on Twitter.
+### 社交媒体
 
-### Blog
+有关 TensorFlow 项目的最新新闻和更新，请 Twitter 在关注 [@tensorflow](https://twitter.com/tensorflow)。
 
-We post regularly to the [TensorFlow Blog](http://blog.tensorflow.org/),
-with content from the TensorFlow team and the best articles from the community.
+### 博客
+
+我们会定期发布 [TensorFlow Blog](http://blog.tensorflow.org/)，其中内容来自 TensorFlow 团队以及社区的优秀文章。
 
 ### YouTube
 
-Our [YouTube Channel](http://youtube.com/tensorflow/) focuses on machine learing
-and AI with TensorFlow. On it we have a number of new shows, including:
+我们的 [YouTube Channel](http://youtube.com/tensorflow/) 侧重于使用 TensorFlow 技术的机器学习和 AI。当然我们也有很多新的节目，其中包括：
 
-- TensorFlow Meets: meet with community contributors to learn and share what they're doing
+- TensorFlow Meets: 与社区的贡献者交流见面，学习并且分享他们正在做的事情
 - Ask TensorFlow: the team answers the best questions tagged #AskTensorFlow from social media 
 - Coding TensorFlow: short bites with tips for success with TensorFlow
 
-## Community Support
+## 社区支持
 
-### Mailing Lists
+### 邮件列表
 
-For general discussion about TensorFlow development and direction, please join
-the [TensorFlow discuss mailing
-list](https://groups.google.com/a/tensorflow.org/d/forum/discuss).
+有关 TensorFlow 发展和方向的讨论，请加入 [TensorFlow 讨论邮件列表](https://groups.google.com/a/tensorflow.org/d/forum/discuss)。
 
-A number of other mailing lists exist, focused on different project areas, which
-can be found at @{$lists$TensorFlow Mailing Lists}.
+还有一些其他的邮件列表，主要针对不同的项目区域，可以在 @{$lists$TensorFlow Mailing Lists} 中找到。
 
-### User Groups
+### 用户组
 
-To meet with like-minded people local to you, check out the many
-@{$groups$TensorFlow user groups} around the world.
+如果想要和与你相同地区志同道合的人见面，请查看全球各地的 @{$groups$TensorFlow user groups} 用户组织。
 
 
-## Contributing To TensorFlow
+## 对 TensorFlow 做出贡献
 
-We welcome contributions and collaboration on TensorFlow. For more information,
-please read [Contributing to TensorFlow](contributing.md).
-
+我们非常欢迎您对 TensorFlow 进行贡献以及合作。 想了解更多的消息,
+请阅读 [为 TensorFlow 进行贡献](contributing.md).
