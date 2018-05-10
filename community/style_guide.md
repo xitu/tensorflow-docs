@@ -27,9 +27,9 @@ from __future__ import print_function
 
 ## Bazel 构建规则
 
-TensorFlow uses Bazel build system and enforces next requirements:
+TensorFlow 使用 Bazel 来构建系统并执行下面的依赖:
 
-* Every BUILD file should contain next header:
+* 每一个 BUILD 文件头部都应该包含这些代码：
 
 ```
 # Description:
@@ -44,7 +44,7 @@ licenses(["notice"])  # Apache 2.0
 exports_files(["LICENSE"])
 ```
 
-* At the end of every BUILD file, should contain:
+* 每一个 BUILD 文件尾部都应该包含这些代码：
 
 ```
 filegroup(
@@ -60,13 +60,13 @@ filegroup(
 )
 ```
 
-* When adding new BUILD file, add this line to `tensorflow/BUILD` file into `all_opensource_files` target.
+* 在创建新的 BUILD 文件时，把下面这一行加入到 `all_opensource_files` 目标内的 `tensorflow/BUILD` 文件中。
 
 ```
 "//tensorflow/<directory>:all_files",
 ```
 
-* For all Python BUILD targets (libraries and tests) add next line:
+* 在所有的 python BUILD 目标中 （库文件和测试用例） 加入下面这行代码：
 
 ```
 srcs_version = "PY2AND3",
@@ -75,7 +75,7 @@ srcs_version = "PY2AND3",
 
 ## Tensor
 
-* Operations that deal with batches may assume that the first dimension of a Tensor is the batch dimension.
+* 在假设 Tensor 的第一维度是 batche 维度的情况下对 batches 的操作。
 
 
 ## Python operations
