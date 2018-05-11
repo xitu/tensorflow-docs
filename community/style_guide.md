@@ -85,7 +85,7 @@ srcs_version = "PY2AND3",
 
 * 第一个参数应该传入 tensors ，后面的参数再传入一些基本的 python 参数。
  最后一个参数是默认值为 `None` 的 `name` 参数。
- 如果这个处理函数需要保存一些 `Tensor` 来收集 Graph collections ，
+ 如果这个处理函数需要保存一些 `Tensor` 来用于收集 Graph 的话，
  那么在 `name` 参数前加上要收集的参数名称即可。
 
 * Tensor 参数应该是单个的 tensor 变量，也可以是个可迭代的 tensors 变量。
