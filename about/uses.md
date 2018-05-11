@@ -31,12 +31,12 @@
 
 * **Inception Image Classification Model**
    * **组织**: Google
-   * **描述**: 从赢得2014年Imagenet图像分类挑战的模型开始，基准模型和研究高度精确的计算机视觉模型。
+   * **描述**: 从赢得 2014 年 Imagenet 图像分类挑战的模型开始，基准模型和研究高度精确的计算机视觉模型。
    * **更多信息**: 基准模型在 [Arxiv paper](http://arxiv.org/abs/1409.4842) 进行描述
 
 * **SmartReply**
   * **组织**: Google
-  * **描述**: Deep LSTM模型自动生成电子邮件回复
+  * **描述**: Deep LSTM 模型自动生成电子邮件回复
   * **更多信息**: [Google research blog post](http://googleresearch.blogspot.com/2015/11/computer-respond-to-this-email.html)
 
 
