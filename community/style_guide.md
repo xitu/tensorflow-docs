@@ -83,13 +83,13 @@ srcs_version = "PY2AND3",
 一个 *Python 处理函数* 应该像这样，输入的 tensors 和 参数，
 会创建一部分 graph 并且输出返回的 tensors 。
 
-* 第一个参数应该传入 tensors，后面的参数再传入一些基本的 python 参数。
+* 第一个参数应该传入 tensors ，后面的参数再传入一些基本的 python 参数。
  最后一个参数是默认值为 `None` 的 `name` 参数。
  如果这个处理函数需要保存一些 `Tensor` 来收集 Graph collections ，
  那么在 `name` 参数前加上要收集的参数名称即可。
 
 * Tensor 参数应该是单个的 tensor 变量，也可以是个可迭代的 tensors 变量。
- 例如说 “ Tensor 必须是单个 tensor 要不就是个 Tensors 数组” 就太宽泛了。想了解更多可以查看 `assert_proper_iterable` 。
+ 例如说 “ Tensor 必须是单个 tensor 变量要不就是个 Tensors 数组” 就太宽泛了。想了解更多可以查看 `assert_proper_iterable` 。
 
 * Operations that take tensors as arguments should call `convert_to_tensor`
  to convert non-tensor inputs into tensors if they are using C++ operations.
