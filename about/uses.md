@@ -1,68 +1,52 @@
-# TensorFlow In Use
+# 使用 TensorFlow
 
-This page highlights TensorFlow models in real world use.
-
-
-## Model zoo
-
-Please visit our collection of TensorFlow models in the
-[TensorFlow Zoo](https://github.com/tensorflow/models).
-
-If you have built a model with TensorFlow, please consider publishing it in
-the Zoo.
+此页面突出展示了 TensorFlow 模型在实际的环境中的使用。
 
 
-## Current uses
+## 模型区
 
-This section describes some of the current uses of the TensorFlow system.
+请访问我们的 TensorFlow 模型区 [TensorFlow Zoo](https://github.com/tensorflow/models).
 
-> If you are using TensorFlow for research, for education, or for production
-> usage in some product, we would love to add something about your usage here.
-> Please feel free to [email us](mailto:usecases@tensorflow.org) a brief
-> description of how you're using TensorFlow, or even better, send us a
-> pull request to add an entry to this file.
+如果你也使用了 TensorFlow 构建了一个模型，请考虑将其发布到模型区中。
+
+
+## 当前使用
+
+本节介绍 TensorFlow 系统在当前一些使用场景。
+
+> 如果您使用 TensorFlow 进行研究，教育或者某些产品的生产，我们由衷的希望在此添加您的使用情况，请随时[给我们发邮件](mailto:usecases@tensorflow.org) 简要介绍您是如何使用 TensorFlow，或者可以直接发送 Github 的 pull request 以添加到此文档。
 
 * **Deep Speech**
-<ul>
-   <li>**Organization**: Mozilla</li>
-   <li> **Domain**: Speech Recognition</li>
-   <li> **Description**:  A TensorFlow implementation motivated by Baidu's Deep Speech architecture.</li>
-   <li> **More info**: [GitHub Repo](https://github.com/mozilla/deepspeech)</li>
-</ul>
+    * **组织**: Mozilla
+    * **领域**: 语音识别
+    * **描述**:  由百度深度语音结构驱动的 TensorFlow 实现。
+    * **更多信息**: [GitHub Repo](https://github.com/mozilla/deepspeech)
 
 * **RankBrain**
-<ul>
-   <li>**Organization**: Google</li>
-   <li> **Domain**: Information Retrieval</li>
-   <li> **Description**:  A large-scale deployment of deep neural nets for search ranking on www.google.com.</li>
-   <li> **More info**: ["Google Turning Over Its Lucrative Search to AI Machines"](http://www.bloomberg.com/news/articles/2015-10-26/google-turning-its-lucrative-web-search-over-to-ai-machines)</li>
-</ul>
+    * **组织**: Google
+    * **领域**: 信息检索
+    * **描述**: 在 www.google.com 上进行搜索排名的深度神经网络的大规模部署。
+    * **更多信息**: ["Google Turning Over Its Lucrative Search to AI Machines"](http://www.bloomberg.com/news/articles/2015-10-26/google-turning-its-lucrative-web-search-over-to-ai-machines)
+
 
 * **Inception Image Classification Model**
-<ul>
-   <li> **Organization**: Google</li>
-   <li> **Description**: Baseline model and follow on research into highly accurate computer vision models, starting with the model that won the 2014 Imagenet image classification challenge</li>
-   <li> **More Info**: Baseline model described in [Arxiv paper](http://arxiv.org/abs/1409.4842)</li>
-</ul>
+   * **组织**: Google
+   * **描述**: 从赢得2014年Imagenet图像分类挑战的模型开始，基准模型和研究高度精确的计算机视觉模型。
+   * **更多信息**: 基准模型在 [Arxiv paper](http://arxiv.org/abs/1409.4842) 进行描述
 
 * **SmartReply**
-<ul>
-  <li> **Organization**: Google</li>
-  <li> **Description**: Deep LSTM model to automatically generate email responses</li>
-  <li> **More Info**: [Google research blog post](http://googleresearch.blogspot.com/2015/11/computer-respond-to-this-email.html)</li>
-</ul>
+  * **组织**: Google
+  * **描述**: Deep LSTM模型自动生成电子邮件回复
+  * **更多信息**: [Google research blog post](http://googleresearch.blogspot.com/2015/11/computer-respond-to-this-email.html)
+
 
 * **Massively Multitask Networks for Drug Discovery**
-<ul>
-  <li> **Organization**: Google and Stanford University</li>
-  <li> **Domain**: Drug discovery</li>
-  <li> **Description**:  A deep neural network model for identifying promising drug candidates.</li>
-  <li> **More info**: [Arxiv paper](http://arxiv.org/abs/1502.02072)</li>
-</ul>
+  * **组织**: Google and Stanford University
+  * **领域**: 药物发掘
+  * **描述**:  用于识别期望需求的药物的深度神经网络模型。
+  * **更多信息**: [Arxiv paper](http://arxiv.org/abs/1502.02072)
 
 * **On-Device Computer Vision for OCR**
-<ul>
-  <li> **Organization**: Google</li>
-  <li> **Description**: On-device computer vision model to do optical character recognition to enable real-time translation.</li>
-  <li> **More info**: [Google Research blog post](http://googleresearch.blogspot.com/2015/07/how-google-translate-squeezes-deep.html)</li>
-</ul>
+  * **组织**: Google
+  * **描述**: 使用光学字符识别功能进行实时翻译的计算机视觉模型。
+  * **更多信息**: [Google Research blog post](http://googleresearch.blogspot.com/2015/07/how-google-translate-squeezes-deep.html)
