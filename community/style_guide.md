@@ -78,18 +78,18 @@ srcs_version = "PY2AND3",
 * 在假设 Tensor 的第一维度是 batche 维度的情况下对 batches 的操作。
 
 
-## Python operations
+## Python 处理函数
 
-A *Python operation* is a function that, given input tensors and parameters,
-creates a part of the graph and returns output tensors.
+一个 *Python 处理函数* 应该像这样，输入的 tensors 和 参数，
+会创建一部分 graph 并且输出返回 tensors 。
 
-* The first arguments should be tensors, followed by basic python parameters.
- The last argument is `name` with a default value of `None`.
- If operation needs to save some `Tensor`s to Graph collections,
- put the arguments with names of the collections right before `name` argument.
+* 第一个参数应该传入 tensors，后面的参数再传入一些基本的 python 参数。
+ 最后一个参数是默认值为 `None` 的 `name` 参数。
+ 如果这个处理函数需要保存一些 `Tensor` 来收集 Graph collections ，
+ 那么在 `name` 参数前加上要收集的参数名称即可。
 
-* Tensor arguments should be either a single tensor or an iterable of tensors.
- E.g. a "Tensor or list of Tensors" is too broad. See `assert_proper_iterable`.
+* Tensor 参数应该是单个的 tensor 或者是个可迭代的 tensors 。
+ 例如说 “ Tensor 必须是单个 tensor 要不就是个 Tensors 数组” 就太宽泛了。更多请查看 `assert_proper_iterable` 。
 
 * Operations that take tensors as arguments should call `convert_to_tensor`
  to convert non-tensor inputs into tensors if they are using C++ operations.
