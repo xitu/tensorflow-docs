@@ -8,9 +8,9 @@
 
 如果要问或者回答关于 TensorFlow 的技术问题，请使用 [Stack Overflow](https://stackoverflow.com/questions/tagged/tensorflow)。例如，询问或者搜索关于您安装 TensorFlow 时发生的错误信息。
 
-### Bugs 和 功能需求
+### Bugs 和功能需求
 
-如果有报告 bugs 或者功能的需求，请在 Github 上提出问题。请选择该项目的适当仓库。 主要仓库包括：
+如果有报告 bugs 或者功能的需求，请在 Github 上提出问题。请选择该项目的适当仓库。主要仓库包括：
 
   * [TensorFlow](https://github.com/tensorflow/tensorflow/issues)
   * [TensorBoard](https://github.com/tensorflow/tensorboard/issues)
@@ -24,7 +24,7 @@
 
 ### 公告邮件列表
 
-所有主要版本和重要的通知都会发送到 [announce@tensorflow.org](https://groups.google.com/a/tensorflow.org/forum/#!forum/announce)。如果您以任何方式需要使用 TensorFlow ，我们建议您加入此列表。
+所有主要版本和重要的通知都会发送到 [announce@tensorflow.org](https://groups.google.com/a/tensorflow.org/forum/#!forum/announce)。如果您以任何方式需要使用 TensorFlow，我们建议您加入此列表。
 
 ### TensorFlow 发展路线图
 
@@ -32,7 +32,7 @@
 
 ### 社交媒体
 
-有关 TensorFlow 项目的最新新闻和更新，请 Twitter 在关注 [@tensorflow](https://twitter.com/tensorflow)。
+有关 TensorFlow 项目的新闻和最新更新，请在 Twitter 关注 [@tensorflow](https://twitter.com/tensorflow)。
 
 ### 博客
 
@@ -43,8 +43,8 @@
 我们的 [YouTube Channel](http://youtube.com/tensorflow/) 侧重于使用 TensorFlow 技术的机器学习和 AI。当然我们也有很多新的节目，其中包括：
 
 - TensorFlow Meets: 与社区的贡献者交流见面，学习并且分享他们正在做的事情
-- Ask TensorFlow: the team answers the best questions tagged #AskTensorFlow from social media 
-- Coding TensorFlow: short bites with tips for success with TensorFlow
+- Ask TensorFlow: 团队回答一些从社交媒体询问的优秀问题 #AskTensorFlow
+- Coding TensorFlow: 如何简单高效的使用 TensorFlow
 
 ## 社区支持
 
@@ -61,5 +61,4 @@
 
 ## 对 TensorFlow 做出贡献
 
-我们非常欢迎您对 TensorFlow 进行贡献以及合作。 想了解更多的消息,
-请阅读 [为 TensorFlow 进行贡献](contributing.md).
+我们非常欢迎您对 TensorFlow 进行贡献以及合作。想了解更多的消息，请阅读 [为 TensorFlow 进行贡献](contributing.md)。
