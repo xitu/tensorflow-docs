@@ -1,6 +1,6 @@
 # 定义以及运行基准
 
-本指南包含定义以及运行一个 TensorFlow 基准的说明。 这些基准将输出内容储存在 [测试结果](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/util/test_log.proto) 格式中. 如果将这些基准测试添加到 TensorFLow 的 github 仓库中，我们将会持续每天构建运行并通过可视化的方式展示在仪表盘上。https://benchmarks-dot-tensorflow-testing.appspot.com/
+本指南包含定义以及运行一个 TensorFlow 基准的说明。这些基准将输出内容储存在[测试结果](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/util/test_log.proto)格式中。如果将这些基准测试添加到 TensorFLow 的 github 仓库中，我们将会持续每天构建运行并通过可视化的方式展示在仪表盘上。https://benchmarks-dot-tensorflow-testing.appspot.com/
 
 [TOC]
 
@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
 ## 使用 Python 来运行
 
-使用 `--benchmarks` 标志来运行python基准测试。 将会打印 [基准实例](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/core/util/test_log.proto) 。
+使用 `--benchmarks` 标志来运行python基准测试。将会打印[基准实例](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/core/util/test_log.proto)。
 
 ```
 python sample_benchmark.py --benchmarks=SampleBenchmark
@@ -61,12 +61,12 @@ python sample_benchmark.py --benchmarks=SampleBenchmark
 
 将该标志位设置为 `--benchmarks=.` 或 `--benchmarks=all` 也是可以的。
 
-(请确保已安装 Tensorflow 并成功导入 `import tensorflow as tf` 行。有关安装说明，请查看 [Installing TensorFlow](https://www.tensorflow.org/install/)。如果你使用 `bazel` 来运行，这个步骤并不是必须的。)
+（请确保已安装 Tensorflow 并成功导入 `import tensorflow as tf` 行。有关安装说明，请查看 [Installing TensorFlow](https://www.tensorflow.org/install/)。如果你使用 `bazel` 来运行，这个步骤并不是必须的。）
 
 
 ## 添加一个 `bazel` 标志
 
-我们在 TensorFlow github 仓库下，有一个特殊目标叫做 `tf_py_logged_benchmark` 来为定义基准测试。 `tf_py_logged_benchmark` 是依照常规 `py_test` 目标。 运行 `tf_py_logged_benchmark` 将会打印 [测试结果](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/util/test_log.proto)。定义一个 `tf_py_logged_benchmark` 也可以让我们用 TensorFlow 持续构建运行它。
+我们在 TensorFlow github 仓库下，有一个特殊目标叫做 `tf_py_logged_benchmark` 来定义基准测试。`tf_py_logged_benchmark` 是依照常规 `py_test` 目标。 运行 `tf_py_logged_benchmark` 将会打印[测试结果](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/util/test_log.proto)。定义一个 `tf_py_logged_benchmark` 也可以让我们用 TensorFlow 持续构建运行它。
 
 首先，定义一个常规的 `py_test` 目标。请看下面的例子：
 
@@ -81,7 +81,7 @@ py_test(
 )
 ```
 
-你可以通过传递 `--benchmarks` 标志在 `py_test` 目标中进行基准测试。这个基准测试应该只会打印一个 [基准实例](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/core/util/test_log.proto) 原型。
+你可以通过传递 `--benchmarks` 标志在 `py_test` 目标中进行基准测试。这个基准测试应该只会打印一个[基准实例](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/core/util/test_log.proto)原型。
 
 ```shell
 bazel test :sample_benchmark --test_arg=--benchmarks=all
