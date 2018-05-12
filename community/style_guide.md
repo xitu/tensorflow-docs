@@ -91,10 +91,10 @@ srcs_version = "PY2AND3",
 * Tensor 参数应该是单个的 tensor 变量，也可以是个可迭代的 tensors 变量。
  例如说 “ Tensor 必须是单个 tensor 变量要不就是个 Tensors 数组” 就太宽泛了。想了解更多可以查看 `assert_proper_iterable` 。
 
-* 如果使用 C++ 的处理函数，需要调用 `convert_to_tensor` 把 non-tensor 输入转换为 tensors 用来当做处理函数的参数。
+* 如果使用 C++ 的处理函数，需要调用 `convert_to_tensor` 把 non-tensor 输入值转换为 tensors 用来当做处理函数的参数。
  要注意的是这个参数依然被描述为 `Tensor` 文档中具体的 dtype 对象。
 
-* 每个 Python 处理函数都应该有个类似下面的 `name_scope` 。要作为 `name` 参数传入，这是处理函数的一个默认的变量名也是一个输入 tensors 的列表。
+* 每个 Python 处理函数都应该有个类似下面的 `name_scope` 。要作为 `name` 参数传入，这是处理函数的一个默认的变量名也是一个包含输入 tensors 的列表。
 
 * 处理函数应该包含一个通用的 Python 函数注释，包括传入参数以及返回值的声明用于解释每个值的类型和含义。这段说明中应当规定好参数的
  shapes 、 dtypes 、以及 ranks 。
