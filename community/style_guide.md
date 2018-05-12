@@ -75,7 +75,7 @@ srcs_version = "PY2AND3",
 
 ## Tensor
 
-* 在假设 Tensor 的第一维度是 batche 维度的情况下对 batches 的操作。
+* 在假设 Tensor 的第一维度是 batche 维度的情况下对 batches 操作的处理函数。
 
 
 ## Python 处理函数
