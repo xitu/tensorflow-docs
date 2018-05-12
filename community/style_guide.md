@@ -80,7 +80,7 @@ srcs_version = "PY2AND3",
 
 ## Python 处理函数
 
-TensorFlow 的 *Python 处理函数* 是一种在输入的 tensors 和参数后，
+这里的 *Python 处理函数* 是一种在输入的 tensors 和参数后，
 会创建一部分 graph 并且输出返回的 tensors 的函数。
 
 * 第一个参数应该传入 tensors ，后面的参数再传入一些基本的 python 参数。
