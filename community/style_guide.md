@@ -135,9 +135,9 @@ srcs_version = "PY2AND3",
 
 ## Layers
 
-Layer 是一个包含变量创建以及一个或多个其他的 graph 的 Python 处理函数。它遵循通常的 Python 处理函数的需要。
+Layer 是一个集成变量创建以及一个或多个其他 graph 函数的 Python 处理函数。它遵循通常的 Python 处理函数的需要。
 
-* 如果一个 layer 创建了一个或多个变量，这个 layer 函数应该在处理后面参数时也要遵循这个顺序：
+* 如果一个 layer 创建了一个或多个变量，这个 layer 函数应该在传入后面的参数时也应遵循这个顺序：
   - `initializers`: 用于指定变量的 initializers 。
   - `regularizers`: 用于指定变量的 regularizers 。
   - `trainable`: 代表变量是否已经训练过。
