@@ -91,23 +91,18 @@ srcs_version = "PY2AND3",
 * Tensor 参数应该是单个的 tensor 变量，也可以是个可迭代的 tensors 变量。
  例如说 “ Tensor 必须是单个 tensor 变量要不就是个 Tensors 数组” 就太宽泛了。想了解更多可以查看 `assert_proper_iterable` 。
 
-* Operations that take tensors as arguments should call `convert_to_tensor`
- to convert non-tensor inputs into tensors if they are using C++ operations.
- Note that the arguments are still described as a `Tensor` object
- of a specific dtype in the documentation.
+* 如果使用 C++ 的处理函数，需要调用 `convert_to_tensor` 把 non-tensor 输入转换为 tensors 用来当做处理函数的参数。
+ 要注意的是这个参数依然被描述为 `Tensor` 文档中具体的 dtype 对象。
 
-* Each Python operation should have a `name_scope` like below. Pass as
- arguments `name`, a default name of the op, and a list of the input tensors.
+* 每个 Python 处理函数都应该有个类似下面的 `name_scope` 。要作为 `name` 参数传入，这是处理函数的一个默认的变量名也是一个输入 tensors 的列表。
 
-* Operations should contain an extensive Python comment with Args and Returns
- declarations that explain both the type and meaning of each value. Possible
- shapes, dtypes, or ranks should be specified in the description.
+* 处理函数应该包含一个通用的 Python 函数注释，包括传入参数以及返回值的声明用于解释每个值的类型和含义。这段说明中应当规定好参数的
+ shapes 、 dtypes 、以及 ranks 。
  @{$documentation$See documentation details}
 
-* For increased usability include an example of usage with inputs / outputs
- of the op in Example section.
+* 为了提升可用性，示例部分应该包含一个含有处理函数输入输出的用例。
 
-Example:
+示例：
 
     def my_op(tensor_in, other_tensor_in, my_param, other_param=0.5,
               output_collections=(), name=None):
@@ -137,7 +132,7 @@ Example:
         tf.add_to_collection(output_collections, result)
         return result
 
-Usage:
+用法：
 
     output = my_op(t1, t2, my_param=0.5, other_param=0.6,
                    output_collections=['MY_OPS'], name='add_t1t2')
@@ -145,24 +140,18 @@ Usage:
 
 ## Layers
 
-A *Layer* is a Python operation that combines variable creation and/or one or many
-other graph operations. Follow the same requirements as for regular Python
-operation.
+Layer 是一个 Python 处理函数中包含变量创建以及一个或多个其他的 graph 的处理函数。它遵循常规 Python 处理函数的同等依赖。
 
-* If a layer creates one or more variables, the layer function
- should take next arguments also following order:
-  - `initializers`: Optionally allow to specify initializers for the variables.
-  - `regularizers`: Optionally allow to specify regularizers for the variables.
-  - `trainable`: which control if their variables are trainable or not.
-  - `scope`: `VariableScope` object that variable will be put under.
-  - `reuse`: `bool` indicator if the variable should be reused if
-             it's present in the scope.
+* 如果一个 layer 创建了一个或多个变量，这个 layer 函数应该在处理后面参数时也要遵循这个顺序：
+  - `initializers`: 用于指定变量的 initializers 。
+  - `regularizers`: 用于指定变量的 regularizers 。
+  - `trainable`: 用于控制变量是否已经训练过。
+  - `scope`: 变量会被设置成的 `VariableScope` 对象。
+  - `reuse`: 代表变量在作用域中是否应该被重用的 `布尔值` 指示符。
+* 表现不同的 Layers 在训练过程中应该采用：
+  - `is_training`: 在执行阶段用于有条件地选择不同的计算路径的 `布尔值` 指示符。（例如在使用 `tf.cond` 时）
 
-* Layers that behave differently during training should take:
-  - `is_training`: `bool` indicator to conditionally choose different
-                   computation paths (e.g. using `tf.cond`) during execution.
-
-Example:
+示例：
 
     def conv2d(inputs,
                num_filters_out,
@@ -177,5 +166,5 @@ Example:
                trainable=True,
                scope=None,
                reuse=None):
-      ... see implementation at tensorflow/contrib/layers/python/layers/layers.py ...
+      ... 底层实现请查看 tensorflow/contrib/layers/python/layers/layers.py ...
 
