@@ -80,16 +80,11 @@ srcs_version = "PY2AND3",
 
 ## Python 处理函数
 
-这里的 *Python 处理函数* 是一种在输入的 tensors 和参数后，
-会创建一部分 graph 并且输出返回的 tensors 的函数。
+这里的 *Python 处理函数* 是一种在输入的 tensors 和参数后，会创建一部分 graph 并且输出返回的 tensors 的函数。
 
-* 第一个参数应该传入 tensors ，后面的参数再传入一些基本的 python 参数。
- 最后一个参数是默认值为 `None` 的 `name` 参数。
- 如果这个处理函数需要保存一些 `Tensor` 来用于收集 Graph 的话，
- 那么在 `name` 参数前加上要收集的参数名称即可。
+* 第一个参数应该传入 tensors ，后面的参数再传入一些基本的 python 参数。最后一个参数是默认值为 `None` 的 `name` 参数。如果这个处理函数需要保存一些 `Tensor` 来用于收集 Graph 的话，那么在 `name` 参数前加上要收集的参数名称即可。
 
-* Tensor 参数应该是单个的 tensor 变量，也可以是个可迭代的 tensors 变量。
- 例如说 “ Tensor 必须是单个 tensor 变量要不就是个 Tensors 数组” 就太宽泛了。想了解更多可以查看 `assert_proper_iterable` 。
+* Tensor 参数应该是单个的 tensor 变量，也可以是个可迭代的 tensors 变量。例如说 “ Tensor 必须是单个 tensor 变量要不就是个 Tensors 数组” 就太宽泛了。想了解更多可以查看 `assert_proper_iterable` 。
 
 * 如果使用 C++ 的处理函数，需要调用 `convert_to_tensor` 把 non-tensor 输入值转换为 tensors 用来当做处理函数的参数。
  要注意的是这个参数依然被描述为 `Tensor` 文档中具体的 dtype 对象。
@@ -140,7 +135,7 @@ srcs_version = "PY2AND3",
 
 ## Layers
 
-Layer 是一个 Python 处理函数中包含变量创建，以及一个或多个其他的 graph 的处理函数。它遵循常规 Python 处理函数的需要。
+Layer 是一个包含变量创建以及一个或多个其他的 graph 的 Python 处理函数。它遵循通常的 Python 处理函数的需要。
 
 * 如果一个 layer 创建了一个或多个变量，这个 layer 函数应该在处理后面参数时也要遵循这个顺序：
   - `initializers`: 用于指定变量的 initializers 。
