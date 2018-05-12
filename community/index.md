@@ -28,7 +28,7 @@
 
 ### TensorFlow 发展路线图
 
- @{$roadmap$Roadmap} 概述了即将加入 TensorFlow 的功能计划。
+@{$roadmap$Roadmap} 概述了即将加入 TensorFlow 的功能计划。
 
 ### 社交媒体
 
@@ -42,9 +42,9 @@
 
 我们的 [YouTube Channel](http://youtube.com/tensorflow/) 侧重于使用 TensorFlow 技术的机器学习和 AI。当然我们也有很多新的节目，其中包括：
 
-- TensorFlow Meets: 与社区的贡献者交流见面，学习并且分享他们正在做的事情
-- Ask TensorFlow: 团队回答一些从社交媒体询问的优秀问题 #AskTensorFlow
-- Coding TensorFlow: 如何简单高效的使用 TensorFlow
+- TensorFlow Meets：与社区的贡献者交流见面，学习并且分享他们正在做的事情
+- Ask TensorFlow：团队回答一些从社交媒体询问的优秀问题 #AskTensorFlow
+- Coding TensorFlow：如何简单高效的使用 TensorFlow
 
 ## 社区支持
 
@@ -61,4 +61,4 @@
 
 ## 对 TensorFlow 做出贡献
 
-我们非常欢迎您对 TensorFlow 进行贡献以及合作。想了解更多的消息，请阅读 [为 TensorFlow 进行贡献](contributing.md)。
+我们非常欢迎您对 TensorFlow 进行贡献以及合作。想了解更多的消息，请阅读[为 TensorFlow 进行贡献](contributing.md)。
