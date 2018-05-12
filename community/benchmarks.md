@@ -1,14 +1,13 @@
-# Defining and Running Benchmarks
+# 定义以及运行基准
 
-This guide contains instructions for defining and running a TensorFlow benchmark. These benchmarks store output in [TestResults](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/util/test_log.proto) format. If these benchmarks are added to TensorFlow github repo, then we will run them daily with our continuous build and display a graph on our dashboard: https://benchmarks-dot-tensorflow-testing.appspot.com/.
+本指南包含定义以及运行一个 TensorFlow 基准的说明。这些基准将输出内容储存在[测试结果](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/util/test_log.proto)格式中。如果将这些基准测试添加到 TensorFLow 的 github 仓库中，我们将会持续每天构建运行并通过可视化的方式展示在仪表盘上：https://benchmarks-dot-tensorflow-testing.appspot.com/
 
 [TOC]
 
 
-## Defining a Benchmark
+## 定义一个基准
 
-Defining a TensorFlow benchmark requires extending from `tf.test.Benchmark`
-class and calling `self.report_benchmark` method. For example, take a look at the sample benchmark code below:
+定义一个 TensorFlow 基准测试需要继承 `tf.test.Benchmark` 类，并且调用 `self.report_benchmark` 方法。举个例子，请看下面实例基准代码：
 
 ```python
 import time
@@ -42,34 +41,34 @@ class SampleBenchmark(tf.test.Benchmark):
 if __name__ == "__main__":
   tf.test.main()
 ```
-See the full example for [SampleBenchmark](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/benchmark/).
+查看 [SampleBenchmark](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/benchmark/) 的完整示例。
 
 
-Key points to note in the example above:
+在上述例子中需要注意的要点：
 
-* Benchmark class extends from `tf.test.Benchmark`.
-* Each benchmark method should start with `benchmark` prefix.
-* Benchmark method calls `report_benchmark` to report the metric value.
+* 基准类需要从 `tf.test.Benchmark` 继承。
+* 每个基准测试方法都应该以 `benchmark` 为前缀开头。
+* 基准测试方法调用 `report_benchmark` 来报告度量的值。
 
 
-## Running with Python
+## 使用 Python 来运行
 
-Use the `--benchmarks` flag to run the benchmark with python. A [BenchmarkEntries](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/core/util/test_log.proto) proto will be printed.
+使用 `--benchmarks` 标志来运行python基准测试。将会打印[基准实例](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/core/util/test_log.proto)。
 
 ```
 python sample_benchmark.py --benchmarks=SampleBenchmark
 ```
 
-Setting the flag as `--benchmarks=.` or `--benchmarks=all` would work as well.
+将该标志位设置为 `--benchmarks=.` 或 `--benchmarks=all` 也是可以的。
 
-(Please ensure that Tensorflow is installed to successfully import the package in the line `import tensorflow as tf`. For installation instructions, see [Installing TensorFlow](https://www.tensorflow.org/install/). This step is not necessary when running with bazel.)
+（请确保已安装 Tensorflow 并成功导入 `import tensorflow as tf` 行。有关安装说明，请查看 [Installing TensorFlow](https://www.tensorflow.org/install/)。如果你使用 `bazel` 来运行，这个步骤并不是必须的。）
 
 
-## Adding a `bazel` Target
+## 添加一个 `bazel` 标志
 
-We have a special target called `tf_py_logged_benchmark` for benchmarks defined under TensorFlow github repo. `tf_py_logged_benchmark` should wrap around a regular `py_test` target. Running a `tf_py_logged_benchmark` would print a [TestResults](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/util/test_log.proto) proto. Defining a `tf_py_logged_benchmark` also lets us run it with TensorFlow continuous build.
+我们在 TensorFlow github 仓库下，有一个特殊目标叫做 `tf_py_logged_benchmark` 来定义基准测试。`tf_py_logged_benchmark` 是依照常规 `py_test` 目标。 运行 `tf_py_logged_benchmark` 将会打印[测试结果](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/util/test_log.proto)。定义一个 `tf_py_logged_benchmark` 也可以让我们用 TensorFlow 持续构建运行它。
 
-First, define a regular `py_test` target. See example below:
+首先，定义一个常规的 `py_test` 目标。请看下面的例子：
 
 ```build
 py_test(
@@ -82,15 +81,14 @@ py_test(
 )
 ```
 
-You can run benchmarks in a `py_test` target by passing `--benchmarks` flag. The benchmark should just print out a [BenchmarkEntries](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/core/util/test_log.proto) proto.
+你可以通过传递 `--benchmarks` 标志在 `py_test` 目标中进行基准测试。这个基准测试应该只会打印一个[基准实例](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/core/util/test_log.proto)原型。
 
 ```shell
 bazel test :sample_benchmark --test_arg=--benchmarks=all
 ```
 
 
-Now, add the `tf_py_logged_benchmark` target (if available). This target would
-pass in `--benchmarks=all` to the wrapped `py_test` target and provide a way to store output for our TensorFlow continuous build. `tf_py_logged_benchmark` target should be available in TensorFlow repository.
+现在，添加 `tf_py_logged_benchmark` 目标（如果可用）。 这个目标会将 `--benchmarks = all` 传递给包装后的 `py_test` 目标，并为我们的 TensorFlow 持续构建提供存储输出内容的方法。TensorFlow 存储库中允许提供 `tf_py_logged_benchmark` 目标。 
 
 ```build
 load("//tensorflow/tools/test:performance.bzl", "tf_py_logged_benchmark")
@@ -101,7 +99,7 @@ tf_py_logged_benchmark(
 )
 ```
 
-Use the following command to run the benchmark target:
+使用以下命令运行基准目标：
 
 ```shell
 bazel test :sample_logged_benchmark
