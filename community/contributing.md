@@ -27,7 +27,7 @@ TensorFlow 代码托管在 [TensorFlow GitHub organization](https://github.com/t
 
 ## 特殊兴趣小组
 
-为了能够在 TensorFlow 的特定领域实现专注的协作，我们组织了特殊兴趣小组（SIGs）。SIGs 公开了他们的工作: 如果你有兴趣加入他们并作出贡献，审查小组的工作，请与 SIG 的领导取得联系。成员的政策依据每个 SIG 的不同而不同。
+为了能够在 TensorFlow 的特定领域实现专注的协作，我们组织了特殊兴趣小组（SIGs）。SIGs 公开了他们的工作：如果你有兴趣加入他们并作出贡献，审查小组的工作，请与 SIG 的领导取得联系。成员的政策依据每个 SIG 的不同而不同。
 
 * **SIG Build** 专注于 TensorFlow 构建，包装和设计等问题。[Mailing list](https://groups.google.com/a/tensorflow.org/d/forum/build)。
 
