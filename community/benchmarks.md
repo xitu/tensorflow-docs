@@ -1,6 +1,6 @@
 # 定义以及运行基准
 
-本指南包含定义以及运行一个 TensorFlow 基准的说明。这些基准将输出内容储存在[测试结果](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/util/test_log.proto)格式中。如果将这些基准测试添加到 TensorFLow 的 github 仓库中，我们将会持续每天构建运行并通过可视化的方式展示在仪表盘上：https://benchmarks-dot-tensorflow-testing.appspot.com/。
+本指南包含定义以及运行一个 TensorFlow 基准的说明。这些基准将输出内容储存在[测试结果](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/util/test_log.proto)格式中。如果将这些基准测试添加到 TensorFLow 的 github 仓库中，我们将会持续每天构建运行并通过可视化的方式展示在仪表盘上：https://benchmarks-dot-tensorflow-testing.appspot.com/
 
 [TOC]
 
