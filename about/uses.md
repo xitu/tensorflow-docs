@@ -19,7 +19,7 @@
 * **Deep Speech**
     * **组织**：Mozilla
     * **领域**：语音识别
-    * **描述**：由百度深度语音结构驱动的 TensorFlow 实现。
+    * **描述**：由百度深度语音架构驱动的 TensorFlow 实现。
     * **更多信息**：[GitHub Repo](https://github.com/mozilla/deepspeech)
 
 * **RankBrain**
