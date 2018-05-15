@@ -49,4 +49,4 @@
 * **On-Device Computer Vision for OCR**
   * **组织**：Google
   * **描述**：使用光学字符识别功能进行实时翻译的计算机视觉模型。
-  * **更多信息**：[Google 研究论文](http://googleresearch.blogspot.com/2015/07/how-google-translate-squeezes-deep.html)
+  * **更多信息**：[Google 研究论文](http://googleresearch.blogspot.com/2015/07/how-google-translate-squeezes-deep.html)
