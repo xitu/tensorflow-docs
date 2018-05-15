@@ -5,7 +5,7 @@
 
 ## 模型区
 
-请在 [TensorFlow 模型区] (https://github.com/tensorflow/models)中访问我们的 TensorFlow 模型。
+请在 [TensorFlow 模型区](https://github.com/tensorflow/models)中访问我们的 TensorFlow 模型。
 
 如果你也使用了 TensorFlow 构建了一个模型，请考虑将其发布到模型区中。
 
