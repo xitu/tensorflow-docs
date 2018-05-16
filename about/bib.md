@@ -13,15 +13,10 @@
 如果您在研究中使用 TensorFlow 并希望引用 TensorFlow 系统，我们建议您引用本白皮书。
 
 <pre>
-
 @misc{tensorflow2015-whitepaper,
-
 title={ {TensorFlow}: Large-Scale Machine Learning on Heterogeneous Systems},
-
 url={https://www.tensorflow.org/},
-
 note={Software available from tensorflow.org},
-
 author={
     Mart\'{\i}n~Abadi and
     Ashish~Agarwal and
@@ -91,3 +86,4 @@ TensorFlow: Large-scale machine learning on heterogeneous systems,
 [访问此白皮书](https://www.usenix.org/system/files/conference/osdi16/osdi16-abadi.pdf)
 
 **摘要**：TensorFlow 是一个用以运行于大规模系统以及异构环境的机器学习系统。TensorFlow 用数据流图来表示计算过程，共享以及改变其状态的操作。它将数据流图的节点映射到集群中的许多机器上，并跨越多个计算设备（包括多核 CPU，通用 GPU 和定制设计的称为 Tensor Processing Units（TPU）的 ASIC）。这种架构给应用开发人员充分的灵活性：在此之前的“参数服务器”设计中，共享状态管理内置于系统中，TensorFlow 允许开发者尝试新颖的优化和训练算法。TensorFlow 支持各种应用程序，重点是深度神经网络的训练和演算。Google 的许多服务已经在生产环境中使用了 TensorFlow，我们已经将其作为开源项目发布，并且已经被用于广泛的用于机器学习研究。在本文中，我们描述了 TensorFlow 数据流模型，并展示了 TensorFlow 在多个实际应用中实现的令人惊叹的性能。
+
