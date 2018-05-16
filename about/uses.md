@@ -1,6 +1,6 @@
 # 使用 TensorFlow
 
-此页面突出展示了 TensorFlow 模型在实际的环境中的使用。
+此页面突出展示了 TensorFlow 模型在现实环境中的使用。
 
 
 ## 模型区
