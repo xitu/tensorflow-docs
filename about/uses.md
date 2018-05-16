@@ -14,7 +14,7 @@
 
 本节介绍 TensorFlow 系统在当前一些使用场景。
 
-> 如果您使用 TensorFlow 进行研究，教育或者某些产品的生产，我们由衷的希望在此添加您的使用情况，请随时[给我们发邮件](mailto:usecases@tensorflow.org) 简要介绍您是如何使用 TensorFlow，或者可以直接发送 Github 的 pull request 以添加到此文档。
+> 如果您使用 TensorFlow 进行研究，教育或者某些产品的生产，我们由衷的希望在此添加您的使用情况，请随时[给我们发邮件](mailto:usecases@tensorflow.org)简要介绍您是如何使用 TensorFlow，或者可以直接发送 Github 的 pull request 以添加到此文档。
 
 * **Deep Speech**
   * **组织**：Mozilla
