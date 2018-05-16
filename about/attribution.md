@@ -1,9 +1,3 @@
-# Attribution
+# 归属
 
-Please only use the TensorFlow name and marks when accurately referencing this
-software distribution, and do not use our marks in a way that suggests you are
-endorsed by or otherwise affiliated with Google. When referring to our marks,
-please include the following attribution statement: "TensorFlow, the TensorFlow
-logo and any related marks are trademarks of Google Inc."
-
-
+只有在严格遵循此软件分发约定时才能使用 TensorFlow 的名称和标志，并且不要使用我们的商标以暗示您已获得 Google 的认可或以其他方式表示隶属于 Google。当需要提及我们的商标时，请包含以下归属声明：“TensorFlow，TensorFlow 商标和任何相关标志均为 Google Inc. 的商标。”

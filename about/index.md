@@ -1,11 +1,7 @@
-# About TensorFlow
+# 关于 TensorFlow
 
-This section provides a few documents about TensorFlow itself,
-including the following:
+本节提供了关于 TensorFlow 本身的文档，包括以下内容：
 
-  * @{$uses$TensorFlow in Use}, which provides a link to our model zoo and
-    lists some popular ways that TensorFlow is being used.
-  * @{$bib$TensorFlow White Papers}, which provides abstracts of white papers
-    about TensorFlow.
-  * @{$attribution$Attribution}, which specifies how to attribute and refer
-    to TensorFlow.
+  * @{$uses$TensorFlow in Use}，它提供了一个链接到我们的模型区，并列出了 TensorFlow 正在使用的主要方式。
+  * @{$bib$TensorFlow White Papers}，提供了有关 TensorFlow 的白皮书摘要。
+  * @{$attribution$Attribution}，提供了如何署名以及引用 TensorFlow。
