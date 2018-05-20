@@ -15,14 +15,14 @@
 `tensorflow/docs_src` 的内容之后都会尽快地发布到
 https://www.tensorflow.org.
 
-我们绝对允许通过不同的形式的重新发布 TensorFlow 文档，
+我们非常欢迎通过不同的形式重新发布 TensorFlow 文档，
 但我们不大可能允许让别的格式的文档（或者其他的文档生成工具）
 进入我们的代码仓库。
 如果你想以另外的格式重新发布我们的文档，请确保包含以下内容：
 
-* 这种格式的文档对应的 API 版本 (例如 r1.0、master 等等)
+* 这种格式的文档对应的 API 版本（例如 r1.0、master 等等）
 * 这份文档是从哪次提交或者哪个版本产生的
-* 从哪里 (即 https://www.tensorflow.org) 可以找到最新版本的文档
+* 从哪里（即 https://www.tensorflow.org）可以找到最新版本的文档
 * Apache 2.0 开源许可协议
 
 ## 关于版本的说明
@@ -33,7 +33,7 @@ https://www.tensorflow.org.
 
 但是，大多数的开发者都是向 GitHub 的 master 分支里的文档做贡献，
 这份文档
-会在[tensorflow.org/versions/master](https://www.tensorflow.org/versions/master) 不定时地发布。
+会在 [tensorflow.org/versions/master](https://www.tensorflow.org/versions/master) 不定时地发布。
 
 如果你想对出现在网站的根目录中的文档做一些改动，
 你需要将文档的变动提交到当前的稳定版二进制分支 (和/或 
@@ -112,7 +112,7 @@ Python 符号参考页面。需要注意，类成员没有自己的页面，但�
 - <code>&#64;{tensorflow::symbol}</code> 链接到
 C++ 符号页面。
 
-- <code>&#64;{$doc_page}</code> 链接到另一个文档页面 (非 API 参考)。
+- <code>&#64;{$doc_page}</code> 链接到另一个文档页面（非 API 参考）。
 为了链接到
 
     - `red/green/blue/index.md`，使用 <code>&#64;{$blue}</code> 或者
@@ -126,13 +126,13 @@ C++ 符号页面。
     使用 <code>&#64;{$python/<guide-name>}</code> 引用
     以避免产生歧义。
 
-- <code>&#64;{$doc_page#anchor-tag$link-text}</code> 链接到该文档的另一个链接标记并     使用不同的链接文本 (在默认情况下，
-    链接文本是目标页面的标题)。
+- <code>&#64;{$doc_page#anchor-tag$link-text}</code> 链接到该文档的另一个链接标记并使用不同的链接文本（在默认情况下，
+    链接文本是目标页面的标题）。
 
 
     如果只要重写链接文本，可以忽略 `#anchor-tag`。
 
-如果要链接到源代码, 使用以
+如果要链接到源代码，使用以
 `https://www.tensorflow.org/code/` 开头的链接, 然后跟上
 它在 github 根目录下的文件名。例如，你现在正在读的这个文件的
 链接应该写作
@@ -145,7 +145,7 @@ C++ 符号页面。
 
 ## 生成文档和预览链接
 
-在构建文档之前，你必须先完成以下步骤来安装环境:
+在构建文档之前，你必须先完成以下步骤来安装环境：
 
 
 1. 如果你的机器没有安装 bazel，现在就装上它。如果你用的是 Linux，
@@ -154,7 +154,7 @@ C++ 符号页面。
         $ sudo apt-get install bazel  # Linux
 
     如果你用的是 Mac OS, 可以去
-    [这个页面](https://bazel.build/versions/master/docs/install.html#mac-os-x)找 bazel 的安装说明。
+    [这个页面](https://bazel.build/versions/master/docs/install.html#mac-os-x) 找 bazel 的安装说明。
 
 2. 切换至 TensorFlow 源代码中 `tensorflow` 文件夹所在的目录。
 
@@ -164,7 +164,7 @@ C++ 符号页面。
 
         $ ./configure
 
-然后, 切换到包含 `docs_src` 的 `tensorflow` 目录 (`cd
+然后，切换到包含 `docs_src` 的 `tensorflow` 目录 (`cd
 tensorflow`)。运行下面的命令来编译 TensorFlow 并在 
 `/tmp/tfdocs` 目录中生成文档：
 
@@ -213,16 +213,16 @@ tensorflow`)。运行下面的命令来编译 TensorFlow 并在
 所以它会记录意外暴露出来的符号。如果一个模块只会
 暴露那些有意作为开放 API 的一部分的符号，我们就称其为
 **密封的**。由于 Python 有宽松的导包机制和可见性的传统，
-那些写得很天真的 Python 代码会无意中暴露出很多
+那些写得很幼稚的 Python 代码会无意中暴露出很多
 实现细节的模块。
-密封不合理的的模块可能会暴露出其他没有封装好的模块，
+密封不合理的模块可能会暴露出其他没有封装好的模块，
 这往往会导致文档生成器生成失败。
 **这种失败是符合预期的行为。** 它确保我们的 API 定义良好，并允许我们无需担心意外中断用户，就能更改实施细节（包括哪些模块被导入到哪里）。
 
 
 如果一个模块被意外导入了，它通常会中断文档生成器
 (`generate_test`)。这是你需要密封你的模块的一个明显标志。然而
-即使文档生成成功生成了文档，文档中也可能会出现一些不需要的符号。
+即使文档成功生成了，其中也可能会出现一些不需要的符号。
 检查生成的文档以确保所有被记录的符号都是
 符合预期的。如果一个地方出现了不该出现的符号，你有
 下面几个选项可以对它们进行处理：
@@ -236,7 +236,7 @@ tensorflow`)。运行下面的命令来编译 TensorFlow 并在
 #### 私有符号和导入
 
 使 API 密封符合要求的最简单的方法就是将非公开的符号
-私有化 (通过预先加下划线_)。文档生成器会遵守
+私有化（通过预先加下划线 `_`）。文档生成器会遵守
 私有符号，这同样也适用于模块。如果唯一的问题是
 文档中显示少量导入的模块（或打破了
 生成器），你可以简单地在导入时重命名它们，例如：`import sys as _sys`。
@@ -261,7 +261,7 @@ tensorflow`)。运行下面的命令来编译 TensorFlow 并在
 
 __init__.py:
 
-    # 只有在定义了 __all__的文件中使用 * 导入
+    # 只有在定义了 __all__ 的文件中使用 * 导入
     from tensorflow.some_module.some_file import *
 
     # 否则就直接导入符号
@@ -370,7 +370,7 @@ Markdown 中关于示例代码反单引号的两点说明：
 
 当你在谈论一般的张量 (tensor) 时，不要大写这个词的首字母。
 当你在谈论作为
-参数提供给操作 (op) 或由 操作 (op) 返回的特定对象时，你应该使用 Tensor 这个词，并在其周围
+参数提供给操作 (op) 或由操作 (op) 返回的特定对象时，你应该使用 Tensor 这个词，并在其周围
 添加反单引号，因为你在谈论一个 `Tensor` 对象。
 
 不要使用 `Tensors` 这个词来表示多个 Tensor 对象，除非你
@@ -524,7 +524,7 @@ C++ 文件中的文档字符串经过处理会
     给定一个数值类型的张量输入，这个操作会返回一个
     相同类型和大小但是值会按照 `seq_dim` 维度逆序的张量。
     向量 `seq_lengths` 确定
-    维度 0（通常是 batch 的维度）内的每个索引都逆序了哪些元素。
+    维度 0（通常是 batch 对应的维度）内的每个索引都逆序了哪些元素。
 
 
     这一操作会返回一个类型为 `dtype`、维度为 `shape` 的张量，
@@ -546,11 +546,11 @@ C++ 文件中的文档字符串经过处理会
 
     例如，用 `[2]` 对 `[a, b, c, d]` 进行 `tile()` 操作会产生 `[a b c d a b c d]`。
 
-用 Python 来展示示例代码经常是有帮助的。永远不要将它们放到 C++ 的
+最好使用 Python 来展示示例代码。永远不要将它们放到 C++ 的
 操作文件中，并且也要避免将它们放到 Python 的操作文档中。我们推荐
 尽可能地将代码示例放到
 [API 指南](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/docs_src/api_guides)。
-否则，将它们添加到调用操作操作构造函数的模块或者类的文档字符串中。
+否则，将它们添加到调用操作构造函数的模块或者类的文档字符串中。
 
 
 在 `api_guides/python/math_ops.md` 有一个模块文档字符串的例子：
@@ -582,8 +582,8 @@ C++ 文件中的文档字符串经过处理会
 
 ```
 说明：如果对这个张量求值会产生错误。它的值必须
-使用可选参数 `feed_dict` 导入 `Session.run()`、
-`Tensor.eval()` 或 `Operation.run()`。
+使用 `Session.run()`、
+`Tensor.eval()` 或 `Operation.run()` 的可选参数 `feed_dict` 导入 。
 ```
 
 ### 对参数和输出（返回）张量的描述
@@ -595,7 +595,7 @@ C++ 文件中的文档字符串经过处理会
 请记住，对于 C++ 操作，张量的类型是自动添加的，
 为“A ..type .. Tensor”或“A类型在{...list of types...}”。
 在这种情况下，如果操作对
-张量的维度有约束，则可以添加诸如“必须为4维”的文本，或者用
+张量的维度有约束，则可以添加诸如“必须为 4 维”的文本，或者用
 `=`（为了防止添加张量类型）开始描述，例如写上“一个 4 维的 
 float 张量”。
 
