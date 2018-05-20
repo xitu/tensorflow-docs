@@ -1,24 +1,14 @@
 # 编写 TensorFlow 文档
 
-我们欢迎社区对 TensorFlow 文档做贡献。
-这份文档说明了你可以怎样为 TensorFlow 文档做出贡献，
-特别地，这份文档对以下内容进行了说明：
+我们欢迎社区对 TensorFlow 文档做贡献。这份文档说明了你可以怎样为 TensorFlow 文档做出贡献，特别地，这份文档对以下内容进行了说明：
 
 * 文档位于什么地方。
 * 怎样进行格式一致的编辑。
 * 在提交之前，如何构建并测试你对文档做的改动。
 
-你可以在 https://www.tensorflow.org 上查看 TensorFlow 文档，也可以查看并编辑它在
-[GitHub](https://www.tensorflow.org/code/tensorflow/docs_src/)
-上的原始文件。
-我们正在将这些文档发布到 GitHub 上，以便每个人都可以为之做贡献。所有经过核对编入
-`tensorflow/docs_src` 的内容之后都会尽快地发布到
-https://www.tensorflow.org.
+你可以在 https://www.tensorflow.org 上查看 TensorFlow 文档，也可以查看并编辑它在 [GitHub](https://www.tensorflow.org/code/tensorflow/docs_src/) 上的原始文件。我们正在将这些文档发布到 GitHub 上，以便每个人都可以为之做贡献。所有经过核对编入 `tensorflow/docs_src` 的内容之后都会尽快地发布到 [https://www.tensorflow.org](https://www.tensorflow.org)。
 
-我们非常欢迎通过不同的形式重新发布 TensorFlow 文档，
-但我们不大可能允许让别的格式的文档（或者其他的文档生成工具）
-进入我们的代码仓库。
-如果你想以另外的格式重新发布我们的文档，请确保包含以下内容：
+我们非常欢迎通过不同的形式重新发布 TensorFlow 文档，但我们不大可能允许让别的格式的文档（或者其他的文档生成工具）进入我们的代码仓库。如果你想以另外的格式重新发布我们的文档，请确保包含以下内容：
 
 * 这种格式的文档对应的 API 版本（例如 r1.0、master 等等）
 * 这份文档是从哪次提交或者哪个版本产生的
@@ -27,22 +17,16 @@ https://www.tensorflow.org.
 
 ## 关于版本的说明
 
-在 tensorflow.org 网站的根目录下有针对 Tensorflow 最新的稳定版二进制文档。
-如果你在用 `pip` 命令来安装 TensorFlow，你应该阅读这份文档。
+在 tensorflow.org 网站的根目录下有针对 Tensorflow 最新的稳定版二进制文档。如果你在用 `pip` 命令来安装 TensorFlow，你应该阅读这份文档。
 
 
-但是，大多数的开发者都是向 GitHub 的 master 分支里的文档做贡献，
-这份文档
-会在 [tensorflow.org/versions/master](https://www.tensorflow.org/versions/master) 不定时地发布。
+但是，大多数的开发者都是向 GitHub 的 master 分支里的文档做贡献，这份文档会在 [tensorflow.org/versions/master](https://www.tensorflow.org/versions/master) 不定时地发布。
 
-如果你想对出现在网站的根目录中的文档做一些改动，
-你需要将文档的变动提交到当前的稳定版二进制分支 (和/或 
-[cherrypick](https://stackoverflow.com/questions/9339429/what-does-cherry-picking-a-commit-with-git-mean) 分支)。
+如果你想对出现在网站的根目录中的文档做一些改动，你需要将文档的变动提交到当前的稳定版二进制分支 (和/或 [cherrypick](https://stackoverflow.com/questions/9339429/what-does-cherry-picking-a-commit-with-git-mean) 分支)。
 
 ## 参考文档与非参考文档
 
 下面的 reference documentation 是由代码中的注释自动生成的：
-
 
 - C++ API 参考文档
 - Java API 参考文档
@@ -52,34 +36,25 @@ https://www.tensorflow.org.
 
 非参考文档 (例如 TensorFlow 的安装指南) 是由人们撰写的。
 
-这份文档位于 [`tensorflow/docs_src`](https://www.tensorflow.org/code/tensorflow/docs_src/) 目录。
-`docs_src` 的每个子目录下包含一系列相关 TensorFlow 文档。
-例如，TensorFlow 的安装指南全部位于
-`docs_src/install` 目录中。
+这份文档位于 [`tensorflow/docs_src`](https://www.tensorflow.org/code/tensorflow/docs_src/) 目录。`docs_src` 的每个子目录下包含一系列相关 TensorFlow 文档。例如，TensorFlow 的安装指南全部位于 `docs_src/install` 目录中。
 
-C++ 文档是通过文档生成工具从 XML 文件生成的；
-但是这些工具现在还没有开源。
+C++ 文档是通过文档生成工具从 XML 文件生成的；但是这些工具现在还没有开源。
 
 ## Markdown
 
-可编辑的 TensorFlow 文档都是用 Markdown 编写的。
-除了一些例外的情况，TensorFlow
-使用[标准 Markdown 语法规则](https://daringfireball.net/projects/markdown/)。
+可编辑的 TensorFlow 文档都是用 Markdown 编写的。除了一些例外的情况，TensorFlow使用[标准 Markdown 语法规则](https://daringfireball.net/projects/markdown/)。
 
 
 这一节介绍标准 Markdown 语法规则和可编辑的 TensorFlow 文档中使用的 Markdown 语法规则之间的主要差异。
 
 ### Markdown 中的数学公式
 
-在编辑 Markdown 文件时，你可以在 TensorFlow 中使用 MathJax，
-但是需要注意以下几点：
+在编辑 Markdown 文件时，你可以在 TensorFlow 中使用 MathJax，但是需要注意以下几点：
 
 - MathJax 可以在 [tensorflow.org](https://www.tensorflow.org) 上正确地渲染
 - MathJax 不能在 [github](https://github.com/tensorflow/tensorflow) 上正确地渲染
 
-在写 MathJax 的时候，你可以使用 <code>&#36;&#36;</code> 和 `\\(`、`\\)`
-将数学公式包起来。<code>&#36;&#36;</code> 会导致会换行，
-所以在文本行内使用 `\\(`、`\\)`。
+在写 MathJax 的时候，你可以使用 <code>&#36;&#36;</code> 和 `\\(`、`\\)` 将数学公式包起来。<code>&#36;&#36;</code> 会导致会换行，所以在文本行内使用 `\\(`、`\\)`。
 
 ### Markdown 中的链接
 
@@ -89,84 +64,57 @@ C++ 文档是通过文档生成工具从 XML 文件生成的；
 - 指向 tensorflow.org 网站外其他 URL 地址的链接
 - 从一个 Markdown 文件 (或者代码注释) 指向 tensorflow.org 网站内其他文件的链接。
 
-对于前两种链接类型，你可以使用标准的 Markdown 链接，
-但要把链接全部都放在一行，而不是把它拆分成多行。
-例如：
+对于前两种链接类型，你可以使用标准的 Markdown 链接，但要把链接全部都放在一行，而不是把它拆分成多行。例如：
 
 - `[text](link)    # 好的链接`
 - `[text]\n(link)  # 不好的链接`
 - `[text](\nlink)  # 不好的链接`
 
-对于最后一种类型的链接 (指向 tensorflow.org 网站内其他文件的链接)，
-请使用一种特殊的链接参数化机制，以使
-作者不改动链接也能移动和重新组织文件。
+对于最后一种类型的链接 (指向 tensorflow.org 网站内其他文件的链接)，请使用一种特殊的链接参数化机制，以使作者不改动链接也能移动和重新组织文件。
 
 这种参数化机制具体如下，使用：
 
 <!-- 注意：t&#64; 的使用是一种 hack，所以我们没有把它转换成符号 -->
-- <code>&#64;{tf.symbol}</code> 链接到
-Python 符号参考页面。需要注意，类成员没有自己的页面，但是这种
-语法仍然奏效，因为 <code>&#64;{tf.MyClass.method}</code> 会链接到
-`tf.MyClass` 页面合适的部分。
+- <code>&#64;{tf.symbol}</code> 链接到 Python 符号参考页面。需要注意，类成员没有自己的页面，但是这种语法仍然奏效，因为 <code>&#64;{tf.MyClass.method}</code> 会链接到`tf.MyClass` 页面合适的部分。
 
-- <code>&#64;{tensorflow::symbol}</code> 链接到
-C++ 符号页面。
+- <code>&#64;{tensorflow::symbol}</code> 链接到C++ 符号页面。
 
-- <code>&#64;{$doc_page}</code> 链接到另一个文档页面（非 API 参考）。
-为了链接到
+- <code>&#64;{$doc_page}</code> 链接到另一个文档页面（非 API 参考）。为了链接到
 
-    - `red/green/blue/index.md`，使用 <code>&#64;{$blue}</code> 或者
-      <code>&#64;{$green/blue}</code>，
+    - `red/green/blue/index.md`，使用 <code>&#64;{$blue}</code> 或者 <code>&#64;{$green/blue}</code>，
 
-    - `foo/bar/baz.md`，使用 <code>&#64;{$baz}</code> 或者
-      <code>&#64;{$bar/baz}</code>。
+    - `foo/bar/baz.md`，使用 <code>&#64;{$baz}</code> 或者 <code>&#64;{$bar/baz}</code>。
 
-    应该首选较短的这个，这样我们就可以在不破坏这些引用的情况下移动页面。
-    主要的例外是 Python API 指南应该
-    使用 <code>&#64;{$python/<guide-name>}</code> 引用
-    以避免产生歧义。
+    应该首选较短的这个，这样我们就可以在不破坏这些引用的情况下移动页面。主要的例外是 Python API 指南应该使用 <code>&#64;{$python/<guide-name>}</code> 引用以避免产生歧义。
 
-- <code>&#64;{$doc_page#anchor-tag$link-text}</code> 链接到该文档的另一个链接标记并使用不同的链接文本（在默认情况下，
-    链接文本是目标页面的标题）。
+- <code>&#64;{$doc_page#anchor-tag$link-text}</code> 链接到该文档的另一个链接标记并使用不同的链接文本（在默认情况下，链接文本是目标页面的标题）。
 
 
     如果只要重写链接文本，可以忽略 `#anchor-tag`。
 
-如果要链接到源代码，使用以
-`https://www.tensorflow.org/code/` 开头的链接, 然后跟上
-它在 github 根目录下的文件名。例如，你现在正在读的这个文件的
-链接应该写作
-`https://www.tensorflow.org/code/tensorflow/docs_src/community/documentation.md`。
+如果要链接到源代码，使用以`https://www.tensorflow.org/code/` 开头的链接，然后跟上它在 github 根目录下的文件名。例如，你现在正在读的这个文件的
+链接应该写作 `https://www.tensorflow.org/code/tensorflow/docs_src/community/documentation.md`。
 
-这种 URL 的命名方式可以确保
-[tensorflow.org](https://www.tensorflow.org/) 能够将链接转到
-你正在阅读的相应版本文档的代码。
-一定不要在源代码的 URL 中添加链接参数。
+这种 URL 的命名方式可以确保 [tensorflow.org](https://www.tensorflow.org/) 能够将链接转到你正在阅读的相应版本文档的代码。一定不要在源代码的 URL 中添加链接参数。
 
 ## 生成文档和预览链接
 
 在构建文档之前，你必须先完成以下步骤来安装环境：
 
 
-1. 如果你的机器没有安装 bazel，现在就装上它。如果你用的是 Linux，
-   使用下面的命令来安装 bazel：
+1. 如果你的机器没有安装 bazel，现在就装上它。如果你用的是 Linux，使用下面的命令来安装 bazel：
 
         $ sudo apt-get install bazel  # Linux
 
-    如果你用的是 Mac OS, 可以去
-    [这个页面](https://bazel.build/versions/master/docs/install.html#mac-os-x) 找 bazel 的安装说明。
+    如果你用的是 Mac OS, 可以去[这个页面](https://bazel.build/versions/master/docs/install.html#mac-os-x) 找 bazel 的安装说明。
 
 2. 切换至 TensorFlow 源代码中 `tensorflow` 文件夹所在的目录。
 
-
 3. 运行 `configure` 脚本，按照提示，根据你的系统选择合适的指令。
-
 
         $ ./configure
 
-然后，切换到包含 `docs_src` 的 `tensorflow` 目录 (`cd
-tensorflow`)。运行下面的命令来编译 TensorFlow 并在 
-`/tmp/tfdocs` 目录中生成文档：
+然后，切换到包含 `docs_src` 的 `tensorflow` 目录 (`cd tensorflow`)。运行下面的命令来编译 TensorFlow 并在 `/tmp/tfdocs` 目录中生成文档：
 
     bazel run tools/docs:generate -- \
               --src_dir="$(pwd)/docs_src/" \
@@ -176,56 +124,31 @@ tensorflow`)。运行下面的命令来编译 TensorFlow 并在
 
 ## 生成 Python API 文档
 
-操作 (op)、类 (class)、功能函数 (utility functions) 都是在 Python 模块中定义的，例如
-`image_ops.py`。Python 中模块都包含一个模块文档字符串。例如：
+操作 (op)、类 (class)、功能函数 (utility functions) 都是在 Python 模块中定义的，例如 `image_ops.py`。Python 中模块都包含一个模块文档字符串。例如：
 
 ```python
 """Image processing and decoding ops."""
 ```
 
-文档生成器会把模块文档字符串放在
-针对该模块生成的 Markdown 文件的开头，在这个
-例子中就是 [tf.image](https://www.tensorflow.org/api_docs/python/tf/image)。
+文档生成器会把模块文档字符串放在针对该模块生成的 Markdown 文件的开头，在这个例子中就是 [tf.image](https://www.tensorflow.org/api_docs/python/tf/image)。
 
-有时候需要在模块文件的开头列出一个模块的所有成员，
-这时可以在每个成员前添加 `@@`。
-`@@member_name` 语法已经被废弃了，不会生成任何文档。但是根据
-模块的[密封方式](#密封模块)，有可能需要将一个模块的内容元素标记为
-公开的。被调用的操作 (op)、函数 (function)
-或类 (class) 不必在同一个文件中进行定义。本文档接下来的几个部分
-将讨论密封以及如何向公共文档添加元素。
+有时候需要在模块文件的开头列出一个模块的所有成员，这时可以在每个成员前添加 `@@`。`@@member_name` 语法已经被废弃了，不会生成任何文档。但是根据模块的[密封方式](#密封模块)，有可能需要将一个模块的内容元素标记为公开的。被调用的操作 (op)、函数 (function)或类 (class) 不必在同一个文件中进行定义。本文档接下来的几个部分将讨论密封以及如何向公共文档添加元素。
 
 
-新的文档系统会自动记录公共符号，但不包括
-下面这些：
+新的文档系统会自动记录公共符号，但不包括下面这些：
 
 - 以下划线开头的私有符号。
 - `object` 中原本定义的符号或 protobuf 的 `Message`。
 - 一些类的成员，例如被动态创建但通常有没有有用的文档的 `__base__`、`__class__`。
 
-
-只有上层模块（目前只有 `tf` 和 `tfdbg`）需要被手动
-添加到生成脚本中。
+只有上层模块（目前只有 `tf` 和 `tfdbg`）需要被手动添加到生成脚本中。
 
 ### 密封模块
 
-因为文档生成器会遍历所有可见的符号，并深入它能找到的任何东西，
-所以它会记录意外暴露出来的符号。如果一个模块只会
-暴露那些有意作为开放 API 的一部分的符号，我们就称其为
-**密封的**。由于 Python 有宽松的导包机制和可见性的传统，
-那些写得很幼稚的 Python 代码会无意中暴露出很多
-实现细节的模块。
-密封不合理的模块可能会暴露出其他没有封装好的模块，
-这往往会导致文档生成器生成失败。
-**这种失败是符合预期的行为。** 它确保我们的 API 定义良好，并允许我们无需担心意外中断用户，就能更改实施细节（包括哪些模块被导入到哪里）。
+因为文档生成器会遍历所有可见的符号，并深入它能找到的任何东西，所以它会记录意外暴露出来的符号。如果一个模块只会暴露那些有意作为开放 API 的一部分的符号，我们就称其为**密封的**。由于 Python 有宽松的导包机制和可见性的传统，那些写得很幼稚的 Python 代码会无意中暴露出很多实现细节的模块。密封不合理的模块可能会暴露出其他没有封装好的模块，这往往会导致文档生成器生成失败。**这种失败是符合预期的行为。** 它确保我们的 API 定义良好，并允许我们无需担心意外中断用户，就能更改实施细节（包括哪些模块被导入到哪里）。
 
 
-如果一个模块被意外导入了，它通常会中断文档生成器
-(`generate_test`)。这是你需要密封你的模块的一个明显标志。然而
-即使文档成功生成了，其中也可能会出现一些不需要的符号。
-检查生成的文档以确保所有被记录的符号都是
-符合预期的。如果一个地方出现了不该出现的符号，你有
-下面几个选项可以对它们进行处理：
+如果一个模块被意外导入了，它通常会中断文档生成器(`generate_test`)。这是你需要密封你的模块的一个明显标志。然而即使文档成功生成了，其中也可能会出现一些不需要的符号。检查生成的文档以确保所有被记录的符号都是符合预期的。如果一个地方出现了不该出现的符号，你有下面几个选项可以对它们进行处理：
 
 - 私有符号和导入
 - `remove_undocumented` 过滤器
@@ -235,11 +158,8 @@ tensorflow`)。运行下面的命令来编译 TensorFlow 并在
 
 #### 私有符号和导入
 
-使 API 密封符合要求的最简单的方法就是将非公开的符号
-私有化（通过预先加下划线 `_`）。文档生成器会遵守
-私有符号，这同样也适用于模块。如果唯一的问题是
-文档中显示少量导入的模块（或打破了
-生成器），你可以简单地在导入时重命名它们，例如：`import sys as _sys`。
+使 API 密封符合要求的最简单的方法就是将非公开的符号私有化（通过预先加下划线 `_`）。文档生成器会遵守私有符号，这同样也适用于模块。如果唯一的问题是
+文档中显示少量导入的模块（或打破了生成器），你可以简单地在导入时重命名它们，例如：`import sys as _sys`。
 
 因为 Python 会将所有的文件视为模块，所以这也适用与文件。
 如果你的文件中包含下面两个文件/模块：
