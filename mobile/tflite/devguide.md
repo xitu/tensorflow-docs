@@ -15,11 +15,15 @@ Depending on the use case, you can choose one of the popular open-sourced models
 ### 使用预训练模型
 [MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) is a family of mobile-first computer vision models for TensorFlow designed to effectively maximize accuracy, while taking into consideration the restricted resources for on-device or embedded applications. MobileNets are small, low-latency, low-power models parameterized to meet the resource constraints for a variety of uses. They can be used for classification, detection, embeddings, and segmentation—similar to other popular large scale models, such as [Inception](https://arxiv.org/pdf/1602.07261.pdf). Google provides 16 pre-trained [ImageNet](http://www.image-net.org/challenges/LSVRC/) classification checkpoints for MobileNets that can be used in mobile projects of all sizes.
 
-[MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) 是一系列专为 TensorFlow 设计的移动（场景）优先的计算机视觉模型，这类模型用于有效地最大化（提升）精确度，同时，模型还考虑到设备内置应用或嵌入式应用的资源限制问题。 MobileNets 是小型化，低延迟，低能耗的模型 ，能够参数化地满足各种各样使用案例中资源限制的要求。这些模型可以被用于分类、识别、
+[MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) 是一系列专为 TensorFlow 设计的移动（场景）优先的计算机视觉模型，这类模型用于有效地最大化（提升）精确度，同时，模型还考虑到设备内置应用或嵌入式应用的资源限制问题。 MobileNets 是小型化，低延迟，低能耗的模型 ，能够参数化地满足各种各样使用案例中资源限制的要求。这些模型可以被用于分类、检测、嵌入和分割 —— 原理和其他一些流行的大规模模型相似，例如 [Inception](https://arxiv.org/pdf/1602.07261.pdf). 谷歌提供了
 
 [Inception-v3](https://arxiv.org/abs/1512.00567) is an image recognition model that achieves fairly high accuracy recognizing general objects with 1000 classes, for example, "Zebra", "Dalmatian", and "Dishwasher". The model extracts general features from input images using a convolutional neural network and classifies them based on those features with fully-connected and softmax layers.
 
+[Inception-v3](https://arxiv.org/abs/1512.00567) 是一个能对 1000 种常见事物，例如，“斑马”、“斑点狗”、“洗碗机”，进行非常高精度识别的图像识别模型。这个模型使用了一个卷积神经网络来提取输入图片的一般特征，然后在这些特征的基础上使用全连接和 softmax 层来对这些图片进行分类。
+
 [On Device Smart Reply](https://research.googleblog.com/2017/02/on-device-machine-intelligence.html) is an on-device model that provides one-touch replies for incoming text messages by suggesting contextually relevant messages. The model is built specifically for memory constrained devices, such as watches and phones, and has been successfully used in Smart Replies on Android Wear. Currently, this model is Android-specific.
+
+[On Device Smart Reply](https://research.googleblog.com/2017/02/on-device-machine-intelligence.html) 是一个
 
 These pre-trained models are [available for download](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/models.md)
 
@@ -47,13 +51,14 @@ The model generated (or downloaded) in the previous step is a *standard* Tensorf
 * *TensorFlow Lite model* (.tflite) —A serialized [FlatBuffer](https://google.github.io/flatbuffers/) that contains TensorFlow Lite operators and tensors for the TensorFlow Lite interpreter, similar to a `FrozenGraphDef`.
 
 ### Freeze Graph
-
+### 固化图
 To use the `GraphDef` .pb file with TensorFlow Lite, you must have checkpoints that contain trained weight parameters. The .pb file only contains the structure of the graph. The process of merging the checkpoint values with the graph structure is called *freezing the graph*.
 
 You should have a checkpoints folder or download them for a pre-trained model (for example, [MobileNets](https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md)).
 
 To freeze the graph, use the following command (changing the arguments):
 
+使用如下一些命令来对图进行固化（使用时请修改参数）：
 ```
 freeze_graph --input_graph=/tmp/mobilenet_v1_224.pb \
   --input_checkpoint=/tmp/checkpoints/mobilenet-10202.ckpt \
@@ -110,9 +115,10 @@ This generates an interactive HTML page listing subgraphs, operations, and a gra
 
 
 ## 3. Use the TensorFlow Lite model for inference in a mobile app
-## 3. 在移动 app 中引用 TensorFlow 简化模型
+## 3. 在移动 app 中引用 TensorFlow Lite 模型
 After completing the prior steps, you should now have a `.tflite` model file.
 
+在完成了上述的步骤之后，你现在应该已经获得了一个 `.tflite` 模型文件了。
 ### Android
 ### 安卓
 Since Android apps are written in Java and the core TensorFlow library is in C++, a JNI library is provided as an interface. This is only meant for inference—it provides the ability to load a graph, set up inputs, and run the model to calculate outputs.
@@ -125,12 +131,15 @@ The @{$mobile/android_build} guide has instructions for installing TensorFlow on
 ### iOS
 To integrate a TensorFlow model in an iOS app, see the [TensorFlow Lite for iOS](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/ios.md) guide and @{$tflite/demo_ios} guide.
 
+查看 [TensorFlow Lite for iOS](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/ios.md) 指南 和 @{$tflite/demo_ios} 指南，来把 TensorFlow 模型整合进一个 iOS app中。
+
 #### Core ML support
-### 核心 ML 支持
+### Core ML 支持
 Core ML is a machine learning framework used in Apple products. In addition to using Tensorflow Lite models directly in your applications, you can convert trained Tensorflow models to the [CoreML](https://developer.apple.com/machine-learning/) format for use on Apple devices. To use the converter, refer to the [Tensorflow-CoreML converter documentation](https://github.com/tf-coreml/tf-coreml).
 
+Core ML 是一个用于苹果产品的机器学习框架。除了直接在你的应用中应用 Tensorflow Lite 模型，
 ### Raspberry Pi
 ### 树莓派
 Compile Tensorflow Lite for a Raspberry Pi by following the [RPi build instructions](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/rpi.md) This compiles a static library file (`.a`) used to build your app. There are plans for Python bindings and a demo app.
 
-依据下述的 [RPi 构建指导](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/rpi.md) 为树莓派编译 Tensorflow 简化模式。
+依据下述的 [RPi 构建指导](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/rpi.md) 为树莓派编译 Tensorflow Lite 模型。这个操作编译了一个用于构建你 app 的静态库文件(`.a`)。里面包含了一些用于 Python 绑定的计划和一个 demo app.
