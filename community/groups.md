@@ -1,8 +1,8 @@
-# User Groups
+# 用户组织
 
-TensorFlow has communities around the world.
+TensorFlow 在世界各地都有社区。
 
-## Asia
+## 亚洲
 
 * [TensorFlow Korea (TF-KR) User Group](https://www.facebook.com/groups/TensorFlowKR/) _(Korean language)_
 * [TensorFlow User Group Tokyo](https://tfug-tokyo.connpass.com/) _(Japanese Language)_
@@ -10,7 +10,7 @@ TensorFlow has communities around the world.
 * [TensorFlow User Group Utsunomiya](https://tfug-utsunomiya.connpass.com/)
 
 
-## Europe
+## 欧洲
 
 * [TensorFlow Barcelona](https://www.meetup.com/Barcelona-Machine-Learning-Meetup/)
 * [TensorFlow Madrid](https://www.meetup.com/TensorFlow-Madrid/)
