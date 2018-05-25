@@ -3,13 +3,19 @@
 
 Using a TensorFlow Lite model in your mobile app requires multiple considerations: you must choose a pre-trained or custom model, convert the model to a TensorFLow Lite format, and finally, integrate the model in your app.
 
-## 1. Choose a model
+在你的移动 app 中使用 TensorFlow Lite 模型需有如下注意事项：你必须选择一个预训练或者自定义模型，把这个模型转化为 TensorFlow Lite 格式，最后把模型整合进你的 app 中。
 
+## 1. Choose a model
+## 1. 模型选择
 Depending on the use case, you can choose one of the popular open-sourced models, such as *InceptionV3* or *MobileNets*, and re-train these models with a custom data set or even build your own custom model.
 
-### Use a pre-trained model
+取决于使用实例，你可以选择任何一个流行的开源模型，例如 *InceptionV3* 或者 *MobileNets*，然后使用你自定义的数据集对（你选择的）这些模型进行重新训练，或者甚至构建你自定义的模型。
 
+### Use a pre-trained model
+### 使用预训练模型
 [MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) is a family of mobile-first computer vision models for TensorFlow designed to effectively maximize accuracy, while taking into consideration the restricted resources for on-device or embedded applications. MobileNets are small, low-latency, low-power models parameterized to meet the resource constraints for a variety of uses. They can be used for classification, detection, embeddings, and segmentation—similar to other popular large scale models, such as [Inception](https://arxiv.org/pdf/1602.07261.pdf). Google provides 16 pre-trained [ImageNet](http://www.image-net.org/challenges/LSVRC/) classification checkpoints for MobileNets that can be used in mobile projects of all sizes.
+
+[MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) 是一系列专为 TensorFlow 设计的移动（场景）优先的计算机视觉模型，这类模型用于有效地最大化（提升）精确度，同时，模型还考虑到设备内置应用或嵌入式应用的资源限制问题。 MobileNets 是小型化，低延迟，低能耗的模型 ，能够参数化地满足各种各样使用案例中资源限制的要求。这些模型可以被用于分类、识别、
 
 [Inception-v3](https://arxiv.org/abs/1512.00567) is an image recognition model that achieves fairly high accuracy recognizing general objects with 1000 classes, for example, "Zebra", "Dalmatian", and "Dishwasher". The model extracts general features from input images using a convolutional neural network and classifies them based on those features with fully-connected and softmax layers.
 
@@ -18,19 +24,19 @@ Depending on the use case, you can choose one of the popular open-sourced models
 These pre-trained models are [available for download](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/models.md)
 
 ### Re-train Inception-V3 or MobileNet for a custom data set
-
+### 
 These pre-trained models were trained on the *ImageNet* data set which contains 1000 predefined classes. If these classes are not sufficient for your use case, the model will need to be re-trained. This technique is called *transfer learning* and starts with a model that has been already trained on a problem, then retrains the model on a similar problem. Deep learning from scratch can take days, but transfer learning is fairly quick. In order to do this, you need to generate a custom data set labeled with the relevant classes.
 
 The [TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/) codelab walks through the re-training process step-by-step. The code supports both floating point and quantized inference.
 
 ### Train a custom model
-
+### 自定义模型训练
 A developer may choose to train a custom model using Tensorflow (see the @{$tutorials} for examples of building and training models). If you have already written a model, the first step is to export this to a @{tf.GraphDef} file. This is required because some formats do not store the model structure outside the code, and we must communicate with other parts of the framework. See [Exporting the Inference Graph](https://github.com/tensorflow/models/blob/master/research/slim/README.md) to create .pb file for the custom model.
 
 TensorFlow Lite currently supports a subset of TensorFlow operators. Refer to the [TensorFlow Lite & TensorFlow Compatibility Guide](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/tf_ops_compatibility.md) for supported operators and their usage. This set of operators will continue to grow in future Tensorflow Lite releases.
 
 ## 2. Convert the model format
-
+## 2. 模型格式转换
 The model generated (or downloaded) in the previous step is a *standard* Tensorflow model and you should now have a .pb or .pbtxt @{tf.GraphDef} file. Models generated with transfer learning (re-training) or custom models must be converted—but, we must first freeze the graph to convert the model to the Tensorflow Lite format. This process uses several model formats:
 
 * @{tf.GraphDef} (.pb) —A protobuf that represents the TensorFlow training or computation graph. It contains operators, tensors, and variables definitions.
@@ -104,11 +110,11 @@ This generates an interactive HTML page listing subgraphs, operations, and a gra
 
 
 ## 3. Use the TensorFlow Lite model for inference in a mobile app
-
+## 3. 在移动 app 中引用 TensorFlow 简化模型
 After completing the prior steps, you should now have a `.tflite` model file.
 
 ### Android
-
+### 安卓
 Since Android apps are written in Java and the core TensorFlow library is in C++, a JNI library is provided as an interface. This is only meant for inference—it provides the ability to load a graph, set up inputs, and run the model to calculate outputs.
 
 The open source Android demo app uses the JNI interface and is available [on GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app). You can also download a [prebuilt APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk). See the @{$tflite/demo_android} guide for details.
@@ -116,13 +122,15 @@ The open source Android demo app uses the JNI interface and is available [on Git
 The @{$mobile/android_build} guide has instructions for installing TensorFlow on Android and setting up `bazel` and Android Studio.
 
 ### iOS
-
+### iOS
 To integrate a TensorFlow model in an iOS app, see the [TensorFlow Lite for iOS](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/ios.md) guide and @{$tflite/demo_ios} guide.
 
 #### Core ML support
-
+### 核心 ML 支持
 Core ML is a machine learning framework used in Apple products. In addition to using Tensorflow Lite models directly in your applications, you can convert trained Tensorflow models to the [CoreML](https://developer.apple.com/machine-learning/) format for use on Apple devices. To use the converter, refer to the [Tensorflow-CoreML converter documentation](https://github.com/tf-coreml/tf-coreml).
 
 ### Raspberry Pi
-
+### 树莓派
 Compile Tensorflow Lite for a Raspberry Pi by following the [RPi build instructions](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/rpi.md) This compiles a static library file (`.a`) used to build your app. There are plans for Python bindings and a demo app.
+
+依据下述的 [RPi 构建指导](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/rpi.md) 为树莓派编译 Tensorflow 简化模式。
