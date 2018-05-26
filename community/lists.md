@@ -1,6 +1,6 @@
 # 关于邮件组
 
-作为一个社会组织，我们与很多开放的邮件组进行合作。如果你正在学习 TensorFlow 那你可要留意这几个邮件组，最适合入门学习的邮件组就在 [Stack
+作为一个社会组织，我们与很多开放的邮件组进行合作。如果你在看 TensorFlow 相关的使用说明那你可要留意这几个邮件组，最适合入门学习的邮件组就在 [Stack
 Overflow](https://stackoverflow.com/questions/tagged/tensorflow) 和
 [GitHub issues](https://github.com/tensorflow/tensorflow/issues) 。还想要了解更多请查看 [how to get help](/community/#get_help) 。
 
