@@ -1,6 +1,6 @@
 # 关于邮件组
 
-作为一个社会组织，我们与很多开放的邮件组进行合作。如果你在看 TensorFlow 相关的使用说明那你可要留意这几个邮件组，最适合入门学习的邮件组就在 [Stack
+作为一个社区，我们与很多开放的邮件组进行合作。如果你在看 TensorFlow 相关的使用说明那你可要留意这几个邮件组，最适合入门学习的邮件组就在 [Stack
 Overflow](https://stackoverflow.com/questions/tagged/tensorflow) 和
 [GitHub issues](https://github.com/tensorflow/tensorflow/issues) 。还想要了解更多请查看 [how to get help](/community/#get_help) 。
 
@@ -17,7 +17,7 @@ TensorFlow 的 GitHub 组织内有很多项目是靠专项邮件组交流的：
 * [hub](https://groups.google.com/a/tensorflow.org/d/forum/hub) -
   [TensorFlow Hub](https://github.com/tensorflow/hub) 交流合作邮件组
 * [magenta-discuss](https://groups.google.com/a/tensorflow.org/d/forum/magenta-discuss) -
-  [Magenta](https://magenta.tensorflow.org/) 发展方向讨论邮件组
+  [Magenta](https://magenta.tensorflow.org/) 发展方向综合讨论邮件组
 * [swift](https://groups.google.com/a/tensorflow.org/d/forum/swift) -
   TensorFlow Swift 交流合作邮件组
 * [tensor2tensor](https://groups.google.com/d/forum/tensor2tensor) - Tensor2Tensor 交流与相关支持邮件组
