@@ -8,7 +8,7 @@ TensorFlow 是一个频繁更新并且社区活跃的项目。这份文档旨在
 ### APIs
 #### 高阶 APIs:
 * 基于 Estimators 的友好型 multi-GPU 接口
-* Boosted Trees, Time Series 及其他模型的友好型高阶预制 estimators
+* Gradient Boosted Trees, Time Series 及其他模型的友好型高阶预制 estimators
 
 #### Eager Execution:
 * multiple GPUs 的高效使用接口
