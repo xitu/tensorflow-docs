@@ -18,7 +18,7 @@
 
     你可使用 `/tmp/model/chkpt-1000` 来引用他们。
 
-- [GraphDef](https://www.tensorflow.org/code/tensorflow/core/framework/graph.proto)：保存着 `NodeDefs` 列表，定义着计算图是如何被运行的。在训练中，有一些节点可能是 `Variables`，所以如果你想要一个完整的可运行的图，也即包含权重的，您需要调用恢复操作从检查点文件中提取这些值。检查点文件的格式设计的很灵活以至于能够满足我们训练的所有要求，通过一些技巧来移植模型到手机或其他嵌入设备内，尤其是像 IOS 设备那种具备特殊文件系统的。脚本 [`freeze_graph.py`](https://www.tensorflow.org/code/tensorflow/python/tools/freeze_graph.py) 就是用来生成一个完整的可运行的图的。上面我们讲解过，`Const` 操作是作为 `NodeDef` 中的值储存的，因此如果将所有的 `Variable` 转换成 `Const` 节点的话，那么一个单独的 `GraphDef` 文件就已经包含了模型的结构和权重了。冻结网络的流程包含加载检查点文件，转换 `Variables` 为 `Consts` 这两个过程。然后您便可以抛弃检查点文件，单独调用 GraphDef 文件来加载模型了。需要注意的是有时候 `GraphDef` 文件会被保存为文本的格式以便我们查看里面的值，这种情况下文件后缀为 `.pbtxt`，否则后缀为 `.pb`。
+- [GraphDef](https://www.tensorflow.org/code/tensorflow/core/framework/graph.proto)：保存着 `NodeDefs` 列表，定义着计算图是如何被运行的。在训练中，有一些节点可能是 `Variables`，所以如果你想要一个完整的可运行的图，也即包含权重的，您需要调用恢复操作从检查点文件中提取这些值。检查点文件的格式设计的很灵活以至于能够满足我们训练的所有要求，通过一些技巧来移植模型到手机或其他嵌入设备内，尤其是像 iOS 设备那种具备特殊文件系统的。脚本 [`freeze_graph.py`](https://www.tensorflow.org/code/tensorflow/python/tools/freeze_graph.py) 就是用来生成一个完整的可运行的图的。上面我们讲解过，`Const` 操作是作为 `NodeDef` 中的值储存的，因此如果将所有的 `Variable` 转换成 `Const` 节点的话，那么一个单独的 `GraphDef` 文件就已经包含了模型的结构和权重了。冻结网络的流程包含加载检查点文件，转换 `Variables` 为 `Consts` 这两个过程。然后您便可以抛弃检查点文件，单独调用 GraphDef 文件来加载模型了。需要注意的是有时候 `GraphDef` 文件会被保存为文本的格式以便我们查看里面的值，这种情况下文件后缀为 `.pbtxt`，否则后缀为 `.pb`。
 
 - [FunctionDefLibrary](https://www.tensorflow.org/code/tensorflow/core/framework/function.proto)：在 `GraphDef` 中出现，实际上是一组子图，每个子图都有关于它们的输入和输出节点的信息。每个子图可以被用作主图中的操作，类似于用函数封装其他语言的代码，提供便利的实例化方式。
 
@@ -56,11 +56,11 @@
 
 TensorFlow 在训练中产生的 `GraphDefs` 文件包含了所有反向传播更新权重需要的计算，其中包含得到输入数据的队列，输入数据的解码，以及保存检查点。这些节点在推断的时候都是没有必要的，有些操作像保存检查点在移动平台上设置都是不支持的。为了创建在移动端加载的模型，您需要运行 `strip_unused_nodes` 规则来删除掉这些无用的操作。
 
-这个过程中最棘手的部分就是要弄清楚在推断过程中那些节点对应的名字是作为输入和输出的。输入输出节点的名字不仅在运行推断过程中会被用到，而且在转换过程中也需要根据它来判断推断的路径从而得知那些节点是不需要的。在 Tensorboard 中视察图结构是最容易得知这些节点的方法。
+这个过程中最棘手的部分就是要弄清楚在推断过程中哪些节点对应的名字是作为输入和输出的。输入输出节点的名字不仅在运行推断过程中会被用到，而且在转换过程中也需要根据它来判断推断的路径从而得知那些节点是不需要的。在 Tensorboard 中视察图结构是最容易得知这些节点的方法。
 
-请记住，移动应用程序通常从传感器收集数据，并将其作为内存中的数组，但是训练过程通常涉及对储存在磁盘上的数据进行加载和解码。例如，在 Inception V3 的情况下，图的开始部分有一个 `DecodeJpeg` 操作，它设计的目的是将从磁盘检索到的文件中的 jpeg 编码数据转换成任意大小的图像。在此之后，有一个`双线性调整`操作将其扩展到预期的大小，然后是其他一些操作，它们将字节数据转换为浮点数，并按图中其余部分所期望的方式缩放数值。一个典型的移动应用程序会跳过这些的步骤，因为它直接从摄像头中实时获得输入，所以你将提供的输入节点将是 `Mul` 节点的输出。
+请记住，移动应用程序通常从传感器收集数据，并将其作为内存中的数组，但是训练过程通常涉及对储存在磁盘上的数据进行加载和解码。例如，在 Inception V3 的情况下，图的开始部分有一个 `DecodeJpeg` 操作，它设计的目的是将从磁盘检索到的文件中的 jpeg 编码数据转换成任意大小的图像。在此之后，有一个`BilinearResize`操作将其扩展到预期的大小，然后是其他一些操作，它们将字节数据转换为浮点数，并按图中其余部分所期望的方式缩放数值。一个典型的移动应用程序会跳过这些的步骤，因为它直接从摄像头中实时获得输入，所以你将提供的输入节点将是 `Mul` 节点的输出。
 
-<img src ="../images/inception_input.png" width="300">
+<img src ="https://www.tensorflow.org/images/inception_input.png" width="300">
 
 同样，你也需要做相同的操作来确认正确的输出节点。
 
@@ -93,7 +93,7 @@ TensorFlow 支持上百种不同的操作，而且针对不同的数据类型还
 
 移动设备要包含的操作和类型主要有以下几类：
 
-- 移动端只专注推断，因此在后向传播中计算梯度用到的操作和类型是不需要包含。
+- 移动端只专注推断，因此在后向传播中计算梯度用到的操作和类型不需要包含。
 
 - 它们如果用于其他的训练要求，譬如保存检查点，这些操作和类型也不需要包含。
 
@@ -117,7 +117,6 @@ TensorFlow 支持上百种不同的操作，而且针对不同的数据类型还
 
 ### 在构建中添加实现
 
-如果您在使用 Bazel 构建安卓应用，那么需要添加 [`android_extended_ops_group1`](https://www.tensorflow.org/code/tensorflow/core/kernels/BUILD#L3565) 或 [`android_extended_ops_group2`](https://www.tensorflow.org/code/tensorflow/core/kernels/BUILD#L3632) 作为构建目标。同时也需要包含里面所有的 .cc 文件。如果在构建中抛出没有头文件的异常，那么您可以添加 [`android_extended_ops`】 (https://www.tensorflow.org/code/tensorflow/core/kernels/BUILD#L3525)作为构建目标。
+如果您在使用 Bazel 构建安卓应用，那么需要添加 [`android_extended_ops_group1`](https://www.tensorflow.org/code/tensorflow/core/kernels/BUILD#L3565) 或 [`android_extended_ops_group2`](https://www.tensorflow.org/code/tensorflow/core/kernels/BUILD#L3632) 作为构建目标。同时也需要包含里面所有的 .cc 文件。如果在构建中抛出没有头文件的异常，那么您可以添加 [`android_extended_ops`](https://www.tensorflow.org/code/tensorflow/core/kernels/BUILD#L3525)作为构建目标。
 
-如果您使用 makefile 为 IOS 或 Raspberry Pi 等设备构建应用，那么请到 [`tensorflow/contrib/makefile/tf_op_files.txt`](https://www.tensorflow.org/code/tensorflow/contrib/makefile/tf_op_files.txt) 添加相关的实现文件。
-
+如果您使用 makefile 为 iOS 或 Raspberry Pi 等设备构建应用，那么请到 [`tensorflow/contrib/makefile/tf_op_files.txt`](https://www.tensorflow.org/code/tensorflow/contrib/makefile/tf_op_files.txt) 添加相关的实现文件。
