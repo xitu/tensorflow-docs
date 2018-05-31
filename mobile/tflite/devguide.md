@@ -24,7 +24,7 @@ Depending on the use case, you can choose one of the popular open-sourced models
 These pre-trained models are [available for download](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/models.md)
 
 ### Re-train Inception-V3 or MobileNet for a custom data set
-### 
+### 为自定义的数据库重新训练 Inception-V3 或者 MobileNet
 These pre-trained models were trained on the *ImageNet* data set which contains 1000 predefined classes. If these classes are not sufficient for your use case, the model will need to be re-trained. This technique is called *transfer learning* and starts with a model that has been already trained on a problem, then retrains the model on a similar problem. Deep learning from scratch can take days, but transfer learning is fairly quick. In order to do this, you need to generate a custom data set labeled with the relevant classes.
 
 The [TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/) codelab walks through the re-training process step-by-step. The code supports both floating point and quantized inference.
@@ -85,6 +85,8 @@ The `input_file` argument should reference the frozen `GraphDef` file containing
 
 It is also possible to use the Tensorflow Optimizing Converter with protobufs from either Python or from the command line (see the  [toco_from_protos.py](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/python/toco_from_protos.py) example). This allows you to integrate the conversion step into the model design workflow, ensuring the model is easily convertible to a mobile inference graph. For example:
 
+还可以使用来自 Python 或者命令行 （参见  [toco_from_protos.py](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/python/toco_from_protos.py) 案例）的含有 protobufs （译者注：一种轻便高效的结构化数据存储格式）的 Tensorflow 优化转换器。这允许你将转换步骤集成到模型设计工作流中，确保模型可以轻松地转换为移动推理图。例如：
+
 ```python
 import tensorflow as tf
 
@@ -99,9 +101,16 @@ with tf.Session() as sess:
 
 For usage, see the Tensorflow Optimizing Converter [command-line examples](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/g3doc/cmdline_examples.md).
 
+有关使用情况，请参阅 Tensorflow 优化转换器[命令行工具案例](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/g3doc/cmdline_examples.md)。
+
 Refer to the [Ops compatibility guide](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/tf_ops_compatibility.md) for troubleshooting help, and if that doesn't help, please [file an issue](https://github.com/tensorflow/tensorflow/issues).
 
+参照[运维兼容性指南](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/tf_ops_compatibility.md)进行故障诊断帮助，如果你在这份指南里没有获得帮助，请提一个 [issue](https://github.com/tensorflow/tensorflow/issues).
+
+
 The [development repo](https://github.com/tensorflow/tensorflow) contains a tool to visualize TensorFlow Lite models after conversion. To build the [visualize.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/tools/visualize.py) tool:
+
+这份 [开发仓库](https://github.com/tensorflow/tensorflow) 包含了一个可以在转换之后可视化 TensorFlow Lite 模型的工具。你可以使用 [visualize.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/tools/visualize.py) 构建这个工具。
 
 ```sh
 bazel run tensorflow/contrib/lite/tools:visualize -- model.tflite model_viz.html
@@ -109,6 +118,7 @@ bazel run tensorflow/contrib/lite/tools:visualize -- model.tflite model_viz.html
 
 This generates an interactive HTML page listing subgraphs, operations, and a graph visualization.
 
+这会生成一个交互式的 HTML 页面，在这个页面中会列出子图，操作和可视化的图形。
 
 ## 3. Use the TensorFlow Lite model for inference in a mobile app
 ## 3. 在移动 app 中引用 TensorFlow Lite 模型
@@ -119,21 +129,35 @@ After completing the prior steps, you should now have a `.tflite` model file.
 ### 安卓
 Since Android apps are written in Java and the core TensorFlow library is in C++, a JNI library is provided as an interface. This is only meant for inference—it provides the ability to load a graph, set up inputs, and run the model to calculate outputs.
 
-The open source Android demo app uses the JNI interface and is available [on GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app). You can also download a [prebuilt APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk). See the @{$tflite/demo_android} guide for details.
+因为安卓 app 都是用 Java 语言编写的，同时 TesorFlow 核心库是基于 C++ 编写的，因此还提供了一个 JNI （译者注：JNI是Java Native Interface 的缩写，它提供了若干的 API,实现了 Java 和其他语言，主要是 C 和 C++ 的通信）接口。这个接口仅用于推断 —— 它提供了加载图形、输入设置和运行模型来计算输出的能力。
+
+The open source Android demo app uses the JNI interface and is available [on GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app). 
+
+这个开源的安卓 demo app 使用了 JNI 接口，这个接口在 [GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app) 上面。
+
+You can also download a [prebuilt APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk). See the @{$tflite/demo_android} guide for details.
+
+你也可以下载一个 [预构建 APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk),查看 @{$tflite/demo_android} 指南获取详细信息。
 
 The @{$mobile/android_build} guide has instructions for installing TensorFlow on Android and setting up `bazel` and Android Studio.
+
+如下这份指南  @{$mobile/android_build}  提供了在安卓上安装 TensorFlow 的方法以及设置 `bazel` 和安装 Android Studio 的方法。
+
 
 ### iOS
 ### iOS
 To integrate a TensorFlow model in an iOS app, see the [TensorFlow Lite for iOS](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/ios.md) guide and @{$tflite/demo_ios} guide.
+
 要在 iOS 应用程序中集成一个 TensorFlow 模型，请参见 [TensorFlow Lite for iOS](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/index/g3doc/ios.md) 指南和 @{$tflite/demo_ios} 指南。
 
 #### Core ML support
 ### Core ML 支持
-Core ML is a machine learning framework used in Apple products. In addition to using Tensorflow Lite models directly in your applications, you can convert trained Tensorflow models to the [CoreML](https://developer.apple.com/machine-learning/) format for use on Apple devices. To use the converter, refer to the [Tensorflow-CoreML 转换文档](https://github.com/tf-coreml/tf-coreml).
-Core ML 是一个用于苹果产品的机器学习框架。除了直接在你的应用中使用 Tensorflow Lite 模型，你也可以把你的 Tensorflow 模型转换训练成能够应用于苹果设备的 [CoreML](https://developer.apple.com/machine-learning/) 格式。要使用这个转换器，请参见下面的文档 [Tensorflow-CoreML converter documentation](https://github.com/tf-coreml/tf-coreml).
+Core ML is a machine learning framework used in Apple products. In addition to using Tensorflow Lite models directly in your applications, you can convert trained Tensorflow models to the [CoreML](https://developer.apple.com/machine-learning/) format for use on Apple devices. To use the converter, refer to the [Tensorflow-CoreML converter documentation](https://github.com/tf-coreml/tf-coreml).
+
+Core ML 是一个用于苹果产品的机器学习框架。除了直接在你的应用中使用 Tensorflow Lite 模型，你也可以把你的 Tensorflow 模型转换训练成能够应用于苹果设备的 [CoreML](https://developer.apple.com/machine-learning/) 格式。要使用这个转换器，请参见 [Tensorflow-CoreML 转换文档](https://github.com/tf-coreml/tf-coreml).
 
 ### Raspberry Pi
 ### 树莓派
 Compile Tensorflow Lite for a Raspberry Pi by following the [RPi build instructions](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/rpi.md) This compiles a static library file (`.a`) used to build your app. There are plans for Python bindings and a demo app.
+
 根据下述的 [RPi 构建指导](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/rpi.md) 为树莓派编译 Tensorflow Lite 模型。这个操作编译了一个用于构建你 app 的静态库文件(`.a`)。里面包含了一些用于 Python 绑定的计划和一个 demo app.
