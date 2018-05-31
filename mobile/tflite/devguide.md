@@ -2,19 +2,23 @@
 # 开发者指南
 
 Using a TensorFlow Lite model in your mobile app requires multiple considerations: you must choose a pre-trained or custom model, convert the model to a TensorFLow Lite format, and finally, integrate the model in your app.
+
 在你的移动 app 中使用 TensorFlow Lite 模型需有如下注意事项：你必须选择一个预训练或者自定义模型，把这个模型转化为 TensorFlow Lite 格式，最后把模型整合进你的 app 中。
 
 ## 1. Choose a model
 ## 1. 模型选择
 Depending on the use case, you can choose one of the popular open-sourced models, such as *InceptionV3* or *MobileNets*, and re-train these models with a custom data set or even build your own custom model.
+
 取决于使用实例，你可以选择任何一个流行的开源模型，例如 *InceptionV3* 或者 *MobileNets*，然后使用你自定义的数据集对（你选择的）这些模型进行重新训练，或者甚至构建你自定义的模型。
 
 ### Use a pre-trained model
 ### 使用预训练模型
 [MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) is a family of mobile-first computer vision models for TensorFlow designed to effectively maximize accuracy, while taking into consideration the restricted resources for on-device or embedded applications. MobileNets are small, low-latency, low-power models parameterized to meet the resource constraints for a variety of uses. They can be used for classification, detection, embeddings, and segmentation—similar to other popular large scale models, such as [Inception](https://arxiv.org/pdf/1602.07261.pdf). Google provides 16 pre-trained [ImageNet](http://www.image-net.org/challenges/LSVRC/) classification checkpoints for MobileNets that can be used in mobile projects of all sizes.
+
 [MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) 是一系列专为 TensorFlow 设计的移动（场景）优先的计算机视觉模型，这类模型用于有效地最大化（提升）精确度，同时，模型还考虑到设备内置应用或嵌入式应用的资源限制问题。 MobileNets 是小型化，低延迟，低能耗的模型 ，能够参数化地满足各种各样使用案例中资源限制的要求。这些模型可以被用于分类、检测、嵌入和分割 —— 原理和其他一些流行的大规模模型相似，例如 [Inception](https://arxiv.org/pdf/1602.07261.pdf). 谷歌提供了
 
 [Inception-v3](https://arxiv.org/abs/1512.00567) is an image recognition model that achieves fairly high accuracy recognizing general objects with 1000 classes, for example, "Zebra", "Dalmatian", and "Dishwasher". The model extracts general features from input images using a convolutional neural network and classifies them based on those features with fully-connected and softmax layers.
+
 [Inception-v3](https://arxiv.org/abs/1512.00567) 是一个能对 1000 种常见事物，例如，“斑马”、“斑点狗”、“洗碗机”，进行非常高精度识别的图像识别模型。这个模型使用了一个卷积神经网络来提取输入图片的一般特征，然后在这些特征的基础上使用全连接和 softmax 层来对这些图片进行分类。
 
 [On Device Smart Reply](https://research.googleblog.com/2017/02/on-device-machine-intelligence.html) is an on-device model that provides one-touch replies for incoming text messages by suggesting contextually relevant messages. The model is built specifically for memory constrained devices, such as watches and phones, and has been successfully used in Smart Replies on Android Wear. Currently, this model is Android-specific.
