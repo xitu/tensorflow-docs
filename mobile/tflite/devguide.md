@@ -126,14 +126,13 @@ The @{$mobile/android_build} guide has instructions for installing TensorFlow on
 ### iOS
 ### iOS
 To integrate a TensorFlow model in an iOS app, see the [TensorFlow Lite for iOS](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/ios.md) guide and @{$tflite/demo_ios} guide.
-
-查看 [TensorFlow Lite for iOS](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/ios.md) 指南 和 @{$tflite/demo_ios} 指南，来把 TensorFlow 模型整合进一个 iOS app中。
+要在 iOS 应用程序中集成一个 TensorFlow 模型，请参见 [TensorFlow Lite for iOS](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/index/g3doc/ios.md) 指南和 @{$tflite/demo_ios} 指南。
 
 #### Core ML support
 ### Core ML 支持
-Core ML is a machine learning framework used in Apple products. In addition to using Tensorflow Lite models directly in your applications, you can convert trained Tensorflow models to the [CoreML](https://developer.apple.com/machine-learning/) format for use on Apple devices. To use the converter, refer to the [Tensorflow-CoreML converter documentation](https://github.com/tf-coreml/tf-coreml).
+Core ML is a machine learning framework used in Apple products. In addition to using Tensorflow Lite models directly in your applications, you can convert trained Tensorflow models to the [CoreML](https://developer.apple.com/machine-learning/) format for use on Apple devices. To use the converter, refer to the [Tensorflow-CoreML 转换文档](https://github.com/tf-coreml/tf-coreml).
+Core ML 是一个用于苹果产品的机器学习框架。除了直接在你的应用中使用 Tensorflow Lite 模型，你也可以把你的 Tensorflow 模型转换训练成能够应用于苹果设备的 [CoreML](https://developer.apple.com/machine-learning/) 格式。要使用这个转换器，请参见下面的文档 [Tensorflow-CoreML converter documentation](https://github.com/tf-coreml/tf-coreml).
 
-Core ML 是一个用于苹果产品的机器学习框架。除了直接在你的应用中应用 Tensorflow Lite 模型，
 ### Raspberry Pi
 ### 树莓派
 Compile Tensorflow Lite for a Raspberry Pi by following the [RPi build instructions](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/rpi.md) This compiles a static library file (`.a`) used to build your app. There are plans for Python bindings and a demo app.
