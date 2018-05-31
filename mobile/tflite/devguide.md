@@ -2,7 +2,7 @@
 # 开发者指南
 
 Using a TensorFlow Lite model in your mobile app requires multiple considerations: you must choose a pre-trained or custom model, convert the model to a TensorFLow Lite format, and finally, integrate the model in your app.
-在你的移动 app 中使用 TensorFlow Lite 模型需有如下注意事项：你必须选择一个预训练或者自定义模型，把这个模型转化为 TensorFlow Lite 格式，最后把模型整合进你的 app 中。
+在你的移动 app 中使用 TensorFlow Lite 格式需有如下注意事项：你必须选择一个预训练或者自定义模型，把这个模型转化为 TensorFlow Lite 格式，最后把模型整合进你的 app 中。
 
 ## 1. Choose a model
 ## 1. 模型选择
@@ -12,45 +12,52 @@ Depending on the use case, you can choose one of the popular open-sourced models
 ### Use a pre-trained model
 ### 使用预训练模型
 [MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) is a family of mobile-first computer vision models for TensorFlow designed to effectively maximize accuracy, while taking into consideration the restricted resources for on-device or embedded applications. MobileNets are small, low-latency, low-power models parameterized to meet the resource constraints for a variety of uses. They can be used for classification, detection, embeddings, and segmentation—similar to other popular large scale models, such as [Inception](https://arxiv.org/pdf/1602.07261.pdf). Google provides 16 pre-trained [ImageNet](http://www.image-net.org/challenges/LSVRC/) classification checkpoints for MobileNets that can be used in mobile projects of all sizes.
-[MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) 是一系列专为 TensorFlow 设计的移动（场景）优先的计算机视觉模型，这类模型用于有效地最大化（提升）精确度，同时，模型还考虑到设备内置应用或嵌入式应用的资源限制问题。 MobileNets 是小型化，低延迟，低能耗的模型 ，能够参数化地满足各种各样使用案例中资源限制的要求。这些模型可以被用于分类、检测、嵌入和分割 —— 原理和其他一些流行的大规模模型相似，例如 [Inception](https://arxiv.org/pdf/1602.07261.pdf). 谷歌提供了 16 个
+[MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) 是一系列专为 TensorFlow 设计的移动（场景）优先的计算机视觉模型，这类模型用于有效地最大化（提升）精确度，同时，模型还考虑到设备内置应用或嵌入式应用的资源限制问题。 MobileNets 是小型化，低延迟，低能耗的模型 ，能够参数化地满足各种各样使用案例中资源限制的要求。这些模型可以被用于分类、检测、嵌入和分割 —— 原理和其他一些流行的大规模模型相似，例如 [Inception](https://arxiv.org/pdf/1602.07261.pdf). 谷歌提供了 16 个利用 [ImageNet](http://www.image-net.org/challenges/LSVRC/) 进行预训练的 MobileNets 模型分类检查点,可用于各种规模的移动项目。
 
 [Inception-v3](https://arxiv.org/abs/1512.00567) is an image recognition model that achieves fairly high accuracy recognizing general objects with 1000 classes, for example, "Zebra", "Dalmatian", and "Dishwasher". The model extracts general features from input images using a convolutional neural network and classifies them based on those features with fully-connected and softmax layers.
 [Inception-v3](https://arxiv.org/abs/1512.00567) 是一个能对 1000 种常见事物，例如，“斑马”、“斑点狗”、“洗碗机”，进行非常高精度识别的图像识别模型。这个模型使用了一个卷积神经网络来提取输入图片的一般特征，然后在这些特征的基础上使用全连接和 softmax 层来对这些图片进行分类。
 
 [On Device Smart Reply](https://research.googleblog.com/2017/02/on-device-machine-intelligence.html) is an on-device model that provides one-touch replies for incoming text messages by suggesting contextually relevant messages. The model is built specifically for memory constrained devices, such as watches and phones, and has been successfully used in Smart Replies on Android Wear. Currently, this model is Android-specific.
-
-[On Device Smart Reply](https://research.googleblog.com/2017/02/on-device-machine-intelligence.html) 是一个
+[On Device Smart Reply](https://research.googleblog.com/2017/02/on-device-machine-intelligence.html)是一种设备上的模型，通过提示与上下文相关的消息，为传入的文本消息提供一键回复。这种模型专门用于内存受限的设备，如手表和手机，并且已经成功地用于 Android Wear 的智能回复。目前，该模型仅仅用于安卓系统。
 
 These pre-trained models are [available for download](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/models.md)
-
+这些预训练模型可以在[这里下载](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/models.md)。
 ### Re-train Inception-V3 or MobileNet for a custom data set
-### 为自定义的数据库重新训练 Inception-V3 或者 MobileNet
+### 为自定义的数据集重新训练 Inception-V3 或 MobileNet 模型
 These pre-trained models were trained on the *ImageNet* data set which contains 1000 predefined classes. If these classes are not sufficient for your use case, the model will need to be re-trained. This technique is called *transfer learning* and starts with a model that has been already trained on a problem, then retrains the model on a similar problem. Deep learning from scratch can take days, but transfer learning is fairly quick. In order to do this, you need to generate a custom data set labeled with the relevant classes.
-
+这些预训练模型都是使用 *ImageNet* 数据集（一种包含了1000种预定义类型的数据集）进行训练的。如果这些类别不能满足于你用例的需求，这个模型就需要进行重新训练。这种技术被称为 *转移学习*，这需要使用一个已经基于某个问题训练过的模型，然后在相似的问题下对该模型进行重新训练。从头开始进行深度学习可能需要一些时间，但是转移学习却相当快。为了做到这一点，你需要生成一个标记为（和你问题）相关的类的自定义数据集。
 The [TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/) codelab walks through the re-training process step-by-step. The code supports both floating point and quantized inference.
+[TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/) 编码在一步步地进行再训练。这种编码支持浮点和量化推断。
 
 ### Train a custom model
 ### 自定义模型训练
 A developer may choose to train a custom model using Tensorflow (see the @{$tutorials} for examples of building and training models). If you have already written a model, the first step is to export this to a @{tf.GraphDef} file. This is required because some formats do not store the model structure outside the code, and we must communicate with other parts of the framework. See [Exporting the Inference Graph](https://github.com/tensorflow/models/blob/master/research/slim/README.md) to create .pb file for the custom model.
+开发者可能会选择使用 Tensorflow 对自定义的模型进行训练 （构建和训练模型的案例可参照 @{$tutorials} ）。如果你已经写好了一个模型，第一步是把模型导出为一个 @{tf.GraphDef} 文件。这个步骤是必需的，因为除代码之外，有些格式并不存储模型结构，而我们必须与框架的其他部分进行通信。为了为自定义模型创造 .pb 文件，你可以参照 [Exporting the Inference Graph](https://github.com/tensorflow/models/blob/master/research/slim/README.md).
 
 TensorFlow Lite currently supports a subset of TensorFlow operators. Refer to the [TensorFlow Lite & TensorFlow Compatibility Guide](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/tf_ops_compatibility.md) for supported operators and their usage. This set of operators will continue to grow in future Tensorflow Lite releases.
-
+TensorFlow Lite 目前支持一组 TensorFlow 操作符。可通过参考 [TensorFlow Lite 和 TensorFlow 兼容性指南](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/tf_ops_compatibility.md)获得现在支持的操作符以及其使用案例。在未来的 Tensorflow Lite 版本中，这组操作符将继续增加。
 ## 2. Convert the model format
 ## 2. 模型格式转换
 The model generated (or downloaded) in the previous step is a *standard* Tensorflow model and you should now have a .pb or .pbtxt @{tf.GraphDef} file. Models generated with transfer learning (re-training) or custom models must be converted—but, we must first freeze the graph to convert the model to the Tensorflow Lite format. This process uses several model formats:
 
 * @{tf.GraphDef} (.pb) —A protobuf that represents the TensorFlow training or computation graph. It contains operators, tensors, and variables definitions.
+
 * *CheckPoint* (.ckpt) —Serialized variables from a TensorFlow graph. Since this does not contain a graph structure, it cannot be interpreted by itself.
-* `FrozenGraphDef` —A subclass of `GraphDef` that does not contain variables. A `GraphDef` can be converted to a `FrozenGraphDef` by taking a CheckPoint and a `GraphDef`, and converting each variable into a constant
-  using the value retrieved from the CheckPoint.
+
+* `FrozenGraphDef` —A subclass of `GraphDef` that does not contain variables. A `GraphDef` can be converted to a `FrozenGraphDef` by taking a CheckPoint and a `GraphDef`, and converting each variable into a constant using the value retrieved from the CheckPoint.
+
 * `SavedModel` —A `GraphDef` and CheckPoint with a signature that labels input and output arguments to a model. A `GraphDef` and CheckPoint can be extracted from a `SavedModel`.
+
 * *TensorFlow Lite model* (.tflite) —A serialized [FlatBuffer](https://google.github.io/flatbuffers/) that contains TensorFlow Lite operators and tensors for the TensorFlow Lite interpreter, similar to a `FrozenGraphDef`.
+
 
 ### Freeze Graph
 ### 固化图
 To use the `GraphDef` .pb file with TensorFlow Lite, you must have checkpoints that contain trained weight parameters. The .pb file only contains the structure of the graph. The process of merging the checkpoint values with the graph structure is called *freezing the graph*.
 
+
 You should have a checkpoints folder or download them for a pre-trained model (for example, [MobileNets](https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md)).
+
 
 To freeze the graph, use the following command (changing the arguments):
 使用如下一些命令来对图进行固化（使用时请修改参数）：
@@ -83,7 +90,7 @@ toco --input_file=$(pwd)/mobilenet_v1_1.0_224/frozen_graph.pb \
 The `input_file` argument should reference the frozen `GraphDef` file containing the model architecture. The [frozen_graph.pb](https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_1.0_224_frozen.tgz) file used here is available for download. `output_file` is where the TensorFlow Lite model will get generated. The `input_type` and `inference_type` arguments should be set to `FLOAT`, unless converting a @{$performance/quantization$quantized model}. Setting the `input_array`, `output_array`, and `input_shape` arguments are not as straightforward. The easiest way to find these values is to explore the graph using Tensorboard. Reuse the arguments for specifying the output nodes for inference in the `freeze_graph` step.
 
 It is also possible to use the Tensorflow Optimizing Converter with protobufs from either Python or from the command line (see the  [toco_from_protos.py](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/python/toco_from_protos.py) example). This allows you to integrate the conversion step into the model design workflow, ensuring the model is easily convertible to a mobile inference graph. For example:
-还可以使用来自 Python 或者命令行 （参见  [toco_from_protos.py](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/python/toco_from_protos.py) 案例）的含有 protobufs （译者注：一种轻便高效的结构化数据存储格式）的 Tensorflow 优化转换器。这允许你将转换步骤集成到模型设计工作流中，确保模型可以轻松地转换为移动推理图。例如：
+你还可以使用来自 Python 或者命令行 （参见  [toco_from_protos.py](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/python/toco_from_protos.py) 案例）的含有 protobufs （译者注：一种轻便高效的结构化数据存储格式）的 Tensorflow 优化转换器。这允许你将转换步骤集成到模型设计工作流中，确保模型可以轻松地转换为移动推理图。例如：
 
 ```python
 import tensorflow as tf
