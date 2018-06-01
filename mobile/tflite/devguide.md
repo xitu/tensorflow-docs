@@ -39,25 +39,25 @@ TensorFlow Lite 目前支持一组 TensorFlow 操作符。可通过参考 [Tenso
 ## 2. Convert the model format
 ## 2. 模型格式转换
 The model generated (or downloaded) in the previous step is a *standard* Tensorflow model and you should now have a .pb or .pbtxt @{tf.GraphDef} file. Models generated with transfer learning (re-training) or custom models must be converted—but, we must first freeze the graph to convert the model to the Tensorflow Lite format. This process uses several model formats:
-
+在前面步骤中生成（或者下载的）模型是一个 *标准版* 的 Tensorflow 模型，你现在应该已经有了一个 .pb 或者 .pbtxt @{tf.GraphDef} 文件了。通过转移学习（也可称为再训练）或者自定义模型生成的模型必须被转换 —— 但是（在此之前），我们必须首先进行模型固化，将模型转换为 Tensorflow Lite 格式。这个过程将使用到以下一些模型格式：
 * @{tf.GraphDef} (.pb) —A protobuf that represents the TensorFlow training or computation graph. It contains operators, tensors, and variables definitions.
-
+* @{tf.GraphDef} (.pb) —— 一个代表了 TensorFlow 训练或者计算图谱的 protobuf.这个结构包含了操作符、张量和变量定义。
 * *CheckPoint* (.ckpt) —Serialized variables from a TensorFlow graph. Since this does not contain a graph structure, it cannot be interpreted by itself.
-
+* *CheckPoint* (.ckpt) —— 通过一张 TensorFlow 图得到的序列化变量。因为这个格式没有包含图的结构，因此该格式无法进行自解释。
 * `FrozenGraphDef` —A subclass of `GraphDef` that does not contain variables. A `GraphDef` can be converted to a `FrozenGraphDef` by taking a CheckPoint and a `GraphDef`, and converting each variable into a constant using the value retrieved from the CheckPoint.
-
+* `FrozenGraphDef` —— 一个没有包含变量的 `GraphDef` 子类。通过选取一个检查点和一个 `GraphDef`，可以把 `GraphDef` 转化为 `FrozenGraphDef`，并使用从检查点检索到的值将每个变量转换为常量。
 * `SavedModel` —A `GraphDef` and CheckPoint with a signature that labels input and output arguments to a model. A `GraphDef` and CheckPoint can be extracted from a `SavedModel`.
-
+* `SaveModel` —— 带有签名的 `GraphDef` 和检查点，该签名将输入和输出参数标记为模型。可以从 `SavedModel` 中提取 `GraphDef` 和检查点。
 * *TensorFlow Lite model* (.tflite) —A serialized [FlatBuffer](https://google.github.io/flatbuffers/) that contains TensorFlow Lite operators and tensors for the TensorFlow Lite interpreter, similar to a `FrozenGraphDef`.
-
+* *TensorFlow Lite 模型* (.tflite) —— 一个序列化的 [FlatBuffer](https://google.github.io/flatbuffers/)，其中包含了 TensorFlow Lite 操作符和张量，用于TensorFlow Lite 解释器 ，和 `FrozenGraphDef` 相似。
 
 ### Freeze Graph
-### 固化图
+### 图固化（译者注：指把训练数据和模型固化成 .pb 文件）
 To use the `GraphDef` .pb file with TensorFlow Lite, you must have checkpoints that contain trained weight parameters. The .pb file only contains the structure of the graph. The process of merging the checkpoint values with the graph structure is called *freezing the graph*.
-
+为了在 TensorFlow Lite 模型上使用 `GraphDef` .pb 文件，你必须拥有包含已训练权重参数的检查点。.pb 文件仅仅包含了图的数据结构。把检查点值和图结构进行合并的操作被称为*图固化*。
 
 You should have a checkpoints folder or download them for a pre-trained model (for example, [MobileNets](https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md)).
-
+你应该已经拥有一个检查点文件夹或者已经从一个预训练模型中下载了检查点（例如，[MobileNets](https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md) ）。
 
 To freeze the graph, use the following command (changing the arguments):
 使用如下一些命令来对图进行固化（使用时请修改参数）：
@@ -70,10 +70,13 @@ freeze_graph --input_graph=/tmp/mobilenet_v1_224.pb \
 ```
 
 The `input_binary` flag must be enabled so the protobuf is read and written in a binary format. Set the `input_graph` and `input_checkpoint` files.
+必须启用 `input_binary` 标志位，以便以二进制格式读取和写入 protobuf 。设置 `input_graph` 和 `input_checkpoint` 文件。
 
 The `output_node_names` may not be obvious outside of the code that built the model. The easiest way to find them is to visualize the graph, either with [TensorBoard](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets-2/#3) or `graphviz`.
+在构建模型的代码之外， `output_node_names` 可能并不明显。要找到它们，最简单的方法是使用 [TensorBoard](https://codelabs.developers.google.com/codelabs/tensorflow-for poets-2/#3) 或 `graphviz` 来可视化图形。
 
 The frozen `GraphDef` is now ready for conversion to the `FlatBuffer` format (.tflite) for use on Android or iOS devices. For Android, the Tensorflow Optimizing Converter tool supports both float and quantized models. To convert the frozen `GraphDef` to the .tflite format:
+固化的 `GraphDef` 现在可以转换为 `FlatBuffer` 格式 (.tflite) ，以便在安卓或iOS设备上使用。对于安卓来说， Tensorflow 优化转换器工具同时支持浮动模型和量化模型。将固化的 `GraphDef` 转换为 .tflite 格式:
 
 ```
 toco --input_file=$(pwd)/mobilenet_v1_1.0_224/frozen_graph.pb \
@@ -88,6 +91,7 @@ toco --input_file=$(pwd)/mobilenet_v1_1.0_224/frozen_graph.pb \
 ```
 
 The `input_file` argument should reference the frozen `GraphDef` file containing the model architecture. The [frozen_graph.pb](https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_1.0_224_frozen.tgz) file used here is available for download. `output_file` is where the TensorFlow Lite model will get generated. The `input_type` and `inference_type` arguments should be set to `FLOAT`, unless converting a @{$performance/quantization$quantized model}. Setting the `input_array`, `output_array`, and `input_shape` arguments are not as straightforward. The easiest way to find these values is to explore the graph using Tensorboard. Reuse the arguments for specifying the output nodes for inference in the `freeze_graph` step.
+ `input_file` 参数应该引用包含模型架构的固化 `GraphDef` 文件。这里可以下载使用到的 [frozen_graph.pb](https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_1.0_224_frozen.tgz) 文件。`output_file`是生成 TensorFlow Lite 模型的地方。`input_type` 和 `inference_type` 参数应该设置为浮点数，除非转换为 @{$performance/quantization$quantized model} 。设置 `input_array`、 `output_array` 和 `input_shape` 参数并不那么简单。找到这些值的最简单的方法是使用 Tensorboard 来研究图形。在 `freeze_graph` 步骤中重用指定输出节点进行推理的参数。
 
 It is also possible to use the Tensorflow Optimizing Converter with protobufs from either Python or from the command line (see the  [toco_from_protos.py](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/python/toco_from_protos.py) example). This allows you to integrate the conversion step into the model design workflow, ensuring the model is easily convertible to a mobile inference graph. For example:
 你还可以使用来自 Python 或者命令行 （参见  [toco_from_protos.py](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/python/toco_from_protos.py) 案例）的含有 protobufs （译者注：一种轻便高效的结构化数据存储格式）的 Tensorflow 优化转换器。这允许你将转换步骤集成到模型设计工作流中，确保模型可以轻松地转换为移动推理图。例如：
