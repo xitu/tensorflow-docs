@@ -52,8 +52,9 @@ The model generated (or downloaded) in the previous step is a *standard* Tensorf
 * @{tf.GraphDef} (.pb) —A protobuf that represents the TensorFlow training or computation graph. It contains operators, tensors, and variables definitions.
 * @{tf.GraphDef} (.pb) —— 一个代表了 TensorFlow 训练或者计算图谱的 protobuf（译者注：一种轻便高效的结构化数据存储格式）。这个结构包含了操作符、张量和变量定义。
 * *CheckPoint* (.ckpt) —Serialized variables from a TensorFlow graph. Since this does not contain a graph structure, it cannot be interpreted by itself.
-* `FrozenGraphDef` —A subclass of `GraphDef` that does not contain variables. A `GraphDef` can be converted to a `FrozenGraphDef` by taking a CheckPoint and a `GraphDef`, and converting each variable into a constant using the value retrieved from the CheckPoint.
 * *CheckPoint* (.ckpt) —— 通过一张 TensorFlow 图得到的序列化变量。因为这个格式没有包含图的结构，因此该格式无法进行自解释。
+* `FrozenGraphDef` —A subclass of `GraphDef` that does not contain variables. A `GraphDef` can be converted to a `FrozenGraphDef` by taking a CheckPoint and a `GraphDef`, and converting each variable into a constant
+  using the value retrieved from the CheckPoint.
 * `FrozenGraphDef` —— 一个没有包含变量的 `GraphDef` 子类。通过选取一个检查点和一个 `GraphDef`，可以把 `GraphDef` 转化为 `FrozenGraphDef`，并使用从检查点检索到的值将每个变量转换为常量。
 * `SavedModel` —A `GraphDef` and CheckPoint with a signature that labels input and output arguments to a model. A `GraphDef` and CheckPoint can be extracted from a `SavedModel`.
 * `SaveModel` —— 带有签名的 `GraphDef` 和检查点，该签名将输入和输出参数标记为模型。可以从 `SavedModel` 中提取 `GraphDef` 和检查点。
@@ -149,7 +150,7 @@ After completing the prior steps, you should now have a `.tflite` model file.
 Since Android apps are written in Java and the core TensorFlow library is in C++, a JNI library is provided as an interface. This is only meant for inference—it provides the ability to load a graph, set up inputs, and run the model to calculate outputs.
 因为安卓 app 都是用 Java 语言编写的，同时 TesorFlow 核心库是基于 C++ 编写的，因此还提供了一个 JNI （译者注：JNI是Java Native Interface 的缩写，它提供了若干的 API,实现了 Java 和其他语言，主要是 C 和 C++ 的通信）接口。这个接口仅用于推断 —— 它提供了加载图形、输入设置和运行模型来计算输出的能力。
 
-The open source Android demo app uses the JNI interface and is available [on GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app).You can also download a [prebuilt APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk). See the @{$tflite/demo_android} guide for details.
+The open source Android demo app uses the JNI interface and is available [on GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app). You can also download a [prebuilt APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk). See the @{$tflite/demo_android} guide for details.
 这个开源的安卓 demo app 使用了 JNI 接口，这个接口在 [GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app) 上面。你也可以下载一个 [预构建 APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk),查看 @{$tflite/demo_android} 指南获取详细信息。
 
 The @{$mobile/android_build} guide has instructions for installing TensorFlow on Android and setting up `bazel` and Android Studio.
