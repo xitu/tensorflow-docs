@@ -5,6 +5,7 @@ Using a TensorFlow Lite model in your mobile app requires multiple consideration
 在你的移动 app 中使用 TensorFlow Lite 格式需有如下注意事项：你必须选择一个预训练或者自定义模型，把这个模型转化为 TensorFlow Lite 格式，最后把模型整合进你的 app 中。
 
 ## 1. Choose a model
+
 ## 1. 模型选择
 Depending on the use case, you can choose one of the popular open-sourced models, such as *InceptionV3* or *MobileNets*, and re-train these models with a custom data set or even build your own custom model.
 取决于使用实例，你可以选择任何一个流行的开源模型，例如 *InceptionV3* 或者 *MobileNets*，然后使用你自定义的数据集对（你选择的）这些模型进行重新训练，或者甚至构建你自定义的模型。
