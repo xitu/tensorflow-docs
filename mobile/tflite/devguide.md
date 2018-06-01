@@ -35,7 +35,6 @@ TensorFlow Lite 目前支持一组 TensorFlow 操作符。可通过参考 [Tenso
 * @{tf.GraphDef} (.pb) —— 一个代表了 TensorFlow 训练或者计算图谱的 protobuf（译者注：一种轻便高效的结构化数据存储格式）。这个结构包含了操作符、张量和变量定义。
 * *CheckPoint* (.ckpt) —— 通过一张 TensorFlow 图得到的序列化变量。因为这个格式没有包含图的结构，因此该格式无法进行自解释。
 * `FrozenGraphDef` —— 一个没有包含变量的 `GraphDef` 子类。通过选取一个检查点和一个 `GraphDef`，可以把 `GraphDef` 转化为 `FrozenGraphDef`，并使用从检查点检索到的值将每个变量转换为常量。
-
 * `SaveModel` —— 带有签名的 `GraphDef` 和检查点，该签名将输入和输出参数标记为模型。可以从 `SavedModel` 中提取 `GraphDef` 和检查点。
 * *TensorFlow Lite 模型* (.tflite) —— 一个序列化的 [FlatBuffer](https://google.github.io/flatbuffers/)，其中包含了 TensorFlow Lite 操作符和张量，用于TensorFlow Lite 解释器 ，和 `FrozenGraphDef` 相似。
 
