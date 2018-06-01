@@ -43,7 +43,6 @@ TensorFlow Lite 目前支持一组 TensorFlow 操作符。可通过参考 [Tenso
 为了在 TensorFlow Lite 模型上使用 `GraphDef` .pb 文件，你必须拥有包含已训练权重参数的检查点。.pb 文件仅仅包含了图的数据结构。把检查点值和图结构进行合并的操作被称为*图固化*。
 
 你应该已经拥有一个检查点文件夹或者已经从一个预训练模型中下载了检查点（例如，[MobileNets](https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md) ）。
-
 使用如下一些命令来对图进行固化（使用时请修改参数）：
 ```
 freeze_graph --input_graph=/tmp/mobilenet_v1_224.pb \
