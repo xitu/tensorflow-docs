@@ -193,7 +193,7 @@ for inputs, labels in generate_batch(...):
 
 想看如何实现这个评估过程，请在 [models/tutorials/embedding/word2vec.py](https://www.tensorflow.org/code/tensorflow_models/tutorials/embedding/word2vec.py) 查看 `build_eval_graph()` 和 `eval()` 这两个函数。
 
-超参数的选择会显著的影响到任务的准确性。为了达到这个任务当前水平的的表现，我们需要使用一个很大的数据集来训练，并且精细的调优这些超参数以及利用像二次抽象这样的小技巧，不过二次抽样不在我们的教程范围内。
+超参数的选择会显著的影响到任务的准确性。为了达到这个任务当前水平的的表现，我们需要使用一个很大的数据集来训练，并且精细的调优这些超参数以及利用像二次抽样这样的小技巧，不过二次抽样不在我们的教程范围内。
 
 ## 优化实现
 
