@@ -8,7 +8,7 @@
 
 ### 使用预训练模型
 
-[MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) 是一系列专为 TensorFlow 设计的移动（场景）优先的计算机视觉模型，这类模型用于有效地最大化（提升）精确度，同时，模型还考虑到设备内置应用或嵌入式应用的资源限制问题。 MobileNets 是小型化、低延迟、低能耗的模型，能够参数化地满足各种各样使用案例中资源限制的要求。这些模型可以被用于分类、检测、嵌入和分割 —— 原理和其他一些流行的大规模模型相似，例如 [Inception](https://arxiv.org/pdf/1602.07261.pdf)。谷歌提供了 16 个利用 [ImageNet](http://www.image-net.org/challenges/LSVRC/) 进行预训练的 MobileNets 模型分类检查点（译者注：专业术语为 checkpoints ），可用于各种规模的移动项目。
+[MobileNets](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html) 是一系列专为 TensorFlow 设计的移动（场景）优先的计算机视觉模型，这类模型用于有效地最大化（提升）精确度，同时，模型还考虑到设备内置应用或嵌入式应用的资源限制问题。MobileNets 是小型化、低延迟、低能耗的模型，能够参数化地满足各种各样使用案例中资源限制的要求。这些模型可以被用于分类、检测、嵌入和分割 —— 原理和其他一些流行的大规模模型相似，例如 [Inception](https://arxiv.org/pdf/1602.07261.pdf)。谷歌提供了 16 个利用 [ImageNet](http://www.image-net.org/challenges/LSVRC/) 进行预训练的 MobileNets 模型分类检查点（译者注：专业术语为 checkpoints），可用于各种规模的移动项目。
 
 [Inception-v3](https://arxiv.org/abs/1512.00567) 是一个能对 1000 种常见事物，例如，“斑马”、“斑点狗”、“洗碗机”等进行非常高精度识别的图像识别模型。这个模型使用了一个卷积神经网络来提取输入图片的一般特征，然后在这些特征的基础上使用全连接和 softmax 层来对这些图片进行分类。
 
@@ -18,9 +18,9 @@
 
 ### 为自定义的数据集重新训练 Inception-V3 或 MobileNet 模型
 
-这些预训练模型都是使用 *ImageNet* 数据集（一种包含了1000种预定义类型的数据集）进行训练的。如果这些类别不能满足于你使用案例的需求，你就需要对这个模型进行重新训练。这种技术被称为 *转移学习*，这需要使用一个已经基于某个问题训练过的模型，然后在相似的问题下对该模型进行重新训练。从头开始进行深度学习可能需要一些时间，但是使用转移学习技术却相当快。为了做到这一点，你需要生成一个标记为（和你问题）相关的类的自定义数据集。
+这些预训练模型都是使用 *ImageNet* 数据集（一种包含了1000种预定义类型的数据集）进行训练的。如果这些类别不能满足于你使用案例的需求，你就需要对这个模型进行重新训练。这种技术被称为 **迁移学习**，这需要使用一个已经基于某个问题训练过的模型，然后在相似的问题下对该模型进行重新训练。从头开始进行深度学习可能需要一些时间，但是使用转移学习技术却相当快。为了做到这一点，你需要生成一个标记为（和你问题）相关的类的自定义数据集。
 
-[TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/) 编码在一步步地进行再训练。这种编码支持浮点和量化推断。
+[TensorFlow for Poets](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/) 在 codelab 上展示了一步步地进行再训练的过程。这些代码支持浮点和量化推断。
 
 ### 自定义模型训练
 
@@ -30,9 +30,9 @@ TensorFlow Lite 目前支持一组 TensorFlow 操作符。可通过参考 [Tenso
 
 ## 2. 模型格式转换
 
-在前面步骤中生成（或者下载）的模型是一个 *标准版* 的 Tensorflow 模型，你现在应该已经有了一个 .pb 或者 .pbtxt @{tf.GraphDef} 文件了。通过转移学习（也可称为再训练）或者自定义模型生成的模型必须被转换 —— 但是（在此之前），我们必须首先进行模型固化，将模型转换为 Tensorflow Lite 格式。这个过程将使用到以下一些模型格式：
+在前面步骤中生成（或者下载）的模型是一个 **标准版** 的 Tensorflow 模型，你现在应该已经有了一个 .pb 或者 .pbtxt @{tf.GraphDef} 文件了。通过迁移学习（也可称为再训练）或者自定义模型生成的模型必须被转换 —— 但是（在此之前），我们必须首先进行模型固化，将模型转换为 Tensorflow Lite 格式。这个过程将使用到以下一些模型格式：
 
-* @{tf.GraphDef} (.pb) —— 一个代表了 TensorFlow 训练或者计算图谱的 protobuf（译者注：一种轻便高效的结构化数据存储格式）。这个结构包含了操作符、张量和变量定义。
+* @{tf.GraphDef} (.pb) —— 一个代表了 TensorFlow 训练或者计算图的 protobuf（译者注：一种轻便高效的结构化数据存储格式）。这个结构包含了操作符、张量和变量定义。
 * *CheckPoint* (.ckpt) —— 通过一张 TensorFlow 图得到的序列化变量。因为这个格式没有包含图的结构，因此该格式无法进行自解释。
 * `FrozenGraphDef` —— 一个没有包含变量的 `GraphDef` 子类。通过选取一个检查点和一个 `GraphDef`，可以把 `GraphDef` 转化为 `FrozenGraphDef`，并使用从检查点检索到的值将每个变量转换为常量。
 * `SaveModel` —— 带有签名的 `GraphDef` 和检查点，该签名将输入和输出参数标记为模型。可以从 `SavedModel` 中提取 `GraphDef` 和检查点。
@@ -40,7 +40,7 @@ TensorFlow Lite 目前支持一组 TensorFlow 操作符。可通过参考 [Tenso
 
 ### 图固化（译者注：指把训练数据和模型固化成 .pb 文件）
 
-为了在 TensorFlow Lite 模型上使用 `GraphDef` .pb 文件，你必须拥有包含已训练权重参数的检查点。.pb 文件仅仅包含了图的数据结构。把检查点值和图结构进行合并的操作被称为*图固化*。
+为了在 TensorFlow Lite 模型上使用 `GraphDef` .pb 文件，你必须拥有包含已训练权重参数的检查点。.pb 文件仅仅包含了图的数据结构。把检查点值和图结构进行合并的操作被称为 **图固化**。
 
 你应该已经拥有一个检查点文件夹或者已经从一个预训练模型中下载了检查点（例如，[MobileNets](https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md) ）。
 
@@ -57,7 +57,7 @@ freeze_graph --input_graph=/tmp/mobilenet_v1_224.pb \
 
 在构建模型的代码之外， `output_node_names` 可能并不明显。要找到它们，最简单的方法是使用 [TensorBoard](https://codelabs.developers.google.com/codelabs/tensorflow-for poets-2/#3) 或 `graphviz` 来可视化图形。
 
-固化的 `GraphDef` 现在可以转换为 `FlatBuffer` 格式 (.tflite) ，以便在安卓或iOS设备上使用。对于安卓来说，Tensorflow 优化转换器工具同时支持浮动模型和量化模型。如下代码将固化的 `GraphDef` 转换为 .tflite 格式:
+固化的 `GraphDef` 现在可以转换为 `FlatBuffer` 格式 (.tflite) ，以便在安卓或 iOS 设备上使用。对于安卓来说，Tensorflow 优化转换器工具同时支持浮动模型和量化模型。如下代码将固化的 `GraphDef` 转换为 .tflite 格式:
 
 ```
 toco --input_file=$(pwd)/mobilenet_v1_1.0_224/frozen_graph.pb \
@@ -71,9 +71,9 @@ toco --input_file=$(pwd)/mobilenet_v1_1.0_224/frozen_graph.pb \
   --input_shapes=1,224,224,3
 ```
 
- `input_file` 参数应该引用包含模型架构的固化 `GraphDef` 文件。这里可以下载使用到的 [frozen_graph.pb](https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_1.0_224_frozen.tgz) 文件。 `output_file` 是生成 TensorFlow Lite 模型的地方。 `input_type` 和 `inference_type` 参数应该设置为浮点数，除非转换为 @{$performance/quantization$quantized model} 。设置 `input_array`、`output_array` 和 `input_shape` 参数并不那么简单。找到这些值的最简单的方法是使用 Tensorboard 来研究图形。在 `freeze_graph` 步骤中重用指定输出节点进行推理的参数。
+ `input_file` 参数应该引用包含模型架构的固化 `GraphDef` 文件。这里可以下载使用到的 [frozen_graph.pb](https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_1.0_224_frozen.tgz) 文件。`output_file` 是生成 TensorFlow Lite 模型的地方。 `input_type` 和 `inference_type` 参数应该设置为浮点数，除非转换为 @{$performance/quantization$quantized model} 。设置 `input_array`、`output_array` 和 `input_shape` 参数并不那么简单。找到这些值的最简单的方法是使用 Tensorboard 来研究图形。在 `freeze_graph` 步骤中重用指定输出节点进行推理的参数。
 
-你还可以使用来自 Python 或者命令行 （参见  [toco_from_protos.py](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/python/toco_from_protos.py) 案例）的含有 protobufs 的 Tensorflow 优化转换器。这允许你将转换步骤集成到模型设计工作流中，确保模型可以轻松地转换为移动推理图。例如：
+你还可以使用来自 Python 或者命令行（参见  [toco_from_protos.py](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/python/toco_from_protos.py) 案例）的含有 protobufs 的 Tensorflow 优化转换器。这允许你将转换步骤集成到模型设计工作流中，确保模型可以轻松地转换为移动推理图。例如：
 
 ```python
 import tensorflow as tf
@@ -91,7 +91,7 @@ with tf.Session() as sess:
 
 参照[运维兼容性指南](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/tf_ops_compatibility.md)进行故障诊断帮助，如果你在这份指南里没有获得帮助，请提一个 [issue](https://github.com/tensorflow/tensorflow/issues).
 
-这份 [开发仓库](https://github.com/tensorflow/tensorflow) 包含了一个可以在转换之后可视化 TensorFlow Lite 模型的工具。你可以使用 [visualize.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/tools/visualize.py) 构建这个工具：
+这份[开发仓库](https://github.com/tensorflow/tensorflow)包含了一个可以在转换之后可视化 TensorFlow Lite 模型的工具。你可以使用 [visualize.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/tools/visualize.py) 构建这个工具：
 
 ```sh
 bazel run tensorflow/contrib/lite/tools:visualize -- model.tflite model_viz.html
