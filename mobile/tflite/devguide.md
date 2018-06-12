@@ -30,19 +30,19 @@ TensorFlow Lite 目前支持一组 TensorFlow 操作符。可通过参考 [Tenso
 
 ## 2. 模型格式转换
 
-在前面步骤中生成（或者下载）的模型是一个 **标准版** 的 Tensorflow 模型，你现在应该已经有了一个 .pb 或者 .pbtxt @{tf.GraphDef} 文件了。通过迁移学习（也可称为再训练）或者自定义模型生成的模型必须被转换 —— 但是（在此之前），我们必须首先进行模型固化，将模型转换为 Tensorflow Lite 格式。这个过程将使用到以下一些模型格式：
+在前面步骤中生成（或者下载）的模型是一个**标准版**的 Tensorflow 模型，你现在应该已经有了一个 .pb 或者 .pbtxt @{tf.GraphDef} 文件了。通过迁移学习（也可称为再训练）或者自定义模型生成的模型必须被转换 —— 但是（在此之前），我们必须首先进行模型固化，将模型转换为 Tensorflow Lite 格式。这个过程将使用到以下一些模型格式：
 
 * @{tf.GraphDef} (.pb) —— 一个代表了 TensorFlow 训练或者计算图的 protobuf（译者注：一种轻便高效的结构化数据存储格式）。这个结构包含了操作符、张量和变量定义。
 * *CheckPoint* (.ckpt) —— 通过一张 TensorFlow 图得到的序列化变量。因为这个格式没有包含图的结构，因此该格式无法进行自解释。
 * `FrozenGraphDef` —— 一个没有包含变量的 `GraphDef` 子类。通过选取一个检查点和一个 `GraphDef`，可以把 `GraphDef` 转化为 `FrozenGraphDef`，并使用从检查点检索到的值将每个变量转换为常量。
 * `SaveModel` —— 带有签名的 `GraphDef` 和检查点，该签名将输入和输出参数标记为模型。可以从 `SavedModel` 中提取 `GraphDef` 和检查点。
-* *TensorFlow Lite 模型* (.tflite) —— 一个序列化的 [FlatBuffer](https://google.github.io/flatbuffers/)，其中包含了 TensorFlow Lite 操作符和张量，用于TensorFlow Lite 解释器 ，和 `FrozenGraphDef` 相似。
+* **TensorFlow Lite 模型** (.tflite) —— 一个序列化的 [FlatBuffer](https://google.github.io/flatbuffers/)，其中包含了 TensorFlow Lite 操作符和张量，用于TensorFlow Lite 解释器，和 `FrozenGraphDef` 相似。
 
 ### 图固化（译者注：指把训练数据和模型固化成 .pb 文件）
 
-为了在 TensorFlow Lite 模型上使用 `GraphDef` .pb 文件，你必须拥有包含已训练权重参数的检查点。.pb 文件仅仅包含了图的数据结构。把检查点值和图结构进行合并的操作被称为 **图固化**。
+为了在 TensorFlow Lite 模型上使用 `GraphDef.pb` 文件，你必须拥有包含已训练权重参数的检查点。`.pb` 文件仅仅包含了图的数据结构。把检查点值和图结构进行合并的操作被称为**图固化**。
 
-你应该已经拥有一个检查点文件夹或者已经从一个预训练模型中下载了检查点（例如，[MobileNets](https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md) ）。
+你应该已经拥有一个检查点文件夹或者已经从一个预训练模型中下载了检查点（例如，[MobileNets](https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md)）。
 
 使用如下一些命令来对图进行固化（使用时请修改参数）：
 ```
@@ -53,11 +53,11 @@ freeze_graph --input_graph=/tmp/mobilenet_v1_224.pb \
   --output_node_names=MobileNetV1/Predictions/Reshape_1
 ```
 
-必须启用 `input_binary` 标志位，以便以二进制格式读取和写入 protobuf 。设置 `input_graph` 和 `input_checkpoint` 文件。
+必须启用 `input_binary` 标志位，以便以二进制格式读取和写入 protobuf。设置 `input_graph` 和 `input_checkpoint` 文件。
 
-在构建模型的代码之外， `output_node_names` 可能并不明显。要找到它们，最简单的方法是使用 [TensorBoard](https://codelabs.developers.google.com/codelabs/tensorflow-for poets-2/#3) 或 `graphviz` 来可视化图形。
+在构建模型的代码之外，`output_node_names` 可能并不明显。要找到它们，最简单的方法是使用 [TensorBoard](https://codelabs.developers.google.com/codelabs/tensorflow-for poets-2/#3) 或 `graphviz` 来可视化图形。
 
-固化的 `GraphDef` 现在可以转换为 `FlatBuffer` 格式 (.tflite) ，以便在安卓或 iOS 设备上使用。对于安卓来说，Tensorflow 优化转换器工具同时支持浮动模型和量化模型。如下代码将固化的 `GraphDef` 转换为 .tflite 格式:
+固化的 `GraphDef` 现在可以转换为 `FlatBuffer` 格式（.tflite），以便在安卓或 iOS 设备上使用。对于安卓来说，Tensorflow 优化转换器工具同时支持浮动模型和量化模型。如下代码将固化的 `GraphDef` 转换为 .tflite 格式:
 
 ```
 toco --input_file=$(pwd)/mobilenet_v1_1.0_224/frozen_graph.pb \
@@ -71,9 +71,9 @@ toco --input_file=$(pwd)/mobilenet_v1_1.0_224/frozen_graph.pb \
   --input_shapes=1,224,224,3
 ```
 
- `input_file` 参数应该引用包含模型架构的固化 `GraphDef` 文件。这里可以下载使用到的 [frozen_graph.pb](https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_1.0_224_frozen.tgz) 文件。`output_file` 是生成 TensorFlow Lite 模型的地方。 `input_type` 和 `inference_type` 参数应该设置为浮点数，除非转换为 @{$performance/quantization$quantized model} 。设置 `input_array`、`output_array` 和 `input_shape` 参数并不那么简单。找到这些值的最简单的方法是使用 Tensorboard 来研究图形。在 `freeze_graph` 步骤中重用指定输出节点进行推理的参数。
+`input_file` 参数应该引用包含模型架构的固化 `GraphDef` 文件。这里可以下载使用到的 [frozen_graph.pb](https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_1.0_224_frozen.tgz) 文件。`output_file` 是生成 TensorFlow Lite 模型的地方。`input_type` 和 `inference_type` 参数应该设置为浮点数，除非转换为 @{$performance/quantization$quantized model}。设置 `input_array`、`output_array` 和 `input_shape` 参数并不那么简单。找到这些值的最简单的方法是使用 Tensorboard 来研究图形。在 `freeze_graph` 步骤中重用指定输出节点进行推理的参数。
 
-你还可以使用来自 Python 或者命令行（参见  [toco_from_protos.py](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/python/toco_from_protos.py) 案例）的含有 protobufs 的 Tensorflow 优化转换器。这允许你将转换步骤集成到模型设计工作流中，确保模型可以轻松地转换为移动推理图。例如：
+你还可以使用来自 Python 或者命令行（参见 [toco_from_protos.py](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/python/toco_from_protos.py) 案例）的含有 protobufs 的 Tensorflow 优化转换器。这允许你将转换步骤集成到模型设计工作流中，确保模型可以轻松地转换为移动推理图。例如：
 
 ```python
 import tensorflow as tf
@@ -89,7 +89,7 @@ with tf.Session() as sess:
 
 有关使用情况，请参阅 Tensorflow 优化转换器[命令行工具案例](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco/g3doc/cmdline_examples.md)。
 
-参照[运维兼容性指南](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/tf_ops_compatibility.md)进行故障诊断帮助，如果你在这份指南里没有获得帮助，请提一个 [issue](https://github.com/tensorflow/tensorflow/issues).
+参照[运维兼容性指南](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/tf_ops_compatibility.md)进行故障诊断帮助，如果你在这份指南里没有获得帮助，请提一个 [issue](https://github.com/tensorflow/tensorflow/issues)。
 
 这份[开发仓库](https://github.com/tensorflow/tensorflow)包含了一个可以在转换之后可视化 TensorFlow Lite 模型的工具。你可以使用 [visualize.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/tools/visualize.py) 构建这个工具：
 
@@ -106,11 +106,11 @@ bazel run tensorflow/contrib/lite/tools:visualize -- model.tflite model_viz.html
 
 ### 安卓
 
-因为安卓 app 都是用 Java 语言编写的，同时 TesorFlow 核心库是基于 C++ 编写的，因此还提供了一个 JNI （译者注：JNI是Java Native Interface 的缩写，它提供了若干的 API,实现了 Java 和其他语言，主要是 C 和 C++ 的通信）接口。这个接口仅用于推断 —— 它提供了加载图形、输入设置和运行模型来计算输出的能力。
+因为安卓 app 都是用 Java 语言编写的，同时 TesorFlow 核心库是基于 C++ 编写的，因此还提供了一个 JNI（译者注：JNI 是Java Native Interface 的缩写，它提供了若干的 API，实现了 Java 和其他语言，主要是 C 和 C++ 的通信）接口。这个接口仅用于推断 —— 它提供了加载图形、输入设置和运行模型来计算输出的能力。
 
-这个开源的安卓 demo app 使用了 JNI 接口，这个接口在 [GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app) 上面。你也可以下载一个 [预构建 APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk),查看 @{$tflite/demo_android} 指南获取详细信息。
+这个开源的安卓 demo app 使用了 JNI 接口，这个接口在 [GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app) 上面。你也可以下载一个[预构建 APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk)，查看 @{$tflite/demo_android} 指南获取详细信息。
 
-如下这份指南  @{$mobile/android_build}  提供了在安卓上安装 TensorFlow 的方法以及设置 `bazel` 和安装 Android Studio 的方法。
+如下这份指南 @{$mobile/android_build} 提供了在安卓上安装 TensorFlow 的方法以及设置 `bazel` 和安装 Android Studio 的方法。
 
 ### iOS
 
@@ -118,8 +118,8 @@ bazel run tensorflow/contrib/lite/tools:visualize -- model.tflite model_viz.html
 
 #### Core ML 支持
 
-Core ML 是一个用于苹果产品的机器学习框架。除了直接在你的应用中使用 Tensorflow Lite 模型，你也可以把你的 Tensorflow 模型转换训练成能够应用于苹果设备的 [CoreML](https://developer.apple.com/machine-learning/) 格式。要使用这个转换器，请参见 [Tensorflow-CoreML 转换文档](https://github.com/tf-coreml/tf-coreml).
+Core ML 是一个用于苹果产品的机器学习框架。除了直接在你的应用中使用 Tensorflow Lite 模型，你也可以把你的 Tensorflow 模型转换训练成能够应用于苹果设备的 [CoreML](https://developer.apple.com/machine-learning/) 格式。要使用这个转换器，请参见 [Tensorflow-CoreML 转换文档](https://github.com/tf-coreml/tf-coreml)。
 
 ### 树莓派
 
-根据下述的 [RPi 构建指导](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/rpi.md) 为树莓派编译 Tensorflow Lite 模型。这个操作编译了一个用于构建你 app 的静态库文件(`.a`)。里面包含了一些用于 Python 绑定的计划和一个 demo app。
+根据下述的 [RPi 构建指导](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/rpi.md) 为树莓派编译 Tensorflow Lite 模型。这个操作编译了一个用于构建你 app 的静态库文件（`.a`）。里面包含了一些用于 Python 绑定的计划和一个 demo app。
