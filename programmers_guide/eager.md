@@ -390,7 +390,7 @@ print("Final loss: {:.3f}".format(loss(model, training_inputs, training_outputs)
 print("W = {}, B = {}".format(model.W.numpy(), model.B.numpy()))
 ```
 
-Output (exact numbers may vary):
+Output （确切的数字可能会有所不同）:
 
 ```
 Initial loss: 69.066
