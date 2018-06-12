@@ -309,7 +309,7 @@ for (i, (x, y)) in enumerate(dataset_train):
 print("Final loss: {:.3f}".format(loss(model, x, y)))
 ```
 
-Output (确切的数字可能会发生偏差):
+Output （确切的数字可能会发生偏差）:
 
 ```
 Initial loss: 2.674
