@@ -1,3 +1,1 @@
-This directory holds extra files we'd like to be able
-to link to and serve from within tensorflow.org.
-They are excluded from versioning.
+此目录包含我们希望能够链接到并在 tensorflow.org 内提供的额外文件。他们被排除在版本控制之外。
