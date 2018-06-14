@@ -4,9 +4,9 @@ TensorFlow 的 eager execution 是一种可以立即评估操作，无需构建�
 
 Eager execution 为实验和研究提供了一个灵活的机器学习平台：
 
-* **直观的界面**—为你合理地构建代码并使用 Python 数据结构。在小型模型和小型数据中可快速迭代。
-* **更简单的调试**—直接调用 ops 来检测运行模型已经测试更改。使用标准化 Python 调试工具进行即时错误报告。
-* **合理的控制流**—使用 Python 控制流来取代图控制流，简化了动态模型的规范。
+* **直观的界面** — 为你合理地构建代码并使用 Python 数据结构。在小型模型和小型数据中可快速迭代。
+* **更简单的调试** — 直接调用 ops 来检测运行模型已经测试更改。使用标准化 Python 调试工具进行即时错误报告。
+* **合理的控制流** — 使用 Python 控制流来取代图控制流，简化了动态模型的规范。
 
 Eager execution 支持大多数 TensorFlow 操作和 GPU 加速功能。如果需要 eager execution 运行的示例集合，请参阅： [tensorflow/contrib/eager/python/examples](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/eager/python/examples)。
 
@@ -42,7 +42,7 @@ print("hello, {}".format(m))  # => "hello, [[4.]]"
 
 启用 eager execution 会改变 TensorFlow 操作的行为——现在它们会立即计算值并将结果返回给 Python。`tf.Tensor` 对象会为节点引用计算图中的实际值而不是符号句柄。由于在 session 中没有要构建和运行的计算图，因此使用 `print()` 或调试器来检查结果会很容易。计算、打印以及检查张量值不会中断计算梯度的流程。
 
-Eager execution 可以和 [NumPy](http://www.numpy.org/) 完美结合。NumPy 运算可以接受来自 `tf.Tensor` 的参数。 TensorFlow [数学操作](https://www.tensorflow.org/api_guides/python/math_ops)将 Python 对象和 NumPy 数组转换成 `tf.Tensor` 对象。`tf.Tensor.numpy` 方法将对象值作为 NumPy `ndarray` 返回。
+Eager execution 可以和 [NumPy](http://www.numpy.org/) 完美结合。NumPy 运算可以接受来自 `tf.Tensor` 的参数。TensorFlow [数学操作](https://www.tensorflow.org/api_guides/python/math_ops)将 Python 对象和 NumPy 数组转换成 `tf.Tensor` 对象。`tf.Tensor.numpy` 方法将对象值作为 NumPy `ndarray` 返回。
 
 ```py
 a = tf.constant([[1, 2],
@@ -103,7 +103,7 @@ def fizzbuzz(max_num):
   return counter
 ```
 
-这是有条件的，即依赖于张量值并且可以在运行时打印这些值
+这是有条件的，即依赖于张量值并且可以在运行时打印这些值。
 
 ## 构建模型
 
@@ -117,13 +117,13 @@ class MySimpleLayer(tf.keras.layers.Layer):
     self.output_units = output_units
 
   def build(self, input):
-    # 您的层在第一次被使用时，build() 方法将被用
-    # 在 build() 上创建变量使其形状依赖于输入形状，从而消除了用户指定完整形状的需要，如果您已经知道变量的全部形状，则可以在 _init_() 期间创建变量
+    # 您的层在第一次被使用时，build() 方法将被用。
+    # 在 build() 上创建变量使其形状依赖于输入形状，从而消除了用户指定完整形状的需要，如果您已经知道变量的全部形状，则可以在 _init_() 期间创建变量。
     self.kernel = self.add_variable(
       "kernel", [input.shape[-1], self.output_units])
 
   def call(self, input):
-    # 重载 call() 而不是 __call__ ，这样我们就可以执行一些 bookkeeping 操作
+    # 重载 call() 而不是 __call__ ，这样我们就可以执行一些 bookkeeping 操作。
     return tf.matmul(input, self.kernel)
 ```
 
@@ -309,7 +309,7 @@ for (i, (x, y)) in enumerate(dataset_train):
 print("Final loss: {:.3f}".format(loss(model, x, y)))
 ```
 
-Output （确切的数字可能会发生偏差）:
+Output（确切的数字可能会发生偏差）：
 
 ```
 Initial loss: 2.674
@@ -390,7 +390,7 @@ print("Final loss: {:.3f}".format(loss(model, training_inputs, training_outputs)
 print("W = {}, B = {}".format(model.W.numpy(), model.B.numpy()))
 ```
 
-Output （确切的数字可能会有所不同）:
+Output（确切的数字可能会有所不同）：
 
 ```
 Initial loss: 69.066
@@ -523,8 +523,8 @@ def line_search_step(fn, init_x, rate=1.0):
 
 `tf.GradientTape` 是一个用于计算梯度的功能强大的接口，但其实在自动微分方面，还有另一个 [Autograd](https://github.com/HIPS/autograd)-风格的 API。在只使用张量和梯度函数编写数学代码，而且不使用 `tfe.Variables` 的时候，这些函数是有用的：
 
-* `tfe.gradients_function` —返回一个计算其输入函数参数导数的函数。输入函数参数必须返回标量值。返回函数被调用时，它会返回一个 `tf.Tensor` 对象列表：输入函数的每个参数都有一个元素。因为任何感兴趣的东西都必须作为函数参数传递，如果依赖于许多可训练的参数，这就变得很困难。
-* `tfe.value_and_gradients_function` —类似于 `tfe.gradients_function`，但是当调用返回函数时，除了输入函数的导数列表和参数之外，它还会从输入函数返回值。
+* `tfe.gradients_function` — 返回一个计算其输入函数参数导数的函数。输入函数参数必须返回标量值。返回函数被调用时，它会返回一个 `tf.Tensor` 对象列表：输入函数的每个参数都有一个元素。因为任何感兴趣的东西都必须作为函数参数传递，如果依赖于许多可训练的参数，这就变得很困难。
+* `tfe.value_and_gradients_function` — 类似于 `tfe.gradients_function`，但是当调用返回函数时，除了输入函数的导数列表和参数之外，它还会从输入函数返回值。
 
 在下述示例中，`tfe.gradients_function` 将 `square` 函数作为参数，并返回一个用于计算其输入 `square` 的偏导数的函数。为了计算 `3` 处 `square` 的导数，`grad(3.0)` 返回了 `6`。
 
@@ -687,7 +687,7 @@ if tfe.num_gpus() > 1:
 * 使用 `tf.data` 而不是队列，来进行输入处理。这会更快，更简单。
 * 使用面向对象的层 API——例如 `tf.keras.layers` 和 `tf.keras.Model`——因为它们对变量进行显示存储。
 * 大多数模型在 eager execution 和 graph execution 中的表现是一样的，但也有特列。（例如，动态模型使用 Python 控制流来改变基于输入的计算。）
-* 一旦通过 `tf.enable_eager_execution` 启用 eager execution，它就不会被关闭。启动一个新的 Python session 来返回到graph execution。
+* 一旦通过 `tf.enable_eager_execution` 启用 eager execution，它就不会被关闭。启动一个新的 Python session 来返回到 graph execution。
 
 最好是同时为 eager execution **和** graph execution 编写代码。这将为您提供 eager 的交互式体验和可调式性，以及 graph execution 的分布式性能优势。
 
