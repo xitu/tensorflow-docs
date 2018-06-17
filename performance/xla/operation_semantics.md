@@ -24,7 +24,7 @@
 
 对于特征维数中的每一个特征（`feature_index` 即 `operand` 中特征维度的索引），此操作计算 `operand` 的梯度、在所有其他维度上的 `offset` 和 `scale`。`feature_index` 必须是 `operand` 中特征维度的合法索引。
 
-[需要翻译]：The three gradients are defined by the following formulas (Assuming a 4-dimensional tensor as `operand` and (l) is the index for feature dimension):
+这三个梯度由以下公式定义（假设四维张量为 `operand` 和 (l) 是特征维的索引
 
 \\( coef_l = \frac{1}{mwh}\sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h (\nabla y_{ijkl} * (x_{ijkl} - \mu_l) / (\sigma^2_{l}+\epsilon)) \\)
 
@@ -537,7 +537,7 @@ DotGeneral(lhs, rhs, dnums) -> { {6.0, 12.0},
                                  {15.0, 30.0} }
 ```
 
-'lhs' 和 'rhs' 的批处理维数必须相同，在两个数组中必须以相同的顺序列出，同时维数大小必须相同。[需要翻译]and must be ordered before contracting and non-contracting/non-batch dimension numbers。
+'lhs' 和 'rhs' 的批处理维数必须相同，在两个数组中必须以相同的顺序列出，同时维数大小必须相同。必须在合约和非合约/非批次维度之前订阅。
 
 批处理维数的例子（批处理大小为 2，2x2 矩阵）：
 
@@ -569,7 +569,7 @@ DotGeneral(lhs, rhs, dnums) -> { { {1.0, 2.0},
 | [b0, m, k] `dot` [b0, k, n]         | [b0, m, n]        |  batch matmul    |
 | [b0, b1, m, k] `dot` [b0, b1, k, n] | [b0, b1, m, n]    |  batch matmul    |
 
-[需要翻译]It follows that the resulting dimension number starts with the batch dimension, then the 'lhs' non-contracting/non-batch dimension, and finally the 'rhs' non-contracting/non-batch dimension.
+由此得出的结果维数是从批处理维度开始，然后是 `lhs` 非收缩/非批处理维数，最后是 `rhs` 非收缩/非批处理维数。
 
 ## DynamicSlice
 
@@ -750,27 +750,27 @@ $$\text{sgn}(x) = \begin{cases} -1 & x < 0\\ 0 & x = 0\\ 1 & x > 0 \end{cases}$$
 
 该函数应用于 `operand` 数组的每个元素，从而形成具有相同形状的数组。它允许操作数为标量（秩 0 ）
 
-## Gather[需要翻译]
+## 收集
 
-The XLA gather operation stitches together several slices (each slice at a potentially different runtime offset) of an input tensor into an output tensor.
+XLA 收集操作将一个输入张量的几个片（每个片在一个可能不同的运行时偏移量上）拼接成一个输出张量。
 
-### General Semantics
+### 一般语义
 
-See also [`ComputationBuilder::Gather`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h). For a more intuitive description, see the "Informal Description" section below.
+也可以在 [`ComputationBuilder::Gather`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.h) 进行查阅。更直观的描述，请参阅下面的“非正式描述”部分。
 
 <b> `gather(operand, gather_indices, output_window_dims, elided_window_dims, window_bounds, gather_dims_to_operand_dims)` </b>
 
-|Arguments         | Type                    | Semantics                       |
+|参数      | 类型                    | 语义                       |
 |----------------- | ----------------------- | --------------------------------|
-|`operand`         | `ComputationDataHandle` | The tensor we’re gathering from. |
-|`gather_indices`  | `ComputationDataHandle` | Tensor containing the starting indices of the slices we're we're stitching together into the output tensor. |
-|`index_vector_dim`  | `int64`               | The dimension in `gather_indices` that contains the starting indices.              |
+|`operand`         | `ComputationDataHandle` | 我们收集的张量。|
+|`gather_indices`  | `ComputationDataHandle` | 张量，包含切片的起始指数，我们将它们拼接输出到张量中。|
+|`index_vector_dim`  | `int64`               | 包含起始索引 `gather_indices` 中的维度。 |
 |`output_window_dims` | `ArraySlice<int64>`  | The set of dimensions in the  output shape that are _window dimensions_ (defined below). Not all window dimensions may be present in the output shape. |
 |`elided_window_dims` | `ArraySlice<int64>`  | The set of _window dimensions_ that are not present in the output shape. `window_bounds[i]` must be `1` for all `i` in `elided_window_dims`. |
 |`window_bounds`   | `ArraySlice<int64>`    | `window_bounds[i]` is the bounds for  window dimension `i`. This includes both the window dimensions that are explicitly part of the output shape (via `output_window_dims`) and the window dimensions that are elided (via `elided_window_dims`).|
 |`gather_dims_to_operand_dims` | `ArraySlice<int64>` | A dimension map (the array is interpreted as mapping `i` to `gather_dims_to_operand_dims[i]`)  from the gather indices in `gather_indices` to the operand index space.  It has to be one-to-one and total. |
 
-For every index `Out` in the output tensor, we compute two things (more precisely described later):
+对于输出张量中的每一个索引 `Out`，我们计算两件事（之后进行更精确的描述）：
 
   - An index into `gather_indices.rank` - `1` dimensions of `gather_indices`, which gives us a starting index of a slice, _operand slice_, in the operand tensor.  These `gather_indices.rank` - `1` dimensions are all the dimensions in `gather_indices` except `index_vector_dim`.
 
