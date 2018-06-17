@@ -4,11 +4,11 @@
 
 [TOC]
 
-[需要翻译]`tfdbg` is a specialized debugger for TensorFlow. It lets you view the internal structure and states of running TensorFlow graphs during training and inference, which is difficult to debug with general-purpose debuggers such as Python's `pdb` due to TensorFlow's computation-graph paradigm.
+`tfdbg` 是 TensorFlow 的专用调试器。由于 TensorFlow 的计算-图形使用常规调试器难以调试，例如 Python 的 `pdb`，因此它允许你在训练和推断的i过程中查看运行 TensorFlow 图的内部结构和状态。
 
-This guide focuses on the command-line interface (CLI) of `tfdbg`. For guide on how to use the graphical user interface (GUI) of tfdbg, i.e., the **TensorBoard Debugger Plugin**, please visit [its README](https://github.com/tensorflow/tensorboard/blob/master/tensorboard/plugins/debugger/README.md).
+本指南重点关注 `tfdbg` 的命令行接口（CLI）。关于如何使用 tfdbg 的图形化用户界面（GUI），**TensorBoard 调试插件**，请查询[它的 README](https://github.com/tensorflow/tensorboard/blob/master/tensorboard/plugins/debugger/README.md)。
 
-Note: The TensorFlow debugger uses a [curses](https://en.wikipedia.org/wiki/Curses_\(programming_library\))-based text user interface. On Mac OS X, the `ncurses` library is required and can be installed with `brew install homebrew/dupes/ncurses`. On Windows, curses isn't as well supported, so a [readline](https://en.wikipedia.org/wiki/GNU_Readline)-based interface can be used with tfdbg by installing `pyreadline` with `pip`. If you use Anaconda3, you can install it with a command such as `"C:\Program Files\Anaconda3\Scripts\pip.exe" install pyreadline`. Unofficial Windows curses packages can be downloaded [here](https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses), then subsequently installed using `pip install <your_version>.whl`, however curses on Windows may not work as reliably as curses on Linux or Mac.
+注意：TensorFlow 调试器使用 [curses](https://en.wikipedia.org/wiki/Curses_\(programming_library\)) —— 基于文本用户界面。在 Mac OS X 上， `ncurses` 库是必需的，可以用 `brew install homebrew/dupes/ncurses` 进行安装。Windows 对 curses 支持性并不好，因此可以使用基于接口的 [readline](https://en.wikipedia.org/wiki/GNU_Readline)，用 `pip` 安装 `pyreadline` 来使用 tfdbg。如果你使用 Anaconda3，你可以使用  `"C:\Program Files\Anaconda3\Scripts\pip.exe" install pyreadline` 这样的命令来安装它。 非官方的 Windwos curses 包可以在[这里](https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses)下载，然后用 `pip install <your_version>.whl` 安装。但是 curses 在 Windows 上可能无法像它在 Linux 和 Mac 上一样可靠地运行。
 
 本教程演示了如何使用 tfdbg 命令行界面（CLI）来调试 [`nan`s](https://en.wikipedia.org/wiki/NaN) 和 [`inf`s](https://en.wikipedia.org/wiki/Infinity) 错误，这是 TensorFlow 模型开发中经常遇到的错误类型。 以下示例适用于使用 TensorFlow 的底层 [`Session`](https://www.tensorflow.org/api_docs/python/tf/Session) API 的用户。 本文档的后续部分描述了如何在更高层次的 API（即 `tf-learn` 中的 `Estimator` 和 `Experiment`）中来使用 tfdbg。要**观察**这个问题，请运行以下命令而不使用调试器（源代码可以在[这里](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/debug/examples/debug_mnist.py)可找到）
 
@@ -93,7 +93,7 @@ tfdbg> run
 | | `-n <name_pattern>` | 列出名称与给定正则表达式模式匹配的转储张量。 | `lt -n Softmax.*` |
 | | `-t <op_pattern>` | 列出操作类型与给定正则表达式模式匹配的转储张量。 | `lt -t MatMul` |
 | | `-f <filter_name>` | 列出与给定字符串匹配的转储张量。| `lt -f has_inf_or_nan` |
-| | `-f <filter_name> -fenn <regex>` | [需要翻译]List only the tensors that pass a registered tensor filter, excluding nodes with names matching the regular expression. | `lt -f has_inf_or_nan` `-fenn .*Sqrt.*` |
+| | `-f <filter_name> -fenn <regex>` | 列出只传递注册张量过滤器的张量，不包括与正则表达式匹配的名称的节点| `lt -f has_inf_or_nan` `-fenn .*Sqrt.*` |
 | | `-s <sort_key>` | 根据 sort_key 对输出排序，sort_key 可能的值为 `timestamp（默认）`，`dump_size`，`op_type` 和 `tensor_name`。 | `lt -s dump_size` |
 | | `-r` | 按相反顺序排列。 | `lt -r -s dump_size` |
 | **`pt`** | | **打印转储张量的值。** | |
@@ -101,7 +101,7 @@ tfdbg> run
 | | `pt <tensor>[slicing]` | 使用 [numpy](http://www.numpy.org/)-style数组切片来打印张量中的子数组。| `pt hidden/Relu:0[0:50,:]` |
 | | `-a` | 不截断打印结果很长的张量。（大的张量可能需要花很长的时间来打印）| `pt -a hidden/Relu:0[0:50,:]` |
 | | `-r <range>` | 筛选出指定数值区间内的元素。如果有多个区间可以结合使用。| `pt hidden/Relu:0 -a -r [[-inf,-1],[1,inf]]` |
-| | `-n <number>` | Print dump corresponding to specified 0-based dump number. Required for tensors with multiple dumps. | `pt -n 0 hidden/Relu:0` |
+| | `-n <number>` | 打印转储对应于指定的 基于 0 的转储数值。被具有多转储的张量所需。| `pt -n 0 hidden/Relu:0` |
 | | `-s` | 打印数值张量的摘要（仅适用于布尔型和数字类型的非空张量，如 `int *` 和 `float *`） | `pt -s hidden/Relu:0[0:50,:]` |
 | | `-w` | 使用 [`numpy.save()`](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.save.html) 将张量（可能已分片）的值写入一个 Numpy 文件 | `pt -s hidden/Relu:0 -w /tmp/relu.npy` |
 | **`@[coordinates]`** | | 根据坐标值导航到 `pt` 命令输出值的指定位置。| `@[10,0]` or `@10,0` |
@@ -139,7 +139,7 @@ tfdbg> run
 | | `-n` | 执行下一个 Session.run 而不进行调试，`-n` 添加到 `run` 命令的右边。| `run -n` |
 | | `-t <T>` | 在没有调试的情况下执行 `Session.run` `T - 1` 次，然后运行调试。 `-t` 添加到 `run` 命令的右边。| `run -t 10` |
 | | `-f <filter_name>` | 继续执行 `Session.run`，直到任何中间张量触发指定的 Tensor 过滤器（导致过滤器返回 `True`）。| `run -f has_inf_or_nan` |
-| | `-f <filter_name> -fenn <regex>` | [需要翻译]Continue executing `Session.run` until any intermediate tensor whose node names doesn't match the regular expression triggers the specified Tensor filter (causes the filter to return `True`). | `run -f has_inf_or_nan -fenn .*Sqrt.*` |
+| | `-f <filter_name> -fenn <regex>` | 继续执行 `Session.run`，直到任何中间张量的节点名称与正则表达式不匹配时，触发指定的张量过滤器（导致过滤器返回 true）。| `run -f has_inf_or_nan -fenn .*Sqrt.*` |
 | | `--node_name_filter <pattern>` | 执行下一个 `Session.run`，只查看名称与给定正则表达式模式匹配的结点。| `run --node_name_filter Softmax.*` |
 | | `--op_type_filter <pattern>` | 执行下一个 `Session.run`，只查看符合给定正则表达式模式的操作类型的结点。| `run --op_type_filter Variable.*` |
 | | `--tensor_dtype_filter <pattern>` | 执行下一个 `Session.run`，仅列出与给定正则表达式模式匹配的数据类型（`dtype`s）的转储张量。| `run --tensor_dtype_filter int.*` |
@@ -570,9 +570,9 @@ hooks = [tf_debug.LocalCLIDebugHook(dump_root="/with/lots/of/space")]
    
    上面的第一个命令仅监视其名称与正则表达式模式（`.*hidden.*`）匹配的结点。 第二个命令只监视名称与模式（`Variable.*`）匹配的操作结点。第三个只监视 `dtype` 与模式（`int.*`）匹配的张量（例如，int32）。
 
-**Q**: [需要翻译]I am debugging a model that generates unwanted infinities or NaNs. But there are some nodes in my model that are known to generate infinities or NaNs in their output tensors even under completely normal conditions. How can I skip those nodes during my `run -f has_inf_or_nan` actions?
+**Q**: 我正在调试一个生产了不必要的无穷大或 NAN 的模型。即使在完全正常的条件下，也会在它们的输出张量中生成无穷大或 NANs。我如何在运行 `run -f has_inf_or_nan` 时跳过那些节点？
 
-**A**: Use the `--filter_exclude_node_names` (`-fenn` for short) flag. For example, if you known you have a node with name matching the regular expression `.*Sqrt.*` that generates infinities or NaNs regardless of whether the model is behaving correctly, you can exclude the nodes from the infinity/NaN-finding runs with the command `run -f has_inf_or_nan -fenn .*Sqrt.*`.
+**A**: 使用 `--filter_exclude_node_names` （简称 `-fenn`）标志位。例如，如果你知道有一个节点的名称与正则表达式 `.*Sqrt.*` 匹配，为了将节点改成不会生成无穷大或 NANs,而不管模型的行为是否正确，则可使用命令 `run -f has_inf_or_nan -fenn .*Sqrt.*` 将节点排除在无穷大/NAN 运行中。 
 
 **Q**: 为什么无法在 tfdbg CLI 中选择文本？
 
@@ -603,6 +603,6 @@ sess.run(b)
 
 则不会发生常数折叠，tfdbg 应该是会显示转储的中间张量的。
 
-**Q**: Is there a GUI for tfdbg?[需要翻译]
+**Q**: 有用于 tfdbg 的 GUI 吗？
 
-**A**: Yes, the **TensorBoard Debugger Plugin** is the GUI of tfdbg. It offers features such as inspection of the computation graph, real-time visualization of tensor values, continuation to tensor and conditional breakpoints, and tying tensors to their graph-construction source code, all in the browser environment. To get started, please visit [its README](https://github.com/tensorflow/tensorboard/blob/master/tensorboard/plugins/debugger/README.md).
+**A**: 有。**TensorBoard 调试插件**是 tfdbg 的 GUI。它提供了计算图的检查，张量值的实时可视化，张量和条件断点的延续，以及张量和条件断点绑定到它们的图构造源代码中，所有这些都在浏览器环境中。想要开始尝试，请访[它的 README](https://github.com/tensorflow/tensorboard/blob/master/tensorboard/plugins/debugger/README.md)。
