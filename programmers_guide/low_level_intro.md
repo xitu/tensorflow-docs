@@ -225,7 +225,7 @@ while True:
     break
 ```
 
-[需要翻译]If the `Dataset` depends on stateful operations you may need to initialize the iterator before using it, as shown below:
+如果 `Dataset` 依赖于有状态操作，那么使用它之前，你可能需要初始化迭代器，如下所示：
 
 ``` python
 r = tf.random_normal([10,3])
