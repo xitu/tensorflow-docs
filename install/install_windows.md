@@ -19,7 +19,7 @@
 - CUDA® Toolkit 9.0。详细说明请查看[ NVIDIA 官方文档](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/)。请确保您已按照 NVIDIA 官方文档描述将相关的 Cuda 路径名称添加到 %PATH% 环境变量中。
 - 与 CUDA Toolkit 9.0 相关的 NVIDIA 驱动。
 - cuDNN v7.0 版本。详细说明请查看[ NVIDIA 官方文档](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/)。需要注意的是，一般而言，cuDNN 的安装地址和其他 CUDA DLL 是不同的。同时，请确保将安装 cuDNN DLL 的目录添加到 %PATH% 环境变量中。
-- 支持 CUDA Compute Capability 3.0 或更高版本的 GPU 卡，可用从源码构建或 3.5 或更高版本的二进制文件。请在 [NVIDIA 官方文档]（http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/) 中查询具备条件的 GPU 清单。
+- 支持 CUDA Compute Capability 3.0 或更高版本的 GPU 卡，可用从源码构建或 3.5 或更高版本的二进制文件。请在 [NVIDIA 官方文档](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/) 中查询具备条件的 GPU 清单。
 
 如果您使用的版本与上述要求不一致，请更新为规定的版本。特别说明的是，cuDNN 的版本必须与要求的一致：如果无法找到 cuDNN64_7.dll，那么 TensorFlow 将无法加载。如果您想使用其他版本的 cuDNN，您需要从源代码开始重新编译。
 
@@ -56,7 +56,7 @@
 
 在 Anaconda 的环境下，按照以下步骤进行 TensorFlow 的安装：
 
-1.根据网页 [Anaconda 下载站点]（https://www.anaconda.com/download/）说明下载并安装 Anaconda。 
+1.根据网页 [Anaconda 下载站点](https://www.anaconda.com/download/)说明下载并安装 Anaconda。 
 2.请通过使用以下命令来创建一个名为 tensorflow 的 conda 环境：
 
 `C:\> conda create -n tensorflow pip python=3.5`

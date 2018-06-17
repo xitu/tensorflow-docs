@@ -1,35 +1,15 @@
-# Swift Community
+# Swift 社区
 
-Welcome to the Swift for TensorFlow development community!
+欢迎来到 TensorFlow Swift 开发者社区！
 
-Swift for TensorFlow is a result of first-principles thinking applied to machine
-learning frameworks, and works quite differently than existing TensorFlow
-language bindings.  Whereas prior solutions are designed within the constraints
-of what can be achieved by a (typically Python or Lua) library, Swift for
-TensorFlow is based on the belief that machine learning is important enough to
-deserve first-class language and compiler support.
+TensorFlow 的 Swift 版本是机器学习框架在受到第一原则思想下产生的成果，它的运作方式和已有的 TensorFlow 语言绑定方式十分不同。而框架的早期解决方案，哪些功能可以被已有的库实现（一般都是 Python 或者 Lua 的库）往往限制了框架的设计方式，而 TensorFlow 的 Swift 版本相信机器学习很重要而值得支持一线主流的语言和编译器。
 
-First-class language and compiler support allows us to innovate in areas that
-have traditionally been out of bounds for machine learning libraries.  Our
-results provide the performance of TensorFlow graphs with the ease of use of
-define-by-run models, and provides a great user experience - for example, by
-catching more mistakes before you run your code.
+主流的语言和编译器支持允许我们在机器学库上超越传统的领域进行创新。我们的成果提供了 TensorFlow graphs 同级别的性能，和使用运行时定义模型带来的便利，并且提供了非常好的用户体验 — 例如，你的代码在运行前就可以捕获更多的错误。
 
-## Open Source
+## 开源项目
 
-As announced at the TensorFlow Developer Summit, we are planning to launch our
-open source project on GitHub in April.  In addition to releasing the code, we
-will be using an open design model, where design discussions happen in public.
+就像我们在 TensorFlow 开发者大会上公布的那样，我们计划在四月份把我们的开源项目放在 Github 上。除了开源发行的代码，我们使用的模型也是公开设计的，这些模型都是在社区公开讨论阶段设计的。
 
-Between now and then, we are writing some technical white papers that explain in
-detail the design approach (e.g., the core compiler partitioning technique that
-underlies the whole thing, our approach to automatic differentiation, etc.),
-implementation tradeoffs, and the status of this work.  We can’t wait to engage
-with the broader community, but prefer to start the conversation when these
-white papers are ready.
+在不远的将来，我们将要写一些技术的白皮书来解释一些含框架设计方法的细节（例如：代表了整个框架基础的编译器的核心分区技术，自动分类的方法等等），和代码实现时的权衡，以及目前项目的工作状态。我们很迫不及待想要和更多不同的社区一起协作，但是在这些白皮书准备好之前我们更希望先和大家讨论起来。
 
-[Sign up here to join the community Google
-group](https://groups.google.com/a/tensorflow.org/d/forum/swift). We will
-initially use it for announcements, and then open it for general discussion when
-we are ready in April.
-
+[加入 Google group 社区请在这里注册](https://groups.google.com/a/tensorflow.org/d/forum/swift)。我们最初会先靠这个社区来做公告，等我们四月份一切都准备好的时候，会把社区开放来当做一个综合讨论的社区。
