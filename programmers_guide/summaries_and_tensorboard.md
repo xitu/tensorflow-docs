@@ -5,15 +5,15 @@ Tensorflow 做的一些计算是复杂和混乱，就像训练深度神经网络
 ![](https://camo.githubusercontent.com/f0f03739a6b2a0e312f929759fab857856b7cf0c/68747470733a2f2f7777772e74656e736f72666c6f772e6f72672f696d616765732f6d6e6973745f74656e736f72626f6172642e706e67)
 
 
-[需要翻译]This 30-minute tutorial is intended to get you started with simple TensorBoard usage. It assumes a basic understanding of TensorFlow.
+这个只有 30 分钟的教程旨在让你可以通过简单的 TensorBoard 用法入门。我们假设你对于 TensorFlow 已经有了一定的基础。
 
-There are other resources available as well! The [TensorBoard GitHub](https://github.com/tensorflow/tensorboard) has a lot more information on using individual dashboards within TensorBoard including tips & tricks and debugging information.
+当然还有其他可用的资源！[TensorBoard GitHub](https://github.com/tensorflow/tensorboard) 有更多关于在 TensorBoard 中使用单个面板所需要的信息，包括提示、技巧和调试信息。
 
-## Setup
+## 准备
 
-[Install TensorFlow](https://www.tensorflow.org/install/). Installing TensorFlow via pip should also automatically install TensorBoard.
+[安装 TensorFlow](https://www.tensorflow.org/install/)。通过 pip 方式安装 TensorFlow 时，会自动安装 TensorBoard。
 
-##数据序列化
+## 数据序列化
 
 TensorBoard 是通过读取 Tensorflow 事件文件来操作的，Tensorflow 事件包含 Tensorflow 运行所生成的汇总数据。下面是 TensorBoard 汇总数据的完整生命周期。
 
