@@ -1,16 +1,16 @@
 # 保存和恢复
 
-[需要翻译]The @{tf.train.Saver} class provides methods to save and restore models. The @{tf.saved_model.simple_save} function is an easy way to build a @{tf.saved_model$saved model} suitable for serving. [Estimators](@{$programmers_guide/estimators}) automatically save and restore variables in the `model_dir`.
+@{tf.train.Saver} 类提供保存和恢复模型的方法。@{tf.saved_model.simple_save} 函数是构建适配服务于 @{tf.saved_model$saved model} 的简单方法。 [Estimators](@{$programmers_guide/estimators}) 自动保存和恢复在 `model_dir` 中的变量。
 
 ## 保存和恢复变量
 
-[需要翻译]TensorFlow @{$variables} are the best way to represent shared, persistent state manipulated by your program. The `tf.train.Saver` constructor adds `save` and `restore` ops to the graph for all, or a specified list, of the variables in the graph. The `Saver` object provides methods to run these ops, specifying paths for the checkpoint files to write to or read from.
+TensorFlow @{$variables} 是表示程序操作的共享、持久状态的最佳方法。在图中的所有变量或指定变量列表中 `tf.train.Saver` 构造器将 `save` 和 `restore` ops 添加到图中的所有变量或指定的列表中。`Saver` 对象提供了运行这些操作的方法，指定了要写入或读取的检查点文件的路径。
 
-`Saver` restores all variables already defined in your model. If you're loading a model without knowing how to build its graph (for example, if you're writing a generic program to load models), then read the [Overview of saving and restoring models](#models) section later in this document.
+`Saver` 会恢复所有已经在你的模型中定义了的变量。如果你在加载一个模型，而且不知道如何构建它的图（例如，如果你在编写一个通用程序来加载模型），那么请阅读本文档后面的[保存和恢复概述](#models)章节。
  
-TensorFlow saves variables in binary *checkpoint files* that map variable names to tensor values.
+TensorFlow 将变量保存在二进制文件 *checkpoint files*，这些文件将变量名映射到张量值。
  
-Caution: TensorFlow model files are code. Be careful with untrusted code. See [Using TensorFlow Securely](https://github.com/tensorflow/tensorflow/blob/master/SECURITY.md) for details.
+ 注意：TensorFlow 模型文件是代码。注意那些不受信任的代码。更多细节，请参阅[安全使用 TensorFlow](https://github.com/tensorflow/tensorflow/blob/master/SECURITY.md)。
 
 ### 保存变量
 
@@ -65,7 +65,7 @@ with tf.Session() as sess:
   print("v2 : %s" % v2.eval())
 ```
 
-[需要翻译]Note: There is not a physical file called `/tmp/model.ckpt`. It is the **prefix** of filenames created for the checkpoint. Users only interact with the prefix instead of physical checkpoint files.
+注意：没有一个名为 `/tmp/model.ckpt` 的物理文件夹。它是为检查点创建的文件名的 **prefix**。用户只与前缀交互，而不与物理检查点文件交互。
 
 ### 选择需要保存和恢复的变量
 
@@ -148,13 +148,13 @@ chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='v2', all_t
 <a name="models"></a>
 ## 保存和恢复模型
 
-[需要翻译]Use `SavedModel` to save and load your model—variables, the graph, and the graph's metadata. This is a language-neutral, recoverable, hermetic serialization format that enables higher-level systems and tools to produce, consume, and transform TensorFlow models. TensorFlow provides several ways to interact with `SavedModel`, including the @{tf.saved_model} APIs, @{tf.estimator.Estimator}, and a command-line interface.
+使用 `SavedModel` 来保存和加载模型-变量、图和图的元数据。这是一种语言中立的、可恢复的、封闭的序列化格式，允许更高级别的系统和工具生成、使用和转换 TensorFlow 模型。TensorFlow 提供了几种与 `SavedModel` 交互的方法，包括 @{tf.saved_model} APIs 和 @{tf.estimator.Estimator}，以及命令行接口。
 
 ## 创建并加载一个 SavedModel
 
-### Simple save[需要翻译]
+### 简单保存
 
-The easiest way to create a `SavedModel` is to use the @{tf.saved_model.simple_save} function:
+创建 `SavedModel` 的最简单的方法是使用 @{tf.saved_model.simple_save} 函数：
 
 ```python
 simple_save(session,
@@ -163,14 +163,14 @@ simple_save(session,
             outputs={"z": z})
 ```
 
-This configures the `SavedModel` so it can be loaded by [TensorFlow serving](/serving/serving_basic) and supports the [Predict API](https://github.com/tensorflow/serving/blob/master/tensorflow_serving/apis/predict.proto). To access the classify, regress, or multi-inference APIs, use the manual `SavedModel` builder APIs or an @{tf.estimator.Estimator}.
+这配置了 `SavedModel`，促使它可以由 [TensorFlow serving](/serving/serving_basic) 进行加载，而且支持 [Predict API](https://github.com/tensorflow/serving/blob/master/tensorflow_serving/apis/predict.proto)。想要访问分类、回归或多推理 API，可以使用手动的  `SavedModel` 构建器 API 或 @{tf.estimator.Estimator}。
 
-### Manually build a SavedModel
+### 手动构建一个保存模型
 
-If your use case isn't covered by @{tf.saved_model.simple_save}, use the manual
-@{tf.saved_model.builder$builder APIs} to create a `SavedModel`.
+如果你的用例没有包含在 @{tf.saved_model.simple_save} 中，请使用手动
+@{tf.saved_model.builder$builder APIs} 来创建一个 `SavedModel`。
 
-The @{tf.saved_model.builder.SavedModelBuilder} class provides functionality to save multiple `MetaGraphDef`s.  A **MetaGraph** is a dataflow graph, plus its associated variables, assets, and signatures.  A **`MetaGraphDef`** is the protocol buffer representation of a MetaGraph.  A **signature** is the set of inputs to and outputs from a graph.
+@{tf.saved_model.builder.SavedModelBuilder} 类提供了保存多个 `MetaGraphDef` 的功能。**MetaGraph** 是一个数据流图，加上它的相关变量、资产和签名。**`MetaGraphDef`** 是元图的协议缓冲区表示。**signature** 是图的输入和输出的集合。
 
 如果需要将资源保存、写入或拷贝到磁盘，那么可以在添加第一个 `MetaGraphDef` 时提供这些资源。如果多个 `MetaGraphDef` 与同名资源相关联，则仅保留第一个版本。
 
