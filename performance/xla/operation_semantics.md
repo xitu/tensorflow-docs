@@ -765,10 +765,10 @@ XLA 收集操作将一个输入张量的几个片（每个片在一个可能不�
 |`operand`         | `ComputationDataHandle` | 我们收集的张量。|
 |`gather_indices`  | `ComputationDataHandle` | 张量，包含切片的起始指数，我们将它们拼接输出到张量中。|
 |`index_vector_dim`  | `int64`               | 包含起始索引 `gather_indices` 中的维度。 |
-|`output_window_dims` | `ArraySlice<int64>`  | The set of dimensions in the  output shape that are _window dimensions_ (defined below). Not all window dimensions may be present in the output shape. |
-|`elided_window_dims` | `ArraySlice<int64>`  | The set of _window dimensions_ that are not present in the output shape. `window_bounds[i]` must be `1` for all `i` in `elided_window_dims`. |
-|`window_bounds`   | `ArraySlice<int64>`    | `window_bounds[i]` is the bounds for  window dimension `i`. This includes both the window dimensions that are explicitly part of the output shape (via `output_window_dims`) and the window dimensions that are elided (via `elided_window_dims`).|
-|`gather_dims_to_operand_dims` | `ArraySlice<int64>` | A dimension map (the array is interpreted as mapping `i` to `gather_dims_to_operand_dims[i]`)  from the gather indices in `gather_indices` to the operand index space.  It has to be one-to-one and total. |
+|`output_window_dims` | `ArraySlice<int64>`  | 输出形状中的一组维度，即 **windows 维度**（定义如下）。并非所有窗口维度都可能出现在输出形状中。 |
+|`elided_window_dims` | `ArraySlice<int64>`  | 不存在于输出形状中的 **window dimensions**。对于 `elided_window_dims` 中的所有 `i`，`window_bounds[i]` 必须是 `1`。 |
+|`window_bounds`   | `ArraySlice<int64>`    | `window_bounds[i]` 是窗口维度 `i` 的边界。这包括显式地作为输出形状的一部分的窗口尺寸（通过 `output_window_dims`）和被省略的窗口维度（通过 `elided_window_dims`）。|
+|`gather_dims_to_operand_dims` | `ArraySlice<int64>` | 从  `gather_indices` 中的聚集索引到操作数索引的维度映射（数组被解释为将 `i` 映射为到 `gather_dims_to_operand_dims[i]`）。它必须是一对一和全部的。 |
 
 对于输出张量中的每一个索引 `Out`，我们计算两件事（之后进行更精确的描述）：
 
@@ -778,35 +778,35 @@ XLA 收集操作将一个输入张量的几个片（每个片在一个可能不�
 
  **window index** 是 **operand slice** 中元素的相对索引，它应该出现在索引 `Out` 中。
 
-The output is a tensor of rank `output_window_dims.size` + `gather_indices.rank` - `1`.  Additionally, as a shorthand, we define `output_gather_dims` of type `ArraySlice<int64>` as the set of dimensions in the output shape but not in `output_window_dims`, in ascending order.  E.g. if the output tensor has rank `5`, `output_window_dims` is {`2`, `4`} then `output_gather_dims` is {`0`, `1`, `3`}
+输出是等级 `output_window_dims.size` + `gather_indices.rank` - `1` 的张量。此外，作为简写，我们将 `ArraySlice<int64>`  类型的 `output_gather_dims` 定义为输出形状中的维度集合，而不是 `output_window_dims` 中的维度按照升序排列。例如，如果输出张量具有等级 `5`，则  `output_window_dims` 是 {`2`, `4`}，那么 `output_gather_dims` 是 {`0`, `1`, `3`}。
 
-If `index_vector_dim` is equal to `gather_indices.rank` we implicitly consider `gather_indices` to have a trailing `1` dimension (i.e. if `gather_indices` was of shape `[6,7]` and `index_vector_dim` is `2` then we implicitly consider the shape of `gather_indices` to be `[6,7,1]`).
+如果 `index_vector_dim` 和 `gather_indices.rank` 相等，我们隐式地认为 `gather_indices` 具有尾随的 `1` 维（即，如果 `gather_indices` 是形状 `[6,7]` 而且 `index_vector_dim` 是 `2`，那么我们隐式地认为 `gather_indices` 的形状为 `[6,7,1]`）。
 
 输出张量沿维数 `i` 的边界计算如下：
 
-  1. If `i` is present in `output_gather_dims` (i.e. is equal to `output_gather_dims[k]` for some `k`) then we pick the corresponding dimension bounds out of `gather_indices.shape`, skipping `index_vector_dim` (i.e. pick `gather_indices.shape.dims`[`k`] if `k` < `index_vector_dim` and `gather_indices.shape.dims`[`k`+`1`] otherwise).
-  2. If `i` is present in `output_window_dims` (i.e. equal to `output_window_dims`[`k`] for some `k`) then we pick the corresponding bound out of `window_bounds` after accounting for `elided_window_dims` (i.e. we pick `adjusted_window_bounds`[`k`] where `adjusted_window_bounds` is `window_bounds` with the bounds at indices `elided_window_dims` removed).
+  1. 如果 `i` 存在于 `output_gather_dims`（例如，对于某些 `k` 来说，等于 `output_gather_dims[k]`），那么我们从 `gather_indices.shape` 中选取相应的维度边界，跳过 `index_vector_dim`（例如，如果 `k` < `index_vector_dim` 和 `gather_indices.shape.dims`[`k`+`1`]，则选择`gather_indices.shape.dims`[`k`]，否则不选）。
+  2. 如果 `i` 存在于 `output_window_dims`（例如，对于某些 `k` 来说，等于 `output_window_dims`[`k`]），那么我们在计算 `elided_window_dims` 之后，就从 `window_bounds` 中选出相应的边界（即我们选择 `adjusted_window_bounds`[`k`]，其中 `adjusted_window_bounds` 为 `window_bounds`，删除索引 `elided_window_dims` 处的边界）。
 
 与 `Out` 索引对应的操作数索引 `In` 的计算如下：
 
-  1. Let `G` = { `Out`[`k`] for `k` in `output_gather_dims` }.  Use `G` to slice out vector `S` such that `S`[`i`] = `gather_indices`[Combine(`G`, `i`)] where Combine(A, b) inserts b at position `index_vector_dim` into A. Note that this is well defined even if `G` is empty -- if `G` is empty then `S` = `gather_indices`.
-  2. Create an index, `S`<sub>`in`</sub>, into `operand` using `S` by scattering `S` using the `gather_dims_to_operand_dims` map (`S`<sub>`in`</sub> is the starting indices for _operand slice_ mentioned above).  More precisely:
+  1. Let `G` = { `Out`[`k`] for `k` in `output_gather_dims` }。使用 `G` 将向量 `S` 切片，以便 `S`[`i`] = `gather_indices`[Combine(`G`, `i`)]，将 (A, b) 插入位置为 `index_vector_dim` 的 b 插入到 A 中。注意，这个定义很好，如果 `G` 为空 —— 即，如果 if `G` 为空，则 `S` = `gather_indices`。
+  2. 创建一个索引， `S`<sub>`in`</sub>, into `operand` 通过使用 `gather_dims_to_operand_dims` 映射（`S`<sub>`in`</sub> 是上述提到的 **operand slice**起始索引）来将 `S` 散射成 `S`。 更确切地说：
        1. `S`<sub>`in`</sub>[`gather_dims_to_operand_dims`[`k`]] = `S`[`k`] if `k` < `gather_dims_to_operand_dims.size`.
        2. `S`<sub>`in`</sub>[`_`] = `0` otherwise.
-  3. Create an index `W`<sub>`in`</sub> into `operand` by scattering the indices at the output window dimensions in `Out` according to the `elided_window_dims` set (`W`<sub>`in`</sub> is the _window index_ mentioned above).  More precisely:
-       1. `W`<sub>`in`</sub>[`window_dims_to_operand_dims`(`k`)] = `Out`[`k`] if `k` < `output_window_dims.size` (`window_dims_to_operand_dims` is defined below).
-       2. `W`<sub>`in`</sub>[`_`] = `0` otherwise.
-  4. `In` is `W`<sub>`in`</sub> + `S`<sub>`in`</sub> where + is element-wise addition.
+  3. 创建一个索引 `W`<sub>`in`</sub> into `operand` 通过将指数分散到 `Out` 中的输出窗口维度，按照 `elided_window_dims` 集合 （`W`<sub>`in`</sub> 是上述提及的 **window index**）。更确切地说：
+       1. `W`<sub>`在 `</sub>[`window_dims_to_operand_dims`(`k`)] = `Out`[`k`] if `k` < `output_window_dims.size` （`window_dims_to_operand_dims` 有如下定义）。
+       2. 另外 `W`<sub>` 在 `</sub>[`_`] = `0`。
+  4. `In` 是 `W`<sub>`in`</sub> + `S`<sub>`in`</sub>，是元素级加法。
 
-`window_dims_to_operand_dims` is the monotonic function with domain [`0`, `output_window_dims.size`) and range [`0`, `operand.rank`) \ `elided_window_dims`.  So if, e.g., `output_window_dims.size` is `4`, `operand.rank` is `6` and `elided_window_dims` is {`0`, `2`} then `window_dims_to_operand_dims` is {`0`→`1`, `1`→`3`, `2`→`4`, `3`→`5`}.
+`window_dims_to_operand_dims` 是域 [`0`, `output_window_dims.size`] 和范围 [`0`, `operand.rank`] \ `elided_window_dims` 的单调函数。因此，如果 `output_window_dims.size` 是 `4`，`operand.rank` 为 `6` 并且 `elided_window_dims` 为 {`0`, `2`} 那么 `window_dims_to_operand_dims` 就是 {`0`→`1`, `1`→`3`, `2`→`4`, `3`→`5`}。
 
 ### 非正式说明和实例
 
-`index_vector_dim` is set to `gather_indices.rank` - `1` in all of the examples that follow.  More interesting values for `index_vector_dim` does not change the operation fundamentally, but makes the visual representation more cumbersome.
+在下面的所有示例中，`index_vector_dim` 被设置为 `gather_indices.rank` - `1`。`index_vector_dim` 的更有趣的值不会从根本上改变操作，但会使视觉表示更加繁琐。
 
-To get an intuition on how all of the above fits together, let's look at an example that gathers 5 slices of shape `[8,6]` from a `[16,11]` tensor.  The position of a slice into the `[16,11]` tensor can be represented as an index vector of shape `S64[2]`, so the set of 5 positions can be represented as a `S64[5,2]` tensor.
+为了直观地了解所有上述情况如何结合在一起，我们来看一个例子，它从一个 `[16,11]` 张量中收集 5 片形状为 `[8,6]` 的张量。切片到 `[16,11]` 张量中的位置可以表示为形状为 `S64[2]` 的索引向量，所有以 5 个位置的集合可以表示 `S64[5,2]` 张量。
 
-集合操作的行为可以被描述为一个索引转换，采用 [`G`,`W`<sub>`0`</sub>,`W`<sub>`1`</sub>]， an index in the output shape, and maps it to an element in the input tensor in the following way:
+集合操作的行为可以被描述为一个索引转换，采用 [`G`,`W`<sub>`0`</sub>,`W`<sub>`1`</sub>]输出形状中的索引，并按以下方式将其映射到输入张量中的元素：
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="../../images/ops_xla_gather_0.svg">
