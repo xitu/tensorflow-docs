@@ -148,7 +148,7 @@ chkp.print_tensors_in_checkpoint_file("/tmp/model.ckpt", tensor_name='v2', all_t
 <a name="models"></a>
 ## 保存和恢复模型
 
-使用 `SavedModel` 来保存和加载模型-变量、图和图的元数据。这是一种语言中立的、可恢复的、封闭的序列化格式，允许更高级别的系统和工具生成、使用和转换 TensorFlow 模型。TensorFlow 提供了几种与 `SavedModel` 交互的方法，包括 @{tf.saved_model} APIs 和 @{tf.estimator.Estimator}，以及命令行接口。
+使用 `SavedModel` 来保存和加载模型 — 变量、图和图的元数据。这是一种语言中立的、可恢复的、封闭的序列化格式，允许更高级别的系统和工具生成、使用和转换 TensorFlow 模型。TensorFlow 提供了几种与 `SavedModel` 交互的方法，包括 @{tf.saved_model} APIs 和 @{tf.estimator.Estimator}，以及命令行接口。
 
 ## 创建并加载一个 SavedModel
 
