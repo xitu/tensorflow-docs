@@ -4,11 +4,11 @@
 
 [TOC]
 
-`tfdbg` 是 TensorFlow 的专用调试器。由于 TensorFlow 的计算-图形使用常规调试器难以调试，例如 Python 的 `pdb`，因此它允许你在训练和推断的i过程中查看运行 TensorFlow 图的内部结构和状态。
+`tfdbg` 是 TensorFlow 的专用调试器。由于 TensorFlow 的计算 — 图形使用常规调试器难以调试，例如 Python 的 `pdb`，因此它允许你在训练和推断的 i 过程中查看运行 TensorFlow 图的内部结构和状态。
 
 本指南重点关注 `tfdbg` 的命令行接口（CLI）。关于如何使用 tfdbg 的图形化用户界面（GUI），**TensorBoard 调试插件**，请查询[它的 README](https://github.com/tensorflow/tensorboard/blob/master/tensorboard/plugins/debugger/README.md)。
 
-注意：TensorFlow 调试器使用 [curses](https://en.wikipedia.org/wiki/Curses_\(programming_library\)) —— 基于文本用户界面。在 Mac OS X 上， `ncurses` 库是必需的，可以用 `brew install homebrew/dupes/ncurses` 进行安装。Windows 对 curses 支持性并不好，因此可以使用基于接口的 [readline](https://en.wikipedia.org/wiki/GNU_Readline)，用 `pip` 安装 `pyreadline` 来使用 tfdbg。如果你使用 Anaconda3，你可以使用  `"C:\Program Files\Anaconda3\Scripts\pip.exe" install pyreadline` 这样的命令来安装它。 非官方的 Windwos curses 包可以在[这里](https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses)下载，然后用 `pip install <your_version>.whl` 安装。但是 curses 在 Windows 上可能无法像它在 Linux 和 Mac 上一样可靠地运行。
+注意：TensorFlow 调试器使用 [curses](https://en.wikipedia.org/wiki/Curses_\(programming_library\)) —— 基于文本用户界面。在 Mac OS X 上， `ncurses` 库是必需的，可以用 `brew install homebrew/dupes/ncurses` 进行安装。Windows 对 curses 支持性并不好，因此可以使用基于接口的 [readline](https://en.wikipedia.org/wiki/GNU_Readline)，用 `pip` 安装 `pyreadline` 来使用 tfdbg。如果你使用 Anaconda3，你可以使用 `"C:\Program Files\Anaconda3\Scripts\pip.exe" install pyreadline` 这样的命令来安装它。非官方的 Windwos curses 包可以在[这里](https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses)下载，然后用 `pip install <your_version>.whl` 安装。但是 curses 在 Windows 上可能无法像它在 Linux 和 Mac 上一样可靠地运行。
 
 本教程演示了如何使用 tfdbg 命令行界面（CLI）来调试 [`nan`s](https://en.wikipedia.org/wiki/NaN) 和 [`inf`s](https://en.wikipedia.org/wiki/Infinity) 错误，这是 TensorFlow 模型开发中经常遇到的错误类型。 以下示例适用于使用 TensorFlow 的底层 [`Session`](https://www.tensorflow.org/api_docs/python/tf/Session) API 的用户。 本文档的后续部分描述了如何在更高层次的 API（即 `tf-learn` 中的 `Estimator` 和 `Experiment`）中来使用 tfdbg。要**观察**这个问题，请运行以下命令而不使用调试器（源代码可以在[这里](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/debug/examples/debug_mnist.py)可找到）
 
@@ -81,7 +81,7 @@ tfdbg> run
 
 ![tfdbg run-end UI: accuracy](https://www.tensorflow.org/images/tfdbg_screenshot_run_end_accuracy.png)
 
-在执行​​运行完 `run` 之后，也可以通过运行命令 `lt` 获得张量列表。
+在执行运行完 `run` 之后，也可以通过运行命令 `lt` 获得张量列表。
 
 ### tfdbg CLI 常用的命令
 
@@ -495,16 +495,16 @@ python -m tensorflow.python.debug.cli.offline_analyzer \
 
 ## 常见问题
 
-**Q**: 执行 `lt` 命令输出内容时，其左侧的时间戳可以反映非调试情况下 Session 中的实际性能吗？
+**Q**：执行 `lt` 命令输出内容时，其左侧的时间戳可以反映非调试情况下 Session 中的实际性能吗？
 
-**A**: 不可以的，调试器将附加的专用调试结点插入计算图中以记录中间张量的值。这些结点会减慢计算图的执行。 如果您对分析您模型的性能感兴趣，请参考下列方法
+**A**：不可以的，调试器将附加的专用调试结点插入计算图中以记录中间张量的值。这些结点会减慢计算图的执行。 如果您对分析您模型的性能感兴趣，请参考下列方法
 
    1. tfdbg 的性能分析模式：`tfdbg> run -p`。
    2. [tfprof](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/core/profiler) 和其他的 TensorFlow 性能分析工具。
 
-**Q**: 如何在 Bazel 中将 tfdbg 与我的 `Session` 链接？ 为什么会看到诸如 “ImportError：cannot import name debug” 之类的错误？
+**Q**：如何在 Bazel 中将 tfdbg 与我的 `Session` 链接？ 为什么会看到诸如 “ImportError：cannot import name debug” 之类的错误？
 
-**A**: 在您编译构建（BUILD）的规则中，声明依赖关系：“/ tensorflow：tensorflow_py” 和 “// tensorflow / python / debug：debug_py” 。 其中，第一个依赖是您使用 TensorFlow 即使没有调试器支持的依赖关系；第二个依赖是用来启用调试器的。 然后，在你的 Python 文件中，添加下面的代码：
+**A**：在您编译构建（BUILD）的规则中，声明依赖关系：“/ tensorflow：tensorflow_py” 和 “// tensorflow / python / debug：debug_py” 。 其中，第一个依赖是您使用 TensorFlow 即使没有调试器支持的依赖关系；第二个依赖是用来启用调试器的。 然后，在你的 Python 文件中，添加下面的代码：
 
 ```python
 from tensorflow.python import debug as tf_debug
@@ -513,9 +513,9 @@ from tensorflow.python import debug as tf_debug
 sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 ```
 
-**Q**: tfdbg 是否可以帮助调试运行时的错误，如形状不匹配？
+**Q**：tfdbg 是否可以帮助调试运行时的错误，如形状不匹配？
 
-**A**: 是的。 tfdbg 拦截运行时由操作生成的错误，并在命令行界面中向用户显示带有一些调试指令的错误。参见示例：
+**A**：是的。 tfdbg 拦截运行时由操作生成的错误，并在命令行界面中向用户显示带有一些调试指令的错误。参见示例：
 
 ```none
 # 调试矩阵乘法中的形状不匹配
@@ -527,9 +527,9 @@ python -m tensorflow.python.debug.examples.debug_errors \
     --error uninitialized_variable --debug
 ```
 
-**Q**: 如何让 tfdbg 包装的 Sessions 或钩子仅对主线程进行调试呢？
+**Q**：如何让 tfdbg 包装的 Sessions 或钩子仅对主线程进行调试呢？
 
-**A**: 这是一个常见的用例，其中 Session 对象同时从多个线程使用。 通常来说，子线程处理后台任务，例如执行入队操作。这时，您一般只想调试主线程（或者只是一个子线程）。 你可以使用 `LocalCLIDebugWrapperSession` 中的 `thread_name_filter` 参数来实现线程选择性调试。 例如，想要只调试主线程，构造一个包装的会话，如下所示：
+**A**：这是一个常见的用例，其中 Session 对象同时从多个线程使用。 通常来说，子线程处理后台任务，例如执行入队操作。这时，您一般只想调试主线程（或者只是一个子线程）。 你可以使用 `LocalCLIDebugWrapperSession` 中的 `thread_name_filter` 参数来实现线程选择性调试。 例如，想要只调试主线程，构造一个包装的会话，如下所示：
 
 ```python
 sess = tf_debug.LocalCLIDebugWrapperSession(sess, thread_name_filter="MainThread$")
@@ -537,9 +537,9 @@ sess = tf_debug.LocalCLIDebugWrapperSession(sess, thread_name_filter="MainThread
 
 上述示例依赖于一个事实，即 Python 主线程的默认名称为 `MainThread`。
 
-**Q**: 我正在调试的模型非常大。 tfdbg 转储的数据填满了我磁盘空闲的空间。 我该怎么办？
+**Q**：我正在调试的模型非常大。 tfdbg 转储的数据填满了我磁盘空闲的空间。 我该怎么办？
 
-**A**:
+**A**：
 在以下情况下，您可能会遇到此问题：
 
 *   具有许多中间张量的模型
@@ -570,15 +570,15 @@ hooks = [tf_debug.LocalCLIDebugHook(dump_root="/with/lots/of/space")]
    
    上面的第一个命令仅监视其名称与正则表达式模式（`.*hidden.*`）匹配的结点。 第二个命令只监视名称与模式（`Variable.*`）匹配的操作结点。第三个只监视 `dtype` 与模式（`int.*`）匹配的张量（例如，int32）。
 
-**Q**: 我正在调试一个生产了不必要的无穷大或 NAN 的模型。即使在完全正常的条件下，也会在它们的输出张量中生成无穷大或 NANs。我如何在运行 `run -f has_inf_or_nan` 时跳过那些节点？
+**Q**：我正在调试一个生产了不必要的无穷大或 NAN 的模型。即使在完全正常的条件下，也会在它们的输出张量中生成无穷大或 NANs。我如何在运行 `run -f has_inf_or_nan` 时跳过那些节点？
 
-**A**: 使用 `--filter_exclude_node_names` （简称 `-fenn`）标志位。例如，如果你知道有一个节点的名称与正则表达式 `.*Sqrt.*` 匹配，为了将节点改成不会生成无穷大或 NANs,而不管模型的行为是否正确，则可使用命令 `run -f has_inf_or_nan -fenn .*Sqrt.*` 将节点排除在无穷大/NAN 运行中。 
+**A**：使用 `--filter_exclude_node_names`（简称 `-fenn`）标志位。例如，如果你知道有一个节点的名称与正则表达式 `.*Sqrt.*` 匹配，为了将节点改成不会生成无穷大或 NANs,而不管模型的行为是否正确，则可使用命令 `run -f has_inf_or_nan -fenn .*Sqrt.*` 将节点排除在无穷大/NAN 运行中。 
 
-**Q**: 为什么无法在 tfdbg CLI 中选择文本？
+**Q**：为什么无法在 tfdbg CLI 中选择文本？
 
-**A**: 这是因为 tfdbg CLI 默认启用终端中的鼠标事件。 这种[鼠标掩码](https://linux.die.net/man/3/mousemask)模式覆盖了默认终端交互过程，包括文本选择。您可以使用命令 `mouse off` 或 `m off` 重新启用文本选择。
+**A**：这是因为 tfdbg CLI 默认启用终端中的鼠标事件。 这种[鼠标掩码](https://linux.die.net/man/3/mousemask)模式覆盖了默认终端交互过程，包括文本选择。您可以使用命令 `mouse off` 或 `m off` 重新启用文本选择。
 
-**Q**: 为什么当我调试如下代码时，tfdbg CLI 没有显示转储张量？
+**Q**：为什么当我调试如下代码时，tfdbg CLI 没有显示转储张量？
 
 ``` python
 a = tf.ones([10], name="a")
@@ -588,7 +588,7 @@ sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 sess.run(b)
 ```
 
-**A**: 您看到没有数据转储的原因是因为执行的 TensorFlow 图中的每个节点都被 TensorFlow 运行时常数折叠起来了。 在这个示例中，`a` 是一个常数张量；而且，获取的张量 `b` 实际上也是一个常数张量。 因此，TensorFlow 为了优化图的运行性能，会将 `a` 和 `b` 折叠到一个结点上去。这也是为什么 `tfdbg` 不会产生任何中间张量转储数据的原因。但是，如果 `a` 是一个 @{tf.Variable} 的话，如下例子所示：
+**A**：您看到没有数据转储的原因是因为执行的 TensorFlow 图中的每个节点都被 TensorFlow 运行时常数折叠起来了。 在这个示例中，`a` 是一个常数张量；而且，获取的张量 `b` 实际上也是一个常数张量。 因此，TensorFlow 为了优化图的运行性能，会将 `a` 和 `b` 折叠到一个结点上去。这也是为什么 `tfdbg` 不会产生任何中间张量转储数据的原因。但是，如果 `a` 是一个 @{tf.Variable} 的话，如下例子所示：
 
 ``` python
 import numpy as np
@@ -603,6 +603,6 @@ sess.run(b)
 
 则不会发生常数折叠，tfdbg 应该是会显示转储的中间张量的。
 
-**Q**: 有用于 tfdbg 的 GUI 吗？
+**Q**：有用于 tfdbg 的 GUI 吗？
 
-**A**: 有。**TensorBoard 调试插件**是 tfdbg 的 GUI。它提供了计算图的检查，张量值的实时可视化，张量和条件断点的延续，以及张量和条件断点绑定到它们的图构造源代码中，所有这些都在浏览器环境中。想要开始尝试，请访[它的 README](https://github.com/tensorflow/tensorboard/blob/master/tensorboard/plugins/debugger/README.md)。
+**A**：有。**TensorBoard 调试插件**是 tfdbg 的 GUI。它提供了计算图的检查，张量值的实时可视化，张量和条件断点的延续，以及张量和条件断点绑定到它们的图构造源代码中，所有这些都在浏览器环境中。想要开始尝试，请访[它的 README](https://github.com/tensorflow/tensorboard/blob/master/tensorboard/plugins/debugger/README.md)。
