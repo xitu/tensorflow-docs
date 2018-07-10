@@ -24,7 +24,7 @@
 
 对于特征维数中的每一个特征（`feature_index` 即 `operand` 中特征维度的索引），此操作计算 `operand` 的梯度、在所有其他维度上的 `offset` 和 `scale`。`feature_index` 必须是 `operand` 中特征维度的合法索引。
 
-这三个梯度由以下公式定义（假设四维张量为 `operand` 和 (l) 是特征维的索引
+这三个梯度由以下公式定义（假设四维张量为 `operand` 和（l）是特征维的索引）：
 
 \\( coef_l = \frac{1}{mwh}\sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h (\nabla y_{ijkl} * (x_{ijkl} - \mu_l) / (\sigma^2_{l}+\epsilon)) \\)
 
@@ -768,13 +768,13 @@ XLA 收集操作将一个输入张量的几个片（每个片在一个可能不�
 |`output_window_dims` | `ArraySlice<int64>`  | 输出形状中的一组维度，即 **windows 维度**（定义如下）。并非所有窗口维度都可能出现在输出形状中。 |
 |`elided_window_dims` | `ArraySlice<int64>`  | 不存在于输出形状中的 **window dimensions**。对于 `elided_window_dims` 中的所有 `i`，`window_bounds[i]` 必须是 `1`。 |
 |`window_bounds`   | `ArraySlice<int64>`    | `window_bounds[i]` 是窗口维度 `i` 的边界。这包括显式地作为输出形状的一部分的窗口尺寸（通过 `output_window_dims`）和被省略的窗口维度（通过 `elided_window_dims`）。|
-|`gather_dims_to_operand_dims` | `ArraySlice<int64>` | 从  `gather_indices` 中的聚集索引到操作数索引的维度映射（数组被解释为将 `i` 映射为到 `gather_dims_to_operand_dims[i]`）。它必须是一对一和全部的。 |
+|`gather_dims_to_operand_dims` | `ArraySlice<int64>` | 从 `gather_indices` 中的聚集索引到操作数索引的维度映射（数组被解释为将 `i` 映射为到 `gather_dims_to_operand_dims[i]`）。它必须是一对一和全部的。 |
 
 对于输出张量中的每一个索引 `Out`，我们计算两件事（之后进行更精确的描述）：
 
   - `gather_indices.rank` 的索引值 —— `1` 维度的 `gather_indices`，给出了操作数张量中的一个切片的起始索引 **operand slice**，这些都是 `gather_indices.rank` —— `1` 维度就是 `gather_indices` 中的所有维度，除了 `index_vector_dim`。
 
-  - 与操作数等级相同 **window index** 由 `Out` 在`output_window_dims` 处的维度组成，并根据 `elided_window_dims` 嵌入零。
+  - 与操作数等级相同 **window index** 由 `Out` 在 `output_window_dims` 处的维度组成，并根据 `elided_window_dims` 嵌入零。
 
  **window index** 是 **operand slice** 中元素的相对索引，它应该出现在索引 `Out` 中。
 
@@ -789,12 +789,12 @@ XLA 收集操作将一个输入张量的几个片（每个片在一个可能不�
 
 与 `Out` 索引对应的操作数索引 `In` 的计算如下：
 
-  1. Let `G` = { `Out`[`k`] for `k` in `output_gather_dims` }。使用 `G` 将向量 `S` 切片，以便 `S`[`i`] = `gather_indices`[Combine(`G`, `i`)]，将 (A, b) 插入位置为 `index_vector_dim` 的 b 插入到 A 中。注意，这个定义很好，如果 `G` 为空 —— 即，如果 if `G` 为空，则 `S` = `gather_indices`。
-  2. 创建一个索引， `S`<sub>`in`</sub>, into `operand` 通过使用 `gather_dims_to_operand_dims` 映射（`S`<sub>`in`</sub> 是上述提到的 **operand slice**起始索引）来将 `S` 散射成 `S`。 更确切地说：
+  1. Let `G` = { `Out`[`k`] for `k` in `output_gather_dims` }。使用 `G` 将向量 `S` 切片，以便 `S`[`i`] = `gather_indices`[Combine(`G`, `i`)]，将（A, b）插入位置为 `index_vector_dim` 的 b 插入到 A 中。注意，这个定义很好，如果 `G` 为空 —— 即，如果 if `G` 为空，则 `S` = `gather_indices`。
+  2. 创建一个索引，`S`<sub>`in`</sub>, into `operand` 通过使用 `gather_dims_to_operand_dims` 映射（`S`<sub>`in`</sub> 是上述提到的 **operand slice** 起始索引）来将 `S` 散射成 `S`。更确切地说：
        1. `S`<sub>`in`</sub>[`gather_dims_to_operand_dims`[`k`]] = `S`[`k`] if `k` < `gather_dims_to_operand_dims.size`.
        2. `S`<sub>`in`</sub>[`_`] = `0` otherwise.
   3. 创建一个索引 `W`<sub>`in`</sub> into `operand` 通过将指数分散到 `Out` 中的输出窗口维度，按照 `elided_window_dims` 集合 （`W`<sub>`in`</sub> 是上述提及的 **window index**）。更确切地说：
-       1. `W`<sub>`在 `</sub>[`window_dims_to_operand_dims`(`k`)] = `Out`[`k`] if `k` < `output_window_dims.size` （`window_dims_to_operand_dims` 有如下定义）。
+       1. `W`<sub>` 在 `</sub>[`window_dims_to_operand_dims`(`k`)] = `Out`[`k`] if `k` < `output_window_dims.size` （`window_dims_to_operand_dims` 有如下定义）。
        2. 另外 `W`<sub>` 在 `</sub>[`_`] = `0`。
   4. `In` 是 `W`<sub>`in`</sub> + `S`<sub>`in`</sub>，是元素级加法。
 
@@ -806,10 +806,10 @@ XLA 收集操作将一个输入张量的几个片（每个片在一个可能不�
 
 为了直观地了解所有上述情况如何结合在一起，我们来看一个例子，它从一个 `[16,11]` 张量中收集 5 片形状为 `[8,6]` 的张量。切片到 `[16,11]` 张量中的位置可以表示为形状为 `S64[2]` 的索引向量，所有以 5 个位置的集合可以表示 `S64[5,2]` 张量。
 
-集合操作的行为可以被描述为一个索引转换，采用 [`G`,`W`<sub>`0`</sub>,`W`<sub>`1`</sub>]输出形状中的索引，并按以下方式将其映射到输入张量中的元素：
+集合操作的行为可以被描述为一个索引转换，采用 [`G`,`W`<sub>`0`</sub>,`W`<sub>`1`</sub>] 输出形状中的索引，并按以下方式将其映射到输入张量中的元素：
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
-  <img style="width:100%" src="../../images/ops_xla_gather_0.svg">
+  <img style="width:100%" src="https://www.tensorflow.org/images/ops_xla_gather_1.svg">
 </div>
 
 We first select an (`X`,`Y`) vector from the gather indices tensor using `G`. The element in the output tensor at index [`G`,`W`<sub>`0`</sub>,`W`<sub>`1`</sub>] is then the element in the input tensor at index [`X`+`W`<sub>`0`</sub>,`Y`+`W`<sub>`1`</sub>].
@@ -828,21 +828,21 @@ We first select an (`X`,`Y`) vector from the gather indices tensor using `G`. Th
 
 XLA 中收集的数据操作概括了以上概述的非正式语义：
 
- 1. 在最后一个示例中，我们可以配置输出形状中的哪些维度是窗口维度（上一个示例中包含 `W`<sub>`0`</sub>，`W`<sub>`1`</sub> 的维数）。输出集的维度（上一个示例中包含 `G`<sub>`0`</sub>，`G`<sub>`1`</sub>的维数）被定义为不是窗口的输出维度。
+ 1. 在最后一个示例中，我们可以配置输出形状中的哪些维度是窗口维度（上一个示例中包含 `W`<sub>`0`</sub>，`W`<sub>`1`</sub> 的维数）。输出集的维度（上一个示例中包含 `G`<sub>`0`</sub>，`G`<sub>`1`</sub> 的维数）被定义为不是窗口的输出维度。
 
  2. 输出形状中显式显示的输出窗口维数可能小于输入等级。这些“缺失”的维度显式地列为 `elided_window_dims`，必须有一个窗口为 `1`。由于它们的窗口界为   `1`，因此它们的唯一有效索引是 `0`，而对它们进行赋值并不会引入歧义。
- 
- 3. 从 "Gather Indices" 张量（最后一个示例中的 (`X`, `Y`) 中提取的切片可能比输入张量 级别有更少的元素，并且一个明确的映射指示如何扩展索引，使其与输入具有相同的等级。
 
-最后一个例子，我们使用 (2) 和 (3) 来实现 `tf.gather_nd`：
+ 3. 从 "Gather Indices" 张量（最后一个示例中的（`X`, `Y`）中提取的切片可能比输入张量 级别有更少的元素，并且一个明确的映射指示如何扩展索引，使其与输入具有相同的等级。
+
+最后一个例子，我们使用（2）和（3）来实现 `tf.gather_nd`：
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="../../images/ops_xla_gather_2.svg">
 </div>
 
-和往常一样，`G`<sub>`0`</sub> 和 `G`<sub>`1`</sub> 被用来从集合索引张量中分割一个起始索引，除了起始索引只有一个元素 `X`。类似的，只有一个输出窗口索引的值为 `W`<sub>`0`</sub>。但是，在作为索引运用到张量之前，这些索引被按照“聚集索引映射”（正式描述中的 `gather_dims_to_operand_dims`） 和 “窗口映射”（形式描述中的 `window_dims_to_operand_dims`）将它们扩展为  [`0`,`W`<sub>`0`</sub>] 和 [`X`,`0`] 结果为 [`X`,`W`<sub>`0`</sub>]。换句话说，就是将输入索引 [`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`W`<sub>`0`</sub>] 映射为输出索引 [`GatherIndices`[`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`0`],`X`] 这给 `tf.gather_nd` 带来了语义化。
+和往常一样，`G`<sub>`0`</sub> 和 `G`<sub>`1`</sub> 被用来从集合索引张量中分割一个起始索引，除了起始索引只有一个元素 `X`。类似的，只有一个输出窗口索引的值为 `W`<sub>`0`</sub>。但是，在作为索引运用到张量之前，这些索引被按照“聚集索引映射”（正式描述中的 `gather_dims_to_operand_dims`）和 “窗口映射”（形式描述中的 `window_dims_to_operand_dims`）将它们扩展为 [`0`,`W`<sub>`0`</sub>] 和 [`X`,`0`] 结果为 [`X`,`W`<sub>`0`</sub>]。换句话说，就是将输入索引 [`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`W`<sub>`0`</sub>] 映射为输出索引 [`GatherIndices`[`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`0`],`X`] 这给 `tf.gather_nd` 带来了语义化。
 
-在这种情况下，`window_bounds` 是 `[1,11]`。直觉上这意味着集合索引张量中的每一个索引 `X` 都会选择整行，结果是所有这些行连在一起。 
+在这种情况下，`window_bounds` 是 `[1,11]`。直觉上这意味着集合索引张量中的每一个索引 `X` 都会选择整行，结果是所有这些行连在一起。
 
 ## GetTupleElement
 
