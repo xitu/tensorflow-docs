@@ -228,11 +228,11 @@ sess.run(iterator.initializer)
 next1, (next2, next3) = iterator.get_next()
 ```
 
-Note that `next1`, `next2`, and `next3` are tensors produced by the same op/node (created by `Iterator.get_next()`). Therefore,  evaluating **any** of these tensors will advance the iterator for all components. A typical consumer of an iterator will include all components in a single expression.
+注意：`next1`、`next2` 和 `next3` 是由相同的 op/节点（由 `Iterator.get_next()` 创建）所产生的张量。因此，评估这些张量中的**任何**一个，都会提高所有组件的迭代器。一个典型的迭代器消费者将会在单独的表达式中包含所有的组件。
 
-### Saving iterator state[需要翻译]
+### 保存迭代器状态
 
-The @{tf.contrib.data.make_saveable_from_iterator} function creates a `SaveableObject` from an iterator, which can be used to save and restore the current state of the iterator (and, effectively, the whole input pipeline). A saveable object thus created can be added to @{tf.train.Saver} variables list or the `tf.GraphKeys.SAVEABLE_OBJECTS` collection for saving and restoring in the same manner as a @{tf.Variable}. Refer to @{$saved_model$Saving and Restoring} for details on how to save and restore variables.
+@{tf.contrib.data.make_saveable_from_iterator} 函数从一个迭代器中创建一个 `SaveableObject`，它可以用于保存和恢复迭代器（实际上，甚至可以是整个输入管道）。这样创建的可保存对象，可以添加到 @{tf.train.Saver} 变量列表或者用于保存和恢复的 `tf.GraphKeys.SAVEABLE_OBJECTS` 集合中，方式与  @{tf.Variable} 相同。关于如何保存和恢复变量的更多信息，请参阅 @{$saved_model$Saving and Restoring}。
 
 ```python
 # Create saveable object from iterator.
