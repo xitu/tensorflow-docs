@@ -253,10 +253,10 @@ $ <b>bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pk
 
 ## 安装 pip 包
 
-调用 `pip install` 安装 pip 包。`.whl` 的文件名与你的平台有关，例如下面的命令将会在 Linux 上安装 TensorFlow 1.8.0rc1。
+调用 `pip install` 安装 pip 包。`.whl` 的文件名与你的平台有关，例如下面的命令将会在 Linux 上安装 TensorFlow 1.8.0。
 
 <pre>
-$ <b>sudo pip install /tmp/tensorflow_pkg/tensorflow-1.8.0rc1-py2-none-any.whl</b>
+$ <b>sudo pip install /tmp/tensorflow_pkg/tensorflow-1.8.0-py2-none-any.whl</b>
 </pre>
 
 ## 验证安装是否成功 
