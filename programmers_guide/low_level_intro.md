@@ -4,7 +4,7 @@
 
   * 管理你的 TensorFlow 程序（一张 TensorFlow 计算图，`tf.Graph`）以及 TensorFlow 运行时（一个 TensorFlow 会话，`tf.Session`），而不是依赖 Estimators 来管理它们
   * 使用 `tf.Session` 运行 TensorFlow 操作
-  * 在底层环境中使用高级的组件（[datasets](#datasets), [layers](#layers), 以及 [特征列](#feature_columns)）
+  * 在底层环境中使用高级的组件（[datasets](#datasets), [layers](#layers), 以及 [特征列](#feature_columns)）
   * 创建你自己的训练循环，而不是使用 @{$get_started/premade_estimators$ provided by Estimator}
 
 我们推荐尽量使用更高层次的 API 来构建模型，但了解 TensorFlow 核心 API 有以下几个优点：
@@ -225,7 +225,7 @@ while True:
     break
 ```
 
-[需要翻译]If the `Dataset` depends on stateful operations you may need to initialize the iterator before using it, as shown below:
+如果 `Dataset` 依赖于有状态操作，那么使用它之前，你可能需要初始化迭代器，如下所示：
 
 ``` python
 r = tf.random_normal([10,3])

@@ -130,13 +130,13 @@ versions`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/
 * 对于 `GraphDef` 版本，我们使用 `TF_GRAPH_DEF_VERSION`、	`TF_GRAPH_DEF_VERSION_MIN_CONSUMER`，以及 `TF_GRAPH_DEF_VERSION_MIN_PRODUCER` 标识。
 * 对于检验点版本，我们使用 `TF_CHECKPOINT_VERSION`、`TF_CHECKPOINT_VERSION_MIN_CONSUMER`，以及 `TF_CHECKPOINT_VERSION_MIN_PRODUCER` 标识。
 
-### Add a new attribute with default to an existing op[需要翻译]
+### 向现有 op 添加一个新的属性（默认）
 
-Following the guidance below gives you forward compatibility only if the set of ops has not changed:
+遵循下面的指导，只有 ops 集合未修改的情况下，才能给出前向兼容性：
 
-1. If forward compatibility is desired,  set `strip_default_attrs` to `True` while exporting the model using either the @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph_and_variables$`add_meta_graph_and_variables`} and @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph$`add_meta_graph`} methods of the `SavedModelBuilder` class, or @{tf.estimator.Estimator.export_savedmodel$`Estimator.export_savedmodel`}
-2. This strips off the default valued attributes at the time of producing/exporting the models. This makes sure that the exported @{tf.MetaGraphDef} does not contain the new op-attribute when the default value is used.
-3. Having this control could allow out-of-date consumers (for example, serving binaries that lag behind training binaries) to continue loading the models and prevent interruptions in model serving.
+1. 如果需要向前兼容，请将 `strip_default_attrs` 设置为 `True`。在导出模型时，使用 @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph_and_variables$`add_meta_graph_and_variables`} 和 @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph$`add_meta_graph`} 方法的 `SavedModelBuilder` 类，或者是 @{tf.estimator.Estimator.export_savedmodel$`Estimator.export_savedmodel`}。
+2. 这将在生成/导出模型时去掉默认值属性。这确保在使用默认值时导出的 @{tf.MetaGraphDef} 不包含新的 op 属性。
+3. 使用此控件可以允许过时的消费者（例如，提供落后于训练二进制文件的二进制文件）继续加载模型并防止模型服务中心的中断。
 
 ### GraphDef 版本更迭
 
