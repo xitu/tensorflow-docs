@@ -77,7 +77,7 @@
 
      <pre>
      $ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py3-none-any.whl</b> </pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0-py3-none-any.whl</b> </pre>
 
 如果你遇到了任何安装问题，请查看[常见安装问题](#常见安装问题).
 
@@ -170,7 +170,7 @@ $ <b>sudo easy_install --upgrade six</b> </pre>
 
      <pre>
      $ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py3-none-any.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0-py3-none-any.whl</b></pre>
 
 ### 下一步
 
@@ -247,7 +247,7 @@ Docker 会在第一次启动容器时下载对应的镜像。
      其中 <i>TF_PYTHON_URL</i>  是 [TensorFlow Python 包的 URL](#the_url_of_the_tensorflow_python_package)。例如，如下命令安装了仅支持 CPU 的 Python 2.7 版本下的 TensorFlow：
 
      <pre>(<i>targetDirectory</i>)$ <b>pip install --ignore-installed --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py2-none-any.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0-py2-none-any.whl</b></pre>
 
 <a name="ValidateYourInstallation"></a>
 ## 验证安装
@@ -396,11 +396,11 @@ RuntimeError: Broken toolchain: cannot link a simple C program</pre>
 ### Python 2.7
 
 <pre>
-https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py2-none-any.whl
+https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0-py2-none-any.whl
 </pre>
 
 ### Python 3.4、3.5 或 3.6
 
 <pre>
-https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0rc1-py3-none-any.whl
+https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0-py3-none-any.whl
 </pre>
