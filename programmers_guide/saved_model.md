@@ -199,20 +199,20 @@ builder.save()
 ```
 
 <a name="forward_compatibility"></a>
-#### [需要翻译]Forward compatibility via `strip_default_attrs=True`
+#### 使用 `strip_default_attrs=True` 来实现向前兼容性
 
-Following the guidance below gives you forward compatibility only if the set of Ops has not changed.
+按照下述指南，只有在未更改操作集的情况下，才能给出向前兼容性。
 
-The @{tf.saved_model.builder.SavedModelBuilder$`SavedModelBuilder`} class allows users to control whether default-valued attributes must be stripped from the @{$extend/tool_developers#nodes$`NodeDefs`} while adding a meta graph to the SavedModel bundle. Both @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph_and_variables$`SavedModelBuilder.add_meta_graph_and_variables`} and @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph$`SavedModelBuilder.add_meta_graph`} methods accept a Boolean flag `strip_default_attrs` that controls this behavior.
+@{tf.saved_model.builder.SavedModelBuilder$`SavedModelBuilder`} 类运行用户控制是否必须从 @{$extend/tool_developers#nodes$`NodeDefs`} 中删除默认属性值，同时向 SavedModel bundle 添加一个元图。@{tf.saved_model.builder.SavedModelBuilder.add_meta_graph_and_variables$`SavedModelBuilder.add_meta_graph_and_variables`} 和 @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph$`SavedModelBuilder.add_meta_graph`} 方法都接受控制此行为的布尔标志 `strip_default_attrs`。
 
-If `strip_default_attrs` is `False`, the exported @{tf.MetaGraphDef} will have the default valued attributes in all its @{tf.NodeDef} instances. This can break forward compatibility with a sequence of events such as the following:
+如果 `strip_default_attrs` 为 `False`，则导出的 @{tf.MetaGraphDef} 将在其所有的 @{tf.NodeDef} 实例中拥有默认属性值。这可以中断一系列形如下述事件的向前兼容性：
 
-*  An existing Op (`Foo`) is updated to include a new attribute (`T`) with a default (`bool`) at version 101.
-*  A model producer such as a "trainer binary" picks up this change (version 101) to the `OpDef` and re-exports an existing model that uses Op `Foo`.
-*  A model consumer (such as [Tensorflow Serving](/serving)) running an older binary (version 100) doesn't have attribute `T` for Op `Foo`, but tries to import this model. The model consumer doesn't recognize attribute `T` in a `NodeDef` that uses Op `Foo` and therefore fails to load the model.
-*  By setting `strip_default_attrs` to True, the model producers can strip away any default valued attributes in the `NodeDefs`. This helps ensure that newly added attributes with defaults don't cause older model consumers to fail loading models regenerated with newer training binaries.
+*  更新现有操作（`Foo`），在版本 101 中设置（`bool`）的默认值，使其包含一个新属性（`T`） with a default (`bool`）。
+*  形如 "trainer binary" 之类的模型生产者将这个更改（版本101）选择到 `OpDef`，并重新输出使用 `Foo` 操作的现有模型。
+*  运行旧二进制（版本 100）的模型调用者（例如 [Tensorflow Serving](/serving)）没有操作 `Foo` 的属性 `T`,但是可以尝试导入模型。模型调用者不识别使用 `Foo` 操作的 `NodeDef` 中的属性 `T`，因此无法加载模型。
+*  通过设置 `strip_default_attrs` 为 True，模型生产者可以删除 `NodeDefs` 中的任何默认属性值。这有助于确保添加的带有默认值的属性不回导致以前的模型调用者失效，加载使用更新的训练二进制文件重新生成模型。
 
-See [compatibility guidance](https://www.tensorflow.org/programmers_guide/version_compat) for more information.
+更多信息，请参阅[兼容性指南](https://www.tensorflow.org/programmers_guide/version_compat)。
 
 ### 在 Python 中加载 SavedModel
 
