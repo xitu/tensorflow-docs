@@ -150,7 +150,7 @@ tensorboard —logdir=path/to/log-directory
 ```
 
 
-logdir 就是 FileWriter 序列化数据的目录。如果 logdir 目录包含子目录，并且子目录具有来自单独线程的序列化数据。如果 logdir 目录包含子目录，并且子目录具有来自单独线程的序列化数据，那么 Tensorboard 将统一展示这些可视化数据。一旦 TensorBoard 运行，你可以通过你的 Web 浏览器 localhost:6006，查看 Tensorboard。你会在 Tensorboard 右上角看到导航标签。每个选项代表一组可以可视化的序列化数据
+logdir 就是 FileWriter 序列化数据的目录。如果 logdir 目录包含子目录，并且子目录具有来自单独线程的序列化数据，那么 Tensorboard 将统一展示这些可视化数据。一旦 TensorBoard 运行，你可以通过你的 Web 浏览器 localhost:6006，查看 Tensorboard。你会在 Tensorboard 右上角看到导航标签。每个选项代表一组可以可视化的序列化数据。
 
 关于如何使用 **“graph”** 来显示你的图的详细信息，你可以查看 [TensorBoard: Graph Visualization](https://www.tensorflow.org/get_started/graph_viz)。
 
