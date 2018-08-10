@@ -18,7 +18,7 @@
 如果你正在利用本指南中描述的方法之一来安装支持 GPU 的 TensorFlow，那么你的系统中必须要有如下的 NVIDIA 软件：
 
   * [CUDA Toolkit 9.0](http://nvidia.com/cuda)。详见 [NVIDIA 的文档](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/)。请保证你将 CUDA 相关的路径像 NVIDIA 文档中所描述的那样添加在 `LD_LIBRARY_PATH` 环境变量中。
-  * [cuDNN SDK v7](http://developer.nvidia.com/cudnn). 详见 [NVIDIA 的文档](http://docs.nvidia.com/deeplearning/sdk/cudnn-install/)，请保证你像 NVIDIA 文档中描述的那样创建了 `CUDA_HOME` 环境变量。
+  * [cuDNN SDK v7](http://developer.nvidia.com/cudnn)。详见 [NVIDIA 的文档](http://docs.nvidia.com/deeplearning/sdk/cudnn-install/)，请保证你像 NVIDIA 文档中描述的那样创建了 `CUDA_HOME` 环境变量。
   * GPU 显卡拥有 CUDA 3.0 或者更高版本的计算性能，用于构建源码以及 3.5 或者更高版本的二进制文件。详见 [NVIDIA 英伟达的文档](https://developer.nvidia.com/cuda-gpus) 中支持的 GPU 显卡列表。
   * [GPU 驱动](http://nvidia.com/driver) 支持你的 CUDA Toolkit 版本。
   * NVIDIA CUDA 解析工具的接口，libcupti-dev 库。该库提供了更高级的分析工具支持。要安装这个库，对 CUDA Toolkit 9.0 以上的版本运行如下命令即可：
@@ -39,7 +39,7 @@
     $ <b>sudo apt-get install libcupti-dev</b>
     </pre>
 
-  * **[可选]：** 为了优化推论性能，你也可以安装 **NVIDIA TensorRT 3.0**。The minimal set of TensorRT runtime components needed for use with the pre-built `tensorflow-gpu` package can be installed as follows:
+  * **[可选]：** 为了优化推论性能，你也可以安装 **NVIDIA TensorRT 3.0**。需要使用预编译 `tensorflow-gpu` 包的最小 TensorRT 运行时组件集可以按照以下方式安装：
 
    <pre>
    $ <b>wget https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1404/x86_64/nvinfer-runtime-trt-repo-ubuntu1404-3.0.4-ga-cuda9.0_1.0-1_amd64.deb</b>
@@ -48,22 +48,26 @@
    $ <b>sudo apt-get install -y --allow-downgrades libnvinfer-dev libcudnn7-dev=7.0.5.15-1+cuda9.0 libcudnn7=7.0.5.15-1+cuda9.0</b>
    </pre>
 
-  * **[重要]：** 为了与预构建包 `tensorflow-gpu` 进行兼容，please use the Ubuntu **14.04** package of TensorRT as shown above, even when installing onto an Ubuntu 16.04 system.<br/><br/>
-  To build the TensorFlow-TensorRT integration module from source rather than using pre-built binaries, see the [module documentation](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/tensorrt#using-tensorrt-in-tensorflow).
-  For detailed TensorRT installation instructions, see [NVIDIA's TensorRT documentation](http://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html).<br/><br/>
-  To avoid cuDNN version conflicts during later system upgrades, you can hold the cuDNN version at 7.0.5:
+  * **[重要]：** 为了与预构建包 `tensorflow-gpu` 进行兼容，请使用上述 Ubuntu **14.04** 的 TensorRT 包，即使安装到 Ubuntu 16.04 系统上也是如此。<br/><br/>
+
+  
+如果要从源构建 TensorFlow-TensorRT 集成模块，而不使用预编译的二进制文件，请参阅 [模块文档](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/tensorrt#using-tensorrt-in-tensorflow)。 
+
+有关 TensorRT 的详细安装说明，请参阅 [NVIDIA 的 TensorRT 文档](http://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html)。
+  
+为避免在以后的系统升级期间出现 cuDNN 版本冲突，你可以将 cuDNN 版本保留为 7.0.5：
 
    <pre>
    $ <b> sudo apt-mark hold libcudnn7 libcudnn7-dev</b>
    </pre>
 
-   To later allow upgrades, you can remove the hold:
+以后如果允许升级，你可以删除保留：
 
    <pre>
    $ <b> sudo apt-mark unhold libcudnn7 libcudnn7-dev</b>
    </pre>
 
-如果您已安装前述软件包的旧版本，请升级到指定版本。如果升级失败，那么你可以使用 @{$install_sources$install TensorFlow from Sources}，此时你仍然可以运行支持 GPU 的 TensorFlow。
+如果你已安装前述软件包的旧版本，请升级到指定版本。如果升级失败，那么你可以使用 @{$install_sources$install TensorFlow from Sources}，此时你仍然可以运行支持 GPU 的 TensorFlow。
 
 ## 决定如何安装 TensorFlow
 
@@ -145,7 +149,7 @@ Docker 完全地将 TensorFlow 的安装与其他之前安装于你机器上的�
 
 ### 下一步
 
-在安装了 TensorFlow 之后，需要[验证你的安装](#ValidateYourInstallation)。
+在安装了 TensorFlow 之后，需要 [验证你的安装](#ValidateYourInstallation)。
 
 请注意你必须在每次运行 TensorFlow 之前都要激活你的 Virtualenv 环境。如果 Virtualenv 环境当前并没有激活，运行以下其中一条命令：
 
@@ -203,7 +207,7 @@ $ <b>sudo apt-get install python3-pip python3-dev</b> # for Python 3.n
      $ <b>pip install tensorflow-gpu</b>  # Python 2.7;  GPU support
      $ <b>pip3 install tensorflow-gpu</b> # Python 3.n; GPU support </pre>
 
-     如果命令完成了安装，你现在应该[对你的安装进行验证](#ValidateYourInstallation)。
+     如果命令完成了安装，你现在应该 [对你的安装进行验证](#ValidateYourInstallation)。
 
   2. (可选) 如果步骤 1 失败了，安装如下格式执行命令进行安装:
 
@@ -211,7 +215,7 @@ $ <b>sudo apt-get install python3-pip python3-dev</b> # for Python 3.n
      $ <b>sudo pip  install --upgrade</b> <i>tfBinaryURL</i>   # Python 2.7
      $ <b>sudo pip3 install --upgrade</b> <i>tfBinaryURL</i>   # Python 3.n </pre>
 
-     其中 <code><em>tfBinaryURL</em></code> 指明了 TensorFlow 的 Python 包的 URL 路径。<code><em>tfBinaryURL</em></code> 的值取决于操作系统，Python 版本和 GPU 支持。在[这里](#the_url_of_the_tensorflow_python_package)找到时候你的系统的 <code><em>tfBinaryURL</em></code> 值。例如，如果你要在 Linux 中安装 Python 3.4 和仅支持 CPU 环境的 TensorFlow，在激活的 Virtualenv 环境中运行如下命令即可：
+     其中 <code><em>tfBinaryURL</em></code> 指明了 TensorFlow 的 Python 包的 URL 路径。<code><em>tfBinaryURL</em></code> 的值取决于操作系统，Python 版本和 GPU 支持。在 [这里](#the_url_of_the_tensorflow_python_package) 找到时候你的系统的 <code><em>tfBinaryURL</em></code> 值。例如，如果你要在 Linux 中安装 Python 3.4 和仅支持 CPU 环境的 TensorFlow，在激活的 Virtualenv 环境中运行如下命令即可：
 
      <pre>
      (tensorflow)$ <b>pip3 install --upgrade \
@@ -236,10 +240,10 @@ $ <b>sudo pip3 uninstall tensorflow</b> # for Python 3.n </pre>
 
 通过以下几步来使用 Docker 安装 TensorFlow：
 
-  1. 如 [Docker 文档](http://docs.docker.com/engine/installation/)中所描述的那样来安装 Docker。
-  2. 或者，创建一个 Linux group 叫做 <code>docker</code>，如 [Docker 文档](https://docs.docker.com/engine/installation/linux/linux-postinstall/)中所描述的那样，这样无需 sudo 命令即可运行容器。（如果你不做这一步，你需要在每次使用 Docker 时都使用 sudo 命令。)
-  3. 要安装支持 GPU 的 TensorFlow，你必须先安装位于 GitHub 中的[nvidia-docker](https://github.com/NVIDIA/nvidia-docker)
-  4. 运行包含[TensorFlow 二进制镜像](https://hub.docker.com/r/tensorflow/tensorflow/tags/)的 Docker。
+  1. 如 [Docker 文档](http://docs.docker.com/engine/installation/) 中所描述的那样来安装 Docker。
+  2. 或者，创建一个 Linux group 叫做 <code>docker</code>，如 [Docker 文档](https://docs.docker.com/engine/installation/linux/linux-postinstall/) 中所描述的那样，这样无需 sudo 命令即可运行容器。（如果你不做这一步，你需要在每次使用 Docker 时都使用 sudo 命令。)
+  3. 要安装支持 GPU 的 TensorFlow，你必须先安装位于 GitHub 中的 [nvidia-docker](https://github.com/NVIDIA/nvidia-docker)
+  4. 运行包含 [TensorFlow 二进制镜像](https://hub.docker.com/r/tensorflow/tensorflow/tags/) 的 Docker。
 
 剩下的部分解释了如何运行一个 Docker 容器。
 
@@ -279,7 +283,7 @@ Docker 将会在你第一次运行的时候下载 TensorFlow 二进制镜像。
 ### GPU 支持
 
 在安装 GPU 支持的 TensorFlow 之前，确保你的系统符合
-[NVIDIA 软件要求](#NVIDIARequirements).  要运行一个带有 NVIDIA GPU 支持的 Docker 容器运行如下格式的命令：
+[NVIDIA 软件要求](#NVIDIARequirements)。要运行一个带有 NVIDIA GPU 支持的 Docker 容器运行如下格式的命令：
 
 <pre>
 $ <b>nvidia-docker run -it</b> <i>-p hostPort:containerPort TensorFlowGPUImage</i>
@@ -319,16 +323,16 @@ Docker 会在你第一次运行的时候下载 TensorFlow 二进制镜像。更�
 
 ### 下一步
 
-你应该[验证你的安装](#ValidateYourInstallation).
+你应该 [验证你的安装](#ValidateYourInstallation).
 
 <a name="InstallingAnaconda"></a>
 ## 使用 Anaconda 安装
 
 按照如下步骤在 Anaconda 环境中按照 TensorFlow：
 
-  1. 按照 [Anaconda 下载网站](https://www.continuum.io/downloads)中的指导来下载并安装 Anaconda。
+  1. 按照 [Anaconda 下载网站](https://www.continuum.io/downloads) 中的指导来下载并安装 Anaconda。
  
-  2. 通过以下命令建立一个叫做<tt>tensorflow</tt> 的 conda 环境来运行某一版本的 Python:
+  2. 通过以下命令建立一个叫做 <tt>tensorflow</tt> 的 conda 环境来运行某一版本的 Python:
 
      <pre>$ <b>conda create -n tensorflow pip python=2.7 # or python=3.3, etc.</b></pre>
 
@@ -391,7 +395,7 @@ print(sess.run(hello))
 
 <pre>Hello, TensorFlow!</pre>
 
-如果系统输出了一个错误信息，见[常见安装错误](#common_installation_problems).
+如果系统输出了一个错误信息，见 [常见安装错误](#common_installation_problems).
 
 如果你是机器学习的新手，我们推荐以下内容：
 
@@ -512,7 +516,7 @@ https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.8.0-cp27-none-l
 https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.8.0-cp27-none-linux_x86_64.whl
 </pre>
 
-注意 GPU 支持需要符合[NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements)的软硬件要求。
+注意 GPU 支持需要符合 [NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements) 的软硬件要求。
 
 ### Python 3.4
 
@@ -528,7 +532,7 @@ https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.8.0-cp34-cp34m-
 https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.8.0-cp34-cp34m-linux_x86_64.whl
 </pre>
 
-注意 GPU 支持需要符合[NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements)的软硬件要求。
+注意 GPU 支持需要符合 [NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements) 的软硬件要求。
 
 ### Python 3.5
 
@@ -544,7 +548,7 @@ GPU 支持：
 https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.8.0-cp35-cp35m-linux_x86_64.whl
 </pre>
 
-注意 GPU 支持需要符合[NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements)的软硬件要求。
+注意 GPU 支持需要符合 [NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements) 的软硬件要求。
 
 ### Python 3.6
 
@@ -560,4 +564,4 @@ GPU 支持：
 https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.8.0-cp36-cp36m-linux_x86_64.whl
 </pre>
 
-注意 GPU 支持需要符合[NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements)的软硬件要求。
+注意 GPU 支持需要符合 [NVIDIA 对运行 GPU 支持版本的 TensorFlow 的要求](#NVIDIARequirements) 的软硬件要求。
