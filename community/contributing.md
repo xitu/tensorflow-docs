@@ -19,11 +19,11 @@ TensorFlow 代码托管在 [TensorFlow GitHub organization](https://github.com/t
 
 * 将 [developers@tensorflow.org](https://groups.google.com/a/tensorflow.org/d/forum/developers) 加入邮件列表, 用来协调联系其他参与贡献 TensorFlow 的人，进行讨论。
 
-* 对于代码规范约定, 请看 @{$style_guide$TensorFlow Style Guide}。
+* 对于代码规范约定，请看[TensorFlow 代码风格指南](../community/style_guide.md)。
 
-* 最后, 请查阅 @{$documentation$Writing TensorFlow Documentation}, 这里解释了文档的内容。
+* 最后，请查阅[编写 TensorFlow 文档](../community/documentation.md)，这里解释了文档的内容。
 
-你也可能想查看我们的指南 @{$benchmarks$defining and running benchmarks}。
+你也可能想查看我们的指南[定义以及运行基准](../community/benchmarks.md)。
 
 ## 特殊兴趣小组
 
