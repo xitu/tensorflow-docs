@@ -19,6 +19,7 @@ TensorFlow 的 GitHub 组织内有很多项目是靠专项邮件组交流的：
 * [tfjs-announce](https://groups.google.com/a/tensorflow.org/d/forum/tfjs-announce) — TensorFlow.js 发版公告邮件组
 * [tfjs](https://groups.google.com/a/tensorflow.org/d/forum/tfjs) — TensorFlow.js 交流与相关支持邮件组
 * [tflite](https://groups.google.com/a/tensorflow.org/d/forum/tflite) — TensorFlow Lite 交流与相关支持邮件组
+* [tfprobability](https://groups.google.com/a/tensorflow.org/d/forum/tfprobability) — Discussion and peer support for TensorFlow Probability.
 * [tpu-users](https://groups.google.com/a/tensorflow.org/d/forum/tpu-users) — TPU 用户交流与相关支持邮件组
 
 ## 专项兴趣小组
