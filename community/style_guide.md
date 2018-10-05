@@ -23,7 +23,6 @@ from __future__ import print_function
 
 * 使用 `six` 来编写可兼容的代码（例如 `six.moves.range`）。
 
-
 ## Bazel 构建规则
 
 TensorFlow 使用 Bazel 来构建系统并执行下面的依赖：
@@ -43,39 +42,21 @@ licenses(["notice"])  # Apache 2.0
 exports_files(["LICENSE"])
 ```
 
-* 每一个 BUILD 文件尾部都应该包含这些代码：
-
-```
-filegroup(
-    name = "all_files",
-    srcs = glob(
-        ["**/*"],
-        exclude = [
-            "**/METADATA",
-            "**/OWNERS",
-        ],
-    ),
-    visibility = ["//tensorflow:__subpackages__"],
-)
-```
-
-* 在创建新的 BUILD 文件时，把下面这一行加入到 `all_opensource_files` 目标内的 `tensorflow/BUILD` 文件中。
-
-```
-"//tensorflow/<directory>:all_files",
-```
-
-* 在所有的 python BUILD 目标中（库文件和测试用例）加入下面这行代码：
+* 在所有的 Python BUILD 目标中（库文件和测试用例）加入下面这行代码：
 
 ```
 srcs_version = "PY2AND3",
 ```
 
-
 ## Tensor
 
 * 在假设 Tensor 的第一维度是 batche 维度的情况下对 batches 操作的处理函数。
 
+* In most models the *last dimension* is the number of channels.
+
+* Dimensions excluding the first and last usually make up the "space" dimensions: Sequence-length or Image-size.
+
+* Prefer using a Tensor's overloaded operators rather than TensorFlow functions. For example, prefer `**`, `+`, `/`, `*`, `-`, `and/or` over `tf.pow`, `tf.add`, `tf.div`, `tf.mul`, `tf.subtract`, and `tf.logical*` unless a specific name for the operation is desired.
 
 ## Python 处理函数
 
@@ -85,16 +66,17 @@ srcs_version = "PY2AND3",
 
 * Tensor 参数应该是单个的 tensor 变量，也可以是个可迭代的 tensors 变量。例如说“Tensor 必须是单个 tensor 变量要不就是个 Tensors 数组”就太宽泛了。想了解更多可以查看 `assert_proper_iterable`。
 
-* 如果使用 C++ 的处理函数，需要调用 `convert_to_tensor` 把 non-tensor 输入值转换为 tensors 用来当做处理函数的参数。
- 要注意的是这个参数依然被描述为 `Tensor` 文档中具体的 dtype 对象。
+* 如果使用 C++ 的处理函数，需要调用 `convert_to_tensor` 把 non-tensor 输入值转换为 tensors 用来当做处理函数的参数。要注意的是这个参数依然被描述为 `Tensor` 文档中具体的 dtype 对象。
 
 * 每个 Python 处理函数都应该有个类似下面的 `name_scope`。它要作为 `name` 参数传入，这是处理函数的一个默认的变量名也是一个包含输入 tensors 的列表。
 
-* 处理函数应该包含一个通用的 Python 函数注释，包括传入参数以及返回值的声明用于解释每个值的类型和含义。这段说明中应当规定好参数的
- shapes、 dtypes、以及 ranks。
- @{$documentation$See documentation details}
+* 处理函数应该包含一个通用的 Python 函数注释，包括传入参数以及返回值的声明用于解释每个值的类型和含义。这段说明中应当规定好参数的 shapes、 dtypes、以及 ranks。
+
+[查看文档详细信息](../community/documentation.md)
 
 * 为了提升可用性，示例部分应该包含一个含有处理函数输入与输出的用例。
+
+* Avoid making explicit use of `tf.Tensor.eval` or `tf.Session.run`. For example, to write logic that depends on the Tensor value, use [TensorFlow control flow](https://www.tensorflow.org/api_guides/python/control_flow_ops). Alternatively, restrict the operation to only run when eager execution is enabled (`tf.executing_eagerly()`).
 
 示例：
 
@@ -131,33 +113,8 @@ srcs_version = "PY2AND3",
     output = my_op(t1, t2, my_param=0.5, other_param=0.6,
                    output_collections=['MY_OPS'], name='add_t1t2')
 
-
 ## Layers
 
-Layer 是一个集成变量创建以及一个或多个其他 graph 函数的 Python 处理函数。它遵循通常的 Python 处理函数的需要。
+Use `tf.keras.layers`, not `tf.layers`.
 
-* 如果一个 layer 创建了一个或多个变量，这个 layer 函数应该在传入后面的参数时也应遵循这个顺序：
-  - `initializers`：用于指定变量的 initializers。
-  - `regularizers`：用于指定变量的 regularizers。
-  - `trainable`：代表变量是否已经训练过。
-  - `scope`：代表变量会被设置成的 `VariableScope` 对象。
-  - `reuse`：代表变量在作用域中是否应该被重用的 `布尔值` 指示符。
-* 表现不同的 Layers 在训练过程中应该传入：
-  - `is_training`：代表是否在执行阶段有条件地选择不同的计算路径的 `布尔值` 指示符（例如在使用 `tf.cond` 时）。
-
-示例：
-
-    def conv2d(inputs,
-               num_filters_out,
-               kernel_size,
-               stride=1,
-               padding='SAME',
-               activation_fn=tf.nn.relu,
-               normalization_fn=add_bias,
-               normalization_params=None,
-               initializers=None,
-               regularizers=None,
-               trainable=True,
-               scope=None,
-               reuse=None):
-      ... 底层实现请查看 tensorflow/contrib/layers/python/layers/layers.py ...
+See `tf.keras.layers` and [the Keras guide](../guide/keras.md#custom_layers) for details on how to sub-class layers.
