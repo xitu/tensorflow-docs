@@ -2,88 +2,141 @@
 
 **最近一次更新：2018.02.15**
 
-TensorFlow 是一个频繁更新并且社区活跃的项目。这份文档旨在提供关于 TensorFlow 高优先级领域以及核心开发成员专注领域的发展路线指南，也包括未来的 TensorFlow 新版本期望发行的功能。这里很多功能是靠社区内部的测试用例驱动开发的，此外我们也欢迎对 TensorFlow 更进一步的[讨论](https://github.com/tensorflow/tensorflow/blob/master/CONTRIBUTING.md)。
+TensorFlow 是一个频繁更新并且社区活跃的项目。这份文档旨在提供关于 TensorFlow 高优先级领域以及核心开发成员专注领域的发展路线指南，也包括expected functionality in the upcoming releases of TensorFlow. Many of these areas are driven by community use cases, and we welcome further
+[contributions](https://github.com/tensorflow/tensorflow/blob/master/CONTRIBUTING.md) to TensorFlow.
 
-以下功能并没有具体计划的发行日期，但是大部分功能会在未来的一两个版本中发行。
+## TensorFlow 2.0 is coming
+
+[As announced recently](https://groups.google.com/a/tensorflow.org/forum/#!topic/discuss/bgug1G6a89A), we have started work on the next major version of TensorFlow. TensorFlow 2.0 will be a significant milestone, with a focus on ease of use. Here are some highlights of what users can expect with TensorFlow 2.0:
+
+* Eager execution is a central feature of 2.0. It aligns users’ expectations about the programming model better with TensorFlow practice and should make TensorFlow easier to learn and apply.
+* Support for more platforms and languages, and improved compatibility and parity between these components via standardization on exchange formats and alignment of APIs.
+* We will remove deprecated APIs and reduce the amount of duplication, which has confused for users.
+
+For more details on 2.0 and associated public design consultations, please see the [full announcement](https://groups.google.com/a/tensorflow.org/forum/#!topic/discuss/bgug1G6a89A).
+
+## Roadmap
+
+The features below do not have concrete release dates. However, the majority are expected in the next one to two releases.
 
 ### APIs
 
-#### 高阶 APIs：
+#### High-level APIs
 
-* 基于 Estimators 的友好型 multi-GPU 接口
-* Gradient Boosted Trees, Time Series 及其他模型的友好型高阶预制 estimators
+* Stronger integration of Keras, Eager, and Estimators to use same data pipelines, APIs, and serialization formats (Saved Model).
+* Canned Estimators for commonly used ML models (such as TimeSeries, RNNs, TensorForest, additional boosted trees features) and related functionality (like sequence feature columns) in TensorFlow Core (migrated from contrib if they exist).
 
-#### Eager Execution：
+#### Eager execution
 
-* multiple GPUs 的高效使用接口
-* 分布式训练 (多机器训练)
-* 性能提升
-* 更友好地将模型导出到 GraphDef/SavedModel 
+* Use DistributionStrategy to utilize multiple GPUs and multiple TPU cores.
+* Distributed training support (multi-machine).
+* Performance improvements.
+* Simpler export to a GraphDef/SavedModel.
 
-#### Keras API：
+#### Reference models
 
-* 更好的整合 tf.data (让数据张量有能力直接调用 `model.fit` )
-* 完全支持 Eager Execution (包括对常规的 Keras API 的 Eager support 支持，以及通过模型子类创建 Eager 风格的 Keras 模型的能力)
-* 更好的支持 distribution/multi-GPU 和 TPU (包括更平滑的 model-to-estimator 工作流)
+* Building out a set of [models](https://github.com/tensorflow/models/tree/master/official) across image recognition, object detection, speech, translation, recommendation, and reinforcement learning that demonstrate best practices and serve as a starting point for high-performance model development.
+* A growing set of high-performance [Cloud TPU reference models](https://github.com/tensorflow/tpu).
 
-#### 官方模型：
+#### Contrib
 
-* 这一系列的[参考模型](https://github.com/tensorflow/models/tree/master/official)包含了图像识别、自然语言处理、物体检测、机器翻译等领域，这些都算得上是最佳的练习选择以及学习构建高性能模型训练的理想切入点。
+* Deprecate parts of `tf.contrib` where preferred implementations exist outside of `tf.contrib`.
+* As much as possible, move large projects inside `tf.contrib` to separate repositories.
+* The `tf.contrib` module will be discontinued in its current form with TensorFlow 2.0. Experimental development will happen in other repositories in the future.
 
-#### Contrib：
-
-* 为 tf.contrib 增加弃用声明，目前 tf.contrib 更倾向于在外部实现该功能。
-* 尽可能地将 tf.contrib 的大工程迁移到多个独立的仓库。
-* 目前这种形式的 tf.contrib 模块最终会停止开发，将来会在其他的仓库进行试验性开发。
-
-
-#### 概率推理与统计分析：
-
-* 在 tf.distributions 和 tf.probability 当中有大量的概率推理与统计分析工具可供使用。包括新的采样器、层、优化器、损失和结构化模型。
-* 用于假设检验、收敛诊断、样本统计的统计工具。
-* Edward 2.0：用于 probabilistic programming 的高阶 API
-
-### 跨平台
+### 平台
 
 #### TensorFlow Lite：
 
-* 增加 TensorFlow Lite 可支持操作的覆盖率
-* 为 TensorFlow Lite 提供更易转换的已训练模型
-* 为 TensorFlow Lite 提供 GPU 加速 (包括 iOS 和 Android)
-* 通过 Android NeuralNets API 提供硬件加速支持
-* 通过量化和其他网络优化提升 CPU 性能 (例如 pruning, distillation)
-* 为 Android 和 iOS 以外的设备提升支持 (例如 树莓派, Cortex-M)
+* 增加 TensorFlow Lite 可支持操作的覆盖率。
+* 为 TensorFlow Lite 提供更易转换的已训练模型。
+* Tools for mobile model optimization.
+* Extend support for Edge TPUs, TPU AIY boards.
+* Better documentation and tutorials.
+
+#### TensorFlow.js
+
+* Improve performance of TensorFlow.js in the browser; Implement prototype using compute shaders or WebGPU, when available; Improve CPU performance, implement SIMD+ Web Assembly support when available.
+* Expand support for importing TensorFlow SavedModels and Keras models, with focus on audio and text-based models.
+* Release a new tfjs-data API for efficient data input pipelines, and a new tfjs-vis library for interactive model visualizations during browser training.
+* For server-side TensorFlow.js using Node - improve parity with native TensorFlow ops and model formats by exposing all TensorFlow ops; Add async mode support using libuv.
+
+#### TensorFlow with Swift
+
+* Continue to refine the design and implementation through 2018.
+* Core components (Graph Program Extraction, Basic AutoDiff, Send/Receives) reliable enough for general use by the end of 2018.
+* Explore the use of Swift for TensorFlow for building dynamic models through 2018.
+* Basic tutorials for getting started on Swift for TensorFlow in Colab in early 2019.
 
 ### 性能
 
-#### 分布式 TensorFlow：
+#### Distributed TensorFlow
 
-* 为多种 GPU 拓扑结构提供 Multi-GPU 优化支持
-* 为多机器分布式计算改进实现机制
+* Expand new distribution strategy API to support Keras on TPUs and multi-node GPU.
+* Demonstrate great out-of-the-box performance and easy deployment.
 
-#### 优化：
+#### GPU optimizations
 
-* 为混合精度的训练提供支持，并且提供基本的示例模型和操作指南
-* 原生的 TensorRT 支持
-* 通过 MKY 为 SkyLake 提供 Int8 支持
-* 动态加载 SIMD-optimized 内核
+* Simplify mixed precision API with public design review.
+* Finalize TensorRT API and move to core.
+* TensorRT support for SavedModel and TF Serving.
+* CUDA 10 integration (plan to skip CUDA 9.2 as it has minimal advantages to CUDA 9.0 when using the same version of cuDNN).
+* Optimizations for DGX-2.
 
-### 文档与可用性：
+#### Cloud TPUs and Cloud TPU Pods
 
-* 更新文档、教程以及快速上手指南
-* 允许外部为 TensorFlow 提供支持，其中包括教程、文档以及用博客展示最佳的 TensorFlow 练习用例或者酷炫应用
+* Expand support for Keras on Cloud TPUs and further optimize performance.
+* Extend support for image segmentation - add Mask R-CNN to current [RetinaNet](https://github.com/tensorflow/tpu/tree/master/models/official/retinanet) and [DeepLab](https://github.com/tensorflow/tpu/tree/master/models/experimental/deeplab) semantic segmentation reference models.
+* Optimize new Cloud TPU integrations: GKE, CMLE, Cloud Bigtable, gRPC data input.
+* Enable large-scale model parallelism on Cloud TPU Pods.
+* Optimize reference model performance on Cloud TPU v3.
 
-### 社区以及合作伙伴
+#### CPU optimizations
 
-#### 特别兴趣小组：
+* Int8 support for SkyLake via MKL.
+* Faster 3D ops via MKL.
+* Dynamic loading of SIMD-optimized kernels.
+* MKL for Linux and Windows.
 
-* 动员社区成员一起为重要领域相互协作
-* [tf-distribute](https://groups.google.com/a/tensorflow.org/forum/#!forum/tf-distribute): 用于 TensorFlow 工程构建以及打包
-* 更多待定的以及急需开展的计划
+### Other packages
 
-#### 社区：
+#### TensorFlow Probability
 
-* 通过 Request-for-Comment (RFC) 来集合公众对于重大设计决策的意见
-* 为 TensorFlow 以及相关项目的外部贡献制定程序流程
-* 为 TensorFlow 培育全球性的社区以及用户群体
-* 与行业伙伴合作以联合发展并对外发表论文研究成果
+* Additional implementations of Gaussian processes, including applications to hyperparameter optimization.
+* Bayesian Structural Time Series models.
+* Enhancements to sampling and optimization methods.
+* Rich set of Colab tutorials for using TFP.
+
+#### Tensor2Tensor library
+
+* New datasets and models for video, speech, and music with support for autoencoders, GANs, and RL.
+* Improve support for all platforms and simplify internals using TensorFlow 2.0 best practices.
+* Train huge models with model-parallelism with Mesh TensorFlow.
+
+### End-to-end ML systems
+
+#### TensorFlow Hub
+
+* Expand support for TF-Hub modules with TF Eager integration, Keras layers integration, and TensorFlow.js integration, and support for TF-Transform and TF-Data workflows.
+
+#### TensorFlow Extended
+
+* Open source more of the TensorFlow Extended platform to facilitate the adoption of TensorFlow in production settings.
+* Package TF Model Analysis for model evaluation and validation.
+* Release TFX libraries for Data Validation.
+* Publish end-to-end ML pipeline workflow examples.
+
+### Community and partner engagement
+
+#### Special Interest Groups (SIGs)
+
+* Mobilize the community to work together in focused domains.
+* [Evaluate and form new SIGs](https://github.com/tensorflow/community/blob/master/governance/SIGS.md) as needed to support ecosystem.
+
+#### Community
+
+* Continue public feedback on significant design decisions through the [Request-for-Comment (RFC) process](https://github.com/tensorflow/community/blob/master/governance/TF-RFCs.md).
+* Create a contributors’ guide to augment our [published governance and process](https://github.com/tensorflow/community/tree/master/governance).
+* Grow global TensorFlow communities and user groups.
+* Collaborate with partners to co-develop and publish research papers.
+* Continue to publish blog posts and YouTube videos showcasing applications of TensorFlow and build user case studies for high impact applications.
