@@ -8,9 +8,9 @@
 
 如果要问或者回答关于 TensorFlow 的技术问题，请使用 [Stack Overflow](https://stackoverflow.com/questions/tagged/tensorflow)。例如，询问或者搜索关于您安装 TensorFlow 时发生的错误信息。
 
-### Bugs 和功能需求
+### Bug 和功能需求
 
-如果有报告 bugs 或者功能的需求，请在 Github 上提出问题。请选择该项目的适当仓库。主要仓库包括：
+如果有报告 bug 或者功能的需求，请在 Github 上提出问题。请选择该项目的适当仓库。主要仓库包括：
 
   * [TensorFlow](https://github.com/tensorflow/tensorflow/issues)
   * [TensorBoard](https://github.com/tensorflow/tensorboard/issues)
@@ -18,7 +18,7 @@
 
 ### 安全性
 
-在使用 TensorFlow 之前，请关注我们的安全模块，这里有我们的最近关于安全的报告，在使用 TensorFlow 之前，请关注我们的安全模块，这里有我们的最近关于安全的报告，以及您可以在 [安全地使用 TensorFlow](https://github.com/tensorflow/tensorflow/blob/master/SECURITY.md) GitHub 页面向 TensorFLow 团队报告关于安全的问题。
+在使用 TensorFlow 之前，请关注我们的[安全模块](https://github.com/tensorflow/tensorflow/blob/master/SECURITY.md#tensorflow-models-are-programs)，[近期的安全建议和公告清单](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/security/index.md)，以及你可以在 GitHub 上的[安全地使用 TensorFlow](https://github.com/tensorflow/tensorflow/blob/master/SECURITY.md) 页面向 TensorFLow 团队[报告安全性相关的问题的方式](https://github.com/tensorflow/tensorflow/blob/master/SECURITY.md#reporting-vulnerabilities)。
 
 ## 随时了解最近消息
 
@@ -28,7 +28,7 @@
 
 ### TensorFlow 发展路线图
 
-@{$roadmap$Roadmap} 概述了即将加入 TensorFlow 的功能计划。
+[路线图](../community/roadmap.md)概述了即将加入 TensorFlow 的功能计划。
 
 ### 社交媒体
 
@@ -52,11 +52,11 @@
 
 有关 TensorFlow 发展和方向的讨论，请加入 [TensorFlow 讨论邮件列表](https://groups.google.com/a/tensorflow.org/d/forum/discuss)。
 
-还有一些其他的邮件列表，主要针对不同的项目区域，可以在 @{$lists$TensorFlow Mailing Lists} 中找到。
+还有一些其他的邮件列表，主要针对不同的项目区域，可以在 [TensorFlow 邮件列表](../community/lists.md)中找到。
 
 ### 用户组
 
-如果想要和与你相同地区志同道合的人见面，请查看全球各地的 @{$groups$TensorFlow user groups} 用户组织。
+如果想要和与你相同地区志同道合的人见面，请查看全球各地的 [TensorFlow 用户组织](../community/groups.md)。
 
 
 ## 对 TensorFlow 做出贡献
