@@ -8,15 +8,17 @@
 
 本指南重点关注 `tfdbg` 的命令行接口（CLI）。关于如何使用 tfdbg 的图形化用户界面（GUI），**TensorBoard 调试插件**，请查询[它的 README](https://github.com/tensorflow/tensorboard/blob/master/tensorboard/plugins/debugger/README.md)。
 
-注意：TensorFlow 调试器使用 [curses](https://en.wikipedia.org/wiki/Curses_\(programming_library\)) —— 基于文本用户界面。在 Mac OS X 上， `ncurses` 库是必需的，可以用 `brew install homebrew/dupes/ncurses` 进行安装。Windows 对 curses 支持性并不好，因此可以使用基于接口的 [readline](https://en.wikipedia.org/wiki/GNU_Readline)，用 `pip` 安装 `pyreadline` 来使用 tfdbg。如果你使用 Anaconda3，你可以使用 `"C:\Program Files\Anaconda3\Scripts\pip.exe" install pyreadline` 这样的命令来安装它。非官方的 Windwos curses 包可以在[这里](https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses)下载，然后用 `pip install <your_version>.whl` 安装。但是 curses 在 Windows 上可能无法像它在 Linux 和 Mac 上一样可靠地运行。
+注意：TensorFlow 调试器使用 [curses](https://en.wikipedia.org/wiki/Curses_(programming_library)) —— 基于文本用户界面。在 Mac OS X 上， `ncurses` 库是必需的，可以用 `brew install ncurses` 进行安装。Windows 对 curses 支持性并不好，因此可以使用基于接口的 [readline](https://en.wikipedia.org/wiki/GNU_Readline)，用 `pip` 安装 `pyreadline` 来使用 tfdbg。如果你使用 Anaconda3，你可以使用 `"C:\Program Files\Anaconda3\Scripts\pip.exe" install pyreadline` 这样的命令来安装它。非官方的 Windwos curses 包可以在[这里](https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses)下载，然后用 `pip install <your_version>.whl` 安装。但是 curses 在 Windows 上可能无法像它在 Linux 和 Mac 上一样可靠地运行。
 
-本教程演示了如何使用 tfdbg 命令行界面（CLI）来调试 [`nan`s](https://en.wikipedia.org/wiki/NaN) 和 [`inf`s](https://en.wikipedia.org/wiki/Infinity) 错误，这是 TensorFlow 模型开发中经常遇到的错误类型。 以下示例适用于使用 TensorFlow 的底层 [`Session`](https://www.tensorflow.org/api_docs/python/tf/Session) API 的用户。 本文档的后续部分描述了如何在更高层次的 API（即 `tf-learn` 中的 `Estimator` 和 `Experiment`）中来使用 tfdbg。要**观察**这个问题，请运行以下命令而不使用调试器（源代码可以在[这里](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/debug/examples/debug_mnist.py)可找到）
+本教程演示了如何使用 tfdbg 命令行界面（CLI）来调试 [`nan`s](https://en.wikipedia.org/wiki/NaN) 和 [`inf`s](https://en.wikipedia.org/wiki/Infinity) 错误，这是 TensorFlow 模型开发中经常遇到的错误类型。以下示例适用于使用 TensorFlow 的底层 [`Session`](https://www.tensorflow.org/api_docs/python/tf/Session) API 的用户。本文档的后续部分描述了如何在更高层的 API 中使用 **tfdbg**，包括 `tf.estimator`、`tf.keras` / `keras` 和 `tf.contrib.slim`。
+
+要**观察**这个问题，请运行以下命令而不使用调试器（源代码可以在[这里](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/debug/examples/debug_mnist.py)找到）。
 
 ```none
 python -m tensorflow.python.debug.examples.debug_mnist
 ```
 
-该代码训练一个简单的神经网络用于MNIST数字图像识别。 请注意，在第二次迭代训练后（step 1）训练之后，准确度就虽然还略有提高，但都是在 0.098 附近徘徊，变化已经不大了。
+该代码训练一个简单的神经网络用于 MNIST 数字图像识别。请注意，在第二次迭代训练后（step 1）训练之后，准确度就虽然还略有提高，但都是在 0.098 附近徘徊，变化已经不大了。
 
 
 ```none
@@ -27,11 +29,11 @@ Accuracy at step 3: 0.098
 Accuracy at step 4: 0.098
 ```
 
-想知道可能出了什么问题，你怀疑计算图在训练时中的某些节点产生了不良的数值，例如 `inf`s 和 `nan`s，因为这是训练失败的一个常见原因。 让我们用 tfdbg 来调试这个问题，并确定第一次出现这种数值问题的图结点的确切位置。
+想知道可能出了什么问题，你怀疑计算图在训练时中的某些节点产生了不良的数值，例如 `inf`s 和 `nan`s，因为这是训练失败的一个常见原因。让我们用 tfdbg 来调试这个问题，并确定第一次出现这种数值问题的图结点的确切位置。
 
 ## 使用 tfdbg 包装 TensorFlow 会话（Sessions）
 
-要在我们的示例中添加对 tfdbg 的支持，所需要的是添加以下代码行，并使用调试器包装器包装 Session 对象。 此代码已添加到 [debug_mnist.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/debug/examples/debug_mnist.py) 中，因此您可以在命令行中使用 `--debug` 标志来激活 tfdbg 命令行界面（下文都将简称为 tfdbg CLI）。
+要在我们的示例中添加对 tfdbg 的支持，所需要的是添加以下代码行，并使用调试器包装器包装 Session 对象。此代码已添加到 [debug_mnist.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/debug/examples/debug_mnist.py) 中，因此你可以在命令行中使用 `--debug` 标志来激活 tfdbg 命令行界面（下文都将简称为 tfdbg CLI）。
 
 
 ```python
@@ -46,11 +48,11 @@ sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
 该包装器具有与 Session 相同的接口，因此启动调试不需要对代码进行任何修改。包装器提供了额外的特性，包括：
 
 * 在 `Session.run()` 之前和之后显示一个命令行界面，让你控制执行，并检查图的内部状态。
-* 允许您为张量值注册特殊的过滤器，以便于诊断问题。
+* 允许你为张量值注册特殊的过滤器，以便于诊断问题。
 
-在这个例子中，我们已经注册了一个称为 @{tfdbg.has_inf_or_nan} 的张量过滤器，它简单地确定中间张量是否有包含 `nan` 或 `inf` 值的中间张量（从输入到输出的路径中的张量，而不是 `Session.run()` 时的输入和输出张量）。 该过滤器用于 `nan`s，`inf`s 是一个常见的使用情况，我们使用 @{$python/tfdbg#Classes_for_debug_dump_data_and_directories$`debug_data`} 模块发送它。
+在这个例子中，我们已经注册了一个称为 `tfdbg.has_inf_or_nan` 的张量过滤器，它简单地确定中间张量是否有包含 `nan` 或 `inf` 值的中间张量（从输入到输出的路径中的张量，而不是 `Session.run()` 时的输入和输出张量）。该过滤器用于 `nan`s，`inf`s 是一个常见的使用情况，我们使用 [`debug_data`](../api_guides/python/tfdbg.md#Classes_for_debug_dump_data_and_directories) 模块来发送它。
 
-注意：你也可以编写自己的自定义过滤器。 有关其他信息，请参阅 `@{tfdbg.DebugDumpDir.find$API documentation}`
+注意：你也可以编写自定义的过滤器。到 `tfdbg.DebugDumpDir.find` 中查看其他相关信息。
 
 ## 使用 tfdbg 调试模型训练
 
@@ -60,16 +62,15 @@ sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
 python -m tensorflow.python.debug.examples.debug_mnist --debug
 ```
 
-调试包装器会话将在您要调用第一个 Session.run() 时提示您，并在屏幕上显示一些值，其中包含有关获取的张量（Fetches）的信息，以及供给数据所对应的字典参数（Feeds）。
+调试包装器会话将在你要调用第一个 `Session.run()` 时提示你，并在屏幕上显示一些值，其中包含有关获取的张量（Fetches）的信息，以及供给数据所对应的字典参数（Feeds）。
 
 ![tfdbg run-start UI](https://www.tensorflow.org/images/tfdbg_screenshot_run_start.png)
 
-这就是我们所说的 **run-start CLI**。 在执行任何操作之前，它会将 `Session.run` 调用所需要输入的 Fetch 和 Feed 张量列出来。
+这就是我们所说的 **run-start CLI**。在执行任何操作之前，它会将 `Session.run` 调用所需要输入的 Fetch 和 Feed 张量列出来。
 
-如果屏幕尺寸太小，无法完整显示消息的内容，您可以调整其大小。
+如果屏幕尺寸太小，无法完整显示消息的内容，你可以调整其大小。
 
-使用 **PageUp** / **PageDown** / **Home** / **End** 键来导航屏幕输出，当然也可以使用 **Fn + Up** /
-**Fn + Down** / **Fn + Right** / **Fn + Left**，虽然很多键盘没有这些键。
+使用 **PageUp**/**PageDown**/**Home**/**End** 键来导航屏幕输出，当然也可以使用 **Fn + Up**/**Fn + Down**/**Fn + Right**/**Fn + Left**，虽然很多键盘没有这些键。
 
 在命令提示符下输入 `run` 命令（或者只是 `r`）让终端继续运行：
 
@@ -77,7 +78,7 @@ python -m tensorflow.python.debug.examples.debug_mnist --debug
 tfdbg> run
 ```
 
-`run` 命令会导致 `tfdbg` 执行，直到下一个 `Session.run()` 调用结束，该调用使用测试数据集计算模型的准确性。 `tfdbg` 加载运行时图时转储所有中间张量。运行结束后，`tfdbg` 将显示运行结束后在命令行界面中显示所有的中间张量值。 例如：
+`run` 命令会导致 `tfdbg` 执行，直到下一个 `Session.run()` 调用结束，该调用使用测试数据集计算模型的准确性。`tfdbg` 加载运行时图时转储所有中间张量。运行结束后，`tfdbg` 将显示运行结束后在命令行界面中显示所有的中间张量值。例如：
 
 ![tfdbg run-end UI: accuracy](https://www.tensorflow.org/images/tfdbg_screenshot_run_end_accuracy.png)
 
@@ -85,7 +86,7 @@ tfdbg> run
 
 ### tfdbg CLI 常用的命令
 
-在 `tfdbg>` 提示符下（参考 tensorflow / python / debug / examples / debug_mnist.py 中的代码），尝试以下命令：
+在 `tfdbg>` 提示符下（参考 tensorflow/python/debug/examples/debug_mnist.py 中的代码），尝试以下命令：
 
 | Command            | Syntax or Option | Explanation  | Example                   |
 |:-------------------|:---------------- |:------------ |:------------------------- |
@@ -93,22 +94,22 @@ tfdbg> run
 | | `-n <name_pattern>` | 列出名称与给定正则表达式模式匹配的转储张量。 | `lt -n Softmax.*` |
 | | `-t <op_pattern>` | 列出操作类型与给定正则表达式模式匹配的转储张量。 | `lt -t MatMul` |
 | | `-f <filter_name>` | 列出与给定字符串匹配的转储张量。| `lt -f has_inf_or_nan` |
-| | `-f <filter_name> -fenn <regex>` | 列出只传递注册张量过滤器的张量，不包括与正则表达式匹配的名称的节点| `lt -f has_inf_or_nan` `-fenn .*Sqrt.*` |
-| | `-s <sort_key>` | 根据 sort_key 对输出排序，sort_key 可能的值为 `timestamp（默认）`，`dump_size`，`op_type` 和 `tensor_name`。 | `lt -s dump_size` |
+| | `-f <filter_name> -fenn <regex>` | 列出只传递注册张量过滤器的张量，不包括与正则表达式匹配的名称的节点。| `lt -f has_inf_or_nan` `-fenn .*Sqrt.*` |
+| | `-s <sort_key>` | 根据 sort_key 对输出排序，sort_key 可能的值为 `timestamp（默认）`、`dump_size`、`op_type` 和 `tensor_name`。 | `lt -s dump_size` |
 | | `-r` | 按相反顺序排列。 | `lt -r -s dump_size` |
 | **`pt`** | | **打印转储张量的值。** | |
 | | `pt <tensor>` | 打印张量值。 | `pt hidden/Relu:0` |
 | | `pt <tensor>[slicing]` | 使用 [numpy](http://www.numpy.org/)-style数组切片来打印张量中的子数组。| `pt hidden/Relu:0[0:50,:]` |
-| | `-a` | 不截断打印结果很长的张量。（大的张量可能需要花很长的时间来打印）| `pt -a hidden/Relu:0[0:50,:]` |
+| | `-a` | 不截断打印结果很长的张量（大的张量可能需要花很长的时间来打印）。| `pt -a hidden/Relu:0[0:50,:]` |
 | | `-r <range>` | 筛选出指定数值区间内的元素。如果有多个区间可以结合使用。| `pt hidden/Relu:0 -a -r [[-inf,-1],[1,inf]]` |
 | | `-n <number>` | 打印转储对应于指定的 基于 0 的转储数值。被具有多转储的张量所需。| `pt -n 0 hidden/Relu:0` |
-| | `-s` | 打印数值张量的摘要（仅适用于布尔型和数字类型的非空张量，如 `int *` 和 `float *`） | `pt -s hidden/Relu:0[0:50,:]` |
+| | `-s` | 打印数值张量的摘要（仅适用于布尔型和数字类型的非空张量，如 `int *` 和 `float *`）。| `pt -s hidden/Relu:0[0:50,:]` |
 | | `-w` | 使用 [`numpy.save()`](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.save.html) 将张量（可能已分片）的值写入一个 Numpy 文件 | `pt -s hidden/Relu:0 -w /tmp/relu.npy` |
 | **`@[coordinates]`** | | 根据坐标值导航到 `pt` 命令输出值的指定位置。| `@[10,0]` or `@10,0` |
-| **`/regex`** | | [less](https://linux.die.net/man/1/less) 风格的正则表达式搜索 | `/inf` |
+| **`/regex`** | | [less](https://linux.die.net/man/1/less) 风格的正则表达式搜索。 | `/inf` |
 | **`/`** | | 滚动到下一个正则表达式匹配的结果（如果有）。| `/` |
 | **`pf`** | | **打印 `Session.run` 的参数 `feed_dict`。** | |
-| | `pf <feed_tensor_name>` | 打印供给数据的值。 还要注意，`pf` 命令具有 `-a`，`-r` 和 `-s` 标志（未在下面列出） ，这些标志与 `pt` 命令的那些同名标志具有相同的语法和语义。| `pf input_xs:0` |
+| | `pf <feed_tensor_name>` | 打印供给数据的值。 还要注意，`pf` 命令具有 `-a`，`-r` 和 `-s` 标志（未在下面列出），这些标志与 `pt` 命令的那些同名标志具有相同的语法和语义。| `pf input_xs:0` |
 | **eval** | | **运行 Python 和 numpy 表达式。** | |
 | | `eval <expression>` | 运行 Python / numpy 表达式，用 np 来表示 numpy，调试的张量名需要加上到引号。| ``eval "np.matmul((`output/Identity:0` / `Softmax:0`).T, `Softmax:0`)"`` |
 | | `-a` | 打印表达式返回的结果，就算结果很长也不截断。| ``eval -a 'np.sum(`Softmax:0`, axis=1)'`` |
@@ -148,10 +149,11 @@ tfdbg> run
 | **`config`** | | **设置或显示 TFDBG UI 当前的配置信息。** | |
 | | `set` | 设置配置项，譬如 {`graph_recursion_depth`, `mouse_mode`}。 | `config set graph_recursion_depth 3` |
 | | `show` | 显示当前的 UI 配置信息。 | `config show` |
+| **`version`** | | **打印 TensorFlow 的版本信息及其关键依赖项。** | `version` |
 | **`help`** | | **打印通用的帮助信息** | `help` |
 | | `help <command>` | 打印命令所对应的帮助信息 | `help lt` |
 
-请注意，每当您输入命令时，都会显示新的屏幕输出。 这有点类似于浏览器中的网页。 您可以通过点击命令行界面左上角附近的`<--` 和 `-->` 文字箭头在这些屏幕之间导航。
+请注意，每当你输入命令时，都会显示新的屏幕输出。 这有点类似于浏览器中的网页。 你可以通过点击命令行界面左上角附近的`<--` 和 `-->` 文字箭头在这些屏幕之间导航。
 
 ### tfdbg CLI 的其他特性
 
@@ -170,16 +172,16 @@ tfdbg> run
   
 ### 找到 `nan`s 和 `inf`s
 
-在第一个 `Session.run()` 调用中，碰巧没有出现有问题的数值。 您可以使用命令 run 或 r 进入下一次运行。
+在第一个 `Session.run()` 调用中，碰巧没有出现有问题的数值。你可以使用命令 run 或 r 进入下一次运行。
 
-> 提示：如果您反复输入 `run` 或 `r`，则可以依次的调用 Session.run()。
+> 提示：如果你反复输入 `run` 或 `r`，则可以依次的调用 Session.run()。
 > 
 > 你也可以使用 -t 标志来调用多次 Session.run()，例如：
 > ```
 > tfdbg> run -t 10
 > ```
 
-不必在每次 `Session.run()` 之后，在 run-end 界面中重复输入 run 并手动搜索 `nan`s 和 `inf`s（例如，通过使用上表中所示的 `pt` 命令），您可以使用以下命令让调试器重复执行 Session.run() 直到第一个 `nan` 或 `inf` 值显示在图中。 这在某些程序语言调试器中类似于**条件断点**：
+不必在每次 `Session.run()` 之后，在 run-end 界面中重复输入 run 并手动搜索 `nan`s 和 `inf`s（例如，通过使用上表中所示的 `pt` 命令），你可以使用以下命令让调试器重复执行 Session.run() 直到第一个 `nan` 或 `inf` 值显示在图中。这在某些程序语言调试器中类似于**条件断点**：
 
 ```none
 tfdbg> run -f has_inf_or_nan
@@ -187,8 +189,7 @@ tfdbg> run -f has_inf_or_nan
 
 > 注意：上述命令可以正常工作，因为我们已经注册了一个名为 `has_inf_or_nan`的 `nan`s 和 `inf`s 的过滤器
 > （如前所述）。 
-> 如果您已经注册了其他过滤器，您可以使用 “run -f” 来运行 tfdbg，直到任何张量器触发该过滤器（导致过滤器返回
-> True）。
+> 如果你已经注册了其他过滤器，你可以使用 “run -f” 来运行 tfdbg，直到任何张量器触发该过滤器（导致过滤器返回 True）。
 >
 > ```python
 > def my_filter_callable(datum, tensor):
@@ -198,7 +199,7 @@ tfdbg> run -f has_inf_or_nan
 > sess.add_tensor_filter('my_filter', my_filter_callable)
 > ```
 >
-> 然后在 tfdbg run-start 提示符下继续运行，直到您的过滤器被触发：
+> 然后在 tfdbg run-start 提示符下继续运行，直到你的过滤器被触发：
 >
 > ```shell
 > tfdbg> run -f my_filter
@@ -208,7 +209,7 @@ tfdbg> run -f has_inf_or_nan
 
 ![tfdbg run-end UI: infs 和 nans](https://www.tensorflow.org/images/tfdbg_screenshot_run_end_inf_nan.png)
 
-当屏幕显示在第一行显示时，在第四次 `Session.run()` 调用期间首先触发 `has_inf_or_nan` 过滤器：计算图上运行的一个 [Adam Optimizer](https://www.tensorflow.org/api_docs/python/tf/train/AdamOptimizer) 前向-反向训练过程。 在这次运行中，36个（总共 95 个）中间张量包含 `nan` 或 `inf` 值。 这些张量按时间顺序列出，其时间戳显示在左侧。 在列表的顶部，您可以看到第一个张量，其中首先出现错误的数值是：cross_entropy / Log：0。
+当屏幕显示在第一行显示时，在第四次 `Session.run()` 调用期间首先触发 `has_inf_or_nan` 过滤器：计算图上运行的一个 [Adam Optimizer](https://www.tensorflow.org/api_docs/python/tf/train/AdamOptimizer) 前向-反向训练过程。在这次运行中，36 个（总共 95 个）中间张量包含 `nan` 或 `inf` 值。这些张量按时间顺序列出，其时间戳显示在左侧。在列表的顶部，你可以看到第一个张量，其中首先出现错误的数值是：cross_entropy / Log：0。
 
 要查看张量的值，请单击带下划线的张量名称 `cross_entropy / Log：0` 或输入等效命令：
 
@@ -216,7 +217,7 @@ tfdbg> run -f has_inf_or_nan
 tfdbg> pt cross_entropy/Log:0
 ```
 
-向下滚动一点，你会注意到一些分散的 `inf` 值。 如果 `inf` 和 `nan` 的实例难以察觉，您可以使用以下命令执行正则表达式搜索并高亮显示输出：
+向下滚动一点，你会注意到一些分散的 `inf` 值。 如果 `inf` 和 `nan` 的实例难以察觉，你可以使用以下命令执行正则表达式搜索并高亮显示输出：
 
 ```none
 tfdbg> /inf
@@ -228,13 +229,13 @@ tfdbg> /inf
 tfdbg> /(inf|nan)
 ```
 
-您还可以使用 `-s` 或 `--numeric_summary` 命令得到张量数值类型的快速摘要：
+你还可以使用 `-s` 或 `--numeric_summary` 命令得到张量数值类型的快速摘要：
 
 ```none
 tfdbg> pt -s cross_entropy/Log:0
 ```
 
-从摘要中，你可以看到 `cross_entropy / Log：0` 张量的 1000 个元素中有几个元素是 `-inf`s（负的无穷大）
+从摘要中，你可以看到 `cross_entropy / Log：0` 张量的 1000 个元素中有几个元素是 `-inf`s（负的无穷大）。
 
 为什么这些负无穷大的值会出现？要进一步调试，请通过单击顶部下划线的 `node_info` 菜单项来显示有关结点的 `cross_entropy / Log` 的更多信息，或输入等效的 node_info（`ni`）命令：
 
@@ -244,7 +245,7 @@ tfdbg> ni cross_entropy/Log
 
 ![tfdbg run-end UI: infs and nans](https://www.tensorflow.org/images/tfdbg_screenshot_run_end_node_info.png)
 
-您可以看到该结点的操作类型为 `Log`，并且结点的输入是 Softmax。 运行以下命令，仔细观察输入张量：
+你可以看到该结点的操作类型为 `Log`，并且结点的输入是 Softmax。运行以下命令，仔细观察输入张量：
 
 ```none
 tfdbg> pt Softmax:0
@@ -256,13 +257,13 @@ tfdbg> pt Softmax:0
 tfdbg> /0\.000
 ```
 
-确实有零。现在很清楚，不良数值的起源是采用零日志的结点 cross_entropy / Log。 要了解 Python 源代码中的罪魁祸首行，请使用 `ni` 命令的 `-t` 标记来追溯构造此结点的代码位置：
+确实有零。现在很清楚，不良数值的起源是采用零日志的结点 cross_entropy / Log。要了解 Python 源代码中的罪魁祸首行，请使用 `ni` 命令的 `-t` 标记来追溯构造此结点的代码位置：
 
 ```none
 tfdbg> ni -t cross_entropy/Log
 ```
 
-如果您点击屏幕顶部的 “node_info”，tfdbg 会自动显示此结点构造的回溯。
+如果你点击屏幕顶部的 “node_info”，tfdbg 会自动显示此结点构造的回溯。
 
 从追溯中，你可以看到，此操作结点是在下面这一行中创建的：[debug_mnist.py](https://www.tensorflow.org/code/tensorflow/python/debug/examples/debug_mnist.py)：
 
@@ -285,7 +286,7 @@ diff = -(y_ * tf.log(y))
 修改为系统内建的 softmax 交叉熵函数：
 
 ```python
-diff = tf.losses.sparse_softmax_cross_entropy(labels=y_, logits=logits)
+diff = tf.losses.softmax_cross_entropy(labels=y_, logits=logits)
 ```
 
 带上 `--debug` 标记，重新运行：
@@ -303,14 +304,11 @@ run -f has_inf_or_nan`
 
 确认没有张量被标记为包含 `nan` 或 `inf` 值，并且准确度现在继续上升而不是卡住，意味着我们的修改是成功的。
 
-## 调试 tf-learn 中的 Estimators 和 Experiments
+## 调试 TensorFlow 的 Estimators
 
-这个章节解释了如何调试使用了 `Estimator` 和 `Experiment` API 来调试 TensorFlow 程序。这些 API 的便利之处部分在于它们是内部管理 `Session`。 这使得前面部分中描述的 `LocalCLIDebugWrapperSession` 不适用。 幸运的是，您仍然可以使用 `tfdbg` 提供的特殊钩子进行调试。
+这个章节解释了如何调试使用了 `Estimator` API 来调试 TensorFlow 程序。这些 API 的便利之处部分在于它们是内部管理 `Session`。 这使得前面部分中描述的 `LocalCLIDebugWrapperSession` 不适用。幸运的是，你仍然可以使用 `tfdbg` 提供的特殊钩子进行调试。
 
-### 调试 tf.contrib.learn 评估器对象（Estimator）
-
-目前来说，`tfdbg` 可以对评估器中的 @{tf.contrib.learn.BaseEstimator.fit$`fit()`} 和
-@{tf.contrib.learn.BaseEstimator.evaluate$`evaluate()`} 进行调试。为了调试 `Estimator.fit()`，请创建一个 `LocalCLIDebugHook` 并将它传给参数 `monitors`，例子如下：
+`tfdbg` 能够调试 tf-learn `Estimator` 的 `tf.estimator.Estimator.train`、`tf.estimator.Estimator.evaluate` 和 `tf.estimator.Estimator.predict` 方法。可以创建一个 `LocalCLIDebugHook`，并在 `hooks` 的参数中使用它。例如：
 
 ```python
 # 首先，让编译时的构建（BUILD）目标依赖于 "//tensorflow/python/debug:debug_py"
@@ -321,73 +319,49 @@ from tensorflow.python import debug as tf_debug
 # 创建一个 LocalCLIDebugHook 并作为 monitor 参数的值传递给函数 fit()。
 hooks = [tf_debug.LocalCLIDebugHook()]
 
-classifier.fit(x=training_set.data,
-               y=training_set.target,
-               steps=1000,
-               monitors=hooks)
+# 调试 `train`：
+classifier.train(input_fn,
+                 steps=1000,
+                 hooks=hooks)
 ```
 
-若是调试 `Estimator.evaluate()`，可以将 hooks 作为 `hooks` 参数的值，如下代码所示：
+同样，为了调试 `Estimator.evaluate()` 和 `Estimator.predict()`，可以这样设置 `hooks` 参数的钩子，如下方代码所示：
 
 ```python
-accuracy_score = classifier.evaluate(x=test_set.data,
-                                     y=test_set.target,
+# 调试 `evaluate`：
+accuracy_score = classifier.evaluate(eval_input_fn,
                                      hooks=hooks)["accuracy"]
+# 调试 `predict`：
+predict_results = classifier.predict(predict_input_fn, hooks=hooks)
 ```
 
-[debug_tflearn_iris.py](https://www.tensorflow.org/code/tensorflow/python/debug/examples/debug_tflearn_iris.py) 中的代码是基于 [tf-learn's iris 教程](https://www.tensorflow.org/versions/r1.2/get_started/tflearn)，里面包含了如何将 `tfdbg` 与评估器一起使用的完整示例。要运行这个例子，请输入下面的命令：
+[debug_tflearn_iris.py](https://www.tensorflow.org/code/tensorflow/python/debug/examples/debug_tflearn_iris.py) 里面包含了如何将 `tfdbg` 与 `Estimator` 一起使用的完整示例。要运行这个例子，请输入下面的命令：
 
 ```none
 python -m tensorflow.python.debug.examples.debug_tflearn_iris --debug
 ```
 
-### 调试 tf.contrib.learn 中的 Experiments 对象
-
-`Experiment` 是 `tf.contrib.learn` 模块中比 `Estimator` 更加高层的 API 。它提供了一个训练和评估模型的界面。 要调试 `Experiment` 对象的 `train()` 和 `evaluate()` 调用，可以调用其构造函数时分别使用 `train_monitors` 和 `eval_hooks` 参数。
-
-```python
-# 首先，让编译时的构建（BUILD）目标依赖于 "//tensorflow/python/debug:debug_py"
-# （如果你是使用 pip install 安装的 TensorFlow，那么你就不需要担心构建时的依赖的问题）
-from tensorflow.python import debug as tf_debug
-
-hooks = [tf_debug.LocalCLIDebugHook()]
-
-ex = experiment.Experiment(classifier,
-                           train_input_fn=iris_input_fn,
-                           eval_input_fn=iris_input_fn,
-                           train_steps=FLAGS.train_steps,
-                           eval_delay_secs=0,
-                           eval_steps=1,
-                           train_monitors=hooks,
-                           eval_hooks=hooks)
-
-ex.train()
-accuracy_score = ex.evaluate()["accuracy"]
-```
-
-为了以 `Experiment` 模式来构建和运行 `debug_tflearn_iris` 样例，请在终端键入以下命令：
-
-```none
-python -m tensorflow.python.debug.examples.debug_tflearn_iris \
-    --use_experiment --debug
-```
-
-`LocalCLIDebugHook` 允许您配置 `watch_fn` 来监视特定 `Tensor`s 在不同次 `Session.run()` 调用之间的变化，而这个函数需要和 `fetch` 和 `feed_dict` 其他状态一样传递到 `run` 调用中，更多的信息可以查询`@{tfdbg.DumpingDebugWrapperSession.__init__$this API doc}`。
+`LocalCLIDebugHook` 允许你配置 `watch_fn` 来监视特定 `Tensor`s 在不同次 `Session.run()` 调用之间的变化，而这个函数需要和 `fetch` 和 `feed_dict` 其他状态一样传递到 `run` 调用中，更多的信息可以查看 `tfdbg.DumpingDebugWrapperSession.__init__`。
 
 ## 使用 TFDBG 调试 Keras 模型
 
-要在 [Keras](https://keras.io/) 中使用 TFDBG，需要让 Keras 后端使用一个 TFDBG-wrapped 的 Session 对象。下面是一个使用命令行界面包装器的例子：
+要在 [tf.keras](https://www.tensorflow.org/api_docs/python/tf/keras) 中使用 TFDBG，需要让 Keras 后端使用一个 TFDBG-wrapped 的 Session 对象。下面是一个使用命令行界面包装器的例子：
 
 ```python
 import tensorflow as tf
-from keras import backend as keras_backend
 from tensorflow.python import debug as tf_debug
 
-keras_backend.set_session(tf_debug.LocalCLIDebugWrapperSession(tf.Session()))
+tf.keras.backend.set_session(tf_debug.LocalCLIDebugWrapperSession(tf.Session()))
 
 # 定义你的 keras 模型，变量名称为 “model”。
-model.fit(...)  # 这里将会调试进入 TFDBG CLI。
+
+# 调用 `fit()`、'evaluate()` 和 `predict()` 方法将进入 TFDBG CLI。
+model.fit(...)
+model.evaluate(...)
+model.predict(...)
 ```
+
+通过稍作修改，前面的代码示例也适用于针对 TensorFlow 后端运行的[非 TensorFlow 版本的 Keras](https://keras.io/)。你只需要用 `keras.backend` 替换 `tf.keras.backend`。
 
 ## 使用 TFDBG 调试 tf-slim
 
@@ -429,11 +403,11 @@ tf.contrib.slim.evaluation.evaluate_once(
 
 ## 离线调试远程运行的 Session
 
-很多时候，你的模型正运行在远程机器上，或你无法用终端访问一个进程。为了在这种情况下调试模型，你可以使用 tfdbg 中的 offline_analyzer 库（下面将会描述）。 它可以对转储张量的文件夹进行操作，并且兼容低层的 `Session` API 和高层的 `Estimators` 和 `Experiment` APIs。
+很多时候，你的模型正运行在远程机器上，或你无法用终端访问一个进程。为了在这种情况下调试模型，你可以使用 tfdbg 中的 offline_analyzer 库（下面将会描述）。 它可以对转储张量的文件夹进行操作，并且兼容低层的 `Session` API 和高层的 `Estimators` API。
 
 ### 调试远程的 tf.Sessions
 
-如果您直接与 `python` 中的 `tf.Session` API 进行交互，您可以配置 `RunOptions` 协议（proto），它将会作为参数传递给 @{tfdbg.watch_graph} 方法。当发生 `Session.run()` 调用（以较慢的性能为代价）时，这将导致中间张量和运行时的图转储到您选择的共享存储位置。 例子如下：
+如果你直接与 `python` 中的 `tf.Session` API 进行交互，你可以配置 `RunOptions` 协议（proto），它将会作为参数传递给 `tfdbg.watch_graph` 方法。当发生 `Session.run()` 调用（以较慢的性能为代价）时，这将导致中间张量和运行时的图转储到你选择的共享存储位置。 例子如下：
 
 ```python
 from tensorflow.python import debug as tf_debug
@@ -450,7 +424,7 @@ tf_debug.watch_graph(
 session.run(fetches, feed_dict=feeds, options=run_options)
 ```
 
-之后，在终端访问的环境中（例如，可以访问上面代码中指定的共享存储位置的本地计算机），您可以使用 tfdbg 中的 `offline_analyzer` 模块来加载和检查共享存储中的转储目录中的数据。例子如下：
+之后，在终端访问的环境中（例如，可以访问上面代码中指定的共享存储位置的本地计算机），你可以使用 tfdbg 中的 `offline_analyzer` 模块来加载和检查共享存储中的转储目录中的数据。例子如下：
 
 ```none
 python -m tensorflow.python.debug.cli.offline_analyzer \
@@ -472,11 +446,11 @@ sess = tf_debug.DumpingDebugWrapperSession(
 
 ### C++ 和其他语言
 
-如果您的模型代码用 C ++ 或其他语言编写，您还可以修改 `RunOptions` 的 `debug_options` 字段来生成可以离线检查的调试转储。有关详细信息，请参阅此[协议(proto)](https://www.tensorflow.org/code/tensorflow/core/protobuf/debug.proto)的定义。
+如果你的模型代码用 C ++ 或其他语言编写，你还可以修改 `RunOptions` 的 `debug_options` 字段来生成可以离线检查的调试转储。有关详细信息，请参阅此[协议(proto)](https://www.tensorflow.org/code/tensorflow/core/protobuf/debug.proto)的定义。
 
-### 调试远程运行的 Estimator 和 Experiments
+### 调试远程运行的 Estimator
 
-如果您的远程 TensorFlow 服务器运行着 Estimator，则可以使用非交互式 `DumpingDebugHook`。 例子如下：
+如果你的远程 TensorFlow 服务器运行着 Estimator，则可以使用非交互式 `DumpingDebugHook`。例子如下：
 
 ```python
 # 首先，让你的 BUILD 对象依赖于 "//tensorflow/python/debug:debug_py"
@@ -486,7 +460,7 @@ from tensorflow.python import debug as tf_debug
 hooks = [tf_debug.DumpingDebugHook("/shared/storage/location/tfdbg_dumps_1")]
 ```
 
-那么这个钩子可以像本文前面所述的 `LocalCLIDebugHook` 示例一样来使用。 当 `Estimator` 或 `Experiment` 开始训练或求值时，tfdbg 会创建具有如下命名模式的目录：/ shared / storage / location / tfdbg_dumps_1 / run_<epoch_timestamp_microsec>_<uuid>。 每个目录对应于一次 `Session.run()` 调用，进而调用 `fit()` 或 `evaluate()`。 您可以使用 tfdbg 提供的 offline_analyzer 以离线方式加载这些目录并在命令行界面中进行检查。 例如：
+那么这个钩子可以像本文前面所述的 `LocalCLIDebugHook` 示例一样来使用。当 `Estimator` 开始训练、评估或预测时，tfdbg 会创建具有如下命名模式的目录：`/shared/storage/location/tfdbg_dumps_1/run_<epoch_timestamp_microsec>_<uuid>`。每个目录对应于一次 `Session.run()` 调用，进而调用 `fit()` 或 `evaluate()`。你可以使用 tfdbg 提供的 offline_analyzer 以离线方式加载这些目录并在命令行界面中进行检查。例如：
 
 ```bash
 python -m tensorflow.python.debug.cli.offline_analyzer \
@@ -497,19 +471,19 @@ python -m tensorflow.python.debug.cli.offline_analyzer \
 
 **Q**：执行 `lt` 命令输出内容时，其左侧的时间戳可以反映非调试情况下 Session 中的实际性能吗？
 
-**A**：不可以的，调试器将附加的专用调试结点插入计算图中以记录中间张量的值。这些结点会减慢计算图的执行。 如果您对分析您模型的性能感兴趣，请参考下列方法
+**A**：不可以的，调试器将附加的专用调试结点插入计算图中以记录中间张量的值。这些结点会减慢计算图的执行。如果你对分析你模型的性能感兴趣，请参考下列方法
 
    1. tfdbg 的性能分析模式：`tfdbg> run -p`。
    2. [tfprof](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/core/profiler) 和其他的 TensorFlow 性能分析工具。
 
-**Q**：如何在 Bazel 中将 tfdbg 与我的 `Session` 链接？ 为什么会看到诸如 “ImportError：cannot import name debug” 之类的错误？
+**Q**：如何在 Bazel 中将 tfdbg 与我的 `Session` 链接？为什么会看到诸如 “ImportError：cannot import name debug” 之类的错误？
 
-**A**：在您编译构建（BUILD）的规则中，声明依赖关系：“/ tensorflow：tensorflow_py” 和 “// tensorflow / python / debug：debug_py” 。 其中，第一个依赖是您使用 TensorFlow 即使没有调试器支持的依赖关系；第二个依赖是用来启用调试器的。 然后，在你的 Python 文件中，添加下面的代码：
+**A**：在你编译构建（BUILD）的规则中，声明依赖关系：“/tensorflow：tensorflow_py” 和 “/tensorflow/python/debug：debug_py” 。 其中，第一个依赖是你使用 TensorFlow 即使没有调试器支持的依赖关系；第二个依赖是用来启用调试器的。 然后，在你的 Python 文件中，添加下面的代码：
 
 ```python
 from tensorflow.python import debug as tf_debug
 
-# 然后用 local-CLI 包装器包装您的 TensorFlow 会话。
+# 然后用 local-CLI 包装器包装你的 TensorFlow 会话。
 sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 ```
 
@@ -529,7 +503,7 @@ python -m tensorflow.python.debug.examples.debug_errors \
 
 **Q**：如何让 tfdbg 包装的 Sessions 或钩子仅对主线程进行调试呢？
 
-**A**：这是一个常见的用例，其中 Session 对象同时从多个线程使用。 通常来说，子线程处理后台任务，例如执行入队操作。这时，您一般只想调试主线程（或者只是一个子线程）。 你可以使用 `LocalCLIDebugWrapperSession` 中的 `thread_name_filter` 参数来实现线程选择性调试。 例如，想要只调试主线程，构造一个包装的会话，如下所示：
+**A**：这是一个常见的用例，其中 Session 对象同时从多个线程使用。 通常来说，子线程处理后台任务，例如执行入队操作。这时，你一般只想调试主线程（或者只是一个子线程）。 你可以使用 `LocalCLIDebugWrapperSession` 中的 `thread_name_filter` 参数来实现线程选择性调试。 例如，想要只调试主线程，构造一个包装的会话，如下所示：
 
 ```python
 sess = tf_debug.LocalCLIDebugWrapperSession(sess, thread_name_filter="MainThread$")
@@ -540,15 +514,15 @@ sess = tf_debug.LocalCLIDebugWrapperSession(sess, thread_name_filter="MainThread
 **Q**：我正在调试的模型非常大。 tfdbg 转储的数据填满了我磁盘空闲的空间。 我该怎么办？
 
 **A**：
-在以下情况下，您可能会遇到此问题：
+在以下情况下，你可能会遇到此问题：
 
 *   具有许多中间张量的模型
 *   非常大的中间张量
-*   很多的 @{tf.while_loop} 迭代
+*   很多的 `tf.while_loop` 迭代
 
 有三种可能的解决方法或解决方案：
 
-*  `LocalCLIDebugWrapperSession` 和 `LocalCLIDebugHook` 的构造函数提供一个参数 `dump_root`，以指定 tfdbg 转储调试数据的路径。您可以使用它来让 tfdbg 将调试数据转储在具有较大可用空间的磁盘上。 例如：
+*  `LocalCLIDebugWrapperSession` 和 `LocalCLIDebugHook` 的构造函数提供一个参数 `dump_root`，以指定 tfdbg 转储调试数据的路径。你可以使用它来让 tfdbg 将调试数据转储在具有较大可用空间的磁盘上。 例如：
 
 ``` python
 # LocalCLIDebugWrapperSession
@@ -576,7 +550,7 @@ hooks = [tf_debug.LocalCLIDebugHook(dump_root="/with/lots/of/space")]
 
 **Q**：为什么无法在 tfdbg CLI 中选择文本？
 
-**A**：这是因为 tfdbg CLI 默认启用终端中的鼠标事件。 这种[鼠标掩码](https://linux.die.net/man/3/mousemask)模式覆盖了默认终端交互过程，包括文本选择。您可以使用命令 `mouse off` 或 `m off` 重新启用文本选择。
+**A**：这是因为 tfdbg CLI 默认启用终端中的鼠标事件。 这种[鼠标掩码](https://linux.die.net/man/3/mousemask)模式覆盖了默认终端交互过程，包括文本选择。你可以使用命令 `mouse off` 或 `m off` 重新启用文本选择。
 
 **Q**：为什么当我调试如下代码时，tfdbg CLI 没有显示转储张量？
 
@@ -588,12 +562,12 @@ sess = tf_debug.LocalCLIDebugWrapperSession(sess)
 sess.run(b)
 ```
 
-**A**：您看到没有数据转储的原因是因为执行的 TensorFlow 图中的每个节点都被 TensorFlow 运行时常数折叠起来了。 在这个示例中，`a` 是一个常数张量；而且，获取的张量 `b` 实际上也是一个常数张量。 因此，TensorFlow 为了优化图的运行性能，会将 `a` 和 `b` 折叠到一个结点上去。这也是为什么 `tfdbg` 不会产生任何中间张量转储数据的原因。但是，如果 `a` 是一个 @{tf.Variable} 的话，如下例子所示：
+**A**：你看到没有数据转储的原因是因为执行的 TensorFlow 图中的每个节点都被 TensorFlow 运行时常数折叠起来了。在这个示例中，`a` 是一个常数张量；而且，获取的张量 `b` 实际上也是一个常数张量。因此，TensorFlow 为了优化图的运行性能，会将 `a` 和 `b` 折叠到一个结点上去。这也是为什么 `tfdbg` 不会产生任何中间张量转储数据的原因。但是，如果 `a` 是一个 `tf.Variable` 的话，如下例子所示：
 
 ``` python
 import numpy as np
 
-a = tf.Variable(np.ones[10], name="a")
+a = tf.Variable(np.ones(10), name="a")
 b = tf.add(a, a, name="b")
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
