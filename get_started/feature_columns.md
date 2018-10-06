@@ -2,15 +2,15 @@
 
 本篇文档将详细介绍特征列。**特征列**可以视为原始数据和 Estimator 间的中介。特征列非常丰富，可以让你将各种不同的原始数据转化为 Estimator 可用的格式，从而轻松的进行实验。
 
-在 @{$get_started/premade_estimators$Premade Estimators} 里，我们使用预设的 Estimator @{tf.estimator.DNNClassifier$`DNNClassifier`} 来训练模型，并根据 4 个输入特征，预测不同种类的鸢尾花。这个例子仅仅创建了（@{tf.feature_column.numeric_column} 类型的）数字特征列。尽管数字特征列有效地模拟了花瓣和萼片的长度，但是现实世界的数据集会包含所有类型的特征，其中很多是非数字的。
+在[预制 Estimators](../guide/premade_estimators.md) 里，我们使用预先设定的 Estimator `tf.estimator.DNNClassifier` 来训练模型，并根据 4 个输入特征，预测不同种类的鸢尾花。这个例子仅仅创建了（`tf.feature_column.numeric_column` 类型的）数值特征列。尽管数值特征列有效地模拟了花瓣和萼片的长度，但是现实世界的数据集会包含所有类型的特征，其中很多是非数值的。
 
 <img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/feature_cloud.jpg">
 
-现实世界中，一些的特征（例如经度）是数字的，但是很多（特征）并不是（数字的）。
+现实世界中，一些的特征（例如经度）是数值的，但是很多（特征）并不是（数值的）。
 
 ## 输入至深度神经网络
 
-深度神经网络可以操作什么样的数据？答案当然是数字（例如，`tf.float32`）。毕竟，神经网络的每个神经元都会对权重和输入值进行乘法和加法操作。但是，现实中的输入数据经常包含非数字的（分类的）数据。例如，一个 `product_class` 特征就可能包含如下三个非数字的值：
+深度神经网络可以操作什么样的数据？答案当然是数值（例如，`tf.float32`）。毕竟，神经网络的每个神经元都会对权重和输入值进行乘法和加法操作。但是，现实中的输入数据经常包含非数值的（分类的）数据。例如，一个 `product_class` 特征就可能包含如下三个非数值的值：
 
 * 厨具
 * 电子产品
@@ -22,7 +22,7 @@
 * `0`: 电子产品不存在
 * `1`: 运动产品存在
 
-所以，尽管原始数据可能是数字或者分类，机器学习模型都要以数字表示所有的特征。
+所以，尽管原始数据可能是数值或者分类，机器学习模型都要以数值表示所有的特征。
 
 ## 特征列
 
@@ -32,7 +32,7 @@
 
 特征列将原始数据和模型需要的数据桥接起来。
 
-调用 @{tf.feature_column} 模块的方法可以创建特征列。这个文档定义了该模块的九个方法。如下图所示，这九个方法都会返回 Categorical-Column 或 Dense-Column 对象中的一个，而不是继承自上面两个类的 `bucketized_column` 对象：
+调用 `tf.feature_column` 模块的方法可以创建特征列。这个文档定义了该模块的九个方法。如下图所示，这九个方法都会返回 Categorical-Column 或 Dense-Column 对象中的一个，而不是继承自上面两个类的 `bucketized_column` 对象：
 
 <img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/some_constructors.jpg">
 
@@ -42,7 +42,7 @@
 
 ### 数值列
 
-对如下每个输入特征，鸢尾花分类器都调用了 @{tf.feature_column.numeric_column} 方法。
+对如下每个输入特征，鸢尾花分类器都调用了 `tf.feature_column.numeric_column` 方法。
 
   * `SepalLength`（萼片长度）
   * `SepalWidth`（萼片宽度）
@@ -79,7 +79,7 @@ matrix_feature_column = tf.feature_column.numeric_column(key="MyMatrix",
 
 ### 分桶列
 
-通常情况下，我们不希望直接将数值传入模型，而是根据取值范围将数值放进不同的类别中。可以通过创建 @{tf.feature_column.bucketized_column$bucketized column} 完成上述功能。例如，考虑一组表示房屋建成年份原始数据。我们应该将年份放入 4 个不同的 buckets 中，而不是把每一个年份数值都作为一个标量数值列：
+通常情况下，我们不希望直接将数值传入模型，而是根据取值范围将数值放进不同的类别中。可以通过创建 `tf.feature_column.bucketized_column` 完成上述功能。例如，考虑一组表示房屋建成年份原始数据。我们应该将年份放入 4 个不同的 buckets 中，而不是把每一个年份数值都作为一个标量数值列：
 
 <img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/bucketized_column.jpg">
 
@@ -92,7 +92,7 @@ matrix_feature_column = tf.feature_column.numeric_column(key="MyMatrix",
 |< 1960               | [1, 0, 0, 0] |
 |>= 1960 but < 1980   | [0, 1, 0, 0] |
 |>= 1980 but < 2000   | [0, 0, 1, 0] |
-|> 2000               | [0, 0, 0, 1] |
+|>= 2000              | [0, 0, 0, 1] |
 
 为什么要把可以完美输入到模型中的数值分散到表示不同范围的类别呢？我们注意到，分类后，数值变成了一个四元素向量，因此现在模型可以学习**四个独立的权值**而不是从前的一个；四个权值能比一个权值创建出更丰富的模型。更重要的是，分桶操作让模型能更清晰的区分不同的年份类，因为向量中仅有一个元素置 (1) 而其他都是 (0)。例如，当我们只用一个年份数值作为输入的时候，一个线性模型只能学习线性关系。这样看来，分桶操作为模型提供了附加的灵活性，模型可以基于此进行学习。
 
@@ -117,15 +117,15 @@ bucketized_feature_column = tf.feature_column.bucketized_column(
 
 <img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/categorical_column_with_identity.jpg">
 
-一个分类标识列的映射。注意，这是独热编码，而不是二进制数字编码。
+一个分类标识列的映射。注意，这是独热编码，而不是二进制数值编码。
 
-和分桶列一样，模型能够从每个分类标识列的分类中学习单独的权重。如下所示，我们用唯一的数字而不是字符串来代表 `product_class` 中的值：
+和分桶列一样，模型能够从每个分类标识列的分类中学习单独的权重。如下所示，我们用唯一的数值而不是字符串来代表 `product_class` 中的值：
 
 * `0="厨具"`
 * `1="电子产品"`
 * `2="运动产品"`
 
-调用 @{tf.feature_column.categorical_column_with_identity} 方法来应用分类标识列，例如：
+调用 `tf.feature_column.categorical_column_with_identity` 方法来应用分类标识列，例如：
 
 ``` python
 # 创建一个名为 "my_feature_b" 的整数特征的分类输出，
@@ -144,7 +144,7 @@ def input_fn():
 
 ### 分类词汇列
 
-我们不能将字符串直接作为模型的输入值。我们必须首先将字符串对应为数字或分类的值。分类词汇列（Categorical vocabulary columns）提供了一个不错的用独热向量来代表字符串的方式。例如：
+我们不能将字符串直接作为模型的输入值。我们必须首先将字符串对应为数值或分类的值。分类词汇列（Categorical vocabulary columns）提供了一个不错的用独热向量来代表字符串的方式。例如：
 
 <img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/categorical_column_with_vocabulary.jpg">
 
@@ -152,8 +152,8 @@ def input_fn():
 
 如你所见，分类词汇列（Categorical vocabulary columns）是分类标识列（Categorical identity columns）的一种枚举版本。TensorFlow 提供了如下两个不同的方法来建立是分类标识列：
 
-* @{tf.feature_column.categorical_column_with_vocabulary_list}
-* @{tf.feature_column.categorical_column_with_vocabulary_file}
+* `tf.feature_column.categorical_column_with_vocabulary_list`
+* `tf.feature_column.categorical_column_with_vocabulary_file`
 
 `categorical_column_with_vocabulary_list` 方法基于一个分类的词汇列表，将每个字符串映射为一个整数。例如：
 
@@ -187,11 +187,11 @@ sports
 
 ### 哈希列
 
-目前为止，我们只讨论了类数目很少的实例。例如，product_class 实例只有三个类目。但是通常情况下，类的数量很大，以至于不可能每一个词或者整数都有一个独立的分类，因为如果这样内存开销将会过大。在这种情况下，我们可以反过来思考这个问题：我愿意将输入分为多少个类别？事实上，@{tf.feature_column.categorical_column_with_hash_bucket} 方法允许你定义分类的数目。对于这种类型的特征列，模型会计算输入的哈希值，然后使用模运算符将这个值放入一个 `hash_bucket_size` 类中，如下伪代码所示：
+目前为止，我们只讨论了类数目很少的实例。例如，product_class 实例只有三个类目。但是通常情况下，类的数量很大，以至于不可能每一个词或者整数都有一个独立的分类，因为如果这样内存开销将会过大。在这种情况下，我们可以反过来思考这个问题：我愿意将输入分为多少个类别？事实上，`tf.feature_column.categorical_column_with_hash_bucket` 方法允许你定义分类的数目。对于这种类型的特征列，模型会计算输入的哈希值，然后使用模运算符将这个值放入一个 `hash_bucket_size` 类中，如下伪代码所示：
 
 ```python
 # 伪代码
-feature_id = hash(raw_feature) % hash_buckets_size
+feature_id = hash(raw_feature) % hash_bucket_size
 ```
 
 代码创建的 `feature_column` 也许是这样：
@@ -200,7 +200,7 @@ feature_id = hash(raw_feature) % hash_buckets_size
 hashed_feature_column =
     tf.feature_column.categorical_column_with_hash_bucket(
         key = "some_feature",
-        hash_buckets_size = 100) # 分类数目
+        hash_bucket_size = 100) # 分类数目
 ```
 此时，你理所当然可能会想：这太疯狂了！毕竟，我们强制把不同的输入值变为一个较小的分类集合。这意味着两个可能不相关的输入将会被映射到一个类中，因此也就意味着在神经网络中会发生同样的事情。下图详细说明了这个进退两难的困境，可以看到，厨具和运动产品都被分类到了类别（哈希桶）12：
 
@@ -222,7 +222,7 @@ hashed_feature_column =
 
 亚特兰大地图。想象这个地图被分为大小相同的 10,000 个部分。
 
-下面的解决方案中，我们结合了前面提到的 `bucketized_column` 和方法 @{tf.feature_column.crossed_column}。
+下面的解决方案中，我们结合了前面提到的 `bucketized_column` 和方法 `tf.feature_column.crossed_column`。
 
 <!--TODO(markdaoust) link to full example-->
 
@@ -273,7 +273,7 @@ est = tf.estimator.LinearRegressor(fc, ...)
 (99,0), (99,1)...(99, 99)
 ```
 
-但不足是，完整的网格只适用于有限词汇表的输入。与此相比，`crossed_column` 仅创建 `hash_bucket_size` 参数规定的数字，而不是创建上面所示这样可能会很大的输入表。特征列通过在输入元组上运行哈希函数，为每个索引分配一个样本，接下来用 `hash_bucket_size` 进行模运算。
+但不足是，完整的网格只适用于有限词汇表的输入。与此相比，`crossed_column` 仅创建 `hash_bucket_size` 参数规定的数值，而不是创建上面所示这样可能会很大的输入表。特征列通过在输入元组上运行哈希函数，为每个索引分配一个样本，接下来用 `hash_bucket_size` 进行模运算。
 
 像我们前面讨论过的那样，运行哈希和模函数可以限制分类的数目，但是可能导致类别冲突；也就是，多个（纬度，经度）交叉特征将会最终属于同一个哈希桶。尽管如此，在实际应用中，采用特征交叉仍旧可以为模型的学习能力显著加分。
 
@@ -289,7 +289,7 @@ est = tf.estimator.LinearRegressor(fc, ...)
 
 在指针列中表示数据。
 
-如下所示是如何通过调用 @{tf.feature_column.indicator_column} 来创建指针列：
+如下所示是如何通过调用 `tf.feature_column.indicator_column` 来创建指针列：
 
 ``` python
 categorical_column = ... # 创建一个任意类别的分类列。
@@ -300,7 +300,7 @@ indicator_column = tf.feature_column.indicator_column(categorical_column)
 
 现在假设并不只有三个可能的类，而是有一百万个，甚至十亿个。出于很多原因，当类别的数目增长到很大的时候，使用指针类来训练神经网络就变的不可行了。
 
-我们可以用嵌入列来克服这个限制。**嵌入列**用低维的普通矢量，而非多维度的独热向量来表示数据。普通矢量中每个元素可以包含任何数值，而不仅是 0 和 1。通过为每个元素提供更丰富的数字候选，嵌入列包含的元素数量远少于指标列。
+我们可以用嵌入列来克服这个限制。**嵌入列**用低维的普通矢量，而非多维度的独热向量来表示数据。普通矢量中每个元素可以包含任何数值，而不仅是 0 和 1。通过为每个元素提供更丰富的数值候选，嵌入列包含的元素数量远少于指标列。
 
 让我们来看一个对比指针列和嵌入列的例子。假设输入样本包括来自仅有 81 个单词的有限候选集中的不同单词。进一步假设，数据集在 4 个单独的样本中提供如下的输入词：
 
@@ -313,15 +313,15 @@ indicator_column = tf.feature_column.indicator_column(categorical_column)
 
 <img style="width:100%" src="https://www.tensorflow.org/images/feature_columns/embedding_vs_indicator.jpg">
 
-相比于指针列，嵌入列用维度较低的向量来存储分类数据。（我们只是将随机数放入了嵌入向量；训练决定真实的数字）
+相比于指针列，嵌入列用维度较低的向量来存储分类数据。（我们只是将随机数放入了嵌入向量；训练决定真实的数值）
 
-当一个样本被处理时，其中一个 `categorical_column_with...` 函数将样本字符串映射为数字的分类值。例如，一个方法将“勺子”映射为 `[32]`。（这里的 32 是我们假想的 - 实际值取决于映射函数。）接下来，你可以用如下两种方式来表示这些数字分类值：
+当一个样本被处理时，其中一个 `categorical_column_with...` 函数将样本字符串映射为数值的分类值。例如，一个方法将“勺子”映射为 `[32]`。（这里的 32 是我们假想的 - 实际值取决于映射函数。）接下来，你可以用如下两种方式来表示这些数值分类值：
 
-* 指针列。一个将每个数字分类值转化为 81 元素向量的方法（因为候选集包含 81 个单词），将一个 1 放置在分类值的索引 (0, 32, 79, 80) 上，其余位置都是 0。
+* 指针列。一个将每个数值分类值转化为 81 元素向量的方法（因为候选集包含 81 个单词），将一个 1 放置在分类值的索引 (0, 32, 79, 80) 上，其余位置都是 0。
 
-* 嵌入列。一个使用数字分类值 `(0, 32, 79, 80)` 作为查找表索引的方法。在这个查找表里，每个元素包含一个三元素向量。
+* 嵌入列。一个使用数值分类值 `(0, 32, 79, 80)` 作为查找表索引的方法。在这个查找表里，每个元素包含一个三元素向量。
 
-嵌入向量中的值是如何魔法般的被分配的呢？实际上，分配发生在训练期间。也就是，模型为了解决你的问题，学习了将输入的数字分类值映射为嵌入向量的最好方式。嵌入列提升了你的模型的能力，因为嵌入向量从训练数据中学到了分类之间的新的关系。
+嵌入向量中的值是如何魔法般的被分配的呢？实际上，分配发生在训练期间。也就是，模型为了解决你的问题，学习了将输入的数值分类值映射为嵌入向量的最好方式。嵌入列提升了你的模型的能力，因为嵌入向量从训练数据中学到了分类之间的新的关系。
 
 为什么在我们的实例中，嵌入向量的大小是 3？下面的“公式”提供了关于嵌入维数的一般规则
 
@@ -336,27 +336,27 @@ embedding_dimensions =  number_of_categories**0.25
 ```
 注意这仅是一个一般准则，你可以将嵌入的维度设置为任何你喜欢的值。
 
-如下代码片段建议，调用 @{tf.feature_column.embedding_column} 来创建 `embedding_column`。
+如下代码片段建议，调用 `tf.feature_column.embedding_column` 来创建 `embedding_column`。
 
 ``` python
 categorical_column = ... # 创建任意的分类列
 
 # 将分类列表示为嵌入列
-# 这意味着要为每一个分类创建一个包含一个元素的独热向量
+# 这意味着要为每一个分类创建一个包含一个嵌入向量查找表
 embedding_column = tf.feature_column.embedding_column(
     categorical_column=categorical_column,
-    dimension=dimension_of_embedding_vector)
+    dimension=embedding_dimensions)
 ```
 
-@{$programmers_guide/embedding$Embeddings} 是机器学习中一个很重要的问题。这些信息只是为了能让你开始以特征列来使用它们。
+[Embeddings](../guide/embedding.md) 是机器学习中一个很重要的问题。这些信息只是为了能让你开始以特征列来使用它们。
 
 ## 将特征列传递给 Estimator
 
 如下列表所示，并不是所有 Estimator 都允许 `feature_columns` 参数的所有类别：
 
-* @{tf.estimator.LinearClassifier$`LinearClassifier`} 和 @{tf.estimator.LinearRegressor$`LinearRegressor`}: 接受所有类型特征列。
-* @{tf.estimator.DNNClassifier$`DNNClassifier`} 和 @{tf.estimator.DNNRegressor$`DNNRegressor`}: 只接受稠密列。其他类型的列必须被 `indicator_column` 或者 `embedding_column` 包装。
-* @{tf.estimator.DNNLinearCombinedClassifier$`DNNLinearCombinedClassifier`} 和 @{tf.estimator.DNNLinearCombinedRegressor$`DNNLinearCombinedRegressor`}:
+* `tf.estimator.LinearClassifier` 和 `tf.estimator.LinearRegressor`：接受所有类型特征列。
+* `tf.estimator.DNNClassifier` 和 `tf.estimator.DNNRegressor`：只接受稠密列。其他类型的列必须被 `indicator_column` 或者 `embedding_column` 包装。
+* `tf.estimator.DNNLinearCombinedClassifier` 和 `tf.estimator.DNNLinearCombinedRegressor`：
     * `linear_feature_columns` 参数接受所有特征列类型。
     * `dnn_feature_columns`参数只接受稠密列。
 
@@ -364,8 +364,8 @@ embedding_column = tf.feature_column.embedding_column(
 
 更多特征列的实例，参见如下：
 
-* @{$low_level_intro#feature_columns$Low Level Introduction} 演示了如何用 TensorFlow 的低级 APIs 和 `feature_columns` 直接开始实验。
-* @{$wide$wide} 和 @{$wide_and_deep$Wide & Deep} 教程基于各种输入数据类型，使用 `feature_columns` 解决了二元分类问题。
+* [底层介绍](../guide/low_level_intro.md#feature_columns)演示了如何用 TensorFlow 的低级 APIs 和 `feature_columns` 直接开始实验。
+* [Estimator 广泛且深入的学习教程](https://github.com/tensorflow/models/tree/master/official/wide_deep) 基于各种输入数据类型，使用 `feature_columns` 解决了二元分类问题。
 
 学习更多和嵌入相关的知识，参见如下：
 
