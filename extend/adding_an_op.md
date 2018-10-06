@@ -1,20 +1,14 @@
 # 添加一个新操作（Op）
 
-注意：默认情况下 [www.tensorflow.org](https://tensorflow.org) 显示最新稳定版本的文档。
-本文档中的说明需要从源代码构建。你很可能想要从 TensorFlow 的 `master` 版本开始构建。
-那么，你就应该遵循[本文档的 `master` 版本](https://www.tensorflow.org/versions/master/extend/adding_an_op)
-，以防发生任何更改。
+注意：默认情况下 [www.tensorflow.org](https://tensorflow.org) 显示最新稳定版本的文档。本文档中的说明需要从源代码构建。你很可能想要从 TensorFlow 的 `master` 版本开始构建。那么，你就应该遵循[本文档的 `master` 版本](https://www.tensorflow.org/versions/master/extend/adding_an_op)，以防发生任何更改。
 
-如果你想要创建一个在已有 TensorFlow 库中不存在的操作，我们建议你先从 Python 入手，即写一个已有 Python 操作或函数的复合操作。
-如果这样不可行，你可以定制一个 C++ 操作。下面是你可能需要这样做的一些理由：
+如果你想要创建一个在已有 TensorFlow 库中不存在的操作，我们建议你先从 Python 入手，即写一个已有 Python 操作或函数的复合操作。如果这样不可行，你可以定制一个 C++ 操作。下面是你可能需要这样做的一些理由：
 
 *   将你的操作表示成现有操作的组合不太容易或不可能。
 *   已有基本操作的组合操作效率不高。
 *   你想手工实现一些基本操作的组合，因为未来的编译器做这种融合可能会比较困难。
 
-例如，想象一下，你想实现类似于“最大值池化（MaxPool）”的“中值池化”操作，只不过不再是计算最大值，而是在滑动窗口上计算中值。
-这种操作是可能通过操作组合实现的，比如使用 ExtractImagePatches 和 TopK，但是这可能在性能上、或内存开销上不如原生操作，
-因为你可以在单一的融合操作中采用一些高明的策略。大体上，首先尝试用组合操作来实现你的想法总是值得一试的，只有当组合操作很困难或低效时才考虑添加一个新的操作。
+例如，想象一下，你想实现类似于“最大值池化（MaxPool）”的“中值池化”操作，只不过不再是计算最大值，而是在滑动窗口上计算中值。这种操作是可能通过操作组合实现的，比如使用 ExtractImagePatches 和 TopK，但是这可能在性能上、或内存开销上不如原生操作，因为你可以在单一的融合操作中采用一些高明的策略。大体上，首先尝试用组合操作来实现你的想法总是值得一试的，只有当组合操作很困难或低效时才考虑添加一个新的操作。
 
 为了加入一个定制操作，你需要：
 
@@ -22,13 +16,12 @@
 2.  在 C++ 中实现这个操作。操作的实现称为内核，它是你在步骤 1 中注册的规范的具体实现。对于不同的输入输出类型或架构（比如不同的 CPUs 或 GPUs），可能有多个内核。
 3.  创建一个 Python 包装器（可选）。这个包装器是用于在 Python 中创建操作的公共 API。操作的注册可以产生一个默认的包装器，它可以直接使用，或添加。
 4.  为操作编写一个函数来计算梯度（可选）。
-5.  测试操作。为方便起见，我们通常在 Python 中测试，但你也可以在 C++ 中测试。如果你定义了梯度，你可以使用 Python @{tf.test.compute_gradient_error$gradient checker} 来验证。参见脚本 
-     [`relu_op_test.py`](https://www.tensorflow.org/code/tensorflow/python/kernel_tests/relu_op_test.py)，它提供了一个例子，展示如何测试类似于 Relu 的算子的前向函数及梯度。
+5.  测试操作。为方便起见，我们通常在 Python 中测试，但你也可以在 C++ 中测试。如果你定义了梯度，你可以使用 Python `tf.test.compute_gradient_error` 来验证。参见脚本 [`relu_op_test.py`](https://www.tensorflow.org/code/tensorflow/python/kernel_tests/relu_op_test.py)，它提供了一个例子，展示如何测试类似于 Relu 的算子的前向函数及梯度。
 
 编写新操作代码前，你需要：
 
 *   熟悉 C++ 。
-*   必须已安装 @{$install$TensorFlow binary}，或必须下载有 @{$install_sources$downloaded TensorFlow source}，并能够构建。
+*   必须已安装 [TensorFlow 二进制文件](../install)，或必须 [下载有 TensorFlow 源文件](../install/source.md)，并能够进行构建。
 
 [TOC]
 
@@ -36,8 +29,7 @@
 
 操作接口的定义是通过在 TensorFlow 系统中注册来实现的。在此注册过程中，需要指定操作名称、输入（类型和名称）和输出（类型和名称），以及文档字符串和此操作要求的任何[属性](#属性)。
 
-下面展示注册的具体过程。假设你想创建一个操作，其输入是一个 `int32` 类型的张量，而输出是此张量的一个副本，副本除第一个元素设为零之外其它都不变。为此，创建一个名为 `zero_out.cc` 的文件。然后调用 
-`REGISTER_OP` 宏，以定义你的操作：
+下面展示注册的具体过程。假设你想创建一个操作，其输入是一个 `int32` 类型的张量，而输出是此张量的一个副本，副本除第一个元素设为零之外其它都不变。为此，创建一个名为 `zero_out.cc` 的文件。然后调用 `REGISTER_OP` 宏，以定义你的操作：
 
 ```c++
 #include "tensorflow/core/framework/op.h"
@@ -60,9 +52,7 @@ REGISTER_OP("ZeroOut")
 
 ## 实现操作的内核
 
-定义接口后，接下来就需要为此操作提供一个或多个内核实现了。
-为了实现这些内核，创建一个继承自 `OpKernel` 的类，并重载 `Compute` 方法。 
-`Compute` 方法有一个类型为 `OpKernelContext*` 的参数 `context`，从中可以访问输入和输出张量等有用的信息。
+定义接口后，接下来就需要为此操作提供一个或多个内核实现了。为了实现这些内核，创建一个继承自 `OpKernel` 的类，并重载 `Compute` 方法。`Compute` 方法有一个类型为 `OpKernelContext*` 的参数 `context`，从中可以访问输入和输出张量等有用的信息。
 
 将你的内核加到上面创建的文件中。这个内核的代码形如：
 
@@ -110,17 +100,13 @@ REGISTER_KERNEL_BUILDER(Name("ZeroOut").Device(DEVICE_CPU), ZeroOutOp);
 
 ### 多线程 CPU 内核
 
-为了编写一个多线程 CPU 内核，可使用
-[`work_sharder.h`](https://www.tensorflow.org/code/tensorflow/core/util/work_sharder.h)
-中的 Shard 函数。在 intra-op 线程模式下，此函数将计算函数分片到各个线程执行（参见 
-[`config.proto`](https://www.tensorflow.org/code/tensorflow/core/protobuf/config.proto) 中定义的 intra_op_parallelism_threads  模式）。
+为了编写一个多线程 CPU 内核，可使用 [`work_sharder.h`](https://www.tensorflow.org/code/tensorflow/core/util/work_sharder.h) 中的 Shard 函数。在 intra-op 线程模式下，此函数将计算函数分片到各个线程执行（参见 [`config.proto`](https://www.tensorflow.org/code/tensorflow/core/protobuf/config.proto) 中定义的 intra_op_parallelism_threads 模式）。
 
 ### GPU 内核
 
 一个 GPU 内核的实现包括两个部分：OpKernel 子类、CUDA 内核及其启动代码。
 
-有时候 OpKernel 实现可由 CPU 和 GPU 内核共享，这一部分代码可以完成诸如检查输入和分配输出之类的任务。
-如果采用这种方案，则我们建议用如下实现方式：
+有时候 OpKernel 实现可由 CPU 和 GPU 内核共享，这一部分代码可以完成诸如检查输入和分配输出之类的任务。如果采用这种方案，则我们建议用如下实现方式：
 
 1. 在设备上定义模板化的 OpKernel，并定义张量的基本类型
 2. 为了完成输出的实际计算， Compute 函数要调用一个模板化的函子结构
@@ -208,7 +194,7 @@ REGISTER_CPU(int32);
 #ifdef GOOGLE_CUDA
 #define REGISTER_GPU(T)                                          \
   /* 在 kernel_example.cu.cc 中显式声明模板实例化 */ \
-  extern template ExampleFunctor<GPUDevice, float>;              \
+  extern template ExampleFunctor<GPUDevice, T>;              \
   REGISTER_KERNEL_BUILDER(                                       \
       Name("Example").Device(DEVICE_GPU).TypeConstraint<T>("T"), \
       ExampleOp<GPUDevice, T>);
@@ -260,8 +246,7 @@ template struct ExampleFunctor<GPUDevice, int32>;
 ## 构建操作的库文件
 ### 用系统编译器来编译操作（TensorFlow 二进制安装）
 
-你可以用 `C++` 编译器来编译 `zero_out.cc`，比如你的系统上的 `g++` 或 `clang` 都是可以的。用 PIP 包管理器来安装二进制 TensorFlow 时，已经包含了编译操作所需的头文件和库文件，具体的安装目录则取决于你的操作系统。
-不过，TensorFlow 的 python 库提供了 `get_include` 函数来获得头文件目录，也提供了 `get_lib` 函数来获得链接所需库文件的目录位置。下面是 Ubuntu 机器上这两个函数的输出结果：
+你可以用 `C++` 编译器来编译 `zero_out.cc`，比如你的系统上的 `g++` 或 `clang` 都是可以的。用 PIP 包管理器来安装二进制 TensorFlow 时，已经包含了编译操作所需的头文件和库文件，具体的安装目录则取决于你的操作系统。不过，TensorFlow 的 python 库提供了 `get_include` 函数来获得头文件目录，也提供了 `get_lib` 函数来获得链接所需库文件的目录位置。下面是 Ubuntu 机器上这两个函数的输出结果：
 
 ```bash
 $ python
@@ -286,8 +271,7 @@ g++ -std=c++11 -shared zero_out.cc -o zero_out.so -fPIC ${TF_CFLAGS[@]} ${TF_LFL
 
 ### 使用 bazel 编译操作（TensorFlow 源码安装）
 
-如果你安装了 TensorFlow 源码，则你可以利用 TensorFLow 的构建系统来编译你的操作。把一个 BUILD 文件放在 
-[`tensorflow/core/user_ops`][user_ops] 目录中，其中包含 Bazel 的构建规则，内容如下：
+如果你安装了 TensorFlow 源码，则你可以利用 TensorFLow 的构建系统来编译你的操作。把一个 BUILD 文件放在 [`tensorflow/core/user_ops`][user_ops] 目录中，其中包含 Bazel 的构建规则，内容如下：
 
 ```python
 load("//tensorflow:tensorflow.bzl", "tf_custom_op_library")
@@ -304,12 +288,11 @@ tf_custom_op_library(
 $ bazel build --config opt //tensorflow/core/user_ops:zero_out.so
 ```
 
->   注意：虽然你可以用标准 `cc_library` 规则来生成一个共享库文件（`.so` 文件），我们还是强烈推荐使用 `tf_custom_op_library` 宏。这个宏加了一些必要的依赖项，而且还包含一些检查，以确保输出的共享库文件与 TensorFlow 的插件加载机制兼容。
+> 注意：虽然你可以用标准 `cc_library` 规则来生成一个共享库文件（`.so` 文件），我们还是强烈推荐使用 `tf_custom_op_library` 宏。这个宏加了一些必要的依赖项，而且还包含一些检查，以确保输出的共享库文件与 TensorFlow 的插件加载机制兼容。
 
 ## 在 Python 中使用新的操作
 
-TensorFlow Python API 提供了 @{tf.load_op_library} 函数来加载动态链接库，并将其注册到 TensorFlow 框架中。`load_op_library` 返回一个 Python 模块，其中就包含了你的新操作的 Python 包装器，以及它的内核。
-因而，一旦你构建完操作，你就可以按下面的方式中在 Python 中让它运行起来了：
+TensorFlow Python API 提供了 `tf.load_op_library` 函数来加载动态链接库，并将其注册到 TensorFlow 框架中。`load_op_library` 返回一个 Python 模块，其中就包含了你的新操作的 Python 包装器，以及它的内核。因而，一旦你构建完操作，你就可以按下面的方式中在 Python 中让它运行起来了：
 
 ```python
 import tensorflow as tf
@@ -321,8 +304,7 @@ with tf.Session(''):
 array([[1, 0], [0, 0]], dtype=int32)
 ```
 
-需要注意，生成的函数采用蛇形命令规则（snake\_case），这是为了遵守 [PEP8](https://www.python.org/dev/peps/pep-0008/) 规范。
-所以，如果你的操作在 C++ 代码中命名为 `ZeroOut`，则它的 Python 函数名会变成 `zero_out`。
+需要注意，生成的函数采用蛇形命令规则（snake\_case），这是为了遵守 [PEP8](https://www.python.org/dev/peps/pep-0008/) 规范。所以，如果你的操作在 C++ 代码中命名为 `ZeroOut`，则它的 Python 函数名会变成 `zero_out`。
 
 为了让该操作可以像常规函数一样从某个模块中导入（`import`），则可以在 Python 源码中调用 `load_op_library` 函数：
 
@@ -334,6 +316,7 @@ zero_out = zero_out_module.zero_out
 ```
 
 ## 验证操作正常运行
+
 确认你编写的操作是否可成功运行的一个好办法是写一个测试。创建文件 `zero_out_op_test.py`，内容如下：
 
 ```python
@@ -389,13 +372,9 @@ $ python zero_out_op_test.py
 
 这里我们加了一个断言，它要求输入是一个矢量，否则将设置 `InvalidArgument` 状态。[`OP_REQUIRES` 宏][validation-macros] 有三个参数：
 
-*   上下文 `context`：既可以是一个 `OpKernelContext`，也可以是一个 `OpKernelConstruction` 指针（参见
-    [`tensorflow/core/framework/op_kernel.h`](https://www.tensorflow.org/code/tensorflow/core/framework/op_kernel.h) 文件），用于其 `SetStatus()` 方法。
-*   条件：关于验证张量形状的更多函数，参见文件
-    [`tensorflow/core/framework/tensor_shape.h`](https://www.tensorflow.org/code/tensorflow/core/framework/tensor_shape.h)
-*   错误本身：它由一个 `Status` 对象表示，参见文件
-    [`tensorflow/core/lib/core/status.h`](https://www.tensorflow.org/code/tensorflow/core/lib/core/status.h)。一个 `Status` 对象包含一个类型（常为 `InvalidArgument`，但能看到类型列表）和一条消息。构建一个错误的函数参见文件
-    [`tensorflow/core/lib/core/errors.h`][validation-macros]。
+*   上下文 `context`：既可以是一个 `OpKernelContext`，也可以是一个 `OpKernelConstruction` 指针（参见 [`tensorflow/core/framework/op_kernel.h`](https://www.tensorflow.org/code/tensorflow/core/framework/op_kernel.h) 文件），用于其 `SetStatus()` 方法。
+*   条件：关于验证张量形状的更多函数，参见文件 [`tensorflow/core/framework/tensor_shape.h`](https://www.tensorflow.org/code/tensorflow/core/framework/tensor_shape.h)
+*   错误本身：它由一个 `Status` 对象表示，参见文件 [`tensorflow/core/lib/core/status.h`](https://www.tensorflow.org/code/tensorflow/core/lib/core/status.h)。一个 `Status` 对象包含一个类型（常为 `InvalidArgument`，但能看到类型列表）和一条消息。构建一个错误的函数参见文件 [`tensorflow/core/lib/core/errors.h`][validation-macros]。
 
 另外，如果你想测试从某个函数返回的 `Status` 对象是否为错误，则使用宏 [`OP_REQUIRES_OK`][validation-macros]。这两个宏都会在错误报错时返回错误对象。
 
@@ -403,8 +382,7 @@ $ python zero_out_op_test.py
 
 #### 属性
 
-操作可以有属性，当一个操作被加到计算图中时，它的属性就会被赋值。这些属性用于配置此操作，它们的值既可以在内核实现中访问，也可以在操作注册时的输入输出类型中进行访问。相较于输入，参数的使用要尽量避免，因为输入更为灵活一些。这是因为属性是常数，
-必须在计算图构造时定义。相反，输入作为张量，它的值是动态的；即输入的值在每一步都可以修改，比如使用 feed。属性主要用于无法使用输入的场合：任何影响特征（输入输出的数量和类型）的配置，或无法在每一步修改的时候。
+操作可以有属性，当一个操作被加到计算图中时，它的属性就会被赋值。这些属性用于配置此操作，它们的值既可以在内核实现中访问，也可以在操作注册时的输入输出类型中进行访问。相较于输入，参数的使用要尽量避免，因为输入更为灵活一些。这是因为属性是常数，必须在计算图构造时定义。相反，输入作为张量，它的值是动态的；即输入的值在每一步都可以修改，比如使用 feed。属性主要用于无法使用输入的场合：任何影响特征（输入输出的数量和类型）的配置，或无法在每一步修改的时候。
 
 你需要在注册操作时定义属性，定义时要指定名称和使用 `Attr` 方法的类型，此方法的参数规范如下：
 
@@ -416,54 +394,56 @@ $ python zero_out_op_test.py
 
 比如，如果你想让 `ZeroOut` 操作保留用户指定的索引，而不是仅保留第 0 个元素，你可以按下面的方式来注册操作：
 
-<pre class="prettyprint"><code class="lang-cpp">
-REGISTER\_OP("ZeroOut")
-    <b>.Attr("preserve\_index: int")</b>
-    .Input("to\_zero: int32")
+```c++
+REGISTER_OP("ZeroOut")
+    .Attr("preserve_index: int")
+    .Input("to_zero: int32")
     .Output("zeroed: int32");
-</code></pre>
+```
 
-（注意，[属性类型](#attr_types)与输入输出的 @{tf.DType$tensor types} 是不一样的。）
+（注意，[属性类型](#attr_types)与输入输出的 `tf.DType` 是不一样的。）
 
 你实现的内核可以在构造函数中通过 `context` 参数来访问属性：
-<pre class="prettyprint"><code class="lang-cpp">
+
+```c++
 class ZeroOutOp : public OpKernel {
  public:
-  explicit ZeroOutOp(OpKernelConstruction\* context) : OpKernel(context) {<b>
+  explicit ZeroOutOp(OpKernelConstruction* context) : OpKernel(context) {
     // 获取待保存的索引值
-    OP\_REQUIRES\_OK(context,
-                   context-&gt;GetAttr("preserve\_index", &preserve\_index\_));
-    // 检查 preserve\_index 是否为正值
-    OP\_REQUIRES(context, preserve\_index_ &gt;= 0,
-                errors::InvalidArgument("Need preserve\_index &gt;= 0, got ",
-                                        preserve\_index_));
-  </b>}
-  void Compute(OpKernelContext\* context) override {
+    OP_REQUIRES_OK(context,
+                   context->GetAttr("preserve_index", &preserve_index_));
+    // Check that preserve_index is positive
+    OP_REQUIRES(context, preserve_index_ >= 0,
+                errors::InvalidArgument("Need preserve_index >= 0, got ",
+                                        preserve_index_));
+  }
+  void Compute(OpKernelContext* context) override {
     // ...
   }
- <b>private:
-  int preserve\_index\_;</b>
+ private:
+  int preserve_index_;
 };
-</code></pre>
+```
 
 还可以在 `Compute` 方法中使用这个参数：
-<pre class="prettyprint"><code class="lang-cpp">
-  void Compute(OpKernelContext\* context) override {
+
+```c++
+  void Compute(OpKernelContext* context) override {
     // ...
-<br/>
-    <b>// 我们用保存的属性来检查动态输入的合法性
-    // 所以，我们检查 preserve\_index 是否在允许的值域范围内
-    OP\_REQUIRES(context, preserve\_index_ &lt; input.dimension(0),
-                errors::InvalidArgument("preserve\_index out of range"));<br/>
-    </b>// 将输出张量中所有元素设置为 0
+    // 我们用保存的属性来检查动态输入的合法性
+    // 所以，我们检查 preserve_index 是否在允许的值域范围内
+    OP_REQUIRES(context, preserve_index_ < input.dimension(0),
+                errors::InvalidArgument("preserve_index out of range"));
+
+    // 将输出张量中所有元素设置为 0
     const int N = input.size();
     for (int i = 0; i < N; i++) {
-      output\_flat(i) = 0;
-    }<br/>
-    <b>// 保存指定位置的输入值
-    output\_flat(preserve\_index\_) = input(preserve\_index\_);</b>
+      output_flat(i) = 0;
+    }
+    // 保存指定位置的输入值
+    output_flat(preserve_index_) = input(preserve_index_);
   }
-</code></pre>
+```
 
 #### 属性类型
 
@@ -487,17 +467,17 @@ class ZeroOutOp : public OpKernel {
 
 * `{'<string1>', '<string2>'}`：表示在 `<string1>` 或 `<string2>` 这两种取值中二选一。当你使用这种语法时，系统自动推断出属性类型为 `string`。这相当于模仿构造了一个枚举：
 
-  ```c++
-  REGISTER_OP("EnumExample")
-      .Attr("e: {'apple', 'orange'}");
-  ```
+```c++
+REGISTER_OP("EnumExample")
+    .Attr("e: {'apple', 'orange'}");
+```
 
-* `{<type1>, <type2>}`: 属性类型为 `type`，表示取值是 `<type1>` 类型或 `<type2>` 类型二者之一，其中 `<type1>` 和 `<type2>` 为两种 @{tf.DType$tensor types}。同样，你也不需要指定属性类型为 `type`，因为这个信息是可以从 `{...}` 这个张量类型列表推断出来的。比如，下面的例子中属性 `t` 必须是 `int32`、`float` 或 `bool` 中的一种类型：
+* `{<type1>, <type2>}`: 属性类型为 `type`，表示取值是 `<type1>` 类型或 `<type2>` 类型二者之一，其中 `<type1>` 和 `<type2>` 为两种 `tf.DType`。同样，你也不需要指定属性类型为 `type`，因为这个信息是可以从 `{...}` 这个张量类型列表推断出来的。比如，下面的例子中属性 `t` 必须是 `int32`、`float` 或 `bool` 中的一种类型：
 
-  ```c++
-  REGISTER_OP("RestrictedTypeExample")
-      .Attr("t: {int32, float, bool}");
-  ```
+```c++
+REGISTER_OP("RestrictedTypeExample")
+    .Attr("t: {int32, float, bool}");
+```
 
 * 常用的类型约束可以有如下别名：
 	* `numbertype`：`type` 类型被限制为数值类型（不是字符串，也不是布尔类型）
@@ -575,7 +555,7 @@ REGISTER_OP("AttrDefaultExampleForAllTypes")
    .Attr("l_int: list(int) = [2, 3, 5, 7]");
 ```
 
-注意：若值类型为 `type`，则使用 @{tf.DType$the `DT_*` names for the types}。
+注意：若值类型为 `type`，则使用 `tf.DType`。
 
 #### 多态
 
@@ -584,12 +564,13 @@ REGISTER_OP("AttrDefaultExampleForAllTypes")
 有些操作支持不同类型的输入或产生不同类型的输出，这时你可以在此操作的注册中为[一个输入或输出类型](#输入和输出)指定[一个属性](#属性)。通常，你还要为支持的每种类型注册一个 `OpKernel`。
 
 比如，如果你想让 `ZeroOut` 操作既支持 `int32` 数值类型的张量，还要支持 `float` 类型，那么此操作的注册过程将类似于：
-<pre class="prettyprint"><code class="lang-cpp">
-REGISTER\_OP("ZeroOut")
-    <b>.Attr("T: {float, int32}")</b>
-    .Input("to\_zero: <b>T</b>")
-    .Output("zeroed: <b>T</b>");
-</code></pre>
+
+```c++
+REGISTER_OP("ZeroOut")
+    .Attr("T: {float, int32}")
+    .Input("to_zero: T")
+    .Output("zeroed: T");
+```
 
 现在，此操作在注册中指定了输入类型必须是 `float` 或 `int32`，而它的输出类型将保持一致，因为都是 `T` 类型。
 
@@ -639,107 +620,115 @@ REGISTER\_OP("ZeroOut")
 >   """
 > ```
 
-<pre class="prettyprint"><code class="lang-cpp">
-\#include "tensorflow/core/framework/op_kernel.h"<br/>
-class ZeroOut<b>Int32</b>Op : public OpKernel {
+```c++
+#include "tensorflow/core/framework/op_kernel.h"
+ class ZeroOutInt32Op : public OpKernel {
   // 和前面一样
-};<br/>
-class ZeroOut<b>Float</b>Op : public OpKernel {
+};
+ class ZeroOutFloatOp : public OpKernel {
  public:
-  explicit ZeroOut<b>Float</b>Op(OpKernelConstruction\* context)
-      : OpKernel(context) {}<br/>
-  void Compute(OpKernelContext\* context) override {
+  explicit ZeroOutFloatOp(OpKernelConstruction* context)
+      : OpKernel(context) {}
+  void Compute(OpKernelContext* context) override {
     // 获得输入张量
-    const Tensor& input\_tensor = context-&gt;input(0);
-    auto input = input\_tensor.flat&lt;<b>float</b>&gt;();<br/>
+    const Tensor& input_tensor = context->input(0);
+    auto input = input_tensor.flat<float>();
+    
     // 产生输出张量
     Tensor* output = NULL;
-    OP\_REQUIRES\_OK(context,
-                   context-&gt;allocate\_output(0, input_tensor.shape(), &output));
-    auto output\_flat = output-&gt;template flat&lt;<b>float</b>&gt;();<br/>
+    OP_REQUIRES_OK(context,
+                   context->allocate_output(0, input_tensor.shape(), &output));
+    auto output_flat = output->template flat<float>();
+    
     // 将输出张量中的所有元素设置为 0
     const int N = input.size();
-    for (int i = 0; i &lt; N; i++) {
-      output\_flat(i) = 0;
-    }<br/>
-    // 保留第一个输入值́
-    if (N &gt; 0) output\_flat(0) = input(0);
+    for (int i = 0; i < N; i++) {
+      output_flat(i) = 0;
+    }
+    
+    // 保留第一个输入值
+    if (N > 0) output_flat(0) = input(0);
   }
-};<br/><b>
-// 注意：TypeConstraint&lt;int32&gt;("T") 表示属性 `T` （定义在操作注册代码中）必须是 `int32` 类型的，
-// 即将模板实例化了。</b>
-REGISTER\_KERNEL\_BUILDER(
+};
+
+// 注意：TypeConstraint<int32>("T") 表示属性 `T`（定义在操作注册代码中）必须是 `int32` 类型的，即将模板实例化了。
+REGISTER_KERNEL_BUILDER(
     Name("ZeroOut")
-    .Device(DEVICE\_CPU)
-    <b>.TypeConstraint&lt;int32&gt;("T"),</b>
-    ZeroOutOp<b>Int32</b>);
-<b>REGISTER\_KERNEL\_BUILDER(
+    .Device(DEVICE_CPU)
+    .TypeConstraint<int32>("T"),
+    ZeroOutOpInt32);
+REGISTER_KERNEL_BUILDER(
     Name("ZeroOut")
-    .Device(DEVICE\_CPU)
-    .TypeConstraint&lt;float&gt;("T"),
+    .Device(DEVICE_CPU)
+    .TypeConstraint<float>("T"),
     ZeroOutFloatOp);
-</b></code></pre>
+```
 
 > 为了[后向兼容](#后向兼容)，在将属性加到已有操作中时，你需要指定一个[默认值](#默认值约束)：
 >
-> <pre class="prettyprint"><code class="lang-cpp">
-> REGISTER\_OP("ZeroOut")
->   <b>.Attr("T: {float, int32} = DT_INT32")</b>
->   .Input("to\_zero: T")
+> ```c++
+> REGISTER_OP("ZeroOut")
+>   .Attr("T: {float, int32} = DT_INT32")
+>   .Input("to_zero: T")
 >   .Output("zeroed: T")
-> </code></pre>
+> ```
 
 如果你还想添加更多类型，比如说 `double` 类型，你要稍微修改一下注册代码：
-<pre class="prettyprint"><code class="lang-cpp">
-REGISTER\_OP("ZeroOut")
-    <b>.Attr("T: {float, <b>double,</b> int32}")</b>
-    .Input("to\_zero: <b>T</b>")
-    .Output("zeroed: <b>T</b>");
-</code></pre>
 
-为了避免像上面的代码一样为多个 `OpKernel` 编写冗余代码，你可以使用 C++ 模板。
-不过，你仍然需要为每一次加载注册一个内核（调用 `REGISTER_KERNEL_BUILDER`）。
-<pre class="prettyprint"><code class="lang-cpp">
-<b>template &lt;typename T&gt;</b>
+```c++
+REGISTER_OP("ZeroOut")
+    .Attr("T: {float, double, int32}")
+    .Input("to_zero: T")
+    .Output("zeroed: T");
+```
+
+为了避免像上面的代码一样为多个 `OpKernel` 编写冗余代码，你可以使用 C++ 模板。不过，你仍然需要为每一次加载注册一个内核（调用 `REGISTER_KERNEL_BUILDER`）。
+
+```c++
+template <typename T>
 class ZeroOutOp : public OpKernel {
  public:
-  explicit ZeroOutOp(OpKernelConstruction\* context) : OpKernel(context) {}<br/>
-  void Compute(OpKernelContext\* context) override {
+  explicit ZeroOutOp(OpKernelConstruction* context) : OpKernel(context) {}
+  
+  void Compute(OpKernelContext* context) override {
     // 获得输入张量
-    const Tensor& input\_tensor = context-&gt;input(0);
-    auto input = input\_tensor.flat<b>&lt;T&gt;</b>();<br/>
+    const Tensor& input_tensor = context->input(0);
+    auto input = input_tensor.flat<T>();
+    
     // 产生输出张量
     Tensor* output = NULL;
-    OP\_REQUIRES\_OK(context,
-                   context-&gt;allocate\_output(0, input_tensor.shape(), &output));
-    auto output\_flat = output-&gt;template flat<b>&lt;T&gt;</b>();<br/>
+    OP_REQUIRES_OK(context,
+                   context->allocate_output(0, input_tensor.shape(), &output));
+    auto output_flat = output->template flat<T>();
+    
     // 将输出张量中的所有元素设置为 0
     const int N = input.size();
-    for (int i = 0; i &lt; N; i++) {
-      output\_flat(i) = 0;
-    }<br/>
-    // 保留第一个输入值́
-    if (N &gt; 0) output\_flat(0) = input(0);
+    for (int i = 0; i < N; i++) {
+      output_flat(i) = 0;
+    }
+    
+    // 保留第一个输入值
+    if (N > 0) output_flat(0) = input(0);
   }
-};<br/>
-// 注意：TypeConstraint&lt;int32&gt;("T") 表示属性 `T` （定义在操作注册代码中）必须是 `int32` 类型的，
-// 即将模板实例化了。</b>
-REGISTER\_KERNEL\_BUILDER(
+};
+
+// 注意：TypeConstraint&lt;int32&gt;("T") 表示属性 `T` （定义在操作注册代码中）必须是 `int32` 类型的，即将模板实例化了。
+REGISTER_KERNEL_BUILDER(
     Name("ZeroOut")
-    .Device(DEVICE\_CPU)
-    .TypeConstraint&lt;int32&gt;("T"),
-    <b>ZeroOutOp&lt;int32&gt;</b>);
-REGISTER\_KERNEL\_BUILDER(
+    .Device(DEVICE_CPU)
+    .TypeConstraint<int32>("T"),
+    ZeroOutOp<int32>);
+REGISTER_KERNEL_BUILDER(
     Name("ZeroOut")
-    .Device(DEVICE\_CPU)
-    .TypeConstraint&lt;float&gt;("T"),
-    <b>ZeroOutOp&lt;float&gt;</b>);
-<b>REGISTER\_KERNEL\_BUILDER(
+    .Device(DEVICE_CPU)
+    .TypeConstraint<float>("T"),
+    ZeroOutOp<float>);
+REGISTER_KERNEL_BUILDER(
     Name("ZeroOut")
-    .Device(DEVICE\_CPU)
-    .TypeConstraint&lt;double&gt;("T"),
-    ZeroOutOp&lt;double&gt;);
-</b></code></pre>
+    .Device(DEVICE_CPU)
+    .TypeConstraint<double>("T"),
+    ZeroOutOp<double>);
+```
 
 如果加载次数还不少，那你可以将注册放入宏中。
 
@@ -865,7 +854,7 @@ REGISTER_OP("MultipleInsAndOuts")
 
 * `<type>`：支持的输入类型，比如 `float`、`int32`、`string`。这个表达式指定了 `type` 类型的单个张量。
 
-  参见 @{tf.DType$the list of supported Tensor types}。
+  参见 `tf.DType`。
 
   ```c++
   REGISTER_OP("BuiltInTypesExample")
@@ -901,7 +890,7 @@ REGISTER_OP("MultipleInsAndOuts")
 
   注意，输出 `out` 中的张量的类型和数目与输入 `in` 是一样的，因为它们都是 `T` 类型。
 
-* 相同类型的张量序列：`<number> * <type>`, 其中 `<number>` 为类型为 `int` 的一个[属性](#属性)。`<type>` 可以是 @{tf.DType$a specific type like `int32` or `float`} 或 类型为 `type` 的一个属性的名称。第一种情况中，操作可接受 `int32` 张量的列表，示例如下：
+* 相同类型的张量序列：`<number> * <type>`，其中 `<number>` 为类型为 `int` 的一个[属性](#属性)。`<type>` 可以是 `tf.DType` 或类型为 `type` 的一个属性的名称。第一种情况中，操作可接受 `int32` 张量的列表，示例如下：
 
   ```c++
   REGISTER_OP("Int32SequenceExample")
@@ -928,7 +917,7 @@ REGISTER_OP("MultipleInsAndOuts")
 
 假设你已经编写了一个很好的定制操作，并分享给他人，让你的客户开心地使用了。然而，你还想要进一步修改这个操作。
 
-一般情况下，对已有的已上线的规范进行修改需要考虑后向兼容性：对一个操作的规范进行修改必须保证由旧规范构造出来的序列化 `GraphDef` 协议缓存仍然能用。`GraphDef` 的兼容性的细节参考 @{$version_compat#compatibility_of_graphs_and_checkpoints$described here}。
+一般情况下，对已有的已上线的规范进行修改需要考虑后向兼容性：对一个操作的规范进行修改必须保证由旧规范构造出来的序列化 `GraphDef` 协议缓存仍然能用。`GraphDef` 的兼容性的细节描述[参见这里](../guide/version_compat.md#compatibility of graphs and checkpoints)。
 
 保持后向兼容性的方法有很多，下面列出了一些：
 
@@ -957,13 +946,13 @@ REGISTER_OP("MultipleInsAndOuts")
 
 安全和不安全修改的完整列表可以在源码 [`tensorflow/core/framework/op_compatibility_test.cc`](https://www.tensorflow.org/code/tensorflow/core/framework/op_compatibility_test.cc) 中找到。如果你无法在兼容要求下修改此操作，那么最好是另起炉灶，创建一个新的操作，取一个新的名字，来表示你的新的语义。
 
-还要注意的是，除了维持 `GraphDef` 的兼容性，生成的 Python 代码还是有可能变得与旧的调用它的代码不兼容。因而，为保持兼容性，Python API 的修改要非常小心，最好是手写 Python 包装代码，而且只在旧的接口函数的最后面加上新的可选参数。一般而言，不兼容的改变只会发生在 TensorFlow 的大的版本变动时，而且必须遵从 @{$version_compat#compatibility_of_graphs_and_checkpoints$`GraphDef` version semantics}。
-
+还要注意的是，除了维持 `GraphDef` 的兼容性，生成的 Python 代码还是有可能变得与旧的调用它的代码不兼容。因而，为保持兼容性，Python API 的修改要非常小心，最好是手写 Python 包装代码，而且只在旧的接口函数的最后面加上新的可选参数。一般而言，不兼容的改变只会发生在 TensorFlow 的大的版本变动时，而且必须遵从 [`GraphDef` 的版本语义](../guide/version_compat.md#compatibility_of_graphs_and_checkpoints)。
 
 ### GPU 支持
-你可以实现不同的内核操作(OpKernel)，然后一个注册到 CPU 上，另一个注册到 GPU 上,就像你可以[为不同的类型注册内核](#多态)一样。TensorFlow提供了多个支持 GPU 的内核的例子，参见源码[`tensorflow/core/kernels`](https://www.tensorflow.org/code/tensorflow/core/kernels/)。注意，有些内核的 CPU 版本在一个 `.cc` 文件中，其 GPU 版本在一个 `_gpu.cu.cc` 文件中，它们共享的代码则在一个 `.h` 文件中。
 
-比如，@{tf.pad} 的 CPU 内核代码位于 [`tensorflow/core/kernels/pad_op.cc`](pad_op) 中，它的 GPU 内核在 [`tensorflow/core/kernels/pad_op_gpu.cu.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/pad_op_gpu.cu.cc) 中，而共享代码在 [`tensorflow/core/kernels/pad_op.h`](https://www.tensorflow.org/code/tensorflow/core/kernels/pad_op.h) 中。我们以这种方式组织代码有两个原因：它允许在 CPU 和 GPU 实现之间共享代码，并将 GPU 实现放入单独的文件中，以便只能由 GPU编译器编译。
+你可以实现不同的内核操作（OpKernel），然后一个注册到 CPU 上，另一个注册到 GPU 上,就像你可以[为不同的类型注册内核](#多态)一样。TensorFlow 提供了多个支持 GPU 的内核的例子，参见源码 [`tensorflow/core/kernels`](https://www.tensorflow.org/code/tensorflow/core/kernels/)。注意，有些内核的 CPU 版本在一个 `.cc` 文件中，其 GPU 版本在一个 `_gpu.cu.cc` 文件中，它们共享的代码则在一个 `.h` 文件中。
+
+比如，`tf.pad` 的 CPU 内核代码位于 [`tensorflow/core/kernels/pad_op.cc`](pad_op) 中，它的 GPU 内核在 [`tensorflow/core/kernels/pad_op_gpu.cu.cc`](https://www.tensorflow.org/code/tensorflow/core/kernels/pad_op_gpu.cu.cc) 中，而共享代码在 [`tensorflow/core/kernels/pad_op.h`](https://www.tensorflow.org/code/tensorflow/core/kernels/pad_op.h) 中。我们以这种方式组织代码有两个原因：它允许在 CPU 和 GPU 实现之间共享代码，并将 GPU 实现放入单独的文件中，以便只能由 GPU编译器编译。
 
 值得注意的一点是，即使使用的是 `pad` 操作的 GPU 内核版本，它仍然需要用到 CPU 内存中的 `"paddings"` 输入。为标记这种 CPU 上的输入或输出，在内核注册时添加一个 `HostMemory()` 调用，比如：
 
@@ -990,16 +979,15 @@ g++ -std=c++11 -shared -o cuda_op_kernel.so cuda_op_kernel.cc \
   cuda_op_kernel.cu.o ${TF_CFLAGS[@]} -fPIC -lcudart ${TF_LFLAGS[@]}
 ```
 
-通过 `tf.load_op_library` 函数，上述命令产生的 `cuda_op_kernel.so` 可以像通常的动态链接库一样在 Python 中加载。
-注意，如果 CUDA 库没有安装在 `/usr/local/lib64` 中，你需要在 上面第二个命令（g++）中显式指定其路径。比如，你的 CUDA 安装在 `/usr/local/cuda-8.0` 中，则需要在命令行中添加 `-L /usr/local/cuda-8.0/lib64/`。
->   注意，在某些 Linux 设置中，`nvcc` 编译步骤还需要其他选项。将 `-D_MWAITXINTRIN_H_INCLUDED` 添加到 nvcc 命令行以避免 `mwaitxintrin.h` 中的错误。
+通过 `tf.load_op_library` 函数，上述命令产生的 `cuda_op_kernel.so` 可以像通常的动态链接库一样在 Python 中加载。注意，如果 CUDA 库没有安装在 `/usr/local/lib64` 中，你需要在 上面第二个命令（g++）中显式指定其路径。比如，你的 CUDA 安装在 `/usr/local/cuda-8.0` 中，则需要在命令行中添加 `-L /usr/local/cuda-8.0/lib64/`。
+> 注意，在某些 Linux 设置中，`nvcc` 编译步骤还需要其他选项。将 `-D_MWAITXINTRIN_H_INCLUDED` 添加到 nvcc 命令行以避免 `mwaitxintrin.h` 中的错误。
 
 ### 在 Python 中实现梯度计算
 
-给定一个由操作构成的计算图，TensorFlow 使用自动微分（反向传播）来添加新的操作，用于表示已有的操作的梯度（参见 @{$python/train#gradient_computation$Gradient Computation})）。为了让新实现的操作也支持这种自动微分，你必须注册一个梯度函数，用于在给定关于此操作输出的梯度的情况下计算出关于此操作输入的梯度。
+给定一个由操作构成的计算图，TensorFlow 使用自动微分（反向传播）来添加新的操作，用于表示已有的操作的梯度（参见 [梯度计算](../api_guides/python/train.md#Gradient_Computation)）。为了让新实现的操作也支持这种自动微分，你必须注册一个梯度函数，用于在给定关于此操作输出的梯度的情况下计算出关于此操作输入的梯度。
 
 在数学上，如果一个操作计算 \\(y = f(x)\\)，为它注册的梯度操作将损失函数 \\(L\\) 关于 \\(y\\) 的梯度 \\(\partial L/ \partial y\\) 转化为关于 \\(x\\) 的梯度 \\(\partial L/ \partial x\\)，它使用的是链式法则：
-$$\frac{\partial L}{\partial x}    = \frac{\partial L}{\partial y} \frac{\partial y}{\partial x}    = \frac{\partial L}{\partial y} \frac{\partial f}{\partial x}.$$
+$$\frac{\partial L}{\partial x} = \frac{\partial L}{\partial y} \frac{\partial y}{\partial x} = \frac{\partial L}{\partial y} \frac{\partial f}{\partial x}.$$
 
 以 `ZeroOut` 为例，输入中只有一项会影响输出，所以关于输入的梯度是一个稀疏的 "one hot" 张量。代码如下：
 
@@ -1023,13 +1011,12 @@ def _zero_out_grad(op, grad): 
     to_zero_grad = sparse_ops.sparse_to_dense([index], shape, first_grad, 0)  
     return [to_zero_grad]  # 只有一个张量的列表，因为我们只有一个输入
 ```
-用 @{tf.RegisterGradient} 注册梯度函数的详情如下：
+用 `tf.RegisterGradient` 注册梯度函数的详情如下：
 
-  * 对于只有一个输出的操作，梯度函数的参数为一个 @{tf.Operation} `op`，和一个 @{tf.Tensor} `grad`，然后它会根据张量[`op.inputs[i]`](../../api_docs/python/framework.md#Operation.inputs)、[`op.outputs[i]`](../../api_docs/python/framework.md#Operation.outputs)、及 `grad` 来构建新操作。关于任何属性的信息可通过 @{tf.Operation.get_attr} 来找到。
+  * 对于只有一个输出的操作，梯度函数的参数为一个 `tf.Operation` `op`，和一个 `tf.Tensor` `grad`，然后它会根据张量 [`op.inputs[i]`](../../api_docs/python/framework.md#Operation.inputs)、[`op.outputs[i]`](../../api_docs/python/framework.md#Operation.outputs)、及 `grad` 来构建新操作。关于任何属性的信息可通过 `tf.Operation.get_attr` 来找到。
 
   * 如果操作有多个输出，其梯度函数的参数为 `op` 和 `grads`，其中 `grads` 是关于每个输出的梯度。此梯度函数的返回值为一个张量列表，表示的关于每个输入的梯度。
-  * 如果对某个输入没有良定义的梯度，比如用作指标的整数输入，相应的梯度应该为 `None`。比如，一个操作的一个输入是浮点型张量 `x`，
-另一个输入是一个整数指标 `i`，则梯度函数应该返回 `[x_grad, None]`。
+  * 如果对某个输入没有良定义的梯度，比如用作指标的整数输入，相应的梯度应该为 `None`。比如，一个操作的一个输入是浮点型张量 `x`，另一个输入是一个整数指标 `i`，则梯度函数应该返回 `[x_grad, None]`。
   * 如果一个操作根本就没有任何有意义的梯度，那么就没有必要注册梯度函数了。只要你不会用到操作的梯度，不注册也不会有什么问题。在有些情况下，一个操作没有良定义的梯度，但可能会参与到梯度计算中。在这种情况下，可以使用 `ops.NotDifferentiable` 来自动反向传播零值。
 
 注意，调用梯度函数时，只能访问到操作的数据流图，而不是张量数据本身。因此，所有梯度计算都必须使用其它 TensorFlow 操作执行，以便在计算图执行时运行。
@@ -1037,7 +1024,7 @@ def _zero_out_grad(op, grad): 
 
 ### C++ 中的形状函数
 
-TensorFlow API 有一个功能叫做"形状推断"，可以无需执行计算图而获得张量的形状信息。形状推断是由"形状函数"来支撑的，每个操作类型都会在其 C++ `REGISTER_OP` 声明中注册形状函数，它们有两种作用：在计算图的构造函数中声明输入的形状是兼容的，为输出指定形状。
+TensorFlow API 有一个功能叫做“形状推断”，可以无需执行计算图而获得张量的形状信息。形状推断是由“形状函数”来支撑的，每个操作类型都会在其 C++ `REGISTER_OP` 声明中注册形状函数，它们有两种作用：在计算图的构造函数中声明输入的形状是兼容的，为输出指定形状。
 
 形状函数定义为 `shape_inference::InferenceContext` 类上的操作。比如，在 ZeroOut 的形状函数中：
 
@@ -1059,7 +1046,7 @@ REGISTER_OP("ZeroOut")
     .SetShapeFn(::tensorflow::shape_inference::UnchangedShape);
 ```
 
-一个形状函数也可用于约束输入的形状。对于 [具有矢量形状约束的 `ZeroOut` 版本](#validation)，其形状函数定义如下：
+一个形状函数也可用于约束输入的形状。对于[具有矢量形状约束的 `ZeroOut` 版本](#validation)，其形状函数定义如下：
 
 ```c++
     .SetShapeFn([](::tensorflow::shape_inference::InferenceContext* c) {
@@ -1100,20 +1087,20 @@ REGISTER_OP("ZeroOut")
 
 对于复杂的形状函数，应该考虑添加一个测试，来验证多个输入形状组合可产生预期的输出形状组合。这种测试的编写方法参见源码 [core ops tests](https://www.tensorflow.org/code/tensorflow/core/ops/array_ops_test.cc)。（`INFER_OK` 和 `INFER_ERROR` 的语法会让人感觉有点神秘，不过还是在测试中尽量让表示输入输出形状的规范简洁一些。目前，可以在已有的测试中看看注释，了解如何编写形状的规范。）
 
-[core-array_ops]:https://www.tensorflow.org/code/tensorflow/core/ops/array_ops.cc
-[python-user_ops]:https://www.tensorflow.org/code/tensorflow/python/user_ops/user_ops.py
-[tf-kernels]:https://www.tensorflow.org/code/tensorflow/core/kernels/
-[user_ops]:https://www.tensorflow.org/code/tensorflow/core/user_ops/
-[pad_op]:https://www.tensorflow.org/code/tensorflow/core/kernels/pad_op.cc
-[standard_ops-py]:https://www.tensorflow.org/code/tensorflow/python/ops/standard_ops.py
-[standard_ops-cc]:https://www.tensorflow.org/code/tensorflow/cc/ops/standard_ops.h
-[python-BUILD]:https://www.tensorflow.org/code/tensorflow/python/BUILD
-[validation-macros]:https://www.tensorflow.org/code/tensorflow/core/lib/core/errors.h
-[op_def_builder]:https://www.tensorflow.org/code/tensorflow/core/framework/op_def_builder.h
-[register_types]:https://www.tensorflow.org/code/tensorflow/core/framework/register_types.h
-[FinalizeAttr]:https://www.tensorflow.org/code/tensorflow/core/framework/op_def_builder.cc
-[DataTypeString]:https://www.tensorflow.org/code/tensorflow/core/framework/types.cc
-[python-BUILD]:https://www.tensorflow.org/code/tensorflow/python/BUILD
-[types-proto]:https://www.tensorflow.org/code/tensorflow/core/framework/types.proto
-[TensorShapeProto]:https://www.tensorflow.org/code/tensorflow/core/framework/tensor_shape.proto
-[TensorProto]:https://www.tensorflow.org/code/tensorflow/core/framework/tensor.proto
+[core-array_ops]: https://www.tensorflow.org/code/tensorflow/core/ops/array_ops.cc
+[python-user_ops]: https://www.tensorflow.org/code/tensorflow/python/user_ops/user_ops.py
+[tf-kernels]: https://www.tensorflow.org/code/tensorflow/core/kernels/
+[user_ops]: https://www.tensorflow.org/code/tensorflow/core/user_ops/
+[pad_op]: https://www.tensorflow.org/code/tensorflow/core/kernels/pad_op.cc
+[standard_ops-py]: https://www.tensorflow.org/code/tensorflow/python/ops/standard_ops.py
+[standard_ops-cc]: https://www.tensorflow.org/code/tensorflow/cc/ops/standard_ops.h
+[python-BUILD]: https://www.tensorflow.org/code/tensorflow/python/BUILD
+[validation-macros]: https://www.tensorflow.org/code/tensorflow/core/lib/core/errors.h
+[op_def_builder]: https://www.tensorflow.org/code/tensorflow/core/framework/op_def_builder.h
+[register_types]: https://www.tensorflow.org/code/tensorflow/core/framework/register_types.h
+[FinalizeAttr]: https://www.tensorflow.org/code/tensorflow/core/framework/op_def_builder.cc
+[DataTypeString]: https://www.tensorflow.org/code/tensorflow/core/framework/types.cc
+[python-BUILD]: https://www.tensorflow.org/code/tensorflow/python/BUILD
+[types-proto]: https://www.tensorflow.org/code/tensorflow/core/framework/types.proto
+[TensorShapeProto]: https://www.tensorflow.org/code/tensorflow/core/framework/tensor_shape.proto
+[TensorProto]: https://www.tensorflow.org/code/tensorflow/core/framework/tensor.proto
