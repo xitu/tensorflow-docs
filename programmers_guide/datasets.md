@@ -1,14 +1,14 @@
 # 数据导入
 
-@{tf.data} API 能够快速的从简单可重用的片段中搭建输入总线。例如,一个图像处理模型的输入总线需要完成的任务可能是，从一个分布式文件系统中聚合数据，对每一张图像添加一些数据扰动，并能够将随机选中的图像合并进一个训练批次中。又如，一个文本处理模型的输入总线可能要从未加工的文本数据中提取出标识，并将它们按照一个查询表转化为嵌入标识符，再集合成不同长度的序列。`tf.data` API 能让处理大规模数据、不同数据格式兼容和复杂转换过程变得很简单。
+`tf.data` API 能够快速的从简单可重用的片段中搭建输入总线。例如,一个图像处理模型的输入总线需要完成的任务可能是，从一个分布式文件系统中聚合数据，对每一张图像添加一些数据扰动，并能够将随机选中的图像合并进一个训练批次中。又如，一个文本处理模型的输入总线可能要从未加工的文本数据中提取出标识，并将它们按照一个查询表转化为嵌入标识符，再集合成不同长度的序列。`tf.data` API 能让处理大规模数据、不同数据格式兼容和复杂转换过程变得很简单。
 
 `tf.data` API 为 TensorFlow 引入了两种新的抽象：
 
 * `tf.data.Dataset` 是一个基本元素的序列，每一个基本元素中包含了一个或者多个 `Tensor` 对象。例如，在一个图像输入总线中，一个基本元素可能是一个单独的训练样本，它包含了一对 Tensor 对象，分别代表图像数据和一个标签。创建一个数据集有两种不同的方法：
 
-  * 根据一个或者多个 `tf.Tensor` 对象创建一个 **source** （例如 `Dataset.from_tensor_slices()`）方法来构造一个数据集。
+  * 根据一个或者多个 `tf.Tensor` 对象创建一个 **source**（例如 `Dataset.from_tensor_slices()`）方法来构造一个数据集。
   
-  * 根据一个或多个 `tf.data.Dataset` 对象应用一种 **transformation** （例如 `Dataset.batch()`）来构造一个数据集。
+  * 根据一个或多个 `tf.data.Dataset` 对象应用一种 **transformation**（例如 `Dataset.batch()`）来构造一个数据集。
 
 * `tf.data.Iterator` 提供了从一个数据集中提取基本元素的主要方法。由 `Iterator.get_next()` 返回的操作在执行时会给予 `DataSet` 的下一个基本元素，它通常作为输入总线代码和模型之间的接口。这个最简单的迭代器是 "one-shot iterator"，它关联到一个 `Dataset` 并遍历它一次。在更复杂的情况下，`Iterator.initializer` 操作能够将一个迭代器根据不同的数据集重新初始化并设定参数，所以举例来说，你可以在同样一个程序中多次迭代训练数据和验证数据。
 
@@ -18,13 +18,13 @@
 
 要构建一个基本的输入总线，你必须先定义一个 **source**。例如，要从内存中的一些 tensor 对象中构造一个 `Dataset` ，你能够使用 `tf.data.Dataset.from_tensors()` 或者 `tf.data.Dataset.from_tensor_slices()`。或者，如果你的输入数据按照推荐的 TFRecord 格式存储在硬盘中的话，你可以构造一个 `tf.data.TFRecordDataset`。
 
-一旦你有了一个 `Dataset` 对象，你能通过链接方法调用 `tf.data.Dataset` 对象将它**转换**为一个新的 `Dataset`。例如，你能够使用类似 `Dataset.map()`（用于对每一个元素使用一个函数）的方法转换每一个元素，或者使用 `Dataset.batch()` 处理多重元素的转换。要了解更多请查看关于 @{tf.data.Dataset} 的文档中关于转换的完整内容。
+一旦你有了一个 `Dataset` 对象，你能通过链接方法调用 `tf.data.Dataset` 对象将它**转换**为一个新的 `Dataset`。例如，你能够使用类似 `Dataset.map()`（用于对每一个元素使用一个函数）的方法转换每一个元素，或者使用 `Dataset.batch()` 处理多重元素的转换。要了解更多请查看关于 `tf.data.Dataset` 的文档中关于转换的完整内容。
 
-要遍历来自一个 `Dataset` 中的内容一个最普通的方法是建立一个 **迭代器** 对象，它提供了每次获取数据集中一个元素的方法（比如，通过调用  `Dataset.make_one_shot_iterator()`）。`tf.data.Iterator` 提供了两种操作：`Iterator.initializer` 用作（重新）初始化迭代器的状态；`Iterator.get_next()` 返回符合下一元素标志的  `tf.Tensor` 对象。你可能会根据你的用例采用不同的迭代器，这些选项在下面会有概括。
+要遍历来自一个 `Dataset` 中的内容一个最普通的方法是建立一个**迭代器**对象，它提供了每次获取数据集中一个元素的方法（比如，通过调用  `Dataset.make_one_shot_iterator()`）。`tf.data.Iterator` 提供了两种操作：`Iterator.initializer` 用作（重新）初始化迭代器的状态；`Iterator.get_next()` 返回符合下一元素标志的  `tf.Tensor` 对象。你可能会根据你的用例采用不同的迭代器，这些选项在下面会有概括。
 
 ### 数据集结构
 
-一个数据集由具有相同结构的元素组成。一个元素包含一个或者多个 `tf.Tensor` 对象，它叫做 **组件**。每一个组件都有表示 tensor 中元素类型的 `tf.DType` 和代表元素静态类型（可能是部分指定）的 `tf.TensorShape`。`Dataset.output_types` 和 `Dataset.output_shapes` 属性可以检查一个数据集元素中每个组件的推测类型。这些属性的**嵌套结构**映射到一个元素的结构中，可能是一个单一的 tensor，一组 tensor，或者一组嵌套结构的 tensor。例如：
+一个数据集由具有相同结构的元素组成。一个元素包含一个或者多个 `tf.Tensor` 对象，它叫做**组件**。每一个组件都有表示 tensor 中元素类型的 `tf.DType` 和代表元素静态类型（可能是部分指定）的 `tf.TensorShape`。`Dataset.output_types` 和 `Dataset.output_shapes` 属性可以检查一个数据集元素中每个组件的推测类型。这些属性的**嵌套结构**映射到一个元素的结构中，可能是一个单一的 tensor，一组 tensor，或者一组嵌套结构的 tensor。例如：
 
 ```python
 dataset1 = tf.data.Dataset.from_tensor_slices(tf.random_uniform([4, 10]))
@@ -138,7 +138,7 @@ for _ in range(20):
     sess.run(next_element)
 ```
 
-**feedable**迭代器可以与 @{tf.placeholder} 一起使用，用于在每次调用  @{tf.Session.run} 时选取使用什么  `Iterator`，和 `feed_dict` 原理类似。它提供与了一个 **reinitializable** 迭代器一样的功能，但是它不需要你在切换迭代器时，再从一个数据集的起始处初始化。例如，使用与上述相同的训练和验证样例，你能使用 @{tf.data.Iterator.from_string_handle} 来定义一个 **feedable** 迭代器，它允许你在两个数据集之间进行切换：
+**feedable**迭代器可以与 `tf.placeholder` 一起使用，用于在每次调用 `tf.Session.run` 时选取使用什么  `Iterator`，和 `feed_dict` 原理类似。它提供与了一个 **reinitializable** 迭代器一样的功能，但是它不需要你在切换迭代器时，再从一个数据集的起始处初始化。例如，使用与上述相同的训练和验证样例，你能使用 `tf.data.Iterator.from_string_handle` 来定义一个 **feedable** 迭代器，它允许你在两个数据集之间进行切换：
 
 ```python
 # 将训练集和验证集设定成相同的结构
@@ -232,7 +232,7 @@ next1, (next2, next3) = iterator.get_next()
 
 ### 保存迭代器状态
 
-@{tf.contrib.data.make_saveable_from_iterator} 函数从一个迭代器中创建一个 `SaveableObject`，它可以用于保存和恢复迭代器（实际上，甚至可以是整个输入管道）。这样创建的可保存对象，可以添加到 @{tf.train.Saver} 变量列表或者用于保存和恢复的 `tf.GraphKeys.SAVEABLE_OBJECTS` 集合中，方式与  @{tf.Variable} 相同。关于如何保存和恢复变量的更多信息，请参阅 @{$saved_model$Saving and Restoring}。
+`tf.contrib.data.make_saveable_from_iterator` 函数从一个迭代器中创建一个 `SaveableObject`，它可以用于保存和恢复迭代器（实际上，甚至可以是整个输入管道）。这样创建的可保存对象，可以添加到 `tf.train.Saver` 变量列表或者用于保存和恢复的 `tf.GraphKeys.SAVEABLE_OBJECTS` 集合中，方式与  `tf.Variable` 相同。关于如何保存和恢复变量的更多信息，请参阅[保存和恢复](../guide/saved_model.md)。
 
 ```python
 # Create saveable object from iterator.
@@ -354,6 +354,33 @@ dataset = dataset.flat_map(
         .filter(lambda line: tf.not_equal(tf.substr(line, 0, 1), "#"))))
 ```
 
+### Consuming CSV data
+
+The CSV file format is a popular format for storing tabular data in plain text. The `tf.contrib.data.CsvDataset` class provides a way to extract records from one or more CSV files that comply with [RFC 4180](https://tools.ietf.org/html/rfc4180). Given one or more filenames and a list of defaults, a `CsvDataset` will produce a tuple of elements whose types correspond to the types of the defaults provided, per CSV record. Like `TFRecordDataset` and `TextLineDataset`, `CsvDataset` accepts `filenames` as a `tf.Tensor`, so you can parameterize it by passing a  `tf.placeholder(tf.string)`.
+
+```
+# Creates a dataset that reads all of the records from two CSV files, each with eight float columns
+filenames = ["/var/data/file1.csv", "/var/data/file2.csv"]
+record_defaults = [tf.float32] * 8   # Eight required float columns
+dataset = tf.contrib.data.CsvDataset(filenames, record_defaults)
+```
+
+If some columns are empty, you can provide defaults instead of types.
+
+```
+# Creates a dataset that reads all of the records from two CSV files, each with four float columns which may have missing values
+record_defaults = [[0.0]] * 8
+dataset = tf.contrib.data.CsvDataset(filenames, record_defaults)
+```
+
+By default, a `CsvDataset` yields *every* column of *every* line of the file, which may not be desirable, for example if the file starts with a header line that should be ignored, or if some columns are not required in the input. These lines and fields can be removed with the `header` and `select_cols` arguments respectively.
+
+```
+# Creates a dataset that reads all of the records from two CSV files with headers, extracting float data from columns 2 and 4.
+record_defaults = [[0.0]] * 2  # Only provide defaults for the selected columns
+dataset = tf.contrib.data.CsvDataset(filenames, record_defaults, header=True, select_cols=[2,4])
+```
+
 <!--
 TODO(mrry): Add these sections.
 
@@ -375,7 +402,7 @@ TODO(mrry): Add these sections.
 # 一个整数标量，分别代表一个图像和它的标签。
 def _parse_function(example_proto):
   features = {"image": tf.FixedLenFeature((), tf.string, default_value=""),
-              "label": tf.FixedLenFeature((), tf.int32, default_value=0)}
+              "label": tf.FixedLenFeature((), tf.int64, default_value=0)}
   parsed_features = tf.parse_single_example(example_proto, features)
   return parsed_features["image"], parsed_features["label"]
 
@@ -394,7 +421,7 @@ dataset = dataset.map(_parse_function)
 # 将它重设到一个固定的尺寸。
 def _parse_function(filename, label):
   image_string = tf.read_file(filename)
-  image_decoded = tf.image.decode_image(image_string)
+  image_decoded = tf.image.decode_jpeg(image_string)
   image_resized = tf.image.resize_images(image_decoded, [28, 28])
   return image_resized, label
 
@@ -545,7 +572,7 @@ dataset = dataset.repeat()
 
 ### 使用高级 API
 
-@{tf.train.MonitoredTrainingSession} API 简化了分布式运行 TensorFlow 的许多设置。`MonitoredTrainingSession` 使用 @{tf.errors.OutOfRangeError} 来标识训练已经完成，所以我们推荐使用 `tf.data` API。例如：
+`tf.train.MonitoredTrainingSession` API 简化了分布式运行 TensorFlow 的许多设置。`MonitoredTrainingSession` 使用 `tf.errors.OutOfRangeError` 来标识训练已经完成，所以我们推荐使用 `tf.data` API。例如：
 
 ```python
 filenames = ["/var/data/file1.tfrecord", "/var/data/file2.tfrecord"]
@@ -566,7 +593,7 @@ with tf.train.MonitoredTrainingSession(...) as sess:
     sess.run(training_op)
 ```
 
-要在一个 @{tf.estimator.Estimator} 的 `input_fn` 中使用一个 `Dataset` ，我们也推荐使用 `Dataset.make_one_shot_iterator()`，例如：
+要使用 `tf.estimator.Estimator` 中 `input_fn` 的 `Dataset`，只需返回 `Dataset`，框架将负责创建迭代器并为帮你对其进行初始化。例如：
 
 ```python
 def dataset_input_fn():
@@ -597,10 +624,7 @@ def dataset_input_fn():
   dataset = dataset.shuffle(buffer_size=10000)
   dataset = dataset.batch(32)
   dataset = dataset.repeat(num_epochs)
-  iterator = dataset.make_one_shot_iterator()
 
-  # `features` 是一个字典，它里面是这个特征的一系列数据；
-  #  `labels` 是一系列的标签
-  features, labels = iterator.get_next()
-  return features, labels
+  # `dataset` 的每个元素都是包含特征字典的元组（其中每个值是该特征的一批值）和一批标签。
+  return dataset
 ```
