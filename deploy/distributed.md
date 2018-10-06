@@ -1,6 +1,6 @@
 # 分布式 TensorFlow
 
-本文演示了怎样创建一个 TensorFlow 集群(cluster)，以及怎样向集群提交计算图(graph)。我们假设你已经对基础的 TensorFlow 编程所需要用到的 @{$programmers_guide/low_level_intro$basic concepts} 有所了解。
+本文演示了怎样创建一个 TensorFlow 集群(cluster)，以及怎样向集群提交计算图(graph)。我们假设你已经对基础的 TensorFlow 编程所需要用到的[基本概念](../guide/low_level_intro.md)有所了解。
 
 ## 你好，分布式 TensorFlow ！
 
@@ -17,7 +17,7 @@ $ python
 'Hello, distributed TensorFlow!'
 ```
 
-@{tf.train.Server.create_local_server} 方法使用进程内服务器创建了一个单进程集群。
+`tf.train.Server.create_local_server` 方法使用进程内服务器创建了一个单进程集群。
 
 ## 创建一个集群
 
@@ -38,7 +38,7 @@ TensorFlow “集群”是一组参与分布式执行 TensorFlow 计算图的“
 
 ### 创建一个 `tf.train.ClusterSpec` 来描述集群
 
-群集规范（ClusterSpec）是一个将作业名称映射到网络地址列表地址的字典。把该字典传递给 @{tf.train.ClusterSpec} 构造函数。例如：
+群集规范（ClusterSpec）是一个将作业名称映射到网络地址列表地址的字典。把该字典传递给 `tf.train.ClusterSpec` 构造函数。例如：
 
 <table>
   <tr><th>构造 <code>tf.train.ClusterSpec</code> </th><th>可用的任务</th>
@@ -66,7 +66,7 @@ tf.train.ClusterSpec({
 
 ### 在每个任务中创建一个 `tf.train.Server` 实例
 
-一个 @{tf.train.Server} 对象包含一套本地设备，一套与 `tf.train.ClusterSpec` 中其他任务相连的连接，以及一个可以用来执行分布式计算的 @{tf.Session}。 每个 TensorFlow 服务器都是特定命名作业的成员，并拥有一份该作业中的任务索引。TensorFlow 服务器可以与集群中其他服务器通信。
+一个 `tf.train.Server` 对象包含一套本地设备，一套与 `tf.train.ClusterSpec` 中其他任务相连的连接，以及一个可以用来执行分布式计算的 `tf.Session`。 每个 TensorFlow 服务器都是特定命名作业的成员，并拥有一份该作业中的任务索引。TensorFlow 服务器可以与集群中其他服务器通信。
 
 例如，启动一个运行在 `localhost：2222` 和 `localhost：2223` 两台服务器上的集群，在本地机器的两个不同进程上运行以下代码：
 
@@ -85,7 +85,7 @@ server = tf.train.Server(cluster, job_name="local", task_index=1)
 
 ## 指定模型中的分布式设备
 
-要将操作放在特定的进程上，可以使用同一个 @{tf.device} 函数来指定，它同样被用来指定操作是在 CPU 还是 GPU 上执行。 例如
+要将操作放在特定的进程上，可以使用同一个 `tf.device` 函数来指定，它同样被用来指定操作是在 CPU 还是 GPU 上执行。 例如
 
 ```python
 with tf.device("/job:ps/task:0"):
@@ -118,11 +118,11 @@ with tf.Session("grpc://worker7.example.com:2222") as sess:
    到 `/job:ps` ）的 `tf.Graph`; 以及模型的计算密集型部分的多个副本，
    每个副本固定对应到 `/job:worker` 中不同的任务上。
 
-* **图间复制** 在这种方法中，每个 `/job:worker` 任务都对应一个独立的客户端，客户端通常与 worker 任务在同一进程中。每个客户端会构建一个相似的、带参数的图（这些参数像以往一样，通过 @{tf.train.replica_device_setter} 来映射到相同任务 `/job:ps`，）; 和一个模型中的计算密集型部分的单一副本，对应到 `/job:worker` 中的本地任务。
+* **图间复制** 在这种方法中，每个 `/job:worker` 任务都对应一个独立的客户端，客户端通常与 worker 任务在同一进程中。每个客户端会构建一个相似的、带参数的图（这些参数像以往一样，通过 `tf.train.replica_device_setter` 来映射到相同任务 `/job:ps`，）; 和一个模型中的计算密集型部分的单一副本，对应到 `/job:worker` 中的本地任务。
 
 * **异步训练** 在这种方法中，图的每个副本都有一个没有独立训练循环，不做协调就可以执行。它是兼容的以上两种形式的复制。
 
-* **同步训练** 在这种方法中，所有的副本读取到相同的值赋给当前的参数，并行计算梯度，然后将它们一起应用。它与图内复制（例如：像[CIFAR-10 multi-GPU trainer](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10_multi_gpu_train.py)一样使用梯度平均和多 GPU 图间复制），图间复制（使用 @{tf.train.SyncReplicasOptimizer}）。
+* **同步训练** 在这种方法中，所有的副本读取到相同的值赋给当前的参数，并行计算梯度，然后将它们一起应用。它与图内复制（例如：像[CIFAR-10 multi-GPU trainer](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10_multi_gpu_train.py)一样使用梯度平均和多 GPU 图间复制），图间复制（使用 `tf.train.SyncReplicasOptimizer`）。
 
 ### 总结：示例训练程序
 
@@ -248,7 +248,7 @@ $ python trainer.py \
 
 **集群**
 
-一个 TensorFlow 集群包含一个或多个“作业”，每个“作业”分为一个个列表，列表由一个或多个“任务”组成。集群通常专用于特定的高级用途，比如训练神经网络，并行使用多台机器。一个集群由 @{tf.train.ClusterSpec} 对象定义。
+一个 TensorFlow 集群包含一个或多个“作业”，每个“作业”分为一个个列表，列表由一个或多个“任务”组成。集群通常专用于特定的高级用途，比如训练神经网络，并行使用多台机器。一个集群由 `tf.train.ClusterSpec` 对象定义。
 
 **作业**
 
@@ -264,7 +264,7 @@ $ python trainer.py \
 
 **TensorFlow 服务器**
 
-运行着 @{tf.train.Server} 实例的进程，是集群的成员，并对外提供 `master 服务` 和 `worker 服务`。
+运行着 `tf.train.Server` 实例的进程，是集群的成员，并对外提供 `master 服务` 和 `worker 服务`。
 
 
 **Worker 服务**
