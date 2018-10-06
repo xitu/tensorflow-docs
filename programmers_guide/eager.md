@@ -10,7 +10,7 @@ Eager execution 为实验和研究提供了一个灵活的机器学习平台：
 
 Eager execution 支持大多数 TensorFlow 操作和 GPU 加速功能。如果需要 eager execution 运行的示例集合，请参阅： [tensorflow/contrib/eager/python/examples](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/eager/python/examples)。
 
-注意：一些模型在开启 eager execution 后，可能会增加开销。虽然已经在进行性能优化，但如果您发现了问题，请向我们提交[错误文件报告](https://github.com/tensorflow/tensorflow/issues)并分享您的基准测试。
+注意：一些模型在开启 eager execution 后，可能会增加开销。虽然已经在进行性能优化，但如果你发现了问题，请向我们提交[错误文件报告](https://github.com/tensorflow/tensorflow/issues)并分享你的基准测试。
 
 ## 安装和基本用法
 
@@ -30,7 +30,7 @@ import tensorflow as tf
 tf.enable_eager_execution()
 ```
 
-现在您可以运行 TensorFlow 操作了，结果会被立即返回： 
+现在你可以运行 TensorFlow 操作了，结果会被立即返回： 
 
 ```py
 tf.executing_eagerly()        # => True
@@ -89,13 +89,14 @@ eager execution 的一个主要优势是，在运行模型时，主机语言的�
 ```py
 def fizzbuzz(max_num):
   counter = tf.constant(0)
-  for num in range(max_num):
+  max_num = tf.convert_to_tensor(max_num)
+  for num in range(max_num.numpy()):
     num = tf.constant(num)
-    if num % 3 == 0 and num % 5 == 0:
+    if int(num % 3) == 0 and int(num % 5) == 0:
       print('FizzBuzz')
-    elif num % 3 == 0:
+    elif int(num % 3) == 0:
       print('Fizz')
-    elif num % 5 == 0:
+    elif int(num % 5) == 0:
       print('Buzz')
     else:
       print(num)
@@ -107,20 +108,21 @@ def fizzbuzz(max_num):
 
 ## 构建模型
 
-许多机器学习模型都是由组合网络层构成。在使用具有 eager execution 的 TensorFlow 时，您可以编写自己的网络层或者使用 `tf.keras.layers` 包提供的网络层。
+许多机器学习模型都是由组合网络层构成。在使用具有 eager execution 的 TensorFlow 时，你可以编写自己的网络层或者使用 `tf.keras.layers` 包提供的网络层。
 
-尽管您可以使用任意的 Python 对象来表示网络层，但 TensorFlow 仍然有 `tf.keras.layers.Layer` 来作为便捷的基类。您可以通过继承它来实现自己的网络层：
+尽管你可以使用任意的 Python 对象来表示网络层，但 TensorFlow 仍然有 `tf.keras.layers.Layer` 来作为便捷的基类。你可以通过继承它来实现自己的网络层：
 
 ```py
 class MySimpleLayer(tf.keras.layers.Layer):
   def __init__(self, output_units):
+    super(MySimpleLayer, self).__init__()
     self.output_units = output_units
 
-  def build(self, input):
-    # 您的层在第一次被使用时，build() 方法将被用。
-    # 在 build() 上创建变量使其形状依赖于输入形状，从而消除了用户指定完整形状的需要，如果您已经知道变量的全部形状，则可以在 _init_() 期间创建变量。
+  def build(self, input_shape):
+    # 第一次使用 layer 时，会调用 `build` 方法。
+    # 在 build() 上创建变量使其形状依赖于输入形状，从而消除了用户指定完整形状的需要，如果你已经知道变量的全部形状，则可以在 _init_() 期间创建变量。
     self.kernel = self.add_variable(
-      "kernel", [input.shape[-1], self.output_units])
+      "kernel", [input_shape[-1], self.output_units])
 
   def call(self, input):
     # 重载 call() 而不是 __call__ ，这样我们就可以执行一些 bookkeeping 操作。
@@ -171,12 +173,12 @@ model = MNISTModel()
 在不进行跟踪时，`tf.GradientTape` 是一个提供最佳性能的可选特性。因为每次调用都会发生不同的操作，因此所有向前传播操作都会被记录在一个 "tape" 中。为了计算梯度，需要向后播放 tape，然后丢弃。一个特定的 `tf.GradientTape` 只能计算一个梯度，之后的调用会导致运行时错误。
 
 ```py
-w = tfe.Variable([[1.0]])
+w = tf.Variable([[1.0]])
 with tf.GradientTape() as tape:
   loss = w * w
 
-grad = tape.gradient(loss, [w])
-print(grad)  # => [tf.Tensor([[ 2.]], shape=(1, 1), dtype=float32)]
+grad = tape.gradient(loss, w)
+print(grad)  # => tf.Tensor([[ 2.]], shape=(1, 1), dtype=float32)
 ```
 
 这是 `tf.GradientTape` 在训练简单模型时记录向前传播操作的一个示例:
@@ -205,8 +207,8 @@ def grad(weights, biases):
 train_steps = 200
 learning_rate = 0.01
 # Start with arbitrary values for W and B on the same batch of data
-W = tfe.Variable(5.)
-B = tfe.Variable(10.)
+W = tf.Variable(5.)
+B = tf.Variable(10.)
 
 print("Initial loss: {:.3f}".format(loss(W, B)))
 
@@ -256,8 +258,7 @@ for (batch, (images, labels)) in enumerate(dataset):
                             global_step=tf.train.get_or_create_global_step())
 ```
 
-
-下述示例创建了一个对标准 [MNIST 手写体数字](https://www.tensorflow.org/tutorials/layers)进行了分类的多层模型。它演示了在 eager execution 环境中如何利用优化器和网络层 API 来构建可训练图。
+下述示例创建了一个对标准 MNIST 手写体数字进行了分类的多层模型。它演示了在 eager execution 环境中如何利用优化器和网络层 API 来构建可训练图。
 
 ### 训练模型
 
@@ -272,7 +273,7 @@ result = model(batch)
 # => tf.Tensor([[[ 0.  0., ..., 0.]]], shape=(1, 1, 10), dtype=float32)
 ```
 
-本示例使用 [TensorFlow MNIST example](https://github.com/tensorflow/models/tree/master/official/mnist) 中的 [dataset.py module](https://github.com/tensorflow/models/blob/master/official/mnist/dataset.py)；将本文件下载到您的本地目录。运行以下内容将 MNIST 数据文件下载到您的工作目录，并为训练准备一个 `tf.data.Dataset`：
+本示例使用 [TensorFlow MNIST example](https://github.com/tensorflow/models/tree/master/official/mnist) 中的 [dataset.py module](https://github.com/tensorflow/models/blob/master/official/mnist/dataset.py)；将本文件下载到你的本地目录。运行以下内容将 MNIST 数据文件下载到你的工作目录，并为训练准备一个 `tf.data.Dataset`：
 
 ```py
 import dataset  # download dataset.py file
@@ -340,17 +341,17 @@ with tf.device("/gpu:0"):
 
 ### 变量和优化器
 
-`tfe.Variable` 对象存储在训练时可以访问的可变 `tf.Tensor` 值来让自动微分更加简单。模型参数可以作为变量封装在类中。 
+`tf.Variable` 对象存储在训练时可以访问的可变 `tf.Tensor` 值来让自动微分更加简单。模型参数可以作为变量封装在类中。 
 
-使用结合 `tf.GradientTape` 的 `tfe.Variable` 可以更好的封装模型参数。例如，可以重写上述的自动微分示例：
+使用结合 `tf.GradientTape` 的 `tf.Variable` 可以更好的封装模型参数。例如，可以重写上述的自动微分示例：
 
 ```py
 class Model(tf.keras.Model):
   def __init__(self):
     super(Model, self).__init__()
-    self.W = tfe.Variable(5., name='weight')
-    self.B = tfe.Variable(10., name='bias')
-  def predict(self, inputs):
+    self.W = tf.Variable(5., name='weight')
+    self.B = tf.Variable(10., name='bias')
+  def call(self, inputs):
     return inputs * self.W + self.B
 
 # A toy dataset of points around 3 * x + 2
@@ -361,7 +362,7 @@ training_outputs = training_inputs * 3 + 2 + noise
 
 # The loss function to be optimized
 def loss(model, inputs, targets):
-  error = model.predict(inputs) - targets
+  error = model(inputs) - targets
   return tf.reduce_mean(tf.square(error))
 
 def grad(model, inputs, targets):
@@ -423,18 +424,18 @@ W = 2.99431324005, B = 2.02129220963
 
 ```py
 with tf.device("gpu:0"):
-  v = tfe.Variable(tf.random_normal([1000, 1000]))
+  v = tf.Variable(tf.random_normal([1000, 1000]))
   v = None  # v no longer takes up GPU memory
 ```
 
 ### 基于对象的保存方式
 
-`tfe.Checkpoint` 可以对检查点进行保存并恢复 `tfe.Variable`。
+`tf.Checkpoint` 可以对检查点进行保存并恢复 `tf.Variable`。
 
 ```py
-x = tfe.Variable(10.)
+x = tf.Variable(10.)
 
-checkpoint = tfe.Checkpoint(x=x)  # save as "x"
+checkpoint = tf.Checkpoint(x=x)  # save as "x"
 
 x.assign(2.)   # Assign a new value to the variables and save.
 save_path = checkpoint.save('./ckpt/')
@@ -447,16 +448,16 @@ checkpoint.restore(save_path)
 print(x)  # => 2.0
 ```
 
-在保存并加载模型时，无需请求隐藏变量，`tfe.Checkpoint` 便可以存储对象的内部状态。想要记录 `model`、`optimizer` 的状态和全局步骤，只需将它们传递给 `tfe.Checkpoint`：
+在保存并加载模型时，无需请求隐藏变量，`tf.Checkpoint` 便可以存储对象的内部状态。想要记录 `model`、`optimizer` 的状态和全局步骤，只需将它们传递给 `tf.Checkpoint`：
 
 ```py
 model = MyModel()
 optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
 checkpoint_dir = ‘/path/to/model_dir’
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
-root = tfe.Checkpoint(optimizer=optimizer,
-                      model=model,
-                      optimizer_step=tf.train.get_or_create_global_step())
+root = tf.train.Checkpoint(optimizer=optimizer,
+                           model=model,
+                           optimizer_step=tf.train.get_or_create_global_step())
 
 root.save(file_prefix=checkpoint_prefix)
 # or
@@ -478,14 +479,13 @@ m.result()  # => 5.5
 
 #### Summary 以及 TensorBoard
 
-@{$summaries_and_tensorboard$TensorBoard} 是一个用于帮助理解、调试和优化模型训练过程的可视化工具。它使用在执行程序时生成的 summary event 进行可视化。
+[TensorBoard](../guide/summaries_and_tensorboard.md) 是一个用于帮助理解、调试和优化模型训练过程的可视化工具。它使用在执行程序时生成的 summary event 进行可视化。
 
 `tf.contrib.summary` 同时兼容 eager 和 graph 执行环境。Summary 操作，例如 `tf.contrib.summary.scalar`，是在模型构建时插入的。例如，每执行 100 个全局的 step，就记录一次 summary：
 
 ```py
+global_step = tf.train.get_or_create_global_step()
 writer = tf.contrib.summary.create_file_writer(logdir)
-global_step=tf.train.get_or_create_global_step()  # return global step var
-
 writer.set_as_default()
 
 for _ in range(iterations):
@@ -509,7 +509,7 @@ def line_search_step(fn, init_x, rate=1.0):
     # Variables are automatically recorded, but manually watch a tensor
     tape.watch(init_x)
     value = fn(init_x)
-  grad, = tape.gradient(value, [init_x])
+  grad = tape.gradient(value, init_x)
   grad_norm = tf.reduce_sum(grad * grad)
   init_value = value
   while value > init_value - rate * grad_norm:
@@ -521,7 +521,7 @@ def line_search_step(fn, init_x, rate=1.0):
 
 ### 计算梯度的附加函数
 
-`tf.GradientTape` 是一个用于计算梯度的功能强大的接口，但其实在自动微分方面，还有另一个 [Autograd](https://github.com/HIPS/autograd)-风格的 API。在只使用张量和梯度函数编写数学代码，而且不使用 `tfe.Variables` 的时候，这些函数是有用的：
+`tf.GradientTape` 是一个用于计算梯度的功能强大的接口，但其实在自动微分方面，还有另一个 [Autograd](https://github.com/HIPS/autograd)-风格的 API。在只使用张量和梯度函数编写数学代码，而且不使用 `tf.Variables` 的时候，这些函数是有用的：
 
 * `tfe.gradients_function` — 返回一个计算其输入函数参数导数的函数。输入函数参数必须返回标量值。返回函数被调用时，它会返回一个 `tf.Tensor` 对象列表：输入函数的每个参数都有一个元素。因为任何感兴趣的东西都必须作为函数参数传递，如果依赖于许多可训练的参数，这就变得很困难。
 * `tfe.value_and_gradients_function` — 类似于 `tfe.gradients_function`，但是当调用返回函数时，除了输入函数的导数列表和参数之外，它还会从输入函数返回值。
@@ -604,7 +604,7 @@ grad_log1pexp(100.)  # => [1.0]
 
 ## 性能
 
-在 eager execution 期间，计算会自动加载到 GPU。如果您希望控制计算运行的位置，可以将其封装在 `tf.device('/gpu:0')` 块（或与 CPU 等效的块中）：
+在 eager execution 期间，计算会自动加载到 GPU。如果你希望控制计算运行的位置，可以将其封装在 `tf.device('/gpu:0')` 块（或与 CPU 等效的块中）：
 
 ```py
 import time
@@ -615,7 +615,9 @@ def measure(x, steps):
   start = time.time()
   for i in range(steps):
     x = tf.matmul(x, x)
-    _ = x.numpy()  # Make sure to execute op and not just enqueue it
+  # tf.matmul 可以在完成矩阵乘法运算之前返回（例如，可以在对 CUDA 流进行操作之后返回）。
+  # 下面的 x.numpy() 调用将确保所有排队的操作都已完成（并且还将会结果复制到主机内存中，所以我们要包括的不只是 matmul 操作时间）。
+  _ = x.numpy()
   end = time.time()
   return end - start
 
@@ -639,8 +641,8 @@ Output (exact numbers depend on hardware):
 
 ```
 Time to multiply a (1000, 1000) matrix by itself 200 times:
-CPU: 4.614904403686523 secs
-GPU: 0.5581181049346924 secs
+CPU: 1.46628093719 secs
+GPU: 0.0593810081482 secs
 ```
 
 A `tf.Tensor` object can be copied to a different device to execute its operations:
@@ -689,9 +691,9 @@ if tfe.num_gpus() > 1:
 * 大多数模型在 eager execution 和 graph execution 中的表现是一样的，但也有特列。（例如，动态模型使用 Python 控制流来改变基于输入的计算。）
 * 一旦通过 `tf.enable_eager_execution` 启用 eager execution，它就不会被关闭。启动一个新的 Python session 来返回到 graph execution。
 
-最好是同时为 eager execution **和** graph execution 编写代码。这将为您提供 eager 的交互式体验和可调式性，以及 graph execution 的分布式性能优势。
+最好是同时为 eager execution **和** graph execution 编写代码。这将为你提供 eager 的交互式体验和可调式性，以及 graph execution 的分布式性能优势。
 
-在 eager execution 中编写，调试和迭代，然后为生产部署导入模型图。使用 `tfe.Checkpoint` 来保存和存储模型变量，这允许在 eager 和 graph execution 环境之间移动。请参阅以下示例：[tensorflow/contrib/eager/python/examples](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/eager/python/examples)。
+在 eager execution 中编写，调试和迭代，然后为生产部署导入模型图。使用 `tf.train.Checkpoint` 来保存和存储模型变量，这允许在 eager 和 graph execution 环境之间移动。请参阅以下示例：[tensorflow/contrib/eager/python/examples](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/eager/python/examples)。
 
 ### 在图环境中使用 eager execution 执行
 
