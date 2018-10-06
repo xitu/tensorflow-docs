@@ -5,12 +5,11 @@
 *   检查点（checkpoints）：这是一种依赖于创建模型代码的格式。
 *   SavedModel：这是一种与创建模型代码无关的格式。
 
-本文关心的是检查点格式。对于 SavedModel 的细节内容，请参见 __TensorFlow 程序员指南__ 中的 @{$saved_model$保存和恢复} 章节。
-
+本文关心的是检查点格式。对于 `SavedModel` 的细节内容，请参见[保存和恢复](../guide/saved_model.md)指南。
 
 ## 示例代码
 
-本文档同样依赖于 [Iris 数据分类示例](https://github.com/tensorflow/models/blob/master/samples/core/get_started/premade_estimator.py)，更多细节参见 @{$premade_estimators$TensorFlow 入门}。为下载和访问这个示例，可执行如下命令：
+本文档同样依赖于 [Iris 数据分类示例](https://github.com/tensorflow/models/blob/master/samples/core/get_started/premade_estimator.py)，更多细节参见 [TensorFlow 入门指南](../guide/premade_estimators.md)。为下载和访问这个示例，可执行如下命令：
 
 ```shell
 git clone https://github.com/tensorflow/models/
@@ -19,7 +18,6 @@ cd models/samples/core/get_started
 
 本文中大部分代码片断都是在 `premade_estimator.py` 基础上少量修改的版本。
 
-
 ## 保存未训练完的模型
 
 Estimators 自动将下列内容写到磁盘上：
@@ -27,7 +25,7 @@ Estimators 自动将下列内容写到磁盘上：
 *   **检查点**：训练过程中生成的不同版本的模型。
 *   **事件文件**：包含一些用于 [TensorBoard](https://developers.google.com/machine-learning/glossary/#TensorBoard) 可视化的信息
 
-为指定 Estimator 存储信息的顶层目录，将其赋值给任何一个 Estimator 的构造函数的可选参数 `model_dir`。比如  ，下列代码将 `model_dir` 参数设置为 `models/iris` 目录：
+为指定 Estimator 存储信息的顶层目录，将其赋值给任何一个 Estimator 的构造函数的可选参数 `model_dir`。以 `DNNClassifier` 为例，通过以下代码设置 `models/iris` 目录的 `model_dir` 参数：
 
 ```python
 classifier = tf.estimator.DNNClassifier(
@@ -93,7 +91,7 @@ print(classifier.model_dir)
 
 ### 检查点的保存频率
 
-默认情况下， Estimator 会在 `model_dir` 目录中保存 [检查点](https://developers.google.com/machine-learning/glossary/#checkpoint)，并且采用如下策略：
+默认情况下，Estimator 会在 `model_dir` 目录中保存 [检查点](https://developers.google.com/machine-learning/glossary/#checkpoint)，并且采用如下策略：
 
 *   每隔 10 分钟保存一个检查点（即 600 秒）。
 *   当 `train` 方法开始执行（即第一次循环）和执行结束（最后一次循环）时，会各保存一个检查点。
@@ -101,7 +99,7 @@ print(classifier.model_dir)
 
 你可以用如下步骤改变上述默认策略：
 
-1.  创建一个 @{tf.estimator.RunConfig$`RunConfig`} 对象，用于定义所需的保存策略。
+1.  创建一个 `tf.estimator.RunConfig` 对象，用于定义所需的保存策略。
 2.  当实例化 Estimator 时，将此 `RunConfig` 对象传递给 Estimator 的 `config` 参数。
 
 比如，下面的代码将检查点保存策略修改为每隔 20 分钟保存一次，且保留最近 10 个检查点：
@@ -124,7 +122,7 @@ classifier = tf.estimator.DNNClassifier(
 
 当第一次调用一个 Estimator 的 `train` 方法时，TensorFlow 会在 `model_dir` 目录中保存一个检查点。后续每调用一次 Estimator 的 `train` 、 `evaluate` 或 `predict` 方法，都会发生如下的行为：
 
-1.  这个 Estimator 会用过运行 `model_fn()` 函数来构建模型的[计算图](https://developers.google.com/machine-learning/glossary/#graph)。 (`model_fn()` 的细节参见 @{$custom_estimators$生成定制的 Estimator})
+1.  这个 Estimator 会用过运行 `model_fn()` 函数来构建模型的[计算图](https://developers.google.com/machine-learning/glossary/#graph)。`model_fn()` 的细节请参见[生成定制的 Estimator](../guide/custom_estimators.md)）。
 2.  这个 Estimator 从最近的检查点中恢复出数据，用于初始化新模型的权重值。
 
 换句话说，如下图所示，一旦检查点文件存在，TensorFlow 总会在你调用 `train()` 、 `evaluation()` 或 `predict()` 时重建模型。
@@ -182,7 +180,7 @@ does not match the shape stored in checkpoint: [20]
 
 检查点提供了一种容易的保存和恢复由 Estimator 生成的模型的自动化机制。
 
-参见 **TensorFlow 程序员指南**的 @{$saved_model$保存和恢复} 章节，你可以找到如下内容的更多细节：
+参见[保存和恢复](../guide/saved_model.md)相关细节信息的指南：
 
 *   使用底层 TensorFlow API 来保存和恢复模型。
 *   在 SavedModel 模式中导出和导入模型，这是一种语言无关、可恢复、可序列化格式。
