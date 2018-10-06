@@ -42,7 +42,7 @@ embedded_word_ids = tf.nn.embedding_lookup(word_embeddings, word_ids)
 
 在此之后，在我们的例子中 tensor `embedded_word_ids` 会具备维度 `[5, embedding_size]`，其中就是这 5 个单词的每一个词的 embeddings（密集向量）。在训练结束时，`word_embeddings` 将包含词汇表中所有单词的 embeddings。
 
-Embeddings 可以在多种神经网络中、使用各种损失函数和数据集来训练，例如，可以使用递归神经网络在给定大规模语料库中词句的基础上，根据前一单词来预测下一个单词，或者可以训练两个网络进行多语言翻译。这些方法在 @{$word2vec$Vector Representations of Words} 教程中有详细描述。
+Embeddings 可以在多种神经网络中、使用各种损失函数和数据集来训练，例如，可以使用递归神经网络在给定大规模语料库中词句的基础上，根据前一单词来预测下一个单词，或者可以训练两个网络进行多语言翻译。这些方法在[词向量表示](../tutorials/representation/word2vec.md)教程中有详细描述。
 
 ## 将 Embeddings 可视化
 
@@ -141,7 +141,7 @@ Embedding Projector 为数据集降维提供了三种方法。
 </tr>
 </table>
 
-打开[这个链接]("https://www.tensorflow.org/images/embedding-mnist.mp4" )查看一个有趣的 Embedding Projector 中图像缩略图案例。
+打开[这个链接](https://www.tensorflow.org/images/embedding-mnist.mp4)查看一个有趣的 Embedding Projector 中图像缩略图案例。
 
 ## 小型问答会
 
