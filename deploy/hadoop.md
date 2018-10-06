@@ -4,7 +4,7 @@
 
 ## HDFS
 
-我们默认读者已经了解如何 @{$reading_data$reading data}。
+我们默认读者已经了解如何[读取数据](../api_guides/python/reading_data.md)。
 
 为了在 HDFS 上使用 Tensorflow，需要将读写数据的文件路径改为 HDFS 路径。例如：
 
@@ -47,4 +47,4 @@ filename_queue = tf.train.string_input_producer([
     export KRB5CCNAME=/tmp/krb5cc_10002
     ```
 
-如果要运行 @{$distributed$Distributed TensorFlow}，那么所有的 workers 需要安装 Hadoop 并且配置相应的环境变量。
+如果要运行[分布式 TensorFlow](../deploy/distributed.md)，那么所有的 workers 需要安装 Hadoop 并且配置相应的环境变量。
