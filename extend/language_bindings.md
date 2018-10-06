@@ -10,12 +10,12 @@ Python 是 TensorFlow 支持的第一种且支持特性最多的客户端语言�
 
 在一个编程语言中提供 TensorFlow 的功能可以分解为下面几个广泛的类别：
 
--   *运行一个预定义 Graph*：给定一个 `GraphDef`（或 `MetaGraphDef`）协议消息，能够创建一个会话，执行查询并获得张量结果。 这对于想要在预先训练的模型上运行推断的移动应用或服务器来说足够了。
--   *Graph 构造*：每个定义的 TensorFlow 操作至少有一个函数将操作添加到图中。理想情况下，这些函数会自动生成，以便在操作定义被修改时保持同步。
--   *梯度（即自动微分）*：给定一个图和一系列输入输出操作，将操作添加到图中，计算输出与输入的损失函数的偏微分；并允许能够对图中特定的操作自定义梯度函数。
--   *函数*：定义一个可以在 `GraphDef` 的多个位置调用的子图，并定义一个 `GraphDef` 内的 `FunctionDefLibrary` 中的 `FunctionDef` 。
--   *控制流*：构造用户特定子图的"If"和"While"操作。理想状态下，这些控制流能与梯度共同工作（见上）。
--   *神经网络库*：许多组件支持创建神经网络模型并对其进行训练（可能在分布式环境中）。虽然用其他语言提供这种服务会非常方便，但目前还没有计划支持 Python 以外的语言。这些库通常是对以上功能的封装。
+-   **运行一个预定义 Graph**：给定一个 `GraphDef`（或 `MetaGraphDef`）协议消息，能够创建一个会话，执行查询并获得张量结果。 这对于想要在预先训练的模型上运行推断的移动应用或服务器来说足够了。
+-   **Graph 构造**：每个定义的 TensorFlow 操作至少有一个函数将操作添加到图中。理想情况下，这些函数会自动生成，以便在操作定义被修改时保持同步。
+-   **梯度（即自动微分）**：给定一个图和一系列输入输出操作，将操作添加到图中，计算输出与输入的损失函数的偏微分；并允许能够对图中特定的操作自定义梯度函数。
+-   **函数**：定义一个可以在 `GraphDef` 的多个位置调用的子图，并定义一个 `GraphDef` 内的 `FunctionDefLibrary` 中的 `FunctionDef` 。
+-   **控制流**：构造用户特定子图的"If"和"While"操作。理想状态下，这些控制流能与梯度共同工作（见上）。
+-   **神经网络库**：许多组件支持创建神经网络模型并对其进行训练（可能在分布式环境中）。虽然用其他语言提供这种服务会非常方便，但目前还没有计划支持 Python 以外的语言。这些库通常是对以上功能的封装。
 
 至少，一个语言的绑定必须支持运行预定义的图，当然这也意味着需要支持图的构造。 TensorFlow Python API 提供了所有这些功能。
 
@@ -52,13 +52,13 @@ TensorFlow 具有许多不同的操作，并且不会永远不变。因此我们
 有几种方法可以获得已注册操作的 `OpDef` 列表：
 
 -   在 C API 中的 `TF_GetAllOpList` 会检索所有注册的 `OpDef` 协议消息。 这可以用来为客户端语言编写生成器。这便要求客户端语言具有协议缓冲区支持以便解释 `OpDef` 消息。
--   C++ 函数 `OpRegistry::Global() -> GetRegisteredOps()` 返回所有已注册的 `OpDef`（在[`tensorflow/core/framework/ op.h`] 中定义）的相同列表。 这可以用来在 C++ 中编写生成器（对没有协议缓冲区支持的语言非常有用）。
--   该列表的 ASCII 序列化版本通过自动化过程定期检入[ `tensorflow/core/ops/ops.pbtxt`]。
+-   C++ 函数 `OpRegistry::Global() -> GetRegisteredOps()` 返回所有已注册的 `OpDef`（在 [`tensorflow/core/framework/op.h`](https://www.tensorflow.org/code/tensorflow/core/framework/op.h) 中定义）的相同列表。 这可以用来在 C++ 中编写生成器（对没有协议缓冲区支持的语言非常有用）。
+-   该列表的 ASCII 序列化版本通过自动化过程定期检入 [`tensorflow/core/ops/ops.pbtxt`](https://www.tensorflow.org/code/tensorflow/core/ops/ops.pbtxt)。
 
 `OpDef` 包含以下内容：
 
 -   驼峰法命名的操作名称。对于生成的函数，遵循该语言的约定。例如，如果语言使用 snake_case，则应使用这种习惯而不是 CamelCase 作为 操作的函数名称。
--   输入和输出的列表。如 @{$adding_an_op$Adding an op} 中输入和输出部分所描述的那样，这些类型可能会通过引用属性而变为多态。
+-   输入和输出的列表。如[添加一个新操作（Op）](../extend/adding_an_op.md)中输入和输出部分所描述的那样，这些类型可能会通过引用属性而变为多态。
 -   属性列表及其默认值（如果有的话）。需要注意的是某些默认参数的类型（从输入中）推导情况、可选参数（如果有默认值）以及实参（没有默认值）。
 -   操作文档以及输入、输出和非推断属性。
 -   运行时使用的一些其他字段，可由代码生成器忽略。
@@ -75,7 +75,7 @@ TensorFlow 具有许多不同的操作，并且不会永远不变。因此我们
     -   `TF_ColocateWith()` 将一个操作与另一个操作合并
 -   完成后调用 `TF_FinishOperation()`。这会将操作添加到图中，以后无法对其修改。
 
-现有示例将运行代码生成器作为构建过程的一部分（使用 Bazel genrule）。或者，代码生成器可由自动化 cron 进程运行，可能会检查结果。这会在生成的代码和存储库中的 `OpDef` 之间产生分叉的风险，但对于那些需要提前生成代码的语言来说是有用的，如 Go 中的 `go get` 和 Rust 中的 `cargo ops`。 另一方面，对于某些语言来说，代码可以从 [`tensorflow/core/ops/ops.pbtxt`] 动态生成。
+现有示例将运行代码生成器作为构建过程的一部分（使用 Bazel genrule）。或者，代码生成器可由自动化 cron 进程运行，可能会检查结果。这会在生成的代码和存储库中的 `OpDef` 之间产生分叉的风险，但对于那些需要提前生成代码的语言来说是有用的，如 Go 中的 `go get` 和 Rust 中的 `cargo ops`。 另一方面，对于某些语言来说，代码可以从 [`tensorflow/core/ops/ops.pbtxt`](https://www.tensorflow.org/code/tensorflow/core/ops/ops.pbtxt) 动态生成。
 
 #### 处理常量
 
@@ -107,7 +107,3 @@ TensorFlow 具有许多不同的操作，并且不会永远不变。因此我们
 目前，除了 Python 之外，其他语言并没有提供梯度、函数及控制流操作（if 和 while）。我们会在 [C API] 提供必要支持后更新。
 
 [C API]: https://www.tensorflow.org/code/tensorflow/c/c_api.h
-
-[`tensorflow/core/ops/ops.pbtxt`]: https://www.tensorflow.org/code/tensorflow/core/ops/ops.pbtxt
-[`tensorflow/python/BUILD`]: https://www.tensorflow.org/code/tensorflow/python/BUILD
-[`tensorflow/core/framework/op.h`]: https://www.tensorflow.org/code/tensorflow/core/framework/op.h
