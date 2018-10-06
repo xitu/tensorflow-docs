@@ -164,7 +164,7 @@ TensorFlow 框架经常用于多进程和多机环境，比如谷歌数据中心
     TF_RETURN_IF_ERROR(env->NewWritableFile(filename, &file));
 ```
 
-接下来，你必须构建一个包含这个实现的共享对象。[这里](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/BUILD#L244)是一个使用 bazel `cc_binary` 规则实现的实例，但是你仍然可以使用任何构建系统实现。有关类似说明，请参阅 @{$adding_an_op#build_the_op_library$building the op library} 中的部分。
+接下来，你必须构建一个包含这个实现的共享对象。[这里](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/BUILD#L244)是一个使用 bazel `cc_binary` 规则实现的实例，但是你仍然可以使用任何构建系统实现。有关类似说明，请参阅[构建操作库](../extend/adding_an_op.md#build_the_op_library)中的部分。
 
 构建的结果是一个 `.so` 共享对象文件。
 
