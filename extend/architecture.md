@@ -32,7 +32,7 @@ TensorFlow 运行时是一个跨平台库。图 1 展示了其总体框架。通
 
 图 2 展示了这些组件之间的交互。`/job:worker/task:0` 和 `/job:ps/task:0` 均为具有工作进程的任务。`PS` 代表参数服务器：负责存储和更新模型参数的任务。其他任务在优化参数时会向这些参数发送更新。任务之间的这种特定分工并不是必须的，但是这在分布式训练中很常用。
 
-![TensorFlow 架构图示](https://www.tensorflow.org/images/diag1.svg){: width="500"}
+![TensorFlow 架构图示](https://www.tensorflow.org/images/diag1.svg)
 
 **图 2**
 
