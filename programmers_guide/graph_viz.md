@@ -5,11 +5,11 @@ TensorFlow 的计算图功能强大但却复杂。而图表可视化功能可以
 ![Visualization of a TensorFlow graph](https://www.tensorflow.org/images/graph_vis_animation.gif "Visualization of a TensorFlow graph")
 **Tensorflow 图形可视化**
 
-要查看您自己的图形，请运行 TensorBoard 并将其指向工作的日志目录，单击顶部窗格上的图形选项卡，然后使用左上角的菜单选择相关的运行。如果想获得有关于如何运行 TensorBoard 并且确保记录了所有必要信息的更多信息，请参阅 @{$summaries_and_tensorboard$TensorBoard: Visualizing Learning}。
+要查看您自己的图形，请运行 TensorBoard 并将其指向工作的日志目录，单击顶部窗格上的图形选项卡，然后使用左上角的菜单选择相关的运行。如果想获得有关于如何运行 TensorBoard 并且确保记录了所有必要信息的更多信息，请参阅 [TensorBoard：可视化学习](../guide/summaries_and_tensorboard.md)。
 
 ## 命名范围和节点
 
-典型的 TensorFlow 图可能有成千上万的节点——太多了，很难一次看到，甚至无法使用标准图形工具进行布局。为方便起见，变量名可以作用于域，可视化使用这些信息来定义图中节点上的层次结构。默认情况下，只显示该层次结构的顶部。以下是在一个在 `hidden` 名字域下使用 @{tf.name_scope} 名称的范围定义三个操作的示例 ：
+典型的 TensorFlow 图可能有成千上万的节点——太多了，很难一次看到，甚至无法使用标准图形工具进行布局。为方便起见，变量名可以作用于域，可视化使用这些信息来定义图中节点上的层次结构。默认情况下，只显示该层次结构的顶部。以下是在一个在 `hidden` 名字域下使用 `tf.name_scope` 名称的范围定义三个操作的示例 ：
 
 ```python
 import tensorflow as tf
@@ -187,7 +187,7 @@ TensorBoard 提供了几种方法来改变图形的视觉布局。这不会改�
 
 ## 运行时间统计
 
-通常收集运行时的元数据是非常有用的，例如总内存使用量，总计算时间和节点的张量形状。下面的代码示例是修改自 @{$layers$simple MNIST tutorial} 中的一个片段，其中我们记录了摘要法和运行时统计的信息。有关如何记录摘要的详细信息，请参阅 @{$summaries_and_tensorboard#serializing-the-data$Summaries Tutorial}。完整的源代码在[这里](https://www.tensorflow.org/code/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py)。
+通常收集运行时的元数据是非常有用的，例如总内存使用量，总计算时间和节点的张量形状。下面的代码示例是修改自 [Estimators MNIST 教程](../tutorials/estimators/cnn.md) 中的一个片段，其中我们记录了摘要法和运行时统计的信息。有关如何记录摘要的详细信息，请参阅[摘要教程](../guide/summaries_and_tensorboard.md#serializing-the-data)。完整的源代码在[这里](https://www.tensorflow.org/code/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py)。
 
 ```python
   # 训练模型，并记录日志
