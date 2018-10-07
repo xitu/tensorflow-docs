@@ -1,24 +1,23 @@
 # 性能
 
-在训练机器学习模型时，性能往往是一个值得关注的问题。本节介绍了数种优化性能的方法。使用 @{$performance_guide$Performance Guide} 开始您的研究，然后深入了解 @{$performance_models$High-Performance Models} 中详细介绍的技术：
+性能是训练机器学习模型时一个十分值得关注的问题。Performance speeds up and scales research while also providing end users with near instant predictions. This section provides details on the high level APIs to use along with best practices to build and train high performance models, and quantize models for the least latency and highest throughput for inference.
 
-  * @{$performance_guide$Performance Guide}，本文囊括了一系列优化 TensorFlow 代码的最佳实践。
+* [Performance Guide](../performance/performance_guide.md) contains a collection of best practices for optimizing your TensorFlow code.
+* [Data input pipeline guide](../performance/datasets_performance.md) describes the tf.data API for building efficient data input pipelines for TensorFlow.
+* [Benchmarks](../performance/benchmarks.md) contains a collection of benchmark results for a variety of hardware configurations.
+* For optimizing inference on GPUs, refer to [NVIDIA TensorRT™ integration with TensorFlow.](https://medium.com/tensorflow/speed-up-tensorflow-inference-on-gpus-with-tensorrt-13b49f3db3fa)
 
-  * @{$performance_models$High-Performance Models}，本文包括了一系列针对不同类型系统和网络拓扑设计高伸缩模型的进阶技术。
+Tensorflow Model Optimization Toolkit is a set of techniques for optimizing models for inference:
 
-  * @{$performance/benchmarks$Benchmarks}，包含了一些基准测试的结果。
+* [Overview](../performance/model_optimization.md), which introduces the model optimization toolkit.
+* [Post-training quantization](../performance/post_training_quantization.md), describes post training quantization.
 
-XLA（加速线性代数）是一个正处于实验阶段、用于优化 TensorFlow 计算的编译器。您可以阅读以下指南探索 XLA：
+XLA (Accelerated Linear Algebra) is an experimental compiler for linear algebra that optimizes TensorFlow computations. The following guides explore XLA:
 
-  * @{$xla$XLA Overview}：XLA 简介。
-  * @{$broadcasting$Broadcasting Semantics}，本文介绍了 XLA 的广播语义。
-  * @{$developing_new_backend$Developing a new back end for XLA}，本文解释了如何重定位 TensorFlow 以优化特定硬件的计算图的性能。
-  * @{$jit$Using JIT Compilation}，本文描述了通过 XLA 编译和运行部分 TensorFlow 图，以优化性能的 XLA JIT 编译器。
-  * @{$operation_semantics$Operation Semantics}，本文为描述 `ComputationBuilder` 接口的操作语义参考手册。
-  * @{$shapes$Shapes and Layout}，详细介绍了 `Shape` 协议缓冲区。
-  * @{$tfcompile$Using AOT compilation}，本文解释了 `tfcompile` 这一独立工具，它可以将 TensorFlow 图编译为可执行代码以优化性能。
-
-最后，我们还提供了这份指南：
-
-  * @{$quantization$How to Quantize Neural Networks with TensorFlow}，本文介绍了如何使用量化来减少存储和运行时的模型大小。量化可以改善性能，在移动设备上效果尤为明显。
-
+* [XLA Overview](../performance/xla/index.md), which introduces XLA.
+* [Broadcasting Semantics](../performance/xla/broadcasting.md), which describes XLA's broadcasting semantics.
+* [Developing a new back end for XLA](../performance/xla/developing_new_backend.md), which explains how to re-target TensorFlow in order to optimize the performance of the computational graph for particular hardware.
+* [Using JIT Compilation](../performance/xla/jit.md), which describes the XLA JIT compiler that compiles and runs parts of TensorFlow graphs via XLA in order to optimize performance.
+* [Operation Semantics](../performance/xla/operation_semantics.md), which is a reference manual describing the semantics of operations in the `ComputationBuilder` interface.
+* [Shapes and Layout](../performance/xla/shapes.md), which details the `Shape` protocol buffer.
+* [Using AOT compilation](../performance/xla/tfcompile.md), which explains `tfcompile`, a standalone tool that compiles TensorFlow graphs into executable code in order to optimize performance.
