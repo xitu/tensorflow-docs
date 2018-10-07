@@ -17,9 +17,9 @@ GPU 和 TPU 可以从根本上缩短执行单个训练步骤所需的时间。�
 2.  **转化：** 使用 CPU 内核处理器解析及执行数据预处理操作，如图像解压缩，数据增强型转换（如随机裁剪，翻转和颜色失真），乱序化和批处理。
 3.  **加载：** 将转换的数据加载到执行机器学习模型的加速器（例如 GPU 或 TPU）上。
 
-这种模式在保证加速器来训练你的模型的同时有效利用 CPU 。另外，将输入管道视为一个 ETL 流程提供了一种便于在性能优化中应用的结构。
+这种模式在保证加速器来训练你的模型的同时有效利用 CPU。另外，将输入管道视为一个 ETL 流程提供了一种便于在性能优化中应用的结构。
 
-当使用 @{tf.estimator.Estimator} API 时，前两个阶段（抽取和转换）在传递到 @{tf.estimator.Estimator.train} 时在 `input_fn` 中被捕获。
+当使用 `tf.estimator.Estimator` API 时，前两个阶段（抽取和转换）在传递到 `tf.estimator.Estimator.train` 时在 `input_fn` 中被捕获。
 在代码中，这可能是如下自然顺序的实现：
 
 ```
@@ -55,7 +55,7 @@ def input_fn():
 
 **流水线技术** 重叠训练的预处理和模型训练步骤。当加速器正在执行训练步骤 N 时，CPU 开始准备步骤 N + 1 的数据。这样做可以将步骤时间减少到模型训练与抽取转换数据二者所需的最大时间（而不是二者时间总和）。
 
-没有流水线技术，CPU 和 GPU/TPU 大部分时间将处于闲置状态:
+没有流水线技术，CPU 和 GPU/TPU 大部分时间将处于闲置状态：
 
 ![without pipelining](https://www.tensorflow.org/images/datasets_without_pipelining.png)
 
@@ -63,7 +63,7 @@ def input_fn():
 
 ![with pipelining](https://www.tensorflow.org/images/datasets_with_pipelining.png)
 
-`tf.data` API 通过 @{tf.data.Dataset.prefetch} 转换提供了一种软件流水线机制，该转换可以用来分离从消耗时间生成的时间数据。特别地，转换使用后台线程和内部缓冲区来提前抽取输入数据集中的元素。因此，要实现上面说明的流水线效果，可以添加 `prefetch(1)` 对数据集管道的最终转换（或者如果单个训练步骤消耗 n 个元素，则预取 `prefetch(n)`）。
+`tf.data` API 通过 `tf.data.Dataset.prefetch` 转换提供了一种软件流水线机制，该转换可以用来分离从消耗时间生成的时间数据。特别地，转换使用后台线程和内部缓冲区来提前抽取输入数据集中的元素。因此，要实现上面说明的流水线效果，可以添加 `prefetch(1)` 对数据集管道的最终转换（或者如果单个训练步骤消耗 n 个元素，则预取 `prefetch(n)`）。
 
 要将此应用于我们的运行样例，则需要更改：
 
@@ -72,7 +72,7 @@ dataset = dataset.batch(batch_size=FLAGS.batch_size)
 return dataset
 ```
 
-为:
+为：
 
 ```
 dataset = dataset.batch(batch_size=FLAGS.batch_size)
@@ -84,7 +84,7 @@ return dataset
 
 ### 并行数据转换
 
-当准备批处理时，可能需要预处理输入元素。为此，`tf.data ` API 提供了 @{tf.data.Dataset.map} 转换，该转换将用户定义的函数（例如，来自运行示例的 `parse_fn`）应用于输入数据集的每个元素。由于输入元素彼此独立，因此可以在多个 CPU 内核之间对预处理进行并行处理。为了实现这一点，`map` 转换提供了`num_parallel_calls` 参数来指定并行性的级别。例如，下图说明了将 `num_parallel_calls=2`设置到 `map` 转换的效果：
+当准备批处理时，可能需要预处理输入元素。为此，`tf.data ` API 提供了 `tf.data.Dataset.map` 转换，该转换将用户定义的函数（例如，来自运行示例的 `parse_fn`）应用于输入数据集的每个元素。由于输入元素彼此独立，因此可以在多个 CPU 内核之间对预处理进行并行处理。为了实现这一点，`map` 转换提供了`num_parallel_calls` 参数来指定并行性的级别。例如，下图说明了将 `num_parallel_calls=2`设置到 `map` 转换的效果：
 
 ![parallel map](https://www.tensorflow.org/images/datasets_parallel_map.png)
 
@@ -103,7 +103,7 @@ dataset = dataset.map(map_func=parse_fn)
 dataset = dataset.map(map_func=parse_fn, num_parallel_calls=FLAGS.num_parallel_calls)
 ```
 
-此外，如果您的批大小为数百或数千，那么您的管道可能会从批创建的并行中受益。为此，`tf.data` API 提供了 @{tf.contrib.data.map_and_batch} 转换，它有效地“融合”了映射和批量转换。
+此外，如果您的批大小为数百或数千，那么您的管道可能会从批创建的并行中受益。为此，`tf.data` API 提供了 `tf.contrib.data.map_and_batch` 转换，它有效地“融合”了映射和批量转换。
 
 要将此应用于我们的运行样例，则需要更改：
 
@@ -128,7 +128,7 @@ dataset = dataset.apply(tf.contrib.data.map_and_batch(
 
 另外，一旦将原始字节读入内存中，也可能需要对数据进行反序列化或解密（例如 protobuf），这会增加额外的开销。尽管无论数据是本地存储还是远程存储，都会出现此开销，但如果数据未被有效预取，在云端情况下会变得更糟。
 
-为了减轻各种数据抽取开销的影响，`tf.data`API 提供了 @{tf.contrib.data.parallel_interleave} 转换。使用此转换来并行执行及交错其他数据集的内容（如数据文件读取器）。要重叠的数据集的数量可以由 `cycle_length` 参数指定。下图说明了为 `parallel_interleave` 转换提供 `cycle_length=2` 的效果：
+为了减轻各种数据抽取开销的影响，`tf.data`API 提供了 `tf.contrib.data.parallel_interleave` 转换。使用此转换来并行执行及交错其他数据集的内容（如数据文件读取器）。要重叠的数据集的数量可以由 `cycle_length` 参数指定。下图说明了为 `parallel_interleave` 转换提供 `cycle_length=2` 的效果：
 
 ![parallel io](https://www.tensorflow.org/images/datasets_parallel_io.png)
 
@@ -138,14 +138,14 @@ dataset = dataset.apply(tf.contrib.data.map_and_batch(
 dataset = files.interleave(tf.data.TFRecordDataset)
 ```
 
-为:
+为：
 
 ```
 dataset = files.apply(tf.contrib.data.parallel_interleave(
     tf.data.TFRecordDataset, cycle_length=FLAGS.num_parallel_readers))
 ```
 
-由于负载或网络事件的缘故，云端存储系统的吞吐量可能随时间而发生变化。为了解决这个差异，`parallel_interleave` 转换可以选择使用预读取。（有关详细信息，请参阅 @{tf.contrib.data.parallel_interleave}）。
+由于负载或网络事件的缘故，云端存储系统的吞吐量可能随时间而发生变化。为了解决这个差异，`parallel_interleave` 转换可以选择使用预读取。（有关详细信息，请参阅 `tf.contrib.data.parallel_interleave`）。
 
 默认情况下，`parallel_interleave` 转换提供确定性元素顺序以实现重现性。作为预读取的替代方法（在某些情况下可能无效），`parallel_interleave` 转换还提供了一个选项以提高性能，但会牺牲顺序的确定性。别是，如果 `sloppy` 参数设置为 true，那么转换可能会偏离其确定性顺序，这是通过临时跳过请求下一个元素时元素不可用的文件导致的。
 
@@ -159,7 +159,7 @@ dataset = files.apply(tf.contrib.data.parallel_interleave(
 
 ### 映射和缓存
 
-@{tf.data.Dataset.cache} 转换可以将数据集缓存在内存或本地存储中。 如果传递给 `map` 转换的用户定义函数的开销很大，只要结果数据集仍然适合内存或本地存储，就可以在 `map` 转换之后应用高速缓存变换。 如果用户定义的函数增加了将数据集存储到缓存容量以外所需的空间，请考虑在您训练处理之前预处理您的数据以减少资源使用量。
+`tf.data.Dataset.cache` 转换可以将数据集缓存在内存或本地存储中。 如果传递给 `map` 转换的用户定义函数的开销很大，只要结果数据集仍然适合内存或本地存储，就可以在 `map` 转换之后应用高速缓存变换。 如果用户定义的函数增加了将数据集存储到缓存容量以外所需的空间，请考虑在您训练处理之前预处理您的数据以减少资源使用量。
 
 ### 映射和交错/预取/乱序
 
@@ -167,11 +167,11 @@ dataset = files.apply(tf.contrib.data.parallel_interleave(
 
 ### 重复和乱序
 
-@{tf.data.Dataset.repeat} 转换将输入数据重复有限（或无限）次数；数据的每次重复通常被称为**迭代次数**。@{tf.data.Dataset.shuffle} 转换将乱序随机化数据集样例的顺序。
+`tf.data.Dataset.repeat` 转换将输入数据重复有限（或无限）次数；数据的每次重复通常被称为**迭代次数**。`tf.data.Dataset.shuffle` 转换将乱序随机化数据集样例的顺序。
 
 如果 `repeat` 转换在 `shuffle` 转换之前应用，则迭代次数边界将变的不确定。也就是说，某些元素可以在其他元素出现之前重复一次。另一方面，如果在 `repeat` 转换之前应用 `shuffle` 转换，则在涉及 `shuffle` 转换的内部状态初始化的每个迭代次数开始时性能可能会下降。换句话说，前者（在 `shuffle` 之前 `repeat`）提供了更好的性能，而后者（在 `repeat` 之前 `shuffle`）提供了更确定性的排序。
 
-如果可能，我们建议使用融合的 @{tf.contrib.data.shuffle_and_repeat} 转换，该转换具有两全其美的特性（良好的性能和明确的排序保证）。否则，我们建议在重复之前乱序随机化。
+如果可能，我们建议使用融合的 `tf.contrib.data.shuffle_and_repeat` 转换，该转换具有两全其美的特性（良好的性能和明确的排序保证）。否则，我们建议在重复之前乱序随机化。
 
 ## 最佳实践摘要
 
