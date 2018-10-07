@@ -1,6 +1,6 @@
-# TF Layers 教程：构建卷积神经网络
+# Build a Convolutional Neural Network using Estimators
 
-TensorFlow 的 @{tf.layers$`layers` 模块} 提供的高层 API 能让构建神经网络变得简单。它提供了一些便利的方法来创建全连接层和卷积层，添加激活函数，以及应用 dropout 正则化。在这篇教程中，你将会学习到如何使用 `layers` 来创建一个识别手写数字图片（来自于 MNIST 数据集）的卷积神经网络模型。
+`tf.layers` 模块提供的高层 API 能让构建神经网络变得简单。它提供了一些便利的方法来创建全连接层和卷积层，添加激活函数，以及应用 dropout 正则化。在这篇教程中，你将会学习到如何使用 `layers` 来创建一个识别手写数字图片（来自于 MNIST 数据集）的卷积神经网络模型。
 
 ![MNIST 数据集中 0-9 的手写数字](../images/mnist_0-9.png)
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
 每一个方法都是接受一个张量然后再将转换后的张量作为输出。这使得层与层之间的连接变得简单：即上一层的输出可以直接作为下一层的输入。
 
-打开 `cnn_mnist.py` 文件，然后添加 `cnn_model_fn` 函数，该函数是符合 TensorFlow 评估器 API 接口的要求的（更详细的指南可以查阅后续的[创建评估器](#create-the-estimator)的相关文档）。`cnn_minst.py` 文件将以 MNIST 的特征数据，标签数据和 @{tf.estimator.ModeKeys$model mode} (`TRAIN`, `EVAL`, `PREDICT`) 作为参数来配置 CNN 架构，然后返回模型的预测，损失，和训练的操作。
+打开 `cnn_mnist.py` 文件，然后添加 `cnn_model_fn` 函数，该函数是符合 TensorFlow 评估器 API 接口的要求的（更详细的指南可以查阅后续的[创建评估器](#create-the-estimator)的相关文档）。`cnn_minst.py` 文件将以 MNIST 的特征数据，标签数据和模型（来自 `tf.estimator.ModeKeys`：`TRAIN`、`EVAL` 和 `PREDICT`）作为参数来配置 CNN 架构，然后返回模型的预测，损失，和训练的操作。
 
 
 ```python
@@ -131,17 +131,17 @@ def cnn_model_fn(features, labels, mode):
       mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 ```
 
-接下来会分章节解释上述 `tf.layers` 的代码，内容包括每一层是如何创建的，损失值是如何计算出来的，训练操作是如何配置的，预测是如何生成的。如果你已经使用过 CNNs 和 @{$get_started/custom_estimators$TensorFlow `Estimator`s}，觉得上述的代码已经很直观明了了，你可以跳过这些章节直接看["训练和评估 CNN MNIST 分类器"](#training_and_evaluating_the_cnn_mnist_classifier)。
+接下来会分章节解释上述 `tf.layers` 的代码，内容包括每一层是如何创建的，损失值是如何计算出来的，训练操作是如何配置的，预测是如何生成的。如果你已经使用过 CNNs 和 [TensorFlow `Estimator`](../../guide/custom_estimators.md)，觉得上述的代码已经很直观明了了，你可以跳过这些章节直接看["训练和评估 CNN MNIST 分类器"](#train_eval_mnist)。
 
 ### 输入层
 
 在 `layer` 模块中，用于二维图像数据的卷积层和池化层期望输入的张量维度默认为`[batch_size, image_height, image_width, channels]`。可以通过修改 `data_format` 的参数改变这种行为，定义如下：
 
-*   _`batch_size`_：在训练过中，每次执行梯度下降时使用的样本子集大小。
-*   _`image_height`_：样本图片的高度。
-*   _`image_width`_：样本图片的宽度。
-*   _`channels`_：样本图片的通道数。对于彩色图片，通道数为 3（红，绿，蓝）。对于灰度图片，就只有一个通道（黑）。
-*   _`data_format`_：字符串，`channels_last`（default）或 `channels_first`。`channels_last` 对应于具有 `(batch, ..., channels)` 形状的输入，而 `channels_first` 对应于 具有 `(batch, channels, ...)` 形状的输入。
+*   **`batch_size`**：在训练过中，每次执行梯度下降时使用的样本子集大小。
+*   **`image_height`**：样本图片的高度。
+*   **`image_width`**：样本图片的宽度。
+*   **`channels`**：样本图片的通道数。对于彩色图片，通道数为 3（红，绿，蓝）。对于灰度图片，就只有一个通道（黑）。
+*   **`data_format`**：字符串，`channels_last`（default）或 `channels_first`。`channels_last` 对应于具有 `(batch, ..., channels)` 形状的输入，而 `channels_first` 对应于 *具有 `(batch, channels, ...)` 形状的输入。
 
 在这里，我们的 MNIST 数据集图片是灰度图片，每张图片的大小是 28x28 像素，因此我们输入层数据的维度为`[batch_size, 28, 28, 1]`
 
@@ -176,7 +176,7 @@ conv1 = tf.layers.conv2d(
 
 参数 `padding` 的输入值是两个枚举值中的一个（值不区分大小写）：`valid` （默认值）或 `same`。当你设置 `padding=same` 的时候，TensorFlow 将会在边界填充 0 值从而让输出的张量和输入的张量有相同的宽高，也即 28x28。（如果没有填充，那么 5x5 的卷积核会产生一个 24x24 形状的张量）
 
-参数 `activation` 指定在每层输出时要应用的激活函数。在这里，我们使用的是 ReLU 激活函数 @{tf.nn.relu}。
+参数 `activation` 指定在每层输出时要应用的激活函数。在这里，我们使用的是 ReLU 激活函数 `tf.nn.relu`。
 
 函数 `conv2d()` 的输出张量的形状为 `[batch_size, 28, 28, 32]`：以相同的高度和宽度作为输入，但是有 32 个通道，每个通道对应着一个卷积核的输出。
 
@@ -267,7 +267,7 @@ CNN 最终张量由 `logits` 层输出，它的形状是 `[batch_size, 10]`
 *   每个样本的**预测的类别**：0~9 的数字。
 *   每个样本在不同类别下的**概率**：样本是 0 的概率，样本是 1 的概率，样本是 2 的概率，等等。
 
-对于一个给定的例子，模型输出的张量中数值最大的值对应的下标为预测的类别，使用 @{tf.argmax} 函数找到该数值对应的索引：
+对于一个给定的例子，模型输出的张量中数值最大的值对应的下标为预测的类别，使用 `tf.argmax` 函数找到该数值对应的索引：
 
 ```python
 tf.argmax(input=logits, axis=1)
@@ -275,7 +275,7 @@ tf.argmax(input=logits, axis=1)
 
 参数 `input` 指定了提取最大值的张量，这里传入的张量是 `logits`，用于提取最大值。参数 `axis` 指定了应该沿着 `input` 的哪个轴找最大值，这里传入的值是 1，它意味着我们沿着第二个维度来找最大值，这对应我们输出的预测张量的形状 `[batch_size, 10]` 中的 10。
 
-使用 softmax @{tf.nn.softmax} 激活函数可以从 logits 层获得类别对应的概率值。
+使用 softmax `tf.nn.softmax` 激活函数可以从 logits 层获得类别对应的概率值。
 
 ```python
 tf.nn.softmax(logits, name="softmax_tensor")
@@ -299,40 +299,14 @@ if mode == tf.estimator.ModeKeys.PREDICT:
 对于训练（`TRAIN`）和评价（`EVAL`）环节，我们需要定义[损失函数](https://en.wikipedia.org/wiki/Loss_function)来衡量预测类别和真实类别之间的差距。对于像 MNIST 这样的多分类问题，我们常用[交叉熵](https://en.wikipedia.org/wiki/Cross_entropy)作为损失的度量。下面的代码将会在训练或者验证模式下计算对应的交叉熵。
 
 ```python
-onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=10)
-loss = tf.losses.softmax_cross_entropy(
-    onehot_labels=onehot_labels, logits=logits)
+loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
 ```
 
 让我们清楚地了解一下上面的代码做了什么。
 
-张量 `labels` 包含了样本对应的真实类别，他是一个 list 结构，e.g. `[1 ,9, ...]`。为了能够计算出交叉熵值，首先我们需要对 `labels` 值做 [one-hot 编码](https://www.quora.com/What-is-one-hot-encoding-and-when-is-it-used-in-data-science)：
+Our `labels` tensor contains a list of prediction indices for our examples, e.g. `[1, 9, ...]`. `logits` contains the linear outputs of our last layer. 
 
-```none
-[[0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
- ...]
-```
-
-函数 @{tf.one_hot} 可以执行这样的转换。`tf.one_hot()` 需要传入两个参数：
-
-*   `indices`：one-hot 编码后的下标值，也就是上面张量值为 1 所对应的下标值。
-*   `depth`：one-hot 编码后的深度，也就是目标类别的总数，在这里，深度值是 `10`。
-
-通过执行 one-hot 编码后，我们可以得到 `onehot_labels` 张量：
-
-```python
-onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=10)
-```
-
-因为原始的 `labels` 包含了 0~9 的数字，所以 `indices` 实际上是转换为整数值后的 labels 张量。参数 `depth` 值为 `10` 是因为我们有 10 个可能的类别，每个数字对应的一个类别。
-
-接下来，我们就可以根据 `onehot_labels` 和由 logits 层预测值得到的 softmax 值来计算交叉熵值了。`tf.losses.softmax_cross_entropy()` 函数拿 `onehot_labels` 和 `logits` 张量作为输入，然后在 `logits` 上执行 softmax 激活函数，接着计算交叉熵，最后返回张量类型的 `loss` 值。
-
-```python
-loss = tf.losses.softmax_cross_entropy(
-    onehot_labels=onehot_labels, logits=logits)
-```
+`tf.losses.sparse_softmax_cross_entropy`, calculates the softmax crossentropy (aka: categorical crossentropy, negative log-likelihood) from these two inputs in an efficient, numerically stable way.
 
 ### 配置训练操作
 
@@ -347,7 +321,7 @@ if mode == tf.estimator.ModeKeys.TRAIN:
   return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 ```
 
-> 注意：为评估器模型函数配置训练操作的更多细节，请参考 @{$get_started/custom_estimators$"Creating Estimations in tf.estimator"} 指南中的 @{$get_started/custom_estimators#defining_the_training_op_for_the_model$"Defining the training op for the model"} 小节。
+> functions, see ["Defining the training op for the model"](../../guide/custom_estimators.md#defining-the-training-op-for-the-model) in the ["Creating Estimations in tf.estimator"](../../guide/custom_estimators.md) tutorial.
 
 ### 添加评价指标
 
@@ -361,7 +335,9 @@ return tf.estimator.EstimatorSpec(
     mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 ```
 
-## 训练和评价 CNN MNIST 分类器
+<a id="train_eval_mnist"></a>
+
+## Training and Evaluating the CNN MNIST Classifier
 
 我们已经完成了 CNN 模型的代码工作；现在我们准备训练和评价它。
 
@@ -393,22 +369,22 @@ mnist_classifier = tf.estimator.Estimator(
 
 参数 `model_fn` 指定了用于训练，评价和预测的模型函数；我们传入的 `cnn_model_fn` 函数是在[构建 CNN MNIST 分类器](#building-the-cnn-mnist-classifier)中创建的。参数 `model_dir` 指定了模型数据（检查点）保存的目录（这里我们传入的目录是 `/tmp/mnist_convnet_model`，这个目录是可以更改的）。
 
-> 注意：如果要更深入的了解 TensorFlow 的 `Estimator` API，请查阅 @{$get_started/custom_estimators$"Creating Estimators in tf.estimator"}。
+> 注意：如果要更深入的了解 TensorFlow 的 `Estimator` API，请查阅 ["Creating Estimators in tf.estimator."](../../guide/custom_estimators.md) 教程。
 
 ### 建立一个日志钩子
 
-训练 CNNs 需要耗费一定的时间，在这个过程中记录一些日志可以方便我们追踪在训练的进展。如果我们想在训练过程中输出 CNN 的 softmax 层的值，我们可以在 `main()` 函数中使用 TensorFlow's @{tf.train.SessionRunHook} 创建一个 @{tf.train.LoggingTensorHook}：
+训练 CNNs 需要耗费一定的时间，在这个过程中记录一些日志可以方便我们追踪在训练的进展。如果我们想在训练过程中输出 CNN 的 softmax 层的值，我们可以在 `main()` 函数中使用 TensorFlow 的 tf.train.SessionRunHook` 创建一个 `tf.train.LoggingTensorHook`：
 
 ```python
 # 为预测过程设置日志
-  tensors_to_log = {"probabilities": "softmax_tensor"}
-  logging_hook = tf.train.LoggingTensorHook(
-      tensors=tensors_to_log, every_n_iter=50)
+tensors_to_log = {"probabilities": "softmax_tensor"}
+logging_hook = tf.train.LoggingTensorHook(
+    tensors=tensors_to_log, every_n_iter=50)
 ```
 
 我们可以用字典储存想要打印的张量 `tensors_to_log`。每个键值只不过是用于日志输出的一个别名，它的值则是 TensorFlow 计算图中的某个张量的名称。这里的的 `softmax_tensor` 是前面 `cnn_model_fn` 中创建的一个用于生成概率的张量的名称，而 `probabilities` 是这里给它取的别名。
 
-> 注意：如果你没有通过 `name` 参数显式的给操作分配一个名称，那么 TensorFlow 将分配一个默认名称。有两种简单的方式可以查看到操作的名称，第一种方法是用 @{$graph_viz$TensorBoard} 可视化计算图，另外一种方法是启用 @{$programmers_guide/debugger$TensorFlow Debugger (tfdbg)}。
+> 注意：如果你没有通过 `name` 参数显式的给操作分配一个名称，那么 TensorFlow 将分配一个默认名称。有两种简单的方式可以查看到操作的名称，第一种方法是用 [TensorBoard](../../guide/graph_viz.md) 可视化计算图，另外一种方法是启用 [TensorFlow Debugger (tfdbg)](../../guide/debugger.md)。
 
 接下来，通过给 `tensors` 参数传递 `tensor_to_log` 变量来创建 `LoggingTensorHook` 对象，并且设置 `every_n_iter` 的值为 50，每训练 50 步后在日志中输出概率。
 
@@ -479,5 +455,5 @@ INFO:tensorflow:Saving evaluation summary for step 20000: accuracy = 0.9733, los
 
 如果你想了解更多有关于 TensorFlow 中评估器（Estimators）和 CNNs 的内容，请查阅下面的资料：
 
-*   @{$get_started/custom_estimators$Creating Estimators in tf.estimator} 提供了一个 TensorFlow 估计器 API 的介绍。这篇教程将向你介绍如何配置一个估计器，编写一个模型函数，估计损失以及定义训练运算符。
-*   @{$deep_cnn} 则介绍了如何构建一个使用底层 TensorFlow 运算符而**不使用估计器**的 MNIST CNN 分类模型。
+*   [Creating Estimators in tf.estimator](../../guide/custom_estimators.md) 提供了一个 TensorFlow 估计器 API 的介绍。这篇教程将向你介绍如何配置一个估计器，编写一个模型函数，估计损失以及定义训练运算符。
+*   [先进的卷积神经网络](../../tutorials/images/deep_cnn.md)则介绍了如何构建一个使用底层 TensorFlow 运算符而**不使用估计器**的 MNIST CNN 分类模型。
