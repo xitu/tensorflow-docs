@@ -6,7 +6,7 @@
 
 TensorFlow 图通常由 TensorFlow 运行时执行。这会导致图中的每个节点执行时的运行时开销。同时也增加了二进制文件的大小，因为除了图自身，TensorFlow 运行时的代码也需要可用。而由 `tfcompile` 生成的可执行代码不使用 TensorFlow 运行时，并且只依赖实际用于计算的内核。
 
-编译器构建在 XLA 框架的基础上。桥接 TensorFlow 到 XLA 框架的代码位于 [tensorflow/compiler](https://www.tensorflow.org/code/tensorflow/compiler/) 目录下，这个目录同时包含对 TensorFlow 图 @{$jit$just-in-time (JIT) compilation} 的支持。
+编译器构建在 XLA 框架的基础上。桥接 TensorFlow 到 XLA 框架的代码位于 [tensorflow/compiler](https://www.tensorflow.org/code/tensorflow/compiler/) 目录下，这个目录同时包含对 TensorFlow 图表[即时（JIT）编译](../../performance/xla/jit.md)的支持。
 
 ## tfcompile 做了什么？
 
@@ -57,7 +57,7 @@ fetch {
 这一步通过 `tf_library` 构建宏将图转变成 `cc_library`。`cc_library` 包含一个从图生成的代码的对象文件，以及一个提供对生成代码的访问权限的头文件。`tf_library` 利用 `tfcompile` 将 TensorFlow 图编译成可执行代码。
 
 ```build
-load("//third_party/tensorflow/compiler/aot:tfcompile.bzl", "tf_library")
+load("//tensorflow/compiler/aot:tfcompile.bzl", "tf_library")
 
 # Use the tf_library macro to compile your graph into executable code.
 tf_library(
@@ -85,7 +85,7 @@ tf_library(
 
 > 为了给示例生成 GraphDef 协议（test_graph_tfmatmul.pb），运行 [make_test_graphs.py]("https://www.tensorflow.org/code/tensorflow/compiler/aot/tests/make_test_graphs.py")，并使用 --out_dir 标志指定输出地址。
 
-典型图包含 @{$python/state_ops$`Variables`}，表示通过训练学习的权重，但 `tfcompile` 无法编译一个包含 `Variable` 的子图。[freeze_graph.py](https://www.tensorflow.org/code/tensorflow/python/tools/freeze_graph.py) 工具使用存储在检查点文件中的值将变量转化为常量。为方便起见，`tf_library` 宏支持传入运行工具的 `freeze_checkpoint` 参数。更多示例可以查看 [tensorflow/compiler/aot/tests/BUILD](https://www.tensorflow.org/code/tensorflow/compiler/aot/tests/BUILD)。
+典型图包含 [`Variables`](../../api_guides/python/state_ops.md)，表示通过训练学习的权重，但 `tfcompile` 无法编译一个包含 `Variable` 的子图。[freeze_graph.py](https://www.tensorflow.org/code/tensorflow/python/tools/freeze_graph.py) 工具使用存储在检查点文件中的值将变量转化为常量。为方便起见，`tf_library` 宏支持传入运行工具的 `freeze_checkpoint` 参数。更多示例可以查看 [tensorflow/compiler/aot/tests/BUILD](https://www.tensorflow.org/code/tensorflow/compiler/aot/tests/BUILD)。
 
 > 在编译的子图中显示的常量将直接编译到生成的代码中。为了将常量传入而不是编译进生成的函数，只需将它们作为反馈传入。
 
@@ -148,7 +148,7 @@ class MatMulComp {
 
 根据 `tf_library` 宏中声明的 `cpp_class`，生成了 `foo::bar` 命名空间下的 `MatMulComp` C++ 类。所有生成的类都具有类似的 API，唯一的区别在于处理参数和结果缓冲区的方法。这些方法在缓冲区的数量和类型上存在差异，而这又取决于 `tf_library` 宏接受的 `feed` 和 `fetch` 参数。
 
-在生成的类中有三种类型的缓冲区：`args` 代表输入，`results` 代表输出，以及 `temps` 代表用于内部执行计算的临时缓存。默认情况下，生成类的每个实例都会分配和管理所有缓存。通过设置构造函数参数 `AllocMode` 可以改变这一行为。[`tensorflow/compiler/aot/runtime.h`](https://www.tensorflow.org/code/tensorflow/compiler/aot/runtime.h) 提供的库可以帮助手动分配缓存；库的使用是可选的。所有缓冲区都应 32 字节边界对齐。
+在生成的类中有三种类型的缓冲区：`args` 代表输入，`results` 代表输出，以及 `temps` 代表用于内部执行计算的临时缓存。默认情况下，生成类的每个实例都会分配和管理所有缓存。通过设置构造函数参数 `AllocMode` 可以改变这一行为。所有缓冲区都与 64 字节边界对齐。
 
 生成的 C++ 类只不过是在 XLA 生成的底层代码基础上的一层封装。
 
@@ -194,8 +194,8 @@ int main(int argc, char** argv) {
 
 ```build
 # Example of linking your binary
-# Also see //third_party/tensorflow/compiler/aot/tests/BUILD
-load("//third_party/tensorflow/compiler/aot:tfcompile.bzl", "tf_library")
+# Also see //tensorflow/compiler/aot/tests/BUILD
+load("//tensorflow/compiler/aot:tfcompile.bzl", "tf_library")
 
 # The same tf_library call from step 2 above.
 tf_library(
