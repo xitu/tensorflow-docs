@@ -3,9 +3,9 @@
 这篇指南将帮助你使用底层的 TensorFlow 核心 API 进行编程，会涉及到以下几个部分：
 
   * 管理你的 TensorFlow 程序（一张 TensorFlow 计算图，`tf.Graph`）以及 TensorFlow 运行时（一个 TensorFlow 会话，`tf.Session`），而不是依赖 Estimators 来管理它们
-  * 使用 `tf.Session` 运行 TensorFlow 操作
-  * 在底层环境中使用高级的组件（[datasets](#datasets), [layers](#layers), 以及 [特征列](#feature_columns)）
-  * 创建你自己的训练循环，而不是使用 @{$get_started/premade_estimators$ provided by Estimator}
+  * 使用 `tf.Session` 运行 TensorFlow 操作。
+  * 在底层环境中使用高级的组件（[datasets](#datasets)，[layers](#layers)，以及 [特征列](#特征列)）。
+  * 创建你自己的训练循环，而不是使用 [Estimators 提供的](../guide/premade_estimators.md)。
 
 我们推荐尽量使用更高层次的 API 来构建模型，但了解 TensorFlow 核心 API 有以下几个优点：
 
@@ -14,7 +14,7 @@
 
 ## 配置
 
-在使用这篇指南之前，请先安装 TensorFlow @{$install$install TensorFlow}。
+在使用这篇指南之前，请先安装 TensorFlow [安装 TensorFlow](../install)。
 
 理解本指南的大部分内容需要你有以下知识储备：
 
@@ -52,15 +52,15 @@ TensorFlow 使用 numpy 数组来表示张量的**值**。
 
 使用 TensorFlow 核心 API 编程由以下两部分组成：
 
-1.  构建计算图 (一张 @{tf.Graph})。
-2.  运行计算图 (使用 @{tf.Session})。
+1.  构建计算图（一张 `tf.Graph`）。
+2.  运行计算图（使用 `tf.Session`）。
 
 ### 计算图
 
 **计算图**是一组定义在图中的 TensorFlow 操作，该图由两种类型的对象组成：
 
-  * @{tf.Operation$Operations} （或称为 "ops"）：操作图的节点，操作描述了如何创建和使用张量。
-  * @{tf.Tensor$Tensors}：张量是图的边，代表着计算图中流动的值。大部分的 TensorFlow 函数都会返回一个 `tf.Tensors`。
+  * `tf.Operation`（或称为 "ops"）：操作图的节点，操作描述了如何创建和使用张量。
+  * `tf.Tensor`：张量是图的边，代表着计算图中流动的值。大部分的 TensorFlow 函数都会返回一个 `tf.Tensors`。
 
 重点：`tf.Tensors` 并不包含值，而只是操作图中各个部分的工具。
 
@@ -116,11 +116,11 @@ tensorboard --logdir .
 
 ![TensorBoard screenshot](https://www.tensorflow.org/images/getting_started_add.png)
 
-想要了解更多 TensorBoard 可视化的内容，请查看 @{$graph_viz}。
+想要了解更多 TensorBoard 可视化的内容，请查看 [TensorBoard：图表可视化](../guide/graph_viz.md)。
 
 ### 会话
 
-对张量求值，你需要实例化一个 @{tf.Session} 对象，也叫做**会话**。一个会话封装了 TensorFlow 运行时的状态，并且在会话中运行 TensorFlow 操作。打一个比方，如果把 `tf.Graph` 看做是一个 `.py` 文件，那么一个 `tf.Session` 就像是一个 `python` 可执行文件。
+对张量求值，你需要实例化一个 `tf.Session` 对象，也叫做**会话**。一个会话封装了 TensorFlow 运行时的状态，并且在会话中运行 TensorFlow 操作。打一个比方，如果把 `tf.Graph` 看做是一个 `.py` 文件，那么一个 `tf.Session` 就像是一个 `python` 可执行文件。
 
 下面的代码创建了一个 `tf.Session` 对象，并且调用了它的 `run` 方法来对我们先前创建的 `total` 张量求值：
 
@@ -181,12 +181,13 @@ y = tf.placeholder(tf.float32)
 z = x + y
 ```
 
-上面的三行代码有点像一个函数，我们首先定义了两个输入的参数（`x` 和`y`），然后对他们进行了操作。我们可以对这个计算图进行求值操作，通过使用 `feed_dict` 这个 @{tf.Session.run$run method} 的参数来为占位符赋值：
+上面的三行代码有点像一个函数，我们首先定义了两个输入的参数（`x` 和`y`），然后对他们进行了操作。我们可以对这个计算图进行求值操作，通过使用 `feed_dict` 这个 `tf.Session.run` 的参数来为占位符赋值：
 
 ```python
 print(sess.run(z, feed_dict={x: 3, y: 4.5}))
 print(sess.run(z, feed_dict={x: [1, 3], y: [2, 4]}))
 ```
+
 结果的输出如下：
 
 ```
@@ -198,11 +199,11 @@ print(sess.run(z, feed_dict={x: [1, 3], y: [2, 4]}))
 
 ## 数据集
 
-简单的实验我们可以使用占位符， 在处理大量数据时，使用 @{tf.data$Datasets} 来向模型传递数据是更好的方法。
+简单的实验我们可以使用占位符， 在处理大量数据时，使用 `tf.data$Datasets` 来向模型传递数据是更好的方法。
 
-从数据集（Dataset）中获取一个能够运行的 `tf.Tensor` 对象，你需要先将其转换为 @{tf.data.Iterator} 类型，然后调用迭代器（Iterator）的 @{tf.data.Iterator.get_next$`get_next`} 方法。
+从数据集（Dataset）中获取一个能够运行的 `tf.Tensor` 对象，你需要先将其转换为 `tf.data.Iterator` 类型，然后调用迭代器（Iterator）的 `tf.data.Iterator.get_next` 方法。
 
-最简单的办法就是使用 @{tf.data.Dataset.make_one_shot_iterator$`make_one_shot_iterator`} 创建一个迭代器。比如下列的代码中，每次调用 `run`，`next_item` 会返回 `my_data` 数组中的一行。
+最简单的办法就是使用 `tf.data.Dataset.make_one_shot_iterator` 创建一个迭代器。比如下列的代码中，每次调用 `run`，`next_item` 会返回 `my_data` 数组中的一行。
 
 ``` python
 my_data = [
@@ -215,7 +216,7 @@ slices = tf.data.Dataset.from_tensor_slices(my_data)
 next_item = slices.make_one_shot_iterator().get_next()
 ```
 
-当数据流到达末尾时，`Dataset` 会抛出 @{tf.errors.OutOfRangeError$`OutOfRangeError`}。下面的例子就展示了如何读取数据直到所有数据都被获取。
+当数据流到达末尾时，`Dataset` 会抛出 `tf.errors.OutOfRangeError`。下面的例子就展示了如何读取数据直到所有数据都被获取。
 
 ``` python
 while True:
@@ -241,17 +242,17 @@ while True:
     break
 ```
 
-更多关于数据集和迭代器的内容请参考: @{$programmers_guide/datasets}。
+更多关于数据集和迭代器的内容请参考：[导入数据](../guide/datasets.md)。
 
 ## 网络层
 
-可训练的模型会不断地修改其参数值，从而对于相同的输入得到新的输出。向计算图中添加可训练的参数，使用 @{tf.layers$Layers} 是我们推荐的方式。
+可训练的模型会不断地修改其参数值，从而对于相同的输入得到新的输出。向计算图中添加可训练的参数，使用 `tf.layers` 是我们推荐的方式。
 
 网络层封装了变量和作用其上的操作。比如，[全连接层](https://developers.google.com/machine-learning/glossary/#fully_connected_layer))对输入进行一个加权求和的操作，并且可以作用一个可选择的[激活函数](https://developers.google.com/machine-learning/glossary/#activation_function)。连接的权重和偏置都由网络层对象来管理。
 
 ### 创建网络层
 
-下面的代码创建了一个 @{tf.layers.Dense$`Dense`} 层，它以一个向量批次（即多个向量）作为输入，并且对每个批次产生一个单值输出。你只需要像调用函数一样，就能够将该层作用在输入上：
+下面的代码创建了一个 `tf.layers.Dense` 层，它以一个向量批次（即多个向量）作为输入，并且对每个批次产生一个单值输出。你只需要像调用函数一样，就能够将该层作用在输入上：
 
 ```python
 x = tf.placeholder(tf.float32, shape=[None, 3])
@@ -293,7 +294,7 @@ print(sess.run(y, {x: [[1, 2, 3],[4, 5, 6]]}))
 
 ### 网络层函数快捷键
 
-对于每个网络层类（像 @{tf.layers.Dense}），TensorFlow 都提供了一个便捷函数（像 @{tf.layers.dense}）。唯一的区别就是便捷函数能够只用一行就完成创建和调用操作，下面的代码和先前的是等价的：
+对于每个网络层类（像 `tf.layers.Dense`），TensorFlow 都提供了一个便捷函数（像 `tf.layers.dense`）。唯一的区别就是便捷函数能够只用一行就完成创建和调用操作，下面的代码和先前的是等价的：
 
 ```python
 x = tf.placeholder(tf.float32, shape=[None, 3])
@@ -305,11 +306,11 @@ sess.run(init)
 print(sess.run(y, {x: [[1, 2, 3], [4, 5, 6]]}))
 ```
 
-尽管很方便，但是这样的操作无法获取到 @{tf.layers.Layer} 对象，这就会使得检查和 debug 变得困难，并且导致网络层无法重用。
+尽管很方便，但是这样的操作无法获取到 `tf.layers.Layer` 对象，这就会使得检查和 debug 变得困难，并且导致网络层无法重用。
 
 ## 特征列
 
-体验特征列最简单的方法就是使用 @{tf.feature_column.input_layer} 函数。这个函数接受 @{$get_started/feature_columns$dense columns} 作为输入，所以你需要将输入通过 @{tf.feature_column.indicator_column} 进行封装，才能查看类别列的结果。比如：
+体验特征列最简单的方法就是使用 `tf.feature_column.input_layer` 函数。这个函数接受将 [dense columns](../guide/feature_columns.md) 作为输入，所以你需要将输入通过 `tf.feature_column.indicator_column` 进行封装，才能查看类别列的结果。比如：
 
 ``` python
 features = {
@@ -330,7 +331,7 @@ inputs = tf.feature_column.input_layer(features, columns)
 
 运行 `inputs` 会把 `features` 变成一系列向量。
 
-特征列和网络层一样具有内部状态，所以也需要被初始化。类别列在内部使用 @{tf.contrib.lookup$lookup tables} 进行初始化，因而我们需要一个单独的初始化操作 @{tf.tables_initializer}。
+特征列和网络层一样具有内部状态，所以也需要被初始化。类别列在内部使用 `tf.contrib.lookup` 进行初始化，因而我们需要一个单独的初始化操作 `tf.tables_initializer`。
 
 ``` python
 var_init = tf.global_variables_initializer()
@@ -400,7 +401,7 @@ print(sess.run(y_pred))
 
 为了优化一个模型，你需要先定义损失函数。我们使用经常应用在回归问题中的平方差作为损失函数。
 
-你可以利用低级的数学操作来手动定义这个 loss，但是 @{tf.losses} 已经提供了一系列常用的损失函数。你可以像下面的代码一样，使用它们来计算平方差：
+你可以利用低级的数学操作来手动定义这个 loss，但是 `tf.losses` 已经提供了一系列常用的损失函数。你可以像下面的代码一样，使用它们来计算平方差：
 
 ``` python
 loss = tf.losses.mean_squared_error(labels=y_true, predictions=y_pred)
@@ -415,7 +416,7 @@ print(sess.run(loss))
 
 ### 训练
 
-TensorFlow 提供了实现了标准的优化算法[**优化器**](https://developers.google.com/machine-learning/glossary/#optimizer)，这些优化器是 @{tf.train.Optimizer} 的子类。它们通过对变量的微小改变来最小化损失函数，最简单的优化算法就是[梯度下降](https://developers.google.com/machine-learning/glossary/#gradient_descent)，@{tf.train.GradientDescentOptimizer} 实现了这一算法。它通过损失函数对各个变量的微分大小来进行变量的更新，你可以这样使用它：
+TensorFlow 提供了实现了标准的优化算法[**优化器**](https://developers.google.com/machine-learning/glossary/#optimizer)，这些优化器是 `tf.train.Optimizer` 的子类。它们通过对变量的微小改变来最小化损失函数，最简单的优化算法就是[梯度下降](https://developers.google.com/machine-learning/glossary/#gradient_descent)，`tf.train.GradientDescentOptimizer` 实现了这一算法。它通过损失函数对各个变量的微分大小来进行变量的更新，你可以这样使用它：
 
 ```python
 optimizer = tf.train.GradientDescentOptimizer(0.01)
@@ -475,11 +476,10 @@ print(sess.run(y_pred))
 
 想要学习更多关于使用 TensorFlow 构建模型的内容，你可以参考一下内容：
 
-* @{$get_started/custom_estimators$Custom Estimators}，学习如何构建定制化的模型。你对 TensorFlow Core 的了解能够帮助你更好的理解和 debug 你的模型
+* 阅读[个性化 Estimator](../guide/custom_estimators.md)，学习如何构建定制化的模型。你对 TensorFlow Core 的了解能够帮助你更好的理解和 debug 你的模型
 
 如果你想要学习更多 TensorFlow 内部的工作原理，你可以参考下列文档，其中对我们涉及的话题有更深入的介绍：
 
-* @{$graphs}
-* @{$tensors}
-* @{$variables}
-
+* [图表和会话](../guide/graphs.md)
+* [Tensors](../guide/tensors.md)
+* [变量](../guide/variables.md)
