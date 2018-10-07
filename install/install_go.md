@@ -2,7 +2,7 @@
 
 TensorFlow 提供了 Go 程序中可以调用的 API。这些 API 非常适合加载 Python 创建的模型以及在 Go 应用中执行。本文将介绍如何安装和配置 [TensorFlow Go 包](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go)。
 
-警告：TensorFlow Go API 不在 TensorFlow [API 稳定性保障](https://www.tensorflow.org/programmers_guide/version_semantics)的涵盖范围内。
+警告：TensorFlow Go API 不在 TensorFlow [API 稳定性保障](../guide/version_semantics.md)的涵盖范围内。
 
 ## 支持的平台
 
@@ -25,7 +25,7 @@ Go 版本 TensorFlow 依赖于 TensorFlow C 语言库。按照下面的步骤安
          TF_TYPE="cpu" # Change to "gpu" for GPU support
          TARGET_DIRECTORY='/usr/local'
          curl -L \
-           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-$(go env GOOS)-x86_64-1.8.0.tar.gz" |
+           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-${TF_TYPE}-$(go env GOOS)-x86_64-1.10.0.tar.gz" |
          sudo tar -C $TARGET_DIRECTORY -xz
 
      `tar` 命令会解压 TensorFlow C 语言库到 `TARGET_DIRECTORY` 的子目录 `lib`。比如，指定 `/usr/local` 作为 `TARGET_DIRECTORY` 使得 `tar` 命令可以将 TensorFlow C 语言库解压到 `/usr/local/lib`。
