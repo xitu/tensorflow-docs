@@ -15,7 +15,7 @@
 - 遵循 Android Studio 网站的说明，安装[Android Studio](https://developer.android.com/studio/index.html)。
   
 
-- 从 Github 上克隆 TensorFlow 的仓库：
+- 从 GitHub 上克隆 TensorFlow 的仓库：
 
         git clone https://github.com/tensorflow/tensorflow
 
@@ -23,7 +23,7 @@
 
 1.  打开 Android Studio，在欢迎界面中选择 **Open an existing Android Studio project**。
 
-2. 从 **Open File or Project** 窗口中，切换文件目录并选择`tensorflow/examples/android` 目录，这个目录在你克隆的 TensorFlow 的 Github repo 中, 点击 OK。
+2. 从 **Open File or Project** 窗口中，切换文件目录并选择`tensorflow/examples/android` 目录，这个目录在你克隆的 TensorFlow 的 GitHub repo 中, 点击 OK。
 
     如果，IDE 需要去同步 Gradle，点击 OK。
 
@@ -34,7 +34,7 @@
         // set to 'bazel', 'cmake', 'makefile', 'none'
         def nativeBuildSystem = 'none'
 
-4. 点击启动按钮（绿色的箭头）或者从顶部菜单使用 **Run -> Run 'android'**。
+4. 点击 *Run* 按钮（绿色的箭头）或从顶部菜单选择 *Run > Run 'android'* 。你可能需要使用 *Build > Rebuild Project* 来重建项目。
 
 如果它请求你使用 Instant Run，点击**Proceed Without Instant Run**。
 
@@ -62,7 +62,7 @@
 
 另一种在 Android 中使用 TensorFlow 的方法是使用 [Bazel](https://bazel.build/) 来构建一个 APK，并且通过 [ADB](https://developer.android.com/studio/command-line/adb.html) 来加载它。这需要一些关于构建系统和 Android 开发者工具的知识，但我们会在这里引导您完成基础步骤。
 
-- 首先参考 @{$install/install_sources$installing from sources} 的文档。它也会带领你安装 Bazel 和克隆TensorFlow 的代码。
+- 首先参考[通过源码安装 TensorFlow](./install_sources.md) 的文档。它也会带领你安装 Bazel 和克隆TensorFlow 的代码。
 
 - 下载 Android 的 [SDK](https://developer.android.com/studio/index.html)和 [NDK](https://developer.android.com/ndk/download/index.html) 如果你以前没下载它们的话。你需要下载最新的 12b 版本的 NDK，和版本为 23 及以上的 SDK。
 
