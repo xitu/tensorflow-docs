@@ -10,7 +10,6 @@
 
 - [Checkpoint](https://www.tensorflow.org/code/tensorflow/core/util/tensor_bundle/tensor_bundle.h)：通过使用 `Variable` 操作，我们也可以保存模型中的值。与 `Const` 操作不同的是，它不需要以 `NodeDef` 的形式保存，所以只占用 `GraphDef` 文件中很少的空间。在训练网络和更新权重时，`Variable` 的值在计算运行时保存在内存中，然后定期作为检查点文件保存到磁盘。这是一个时序要求严格的操作，当使用分布式架构来训练模型的时候，多个 worker 会在不同的时间点要求执行该操作，因此储存模型的文件格式必须能够被快速读取且具备一定的扩展性。模型将会保存成多个检查点文件，与用来描述检查点都保存了什么信息的元文件。当你在 API 中引用检查点文件时（譬如说当你将检查点文件名当参数传递给命令行），你将会用到文件的前缀来引用相关联的文件，例如：
 
-
         /tmp/model/model-chkpt-1000.data-00000-of-00002
         /tmp/model/model-chkpt-1000.data-00001-of-00002
         /tmp/model/model-chkpt-1000.index
@@ -30,8 +29,8 @@
 
 在大多数情况下，用 TensorFlow 训练的模型都会输出一个文件夹，里面包含了 `GraphDef` 文件（通常文件后缀是 `.pb` 或 `.pbtxt`）和检查点文件。手机和嵌入式设备需要的只是一个「冻结」的 `GraphDef` 文件，它已经将图中的变量转换为内联的常量。为了实现这个转换，你需要使用 `freeze_graph.py` 脚本，它在仓库的位置是 [`tensorflow/python/tools/freeze_graph.py`](https://www.tensorflow.org/code/tensorflow/python/tools/freeze_graph.py)。运行命令的例子如下：
 
-    bazel build tensorflow/tools:freeze_graph
-    bazel-bin/tensorflow/tools/freeze_graph \
+    bazel build tensorflow/python/tools:freeze_graph
+    bazel-bin/tensorflow/python/tools/freeze_graph \
     --input_graph=/tmp/model/my_graph.pb \
     --input_checkpoint=/tmp/model/model.ckpt-1000 \
     --output_graph=/tmp/frozen_graph.pb \
@@ -44,7 +43,7 @@
 
 `output_graph` 定义了冻结的 `GraphDef` 文件会被保存在哪个路径下。因为它包含了很多的权重文件，用文本格式保存会占据较大空间，所以我们总是将它保存为二进制的协议缓冲区文件。
 
-`output_node_name` 参数可以以列表的形式传递多个节点的名字，它代表了图的输出结果。这个参数告诉了脚本图中哪些节点的输出结果才是我们想要的，进而知道哪些是训练时的产物，譬如说 summarization 操作，只要那些对输出结果有贡献的节点才会被留下。在训练时传递给 `Session::Run()` 的节点名字一般都是你的图需要获取目标。我们在 python 中提供了相应的 api 能够简单的让你能够在构建图的时候视察节点的名字。当然用 Tensorboard 视察图结构也是一种很简便的方法。你可以通过运行 [`summarize_graph` 工具](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/tools/graph_transforms/README.md#inspecting-graphs) 得到一些建议。
+`output_node_name` 参数可以以列表的形式传递多个节点的名字，它代表了图的输出结果。这个参数告诉了脚本图中哪些节点的输出结果才是我们想要的，进而知道哪些是训练时的产物，譬如说 summarization 操作，只要那些对输出结果有贡献的节点才会被留下。在训练时传递给 `Session::Run()` 的节点名字一般都是你的图需要获取目标。我们在 python 中提供了相应的 api 能够简单的让你能够在构建图的时候视察节点的名字。当然用 Tensorboard 视察图结构也是一种很简便的方法。你可以通过运行 [`summarize_graph` 工具](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/tools/graph_transforms/README.md#inspecting-graphs)得到一些建议。
 
 因为 TensorFlow 输出的格式是随时间变化的，所以在工具中存在其他很少用的参数，譬如 `input_saver`，但是幸运的是您在新版本的 TensorFlow 中训练时并不需要这些。
 
