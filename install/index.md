@@ -12,7 +12,7 @@
 以下指南将说明如何安装各版本的 TensorFlow，以使您能用 Python 编写应用：
 
   * [在 Ubuntu 上安装 TensorFlow](./install_linux.md)
-  * [在 macOS 中安装 TensorFlow](./install_mac.md)
+  * [在 macOS 上安装 TensorFlow](./install_mac.md)
   * [在 Windows 上安装 TensorFlow](./install_windows.md)
   * [在 树莓派上安装 TensorFlow](./install_raspbian.md)
   * [通过源码安装 TensorFlow](./install_sources.md)
