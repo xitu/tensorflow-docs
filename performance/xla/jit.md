@@ -8,14 +8,13 @@ TensorFlow / XLA 即时编译器通过 XLA 编译和运行 TensorFlow 图的各�
 
 ## 通过 XLA 运行 TensorFlow 图
 
-有两种方式通过 XLA 运行 TensorFlow 计算图：一是用 CPU 或 GPU 设备上的即时编译操作，二是把操作放到 `XLA_CPU` 或 `XLA_GPU` TensorFlow 设备上。将操作直接放到一个 TensorFlow XLA
-设备上强制执行，因此这种方法主要用于测试。
+有两种方式通过 XLA 运行 TensorFlow 计算图：一是用 CPU 或 GPU 设备上的即时编译操作，二是把操作放到 `XLA_CPU` 或 `XLA_GPU` TensorFlow 设备上。将操作直接放到一个 TensorFlow XLA 设备上强制执行，因此这种方法主要用于测试。
 
-> 注意：XLA CPU 后端会生成快速、单线程的代码，但是不会如 TensorFlow CPU 后端一样并行化。 XLA GPU 后端与标准的 TensorFlow 后端充分竞争，运行速度时快时慢。
+> 注意：The XLA CPU backend supports intra-op parallelism (i.e. it can shard a single operation across multiple cores) but it does not support inter-op parallelism (i.e. it cannot execute independent operations concurrently across multiple cores). XLA GPU 后端与标准的 TensorFlow 后端充分竞争，运行速度时快时慢。
 
 ### 开启即时编译
 
-即时编译可以在会话层开启，或手动进行选择操作。两种方式都是零拷贝 --- 数据在同台设备的已编译 XLA 内核和 TensorFlow 操作之间传递时，无需另行复制。
+即时编译可以在会话层开启，或手动进行选择操作。两种方式都是零拷贝 — 数据在同台设备的已编译 XLA 内核和 TensorFlow 操作之间传递时，无需另行复制。
 
 #### 会话
 
@@ -33,12 +32,12 @@ config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON
 sess = tf.Session(config=config)
 ```
 
-> 注意：在会话层开启即时编译将不会导致为 CPU 编译操作。CPU 运算的即时编译必须通过下面描述的手动方法开启，原因在于 CPU 后端是单线程的。
+> 注意：在会话层开启即时编译将不会导致为 CPU 编译操作。CPU 运算的即时编译必须通过下面描述的手动方法开启。
 
 #### 手动开启
 
-对于单个或多个操作，可以手动开启即时编译，通过对运算进行标记以使用属性 `_XlaCompile=true` 来进行编译。最简单的方法就是通过在 [`tensorflow/contrib/compiler/jit.py`](https://www.tensorflow.org/code/tensorflow/contrib/compiler/jit.py)
-中定义的 `tf.contrib.compiler.jit.experimental_jit_scope()` 。
+对于单个或多个操作，可以手动开启即时编译，通过对运算进行标记以使用属性 `_XlaCompile=true` 来进行编译。最简单的方法就是通过在 [`tensorflow/contrib/compiler/jit.py`](https://www.tensorflow.org/code/tensorflow/contrib/compiler/jit.py) 中定义的 `tf.contrib.compiler.jit.experimental_jit_scope()`。
+
 使用范例：
 
 ```python
@@ -66,8 +65,7 @@ with tf.device("/job:localhost/replica:0/task:0/device:XLA_GPU:0"):
 
 这个教程涵盖了一个简单版的 MNIST softmax 训练模型。在会话层开启了即时编译，只支持 GPU。
 
-在开始本教程之前，先验证 LD_LIBRARY 环境变量或者 ldconfig 包含 `$CUDA_ROOT/extras/CUPTI/lib64`，其中包含 CUDA 分析工具接口库
-[(CUPTI)](http://docs.nvidia.com/cuda/cupti/index.html)。TensorFlow 使用 CUPTI 从 GPU 获取追踪信息。
+在开始本教程之前，先验证 LD_LIBRARY 环境变量或者 ldconfig 包含 `$CUDA_ROOT/extras/CUPTI/lib64`，其中包含 CUDA 分析工具接口库 [(CUPTI)](http://docs.nvidia.com/cuda/cupti/index.html)。TensorFlow 使用 CUPTI 从 GPU 获取追踪信息。
 
 ### 步骤 #1: 准备代码范例
 
@@ -81,7 +79,8 @@ with tf.device("/job:localhost/replica:0/task:0/device:XLA_GPU:0"):
 python mnist_softmax_xla.py --xla=''
 ```
 
-使用 Chrome 跟踪事件探查器 (导航到 chrome://tracing)，当代码执行完时打开时间线文件 `timeline.ctf.json`。呈现的时间线类似于下图，其中有多个绿色框，标记为 `MatMul`，可能跨多个 GPU 。
+使用 Chrome 跟踪事件探查器 (导航到 chrome://tracing)，当代码执行完时打开时间线文件 `timeline.ctf.json`。呈现的时间线类似于下图，其中有多个绿色框，标记为 `MatMul`，可能跨多个 GPU。
+
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="https://www.tensorflow.org/images/jit_timeline_gpu.png">
 </div>
@@ -91,16 +90,16 @@ python mnist_softmax_xla.py --xla=''
 执行 python 代码，用 XLA 训练模型，并打开 XLA 调试工具，用环境变量输出 XLA 图。
 
 ```shell
-TF_XLA_FLAGS=--xla_generate_hlo_graph=.* python mnist_softmax_xla.py
+TF_XLA_FLAGS="--xla_hlo_graph_path=/tmp --xla_generate_hlo_graph=.*" python mnist_softmax_xla.py
 ```
 
-打开时间线文件(`timeline.ctf.json`)。呈现的时间线类似于下图，其中有一个标有 `_XlaLaunch`
-的长块。
+打开时间线文件(`timeline.ctf.json`)。呈现的时间线类似于下图，其中有一个标有 `XlaLaunch` 的长块。
+
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="https://www.tensorflow.org/images/jit_timeline_gpu_xla.png">
 </div>
 
-通过查看控制台类似下面的输出来了解在 `_XlaLaunch` 里到底发生了什么:
+通过查看控制台类似下面的输出来了解在 `XlaLaunch` 里到底发生了什么:
 
 ```shell
 computation cluster_0[_XlaCompiledKernel=true,_XlaNumConstantArgs=1].v82 [CPU:
