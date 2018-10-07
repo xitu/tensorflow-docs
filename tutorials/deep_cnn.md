@@ -1,6 +1,4 @@
-# 卷积神经网络
-
-> **注意**：本教程适合对于 TensorFlow 有**丰富经验**的用户，并假定用户有机器学习相关领域的专业知识和经验。
+# Advanced Convolutional Neural Networks
 
 ## 概述
 
@@ -25,11 +23,11 @@
 
 CIFAR-10 教程示范了一些在 TensorFlow 上构建更大更复杂模型的重要构想：
 
-* 相关核心数学组件，包括 @{tf.nn.conv2d$convolution}（[wiki](https://en.wikipedia.org/wiki/Convolution)）、@{tf.nn.relu$rectified linear activations}（[wiki](https://en.wikipedia.org/wiki/Rectifier_(neural_networks))）、@{tf.nn.max_pool$max pooling}（[wiki](https://en.wikipedia.org/wiki/Convolutional_neural_network#Pooling_layer)）和 @{tf.nn.local_response_normalization$local response normalization}（[AlexNet 论文](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf)的 3.3 章节）
-* 训练过程中网络行为的 @{$summaries_and_tensorboard$Visualization}，包括输入图像、损失情况、行为分布情况和梯度
-* 为计算学习到的参数的 @{tf.train.ExponentialMovingAverage$moving average} 提供范例，以及在评估阶段使用这些平均值来提高预测的性能
-* 实现让 @{tf.train.exponential_decay$learning rate schedule} 随着时间推移平稳地递减
-* 为输入数据设计预存取 @{tf.train.shuffle_batch$queues}，将磁盘延迟和高开销图像预处理操作的模型分离进行处理
+* 相关核心数学组件，包括 `tf.nn.conv2d`（[wiki](https://en.wikipedia.org/wiki/Convolution)）、`tf.nn.relu`（[wiki](https://en.wikipedia.org/wiki/Rectifier_(neural_networks))）、`tf.nn.max_pool`（[wiki](https://en.wikipedia.org/wiki/Convolutional_neural_network#Pooling_layer)）和 `tf.nn.local_response_normalization`（[AlexNet 论文](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf)的 3.3 章节）
+* 训练过程中网络行为的[可视化](../../guide/summaries_and_tensorboard.md)，包括输入图像、损失情况、行为分布情况和梯度
+* 为计算学习到的参数的 `tf.train.ExponentialMovingAverage` 提供范例，以及在评估阶段使用这些平均值来提高预测的性能
+* 实现让 `tf.train.exponential_decay` 随着时间推移平稳地递减
+* 为输入数据设计预存取 `tf.train.shuffle_batch`，将磁盘延迟和高开销图像预处理操作的模型分离进行处理
 
 我们也提供了模型的多 GPU 版本并以此表明：
 
@@ -46,19 +44,19 @@ CIFAR-10 教程中的模型是一个多层架构，由卷积层和非线性层�
 
 ## 代码组织结构
 
-本教程的代码位于 [`models/tutorials/image/cifar10/`](https://www.tensorflow.org/code/tensorflow_models/tutorials/image/cifar10/)。
+本教程的代码位于 [`models/tutorials/image/cifar10/`](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/)。
 
 文件 | 作用
 --- | ---
-[`cifar10_input.py`](https://www.tensorflow.org/code/tensorflow_models/tutorials/image/cifar10/cifar10_input.py) | 读取本地 CIFAR-10 的二进制文件内容
-[`cifar10.py`](https://www.tensorflow.org/code/tensorflow_models/tutorials/image/cifar10/cifar10.py) | 建立 CIFAR-10 模型
-[`cifar10_train.py`](https://www.tensorflow.org/code/tensorflow_models/tutorials/image/cifar10/cifar10_train.py) | 在 CPU 或者 GPU 上训练 CIFAR-10 模型
-[`cifar10_multi_gpu_train.py`](https://www.tensorflow.org/code/tensorflow_models/tutorials/image/cifar10/cifar10_multi_gpu_train.py) | 在多个 GPU 上训练 CIFAR-10 模型
-[`cifar10_eval.py`](https://www.tensorflow.org/code/tensorflow_models/tutorials/image/cifar10/cifar10_eval.py) | 评估 CIFAR-10 模型的预测性能
+[`cifar10_input.py`](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10_input.py) | 读取本地 CIFAR-10 的二进制文件内容
+[`cifar10.py`](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10.py) | 建立 CIFAR-10 模型
+[`cifar10_train.py`](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10_train.py) | 在 CPU 或者 GPU 上训练 CIFAR-10 模型
+[`cifar10_multi_gpu_train.py`](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10_multi_gpu_train.py) | 在多个 GPU 上训练 CIFAR-10 模型
+[`cifar10_eval.py`](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10_eval.py) | 评估 CIFAR-10 模型的预测性能
 
 ## CIFAR-10 模型
 
-CIFAR-10 网络主要的代码位于 [`cifar10.py`](https://www.tensorflow.org/code/tensorflow_models/tutorials/image/cifar10/cifar10.py)。完整的训练图大致包含 765 个操作。但是我们发现通过下面的模块来构造训练图可以最大程度的提供代码的复用率：
+CIFAR-10 网络主要的代码位于 [`cifar10.py`](https://github.com/tensorflow/models/tree/master/tutorials/image/cifar10/cifar10.py)。完整的训练图大致包含 765 个操作。但是我们发现通过下面的模块来构造训练图可以最大程度的提供代码的复用率：
 
 1. **模型输入：**包括 `inputs()` 和 `distorted_inputs()` 操作，分别用于读取 CIFAR 的图像和对其进行预处理，并用于后续评估和训练。
 2. **模型预测：**包括 `inference()` 操作，用于推断。比如对于提供的图像进行分类。
@@ -66,26 +64,26 @@ CIFAR-10 网络主要的代码位于 [`cifar10.py`](https://www.tensorflow.org/c
 
 ### 模型输入
 
-模型输入是通过 `inputs()` 和 `distorted_inputs()` 函数建立起来，它们会从 CIFAR-10 的二进制文件中读取图片数据。由于这些文件存储的字节长度固定，因此我们可以使用 @{tf.FixedLengthRecordReader} 进行读取。更多关于 `Reader` 类的功能可以查看 @{$reading_data#reading-from-files$Reading Data}。
+模型输入是通过 `inputs()` 和 `distorted_inputs()` 函数建立起来，它们会从 CIFAR-10 的二进制文件中读取图片数据。由于这些文件存储的字节长度固定，因此我们可以使用 `tf.FixedLengthRecordReader` 进行读取。更多关于 `Reader` 类的功能可以查看[数据读取](../../api_guides/python/reading_data.md#reading-from-files)。
 
 图片的处理流程如下：
 
-*  图片会被统一裁剪成 24x24 像素大小，中央区域裁剪用于评估或 @{tf.random_crop$randomly} 用于训练；
-*  对图片进行 @{tf.image.per_image_standardization$approximately whitened}，使得模型对于图片的动态范围变化不敏感。
+*  图片会被统一裁剪成 24x24 像素大小，中央区域裁剪用于评估或 `tf.random_crop` 用于训练；
+*  对图片进行 `tf.image.per_image_standardization`，使得模型对于图片的动态范围变化不敏感。
 
 对于训练，我们另外采取了一些列随机变换的方法来认为的增加数据集的大小：
 
-* 对图片 @{tf.image.random_flip_left_right$Randomly flip}
-* 对图片 @{tf.image.random_brightness$image brightness}
-* 对图片 @{tf.image.random_contrast$image contrast}
+* 对图片 `tf.image.random_flip_left_right`
+* 对图片 `tf.image.random_brightness`
+* 对图片 `tf.image.random_contrast`
 
-你可以在 @{$python/image$Images} 页面的列表中查看所有可用的变换。对于每一张图片我们还附带了一个 @{tf.summary.image} 操作来查看图片概要，以便于在 @{$summaries_and_tensorboard$TensorBoard} 中查看他们。这对于检查输入图片是否正确十分有效。
+你可以在[图片](../../api_guides/python/image.md)页面的列表中查看所有可用的变换。对于每一张图片我们还附带了一个 `tf.summary.image` 操作来查看图片概要，以便于在 [TensorBoard](../../guide/summaries_and_tensorboard.md) 中查看他们。这对于检查输入图片是否正确十分有效。
 
 <div style="width:50%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:70%" src="../images/cifar_image_summary.png">
 </div>
 
-从硬盘中加载图片并进行变换需要花费不少的时间，为了避免这些操作减慢训练过程，我们在 16 个独立的线程中运行这些操作，这些线程被连续的安排在一个 TensorFlow 的 @{tf.train.shuffle_batch$queue} 中。
+从硬盘中加载图片并进行变换需要花费不少的时间，为了避免这些操作减慢训练过程，我们在 16 个独立的线程中运行这些操作，这些线程被连续的安排在一个 TensorFlow 的 `tf.train.shuffle_batch` 中。
 
 ### 模型预测
 
@@ -93,14 +91,14 @@ CIFAR-10 网络主要的代码位于 [`cifar10.py`](https://www.tensorflow.org/c
 
 Layer 名称 | 描述
 --- | ---
-`conv1` | @{tf.nn.conv2d$convolution} 和 @{tf.nn.relu$rectified linear} 激活
-`pool1` | @{tf.nn.max_pool$max pooling}
-`norm1` | @{tf.nn.local_response_normalization$local response normalization}
-`conv2` | @{tf.nn.conv2d$convolution} 和 @{tf.nn.relu$rectified linear} 激活
-`norm2` |  @{tf.nn.local_response_normalization$local response normalization}
-`pool2` | @{tf.nn.max_pool$max pooling}
-`local3` | @{$python/nn$fully connected layer with rectified linear activation}
-`local4` | @{$python/nn$fully connected layer with rectified linear activation}
+`conv1` | `tf.nn.conv2d` 和 `tf.nn.relu` 激活
+`pool1` | `tf.nn.max_pool`
+`norm1` | `tf.nn.local_response_normalization`
+`conv2` | `tf.nn.conv2d` 和 `tf.nn.relu` 激活
+`norm2` |  `tf.nn.local_response_normalization`
+`pool2` | `tf.nn.max_pool`
+`local3` | [fully connected layer with rectified linear activation](../../api_guides/python/nn.md)
+`local4` | [fully connected layer with rectified linear activation](../../api_guides/python/nn.md)
 `softmax_linear` | 进行线性变换以输出 logits
 
 这里有一个通过 TensorBoard 绘制的图形，用来描述模型建立中经过的步骤：
@@ -109,7 +107,7 @@ Layer 名称 | 描述
   <img style="width:100%" src="../images/cifar_graph.png">
 </div>
 
-> **练习**：`inference` 的输出是未经归一化的 logits，尝试使用 @{tf.nn.softmax} 对网络架构进行修改，从而返回归一化的预测结果。
+> **练习**：`inference` 的输出是未经归一化的 logits，尝试使用 `tf.nn.softmax` 对网络架构进行修改，从而返回归一化的预测结果。
 
 `input()` 和 `inference()` 函数提供了所有评估模型所需要的必要构件，现在我们把讲解的重点从构建模型操作转向训练一个模型。
 
@@ -117,17 +115,17 @@ Layer 名称 | 描述
 
 ### 模型训练
 
-训练一个可以进行 N 类分类网络常用方法是使用[多项逻辑回归](https://en.wikipedia.org/wiki/Multinomial_logistic_regression)方法，又可以叫做 **softmax 回归**。Softmax regression applies a @{tf.nn.softmax$softmax} nonlinearity to the output of the network and calculates the @{tf.nn.sparse_softmax_cross_entropy_with_logits$cross-entropy} between the normalized predictions and the label index. 在正则化过程中，我们会对所有学习的变量应用常用的 @{tf.nn.l2_loss$weight decay} 损失方法。模型的目标函数是求交叉熵损失和所有权重衰减项的和，`loss()` 函数的返回值就是这个值。
+训练一个可以进行 N 类分类网络常用方法是使用[多项逻辑回归](https://en.wikipedia.org/wiki/Multinomial_logistic_regression)方法，又可以叫做 **softmax 回归**。Softmax regression applies a `tf.nn.softmax` nonlinearity to the output of the network and calculates the `tf.nn.sparse_softmax_cross_entropy_with_logits$cross-entropy` between the normalized predictions and the label index. 在正则化过程中，我们会对所有学习的变量应用常用的 `tf.nn.l2_loss` 损失方法。模型的目标函数是求交叉熵损失和所有权重衰减项的和，`loss()` 函数的返回值就是这个值。
 
-我们可以使用 @{tf.summary.scalar} 在 TensorBoard 中查看该值得变化情况：
+我们可以使用 `tf.summary.scalar` 在 TensorBoard 中查看该值得变化情况：
 
 ![CIFAR-10 Loss](../images/cifar_loss.png "CIFAR-10 Total Loss")
 
-我们使用标准的[梯度下降算法](https://en.wikipedia.org/wiki/Gradient_descent)来训练模型（你也可以在 @{$python/train$Training} 中查看其它方法），其学习速率随着时间以 @{tf.train.exponential_decay$exponentially decays}。
+我们使用标准的[梯度下降算法](https://en.wikipedia.org/wiki/Gradient_descent)来训练模型（你也可以在[训练](../../api_guides/python/train.md)中查看其它方法），其学习速率随着时间以 `tf.train.exponential_decay`。
 
 ![CIFAR-10 Learning Rate Decay](../images/cifar_lr_decay.png "CIFAR-10 Learning Rate Decay")
 
-`train()` 函数会添加一些操作来使得目标函数最小化，这些操作包括梯度计算、更新学习变量（详情可查看 @{tf.train.GradientDescentOptimizer}）。`train()` 函数最终会返回一个用来对一批图片执行所有计算的操作，以便于训练并更新模型。
+`train()` 函数会添加一些操作来使得目标函数最小化，这些操作包括梯度计算、更新学习变量（详情可查看 `tf.train.GradientDescentOptimizer`）。`train()` 函数最终会返回一个用来对一批图片执行所有计算的操作，以便于训练并更新模型。
 
 ## 开始并训练模型
 
@@ -162,7 +160,7 @@ Filling queue with 20000 CIFAR images before starting to train. This will take a
 
 > **练习：** 在实验时，第一阶段训练时间会很长，长到让人厌烦。可以尝试减少初始化时填充到队列中的图片数量来改变这样的长期等待的情况。在 `cifar10_input.py` 脚本中搜索 `min_fraction_of_examples_in_queue` 来进行修改。
 
-`cifar10_train.py` 脚本会周期性的在 @{$programmers_guide/saved_model$checkpoint files} 中 @{tf.train.Saver$saves} 模型的所有参数，但是**不会**对于模型进行评估。`cifar10_eval.py` 脚本会使用该检查点文件来测试预测的性能（详见下面：评估模型）。
+`cifar10_train.py` 脚本会周期性的在 [checkpoint files](../../guide/saved_model.md) 中使用了一个 `tf.train.Saver` 来保存模型的所有参数，但是**不会**对于模型进行评估。`cifar10_eval.py` 脚本会使用该检查点文件来测试预测的性能（详见下面：评估模型）。
 
 如果你根据上面的步骤做下来，那么你已经开始训练一个 CIFAR-10 模型了。[恭喜！](https://www.youtube.com/watch?v=9bZkp7q19f0)
 
@@ -173,7 +171,7 @@ Filling queue with 20000 CIFAR images before starting to train. This will take a
 * 梯度、激活和权重的值是否合理？
 * 当前的学习速率是多少？
 
-@{$summaries_and_tensorboard$TensorBoard} 提供了这样的功能，可以通过 `cifar10_train.py` 文件中的 @{tf.summary.FileWriter} 函数周期性的获取并显示这些数据。
+[TensorBoard](../../guide/summaries_and_tensorboard.md) 提供了这样的功能，可以通过 `cifar10_train.py` 文件中的 `tf.summary.FileWriter` 函数周期性的获取并显示这些数据。
 
 就例如，我们可以在训练过程中查看 `local3` 的激活分布情况以及其特征的稀疏情况。
 
@@ -182,7 +180,7 @@ Filling queue with 20000 CIFAR images before starting to train. This will take a
   <img style="flex-grow:1; flex-shrink:1;" src="../images/cifar_activations.png">
 </div>
 
-相较于总损失，在训练过程中的单项损失更值得注意。但是由于训练过程中使用的数据批量较小，损失值中包含了相当多的噪声。在实际操作中，我们发现除了原始值之外，损失值的移动平均值也十分有用。可以参考 @{tf.train.ExponentialMovingAverage} 来了解如何实现。
+相较于总损失，在训练过程中的单项损失更值得注意。但是由于训练过程中使用的数据批量较小，损失值中包含了相当多的噪声。在实际操作中，我们发现除了原始值之外，损失值的移动平均值也十分有用。可以参考 `tf.train.ExponentialMovingAverage` 来了解如何实现。
 
 ## 评估模型
 
@@ -205,7 +203,7 @@ python cifar10_eval.py
 
 脚本只是周期性地返回 precision @ 1 结果，在这里它返回了 86% 准确率的结果。`cifar10_eval.py` 也可以返回其他在 TensorBoard 中可视化的简要信息。可通过这些简要信息进一步了解评估过程中的模型情况。
 
-训练脚本会计算所有学习到的变量的  @{tf.train.ExponentialMovingAverage$moving average}。评估脚本会将所有学习到的模型参数替换成其对应的移动均值。这种替代方法可以提升在评估过程中模型的性能。
+训练脚本会计算所有学习到的变量的 `tf.train.ExponentialMovingAverage`。评估脚本会将所有学习到的模型参数替换成其对应的移动均值。这种替代方法可以提升在评估过程中模型的性能。
 
 > **练习：** 通过计算 precision @ 1，使用移动均值参数可以将预测性能提升大约 3%。通过修改 `cifar10_eval.py` 脚本不使用移动均值作为模型的参数，可以发现预测性能有所下降。
 
@@ -241,11 +239,11 @@ GPU 同步运行，所有从 GPU 计算得到的梯度值会累积并求平均�
 
 首先要把单个模型拷贝中计算估计值和梯度值得操作抽象到一个函数里。在代码中，我们把这个抽象称为 "tower"。对于每个 "tower"，我们需要设置两个属性：
 
-* 在一个 "tower" 中，所有操作都有唯一的名称。@{tf.name_scope} 通过添加范围前缀来提供这样唯一的名称。比如，第一个 "tower" 中所有操作都会附带前缀 "tower_0"，例子：`tower_0/conv1/Conv2D`；
+* 在一个 "tower" 中，所有操作都有唯一的名称。`tf.name_scope` 通过添加范围前缀来提供这样唯一的名称。比如，第一个 "tower" 中所有操作都会附带前缀 "tower_0"，例子：`tower_0/conv1/Conv2D`；
 
-* 在一个 "tower" 中，设置硬件设备优先级来运行操作。@{tf.device} 提供了该信息。比如，第一个 "tower" 的所有操作都在 `device('/device:GPU:0')` 中运行，即所有操作应当在第一块 GPU 上运行。
+* 在一个 "tower" 中，设置硬件设备优先级来运行操作。`tf.device` 提供了该信息。比如，第一个 "tower" 的所有操作都在 `device('/device:GPU:0')` 中运行，即所有操作应当在第一块 GPU 上运行。
 
-为了在多个 GPU 上共享变量，所有的变量都放在 CPU 上，通过 @{tf.get_variable} 进行访问。详情可以查看 @{$variables$Sharing Variables} 来了解如何共享变量。
+为了在多个 GPU 上共享变量，所有的变量都放在 CPU 上，通过 `tf.get_variable` 进行访问。详情可以查看[共享变量](../../guide/variables.md)来了解如何共享变量。
 
 ### 启动并在多个 GPU 上训练模型
 
@@ -260,8 +258,6 @@ python cifar10_multi_gpu_train.py --num_gpus=2
 > **练习：**`cifar10_train.py` 中批处理大小默认为 128，尝试在两个 GPU 上运行 `cifar10_multi_gpu_train.py` 脚本，并设置批处理大小为 64，并比较两种设置的训练速度。
 
 ## 下一阶段
-
-[恭喜你！](https://www.youtube.com/watch?v=9bZkp7q19f0)你已经完成了 CIFAR-10 教程。
 
 如果你现在对开发和训练自己的图片分类系统感兴趣，我们建议你可以新建该教程的分支，并替换其中的组件来解决你自己的图片分类问题。
 
