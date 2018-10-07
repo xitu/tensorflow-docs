@@ -81,7 +81,7 @@ with tf.device("/device:GPU:1"):
   v = tf.get_variable("v", [1])
 ```
 
-在分布式设置中，将变量部署在正确的设备上尤为重要。比如，如果不小心将变量部署在了工作线程而不是参数服务器上会严重减慢训练效率，最糟糕的情况下，会使得每个工作线程都在不经意间伪造了各自独立的变量的副本。因此，我们提供了 @{tf.train.replica_device_setter} 来自动将变量部署在参数服务器上。比如：
+在分布式设置中，将变量部署在正确的设备上尤为重要。比如，如果不小心将变量部署在了工作线程而不是参数服务器上会严重减慢训练效率，最糟糕的情况下，会使得每个工作线程都在不经意间伪造了各自独立的变量的副本。因此，我们提供了 `tf.train.replica_device_setter` 来自动将变量部署在参数服务器上。比如：
 
 ``` python
 cluster_spec = {
@@ -142,7 +142,7 @@ tf.global_variables_initializer().run()
 sess.run(assignment)  # or assignment.op.run(), or assignment.eval()
 ```
 
-绝大部分的 TensorFlow 优化器都有特定的操作来依据某些梯度下降算法高效地更新变量的值。我们用 @{tf.train.Optimizer} 来解释如何使用优化器。
+绝大部分的 TensorFlow 优化器都有特定的操作来依据某些梯度下降算法高效地更新变量的值。我们用 `tf.train.Optimizer` 来解释如何使用优化器。
 
 因为变量时可变的，因此有些情况下及时知道正在使用的变量的值是哪个版本很有必要。在某些操作后强制重新读取变量值可以通过 `tf.Variable.read_value` 实现。比如：
 
@@ -160,7 +160,7 @@ TensorFlow 支持两种共享变量的方式：
  * 显式地传递 `tf.Variable` 对象。
  * 隐式地将 `tf.Variable` 对象包含在 `tf.variable_scope` 对象中。
 
-尽管显式地传递变量的代码已经很清晰了，有时在 TensorFlow 函数的实现中隐式地使用变量也很方便。`tf.layer` 中的大多数函数层都是用了这种方式，`tf.metrics` 也是，还有一些其他的类库工具也是如此。
+尽管显式地传递变量的代码已经很清晰了，有时在 TensorFlow 函数的实现中隐式地使用变量也很方便。`tf.layers` 中的大多数函数层都是用了这种方式，`tf.metrics` 也是，还有一些其他的类库工具也是如此。
 
 变量作用域允许你控制在调用隐式地创建和使用变量的函数时控制变量的重用规则，也允许你用一种有层次的、易懂的方式来命名变量。
 
@@ -207,7 +207,6 @@ with tf.variable_scope("model"):
   output1 = my_image_filter(input1)
 with tf.variable_scope("model", reuse=True):
   output2 = my_image_filter(input2)
-
 ```
 
 你也可以调用 `scope.reuse_variables()` 来触发重用：
@@ -217,7 +216,6 @@ with tf.variable_scope("model") as scope:
   output1 = my_image_filter(input1)
   scope.reuse_variables()
   output2 = my_image_filter(input2)
-
 ```
 
 因此仅仅依赖于不同名称的作用域是很危险的。有时候，我们还会基于其他作用域来初始化变量作用域：
@@ -227,6 +225,4 @@ with tf.variable_scope("model") as scope:
   output1 = my_image_filter(input1)
 with tf.variable_scope(scope, reuse=True):
   output2 = my_image_filter(input2)
-
 ```
-
