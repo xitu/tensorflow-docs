@@ -127,7 +127,6 @@ for i in range(1000):
   DisplayArray(U.eval(), rng=[-0.1, 0.1])
 ```
 
-![jpeg](../images/pde_output_2.jpg)
+![jpeg](../../images/pde_output_2.jpg)
 
 看，波纹！
-
