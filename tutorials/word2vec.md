@@ -11,14 +11,13 @@
 * 同时，我们要用 TensorFlow 实现一个简单的模型。
 * 最后，我们会介绍能让原生版本更好地拓展的一些方法。
 
-本文只会粗略地过一遍代码，如果你想深入了解的话，可以看看示例 [tensorflow/examples/tutorials/word2vec/word2vec_basic.py](https://www.tensorflow.org/code/tensorflow/examples/tutorials/word2vec/word2vec_basic.py) 中的一个极简的实现。这个简单示例包含下载数据的代码，只需稍微训练一下这些数据，就可以把结果可视化出来了。一旦你可以轻松的阅读并运行这个版本之后，你就可以去看一个更严谨的实现代码了： [models/tutorials/embedding/word2vec.py](https://www.tensorflow.org/code/tensorflow_models/tutorials/embedding/word2vec.py) 。它展示了一些更高级的 TensorFlow 原则，你可从中学到如何高效的使用线程来将数据移动到一个文本模型中，如何在训练中设置检查点，等等。
+本文只会粗略地过一遍代码，如果你想深入了解的话，可以看看示例 [tensorflow/examples/tutorials/word2vec/word2vec_basic.py](https://www.tensorflow.org/code/tensorflow/examples/tutorials/word2vec/word2vec_basic.py) 中的一个极简的实现。这个简单示例包含下载数据的代码，只需稍微训练一下这些数据，就可以把结果可视化出来了。一旦你可以轻松的阅读并运行这个版本之后，你就可以去看一个更严谨的实现代码了： [models/tutorials/embedding/word2vec.py](https://github.com/tensorflow/models/tree/master/tutorials/embedding/word2vec.py) 。它展示了一些更高级的 TensorFlow 原则，你可从中学到如何高效的使用线程来将数据移动到一个文本模型中，如何在训练中设置检查点，等等。
 
 首先，让我们来看一看为什么我们想要学习词嵌入。如果你已经是一个词嵌入专家了，可以跳过本节，直接深入细节。
 
 ## 动机：为什么要学习词嵌入？
 
 图像和音频处理系统在处理丰富，高维度的数据集时会将图像的单个像素信号量或音频的功率谱密度系数编码成向量。对于图像识别或者语音识别这样的任务来说，我们知道要成功的识别出正确结果的所有信息都在数据里（因为人类可以从这些原始数据中得到答案）。然而，传统的自然语言处理系统将单词看做确定的原子符号，因此 `Id537` 会代表 'cat'，`Id143` 会代表 'dog'。这些编码都是任意的，并且它们对于单个字符之间的关系系统毫无帮助。这意味着当模型处理关于 'dogs' 数据的时候，基本上用不到它从处理 'cats' 上学到的知识（然而它们有很多共同点，都是动物，四条腿，宠物等）。将单词表示成唯一离散的 id，这样会使数据变的稀疏，通常情况下这意味着为了成功的训练统计模型，我们需要更多的数据。而使用向量代表单词就可以克服这些困难。
-
 
 <div style="width:100%; margin:auto; margin-bottom:10px; margin-top:20px;">
 <img style="width:100%" src="../images/audio-image-text.png" alt>
@@ -166,7 +165,7 @@ optimizer = tf.train.GradientDescentOptimizer(learning_rate=1.0).minimize(loss)
 
 ## 训练模型
 
-训练模型现在就非常简单了，只需要使用一个 `feed_dict` 将数据推送到 placeholders 中，并且在一个循环中使用这个新的数据来调用 @{tf.Session.run} 就可以了。
+训练模型现在就非常简单了，只需要使用一个 `feed_dict` 将数据推送到 placeholders 中，并且在一个循环中使用这个新的数据来调用 `tf.Session.run` 就可以了。
 
 ```python
 for inputs, labels in generate_batch(...):
@@ -185,13 +184,13 @@ for inputs, labels in generate_batch(...):
 <img style="width:100%" src="../images/tsne.png" alt>
 </div>
 
-完美！和我们想的一样，同样结尾的单词互相之间离的很近。还有一个更加重量级的 word2vec 的实现，它会展现更多 TensorFlow 的高级特性，请查看 [models/tutorials/embedding/word2vec.py](https://www.tensorflow.org/code/tensorflow_models/tutorials/embedding/word2vec.py)。
+完美！和我们想的一样，同样结尾的单词互相之间离的很近。还有一个更加重量级的 word2vec 的实现，它会展现更多 TensorFlow 的高级特性，请查看 [models/tutorials/embedding/word2vec.py](https://github.com/tensorflow/models/tree/master/tutorials/embedding/word2vec.py)。
 
 ## 评估词向量：Analogical Reasoning
 
 词向量在各种各样的 NLP 预测任务中都非常有用。除了训练一个完善的词性标记模型或者实体命名模型，一个简单的评估词向量的方法是直接使用它们来预测语法和语义关系，比如这个句子 `king is to queen as father is to ?`。这就是 *analogical reasoning*，这个任务的介绍在 [Mikolov and colleagues](https://www.aclweb.org/anthology/N13-1090)。你可以从 [download.tensorflow.org](http://download.tensorflow.org/data/questions-words.txt) 下载到这个任务的数据集。
 
-想看如何实现这个评估过程，请在 [models/tutorials/embedding/word2vec.py](https://www.tensorflow.org/code/tensorflow_models/tutorials/embedding/word2vec.py) 查看 `build_eval_graph()` 和 `eval()` 这两个函数。
+想看如何实现这个评估过程，请在 [models/tutorials/embedding/word2vec.py](https://github.com/tensorflow/models/tree/master/tutorials/embedding/word2vec.py) 查看 `build_eval_graph()` 和 `eval()` 这两个函数。
 
 超参数的选择会显著的影响到任务的准确性。为了达到这个任务当前水平的的表现，我们需要使用一个很大的数据集来训练，并且精细的调优这些超参数以及利用像二次抽样这样的小技巧，不过二次抽样不在我们的教程范围内。
 
@@ -199,9 +198,9 @@ for inputs, labels in generate_batch(...):
 
 我们朴实无华的实现展现了 TensorFlow 的灵活性。例如，如果我们想改变训练的目标，仅仅通过调用 `tf.nn.nce_loss()` 就可以使用一个现成的像 `tf.nn.sampled_softmax_loss()` 这样的函数。如果你对损失函数有一些新的想法，那么你可以在 TensorFlow 中手动写一个新的目标函数，并且让优化器计算它的导数。在机器学习模型开发的探索阶段灵活性是非常重要的，因为这样我们才可以快速迭代以及实验不同的想法。
 
-一旦你有了一个满意的模型结构，优化你的实现方法来让让模型更有效率（以及在更少的时间内囊括更多的数据）就会变得很有必要。举个例子，在这篇教程中使用的本地代码会非常拖后腿，因为我们使用 Python 来读取和供给数据条目 -- 在 TensorFlow 这里每一条数据都只需要很少的工作量。如果你发现你的模型在输入数据方面有很大的性能瓶颈，那么你就需要为你的问题实现一个自定义的数据读取器，就像 @{$new_data_formats$New Data Formats} 中说的那样。对于 Skip-Gram 来说，我们已经为了做了这些，请查看 [models/tutorials/embedding/word2vec.py](https://www.tensorflow.org/code/tensorflow_models/tutorials/embedding/word2vec.py)。
+一旦你有了一个满意的模型结构，优化你的实现方法来让让模型更有效率（以及在更少的时间内囊括更多的数据）就会变得很有必要。举个例子，在这篇教程中使用的本地代码会非常拖后腿，因为我们使用 Python 来读取和供给数据条目 -- 在 TensorFlow 这里每一条数据都只需要很少的工作量。如果你发现你的模型在输入数据方面有很大的性能瓶颈，那么你就需要为你的问题实现一个自定义的数据读取器，就像[新的数据格式](../../extend/new_data_formats.md)中说的那样。对于 Skip-Gram 来说，我们已经为了做了这些，请查看 [models/tutorials/embedding/word2vec.py](https://github.com/tensorflow/models/tree/master/tutorials/embedding/word2vec.py)。
 
-如果你的模型已经没有 I/O 问题，但是你仍然想得到更好的性能，那么你可以编写你自己的 TensorFlow 操作，就像 @{$adding_an_op$Adding a New Op} 中描述的那样。重申一遍，我们已经提供了 Skip-Gram 模型的完整实例 [models/tutorials/embedding/word2vec_optimized.py](https://www.tensorflow.org/code/tensorflow_models/tutorials/embedding/word2vec_optimized.py)。可以随意的和其他模型比较来测量每一阶段性能的提升。
+如果你的模型已经没有 I/O 问题，但是你仍然想得到更好的性能，那么你可以编写你自己的 TensorFlow 操作，就像[添加一个新 Op](../../extend/adding_an_op.md) 中描述的那样。重申一遍，我们已经提供了 Skip-Gram 模型的完整实例 [models/tutorials/embedding/word2vec_optimized.py](https://github.com/tensorflow/models/tree/master/tutorials/embedding/word2vec_optimized.py)。可以随意的和其他模型比较来测量每一阶段性能的提升。
 
 ## 总结
 
