@@ -1,6 +1,6 @@
 # Android 示例应用
 
-该 TensorFLow Lite 示例可以在 [GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/app) 上被找到。 这是一个使用量子化的 MobileNet 模型或是浮点 Inception-v3 模型对图片进行持续分类的相机应用。示例的最低运行要求是 Android 5.0（API 21）。
+该 TensorFLow Lite 示例可以在 [GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo) 上被找到。 这是一个使用量子化的 MobileNet 模型或是浮点 Inception-v3 模型对图片进行持续分类的相机应用。示例的最低运行要求是 Android 5.0（API 21）。
 
 在示例中，应用会使用 TensorFlow Lite Java API 来预测。应用会为每一帧都进行实时分类，并将可能性最高的类别和检测对象的时间一同显示出来。
 
@@ -8,16 +8,13 @@
 
 * 下载[预编译 APK](http://download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk)。
 * 使用 Android Studio 编译应用。
-* 下载 TensorFlow Lite 和这个示例应用的源码，然后用
-  bazel 编译。
-
+* 下载 TensorFlow Lite 和这个示例应用的源码，然后用 bazel 编译。
 
 ## 下载预编译版本
 
 尝试这个示例最简单的方法是下载[预编译 APK](https://storage.googleapis.com/download.tensorflow.org/deps/tflite/TfLiteCameraDemo.apk)。
 
 安装完 APK 后，双击应用图标启动程序。当程序第一次运行时，会请求运行时获取设备摄像头的权限。程序会打开设备的后摄像头，并识别视野内的物体。在图像的底部（如果是全景模式则是图像的左边）会展示可能性最高的三个物体和其可能的分类。
-
 
 ## 在 Android Studio 中用 JCenter源的 TensorFlow Lite AAR 编译
 
@@ -28,14 +25,21 @@
 * 将 `tensorflow/contrib/lite/java/demo` 目录作为一个新的 Android Studio 项目导入。
 * 安装需要的 Gradle 插件。
 
-想要获取一个模型，你可以：
+现在你可以构建并运行演示程序。
 
-* 下载量子化的 [Mobilenet TensorFlow Lite 模型](https://storage.googleapis.com/download.tensorflow.org/models/tflite/mobilenet_v1_224_android_quant_2017_11_08.zip)，解压并将 `mobilenet_quant_v1_224.tflite` 拷贝到资源目录： `tensorflow/contrib/lite/java/demo/app/src/main/assets/`下。
-* 或者，下载浮点 [Inception-v3 模型](https://storage.googleapis.com/download.tensorflow.org/models/tflite/inception_v3_slim_2016_android_2017_11_10.zip)，解压并将 `inceptionv3_non_slim_2015.tflite` 拷贝到资源目录下。修改 [Camera2BasicFragment.java](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/java/demo/app/src/main/java/com/example/android/tflitecamerademo/Camera2BasicFragment.java) 中的分类器：<br>
-  把： `classifier = new ImageClassifierQuantizedMobileNet(getActivity());`<br>
-  改成： `classifier = new ImageClassifierFloatInception(getActivity());`。
+The build process downloads the quantized [Mobilenet TensorFlow Lite model](https://storage.googleapis.com/download.tensorflow.org/models/tflite/mobilenet_v1_224_android_quant_2017_11_08.zip), and unzips it into the assets directory: `tensorflow/contrib/lite/java/demo/app/src/main/assets/`.
 
-现在你可以编译并运行程序了。
+Some additional details are available on the [TF Lite Android App page](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/README.md).
+
+### Using other models
+
+To use a different model:
+
+* Download the floating point [Inception-v3 model](https://storage.googleapis.com/download.tensorflow.org/models/tflite/inception_v3_slim_2016_android_2017_11_10.zip).
+* Unzip and copy `inceptionv3_non_slim_2015.tflite` to the assets directory. 
+* Change the chosen classifier in [Camera2BasicFragment.java](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/java/demo/app/src/main/java/com/example/android/tflitecamerademo/Camera2BasicFragment.java)<br>
+  from: `classifier = new ImageClassifierQuantizedMobileNet(getActivity());`<br>
+  to: `classifier = new ImageClassifierFloatInception(getActivity());`.
 
 ## 使用源码编译 TensorFlow Lite 和示例应用
 
