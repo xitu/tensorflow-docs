@@ -1,6 +1,6 @@
 # 对涂鸦进行分类的循环神经网络
 
-[Quick, Draw!]: http://quickdraw.withgoogle.com
+[Quick, Draw!]：http://quickdraw.withgoogle.com
 
 [Quick, Draw!] 是一个涂鸦游戏，玩家需要画出一系列物体，看电脑能否识别。
 
@@ -9,7 +9,7 @@
 在这个教程中，我们将会展示如何为这个游戏构建一个基于 RNN （循环神经网络）的分类器。模型将会使用卷积层、LSTM 层以及一个 softmax 输出层来分辨涂鸦的类别。
 
 
-![RNN 模型架构](../images/quickdraw_model.png)
+![RNN 模型架构](../../images/quickdraw_model.png)
 
 上图展示了此教程中构建的模型架构。输入为一个图形，编码为由 x, y 和 n 构成的坐标点序列，其中 n 表示该点是否是新笔划中的第一个点。
 
@@ -21,7 +21,7 @@
 
 运行这个教程的代码：
 
-1.  如果你还没有安装 TensorFlow，那么请 @{$install$Install TensorFlow}。
+1.  如果你还没有安装 TensorFlow，那么请[安装 TensorFlow](../../install)。
 2.  下载[教程代码](https://github.com/tensorflow/models/tree/master/tutorials/rnn/quickdraw/train_model.py)。
 3.  [下载](http://download.tensorflow.org/data/quickdraw_tutorial_dataset_v1.tar.gz) `TFRecord` 格式的[数据](#下载数据) 并解压。更多细节请参考[可选：下载整个 Quick Draw 数据](#可选下载整个-quick-draw-数据) 以及[如何转换原始 Quick, Draw! 数据](#可选数据转换)。
 
@@ -40,7 +40,7 @@
 
 我们将本教程使用的数据作为包含 `TFExamples` 的 `TFRecord` 文件提供下载：
 
-http://download.tensorflow.org/data/quickdraw_tutorial_dataset_v1.tar.gz
+<a rel="nofollow" href="http://download.tensorflow.org/data/quickdraw_tutorial_dataset_v1.tar.gz">http://download.tensorflow.org/data/quickdraw_tutorial_dataset_v1.tar.gz</a> (~1GB).
 
 或者，你也可以从 Google 云上下载 `ndjson` 格式的原始数据，并将其转换为包含 `TFExamples` 的 `TFRecord` 文件，具体方法参考下一节。
 
@@ -78,14 +78,14 @@ gsutil -m cp "gs://quickdraw_dataset/full/simplified/*" .
 
 ### 可选：数据转换
 
-把 `ndjson` 文件转换为 @{$python/python_io#TFRecords_Format_Details$TFRecord} 格式，其中含有 [`tf.train.Example`](https://www.tensorflow.org/code/tensorflow/core/example/example.proto)，请运行下列的命令：
+把 `ndjson` 文件转换为 [TFRecord](../../api_guides/python/python_io.md#TFRecords_Format_Details) 格式，其中含有 [`tf.train.Example`](https://www.tensorflow.org/code/tensorflow/core/example/example.proto)，请运行下列的命令：
 
 ```shell
    python create_dataset.py --ndjson_path rnn_tutorial_data \
       --output_path rnn_tutorial_data
 ```
 
-这个命令会将数据作为十个分片存储在 @{$python/python_io#TFRecords_Format_Details$TFRecord} 文件，数据的每个类别包含 10000 个训练样本，以及 1000 个测试样本
+这个命令会将数据作为十个分片存储在 [TFRecord](../../api_guides/python/python_io.md#TFRecords_Format_Details) 文件，数据的每个类别包含 10000 个训练样本，以及 1000 个测试样本
 
 下面描述更为详细的转换过程。
 
@@ -165,13 +165,13 @@ def parse_line(ndjson_line):
 
 然后将这些数据重新格式化为形状为 `[num_training_samples, max_length, 3]` 的张量。然后再根据坐标值确定原始图形的边框，并将尺寸标准化，使图形具有单位长度的大小。
 
-<center> ![大小归一](../images/quickdraw_sizenormalization.png) </center>
+<center> ![大小归一](../../images/quickdraw_sizenormalization.png) </center>
 
 最后，我们计算连续点之间的差值并将其作为 `VarLenFeature` 存储在 [tensorflow.Example](https://www.tensorflow.org/code/tensorflow/core/example/example.proto)  下，命名为 `ink` 字段。此外，我们还将 `class_index` 作为单个 `FixedLengthFeature` 条目进行存储，`ink` 的 `shape` 作为长度为 2 的 `FixedLengthFeature` 进行存储。
 
 ### 定义模型
 
-为定义模型，我们首先需要创建一个新的 `Estimator`。如果你想了解更多关于估计器的内容，推荐阅读 @{$get_started/custom_estimators$this tutorial}
+为定义模型，我们首先需要创建一个新的 `Estimator`。如果你想了解更多关于估计器的内容，推荐阅读[这个教程](../../guide/custom_estimators.md)。
 
 构建模型分为以下几步：
 
