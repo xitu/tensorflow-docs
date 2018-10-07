@@ -24,15 +24,15 @@
 
 ### 自定义模型训练
 
-开发者可以选择使用 Tensorflow 对自定义的模型进行训练（构建和训练模型的案例可参照 @{$tutorials} ）。如果你已经写好了一个模型，第一步是把模型导出为一个 @{tf.GraphDef} 文件。这个步骤是必需的，因为除代码之外，有些格式并不存储模型结构，而我们必须与框架的其他部分进行通信。为了为自定义模型创造 .pb 文件，你可以参照 [Exporting the Inference Graph](https://github.com/tensorflow/models/blob/master/research/slim/README.md)。
+开发者可以选择使用 Tensorflow 对自定义的模型进行训练（构建和训练模型的案例可参照 [TensorFlow 教程](../../tutorials/)）。如果你已经写好了一个模型，第一步是把模型导出为一个 `tf.GraphDef` 文件。这个步骤是必需的，因为除代码之外，有些格式并不存储模型结构，而我们必须与框架的其他部分进行通信。为了为自定义模型创造 .pb 文件，你可以参照 [Exporting the Inference Graph](https://github.com/tensorflow/models/blob/master/research/slim/README.md)。
 
 TensorFlow Lite 目前支持一组 TensorFlow 操作符。可通过参考 [TensorFlow Lite 和 TensorFlow 兼容性指南](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/g3doc/tf_ops_compatibility.md)获得现在支持的操作符以及其使用案例。在未来的 Tensorflow Lite 版本中，这组操作符将不断增加。
 
 ## 2. 模型格式转换
 
-在前面步骤中生成（或者下载）的模型是一个**标准版**的 Tensorflow 模型，你现在应该已经有了一个 .pb 或者 .pbtxt @{tf.GraphDef} 文件了。通过迁移学习（也可称为再训练）或者自定义模型生成的模型必须被转换 —— 但是（在此之前），我们必须首先进行模型固化，将模型转换为 Tensorflow Lite 格式。这个过程将使用到以下一些模型格式：
+在前面步骤中生成（或者下载）的模型是一个**标准版**的 Tensorflow 模型，你现在应该已经有了一个 .pb 或者 .pbtxt `tf.GraphDef` 文件了。通过迁移学习（也可称为再训练）或者自定义模型生成的模型必须被转换 —— 但是（在此之前），我们必须首先进行模型固化，将模型转换为 Tensorflow Lite 格式。这个过程将使用到以下一些模型格式：
 
-* @{tf.GraphDef} (.pb) —— 一个代表了 TensorFlow 训练或者计算图的 protobuf（译者注：一种轻便高效的结构化数据存储格式）。这个结构包含了操作符、张量和变量定义。
+* `tf.GraphDef` (.pb) —— 一个代表了 TensorFlow 训练或者计算图的 protobuf（译者注：一种轻便高效的结构化数据存储格式）。这个结构包含了操作符、张量和变量定义。
 * *CheckPoint* (.ckpt) —— 通过一张 TensorFlow 图得到的序列化变量。因为这个格式没有包含图的结构，因此该格式无法进行自解释。
 * `FrozenGraphDef` —— 一个没有包含变量的 `GraphDef` 子类。通过选取一个检查点和一个 `GraphDef`，可以把 `GraphDef` 转化为 `FrozenGraphDef`，并使用从检查点检索到的值将每个变量转换为常量。
 * `SaveModel` —— 带有签名的 `GraphDef` 和检查点，该签名将输入和输出参数标记为模型。可以从 `SavedModel` 中提取 `GraphDef` 和检查点。
