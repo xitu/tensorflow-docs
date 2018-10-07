@@ -6,11 +6,11 @@
 
 ## 图像分类模型的结果
 
-InceptionV3 ([arXiv:1512.00567](https://arxiv.org/abs/1512.00567)), ResNet-50
-([arXiv:1512.03385](https://arxiv.org/abs/1512.03385)), ResNet-152
-([arXiv:1512.03385](https://arxiv.org/abs/1512.03385)), VGG16
-([arXiv:1409.1556](https://arxiv.org/abs/1409.1556)), 和
-[AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 使用 [ImageNet](http://www.image-net.org/) 数据集测试。这些测试运行在 Google 计算云引擎，亚马逊计算云 (Amazon EC2) 和 NVIDIA® DGX-1™ 。大部分测试都使用了合成和真实的数据。使用 `tf.Variable` 对合成数据进行测试，数据集设置为 ImageNet 中每个模型所需的数据的同一形状。我们认为，对平台进行基准测试时，包含真实数据是很重要的。在底层硬件和框架上对准备数据加载测试是为了进行实际训练。为了将磁盘 I/O 作为变量移除，我们从合成数据开始，并设置一个基线。然后使用真实的数据来验证 TensorFlow 的输入管道和底层磁盘 I/O 是否使计算单元饱和。
+InceptionV3 ([arXiv:1512.00567](https://arxiv.org/abs/1512.00567))、ResNet-50
+([arXiv:1512.03385](https://arxiv.org/abs/1512.03385))、ResNet-152
+([arXiv:1512.03385](https://arxiv.org/abs/1512.03385))、VGG16
+([arXiv:1409.1556](https://arxiv.org/abs/1409.1556)) 和
+[AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 使用 [ImageNet](http://www.image-net.org/) 数据集测试。这些测试运行在 Google 计算云引擎，亚马逊计算云（Amazon EC2）和 NVIDIA® DGX-1™。大部分测试都使用了合成和真实的数据。使用 `tf.Variable` 对合成数据进行测试，数据集设置为 ImageNet 中每个模型所需的数据的同一形状。我们认为，对平台进行基准测试时，包含真实数据是很重要的。在底层硬件和框架上对准备数据加载测试是为了进行实际训练。为了将磁盘 I/O 作为变量移除，我们从合成数据开始，并设置一个基线。然后使用真实的数据来验证 TensorFlow 的输入管道和底层磁盘 I/O 是否使计算单元饱和。
 
 ### 使用 NVIDIA® DGX-1™ (NVIDIA® Tesla® P100) 训练
 
@@ -369,7 +369,7 @@ GPUs | InceptionV3 (batch size 32) | ResNet-50 (batch size 32)
 
 ## 方法
 
-该 [脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks) 在各种平台上运行，以生成上述结果。@{$performance_models$High-Performance Models} 详细描述了脚本中的技术，以及如何执行脚本的示例。
+该 [脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks) 在各种平台上运行，以生成上述结果。
 
 为了创建尽可能重复的结果，每个测试运行 5 次，然后将时间取平均值。在给定的平台上，GPU 是在默认状态下运行的。对于 NVIDIA® Tesla® K80 来说这意味着不使用 [GPU
 Boost](https://devblogs.nvidia.com/parallelforall/increase-performance-gpu-boost-k80-autoboost/)。对于每个测试，需要完成 10 次预热，然后再平均完成 100 次测试。
