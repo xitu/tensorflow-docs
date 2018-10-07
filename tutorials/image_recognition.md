@@ -6,11 +6,11 @@
 
 计算机视觉的研究人员将他们的成果和 [ImageNet](http://www.image-net.org)（一个计算机视觉的理论基准测试程序）进行校验和对抗，结果表明他们已经取得了稳定的进步。这些有继承关系的模型持续的展示着它们的进步，并且每次都会产生新的成果：[QuocNet]，[AlexNet]，[Inception (GoogLeNet)]，[BN-Inception-v2]。Google 内部和外部的研究人员也都发表了一些论文来描述所有的这些模型，但是成果仍然很难再现。我们接下来要做的就是运行我们最新的图像识别模型--[Inception-v3]。
 
-[QuocNet]: https://static.googleusercontent.com/media/research.google.com/en//archive/unsupervised_icml2012.pdf
-[AlexNet]: https://www.cs.toronto.edu/~fritz/absps/imagenet.pdf
-[Inception (GoogLeNet)]: https://arxiv.org/abs/1409.4842
-[BN-Inception-v2]: https://arxiv.org/abs/1502.03167
-[Inception-v3]: https://arxiv.org/abs/1512.00567
+[QuocNet]：https://static.googleusercontent.com/media/research.google.com/en//archive/unsupervised_icml2012.pdf
+[AlexNet]：https://www.cs.toronto.edu/~fritz/absps/imagenet.pdf
+[Inception (GoogLeNet)]：https://arxiv.org/abs/1409.4842
+[BN-Inception-v2]：https://arxiv.org/abs/1502.03167
+[Inception-v3]：https://arxiv.org/abs/1512.00567
 
 Inception-v3 从 2012 年就开始使用数据针对 [ImageNet] 这个大型视觉挑战任务训练了。将所有的图片分成像『斑马』，『达尔马西亚狗』，『洗碗工』等 [1000 个类别] 是计算机视觉领域的一个标准任务，例如下面这些图片就是 [AlexNet] 模型分类的结果：
 
@@ -67,7 +67,7 @@ curl -L "https://storage.googleapis.com/download.tensorflow.org/models/inception
   tar -C tensorflow/examples/label_image/data -xz
 ```
 
-下一步我们需要编译包含载入和运行 graph 代码的 C++ 库。如果你做过了 @{$install_sources$the instructions to download the source installation of TensorFlow} 这一步，你应该就可以通过在你的终端中运行下面的的命令来编译示例了：
+下一步我们需要编译包含载入和运行 graph 代码的 C++ 库。如果你按照[下载 TensorFlow 源代码安装的说明](../../install/source.md)一步步进行，你应该就可以通过在你的终端中运行下面的的命令来编译示例了：
 
 ```bash
 bazel build tensorflow/examples/label_image/...
@@ -187,7 +187,7 @@ Status ReadTensorFromImageFile(string file_name, const int input_height,
   TF_RETURN_IF_ERROR(session->Run({}, {output_name}, {}, out_tensors));
   return Status::OK();
 ```
-然后我们创建一个 @{tf.Session}对象，这个对象是真正运行 graph 的接口，并且指明了我们想要从哪个节点得到输出以及把输出的数据推送的哪里。
+然后我们创建一个 `tf.Session` 对象，这个对象是真正运行 graph 的接口，并且指明了我们想要从哪个节点得到输出以及把输出的数据推送的哪里。
 
 它给了我们 `Tensor` 对象的一个向量，在我们知道的情况下它仅仅是一个单个的对象。你可以把 `Tensor` 想象成一个在这个上下文中的多维数组，它高 299 像素，宽 299 像素，图片的三个通道都是浮点数值。如果你在你的产品中已经有了自己的图片处理框架，那么你应该能够用它来替代，只要你在给主要的 graph 供给图片之前做同样的转换就可以了。
 
@@ -341,11 +341,10 @@ int main(int argc, char* argv[]) {
 
 这里我们只展示了目标识别，但是你应该能够在各种各样的领域中以及任何你发现或者你自己训练的模型中使用这些相似的代码。
 
-> **练习**：迁移学习是这样的一种概念，就是如果你知道如何解决好这个问题，那么你应该能够把一些解决相关问题的理念和方法迁移过去。一种表现迁移学习的方法是移除网络最后一个分类层，并且提取出 [next-to-last layer of the CNN](https://arxiv.org/abs/1310.1531)，在这种情况下，就是一个 2048 维的向量。这里有一篇如何这样做的指南 @{$image_retraining$in the how-to section}。
+> **练习**：迁移学习是这样的一种概念，就是如果你知道如何解决好这个问题，那么你应该能够把一些解决相关问题的理念和方法迁移过去。一种表现迁移学习的方法是移除网络最后一个分类层，并且提取出 [next-to-last layer of the CNN](https://arxiv.org/abs/1310.1531)，在这种情况下，就是一个 2048 维的向量。
 
 ## 进一步学习的资源
 
 学习更多的通用神经网络，Michael Nielsen 的[免费在线书籍](http://neuralnetworksanddeeplearning.com/chap1.html)是一个很不错的资源。在卷积神经网络方面，Chris Olah 有一些[很棒的博客](https://colah.github.io/posts/2014-07-Conv-Nets-Modular/)，Michael Nielsen 的书中也有 [一章](http://neuralnetworksanddeeplearning.com/chap6.html) 也包含了这部分内容。
 
-更多的关于实现卷积神经网络的资源，你可以去 TensorFlow @{$deep_cnn$deep convolutional networks tutorial} 查看，或者跟随我们的 @{$layers$MNIST starter tutorial} 入门指南来来学习。最后，如果你想快速提升在这个领域的研究，可以阅读本篇指南引用的所有论文以及他们近期的工作。
-
+更多的关于实现卷积神经网络的资源，你可以去 TensorFlow [深度卷积网络教程](../../tutorials/images/deep_cnn.md)查看，或者跟随我们的 [Estimator MNIST 教程](../estimators/cnn.md)入门指南来来学习。最后，如果你想快速提升在这个领域的研究，可以阅读本篇指南引用的所有论文以及他们近期的工作。
