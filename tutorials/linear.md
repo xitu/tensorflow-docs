@@ -1,6 +1,6 @@
 # TensorFlow 大规模线性模型
 
-@{tf.estimator$Estimators} 和其他内容一起，已经为在 TensorFlow 中使用线性模型提供了一系列丰富的工具。这个文档将是对这些工具的一个综述。包括：
+`tf.estimator` 和其他内容一起，已经为在 TensorFlow 中使用线性模型提供了一系列丰富的工具。这个文档将是对这些工具的一个综述。包括：
 
 * 什么是线性模型。
 * 为什么要使用线性模型。
@@ -9,7 +9,7 @@
 
 你可以通过这个综述知道 Estimator's 的线性模型工具是否对你有帮助。而后你可以在 @{$wide$Linear Models tutorial} 中尝试一下。这个综述的代码用例就来自于那个教程，但是教程会对代码有更详细的说明。
 
-为了更好的理解这个综述，你应该首先对机器学习的基本概念和 @{$get_started/premade_estimators$Estimators} 有所了解。
+为了更好的理解这个综述，你应该首先对机器学习的基本概念和 [Estimators](../../guide/premade_estimators.md) 有所了解。
 
 [TOC]
 
@@ -108,7 +108,7 @@ age_buckets = tf.feature_column.bucketized_column(
 
 `特征列` 为模型提供了一种输入数据规格，指明如何表示和转换数据。但是它们本身不提供数据。你需要通过一个输入函数提供数据。
 
-这个输入函数必须返还一个张量字典。其中的每一个键对应某个 `特征列` 的名字，键所对应的值是一个张量，包含所有数据实例在该特征下的值。想要更多地了解输入函数请看 @{$input_fn$Building Input Functions with tf.estimator}，一个输入函数的实现例子参见：[线性模型教程代码](https://github.com/tensorflow/models/tree/master/official/wide_deep/wide_deep.py)
+这个输入函数必须返还一个张量字典。其中的每一个键对应某个 `特征列` 的名字，键所对应的值是一个张量，包含所有数据实例在该特征下的值。想要更多地了解输入函数请看[预制 Estimators](../../guide/premade_estimators.md#input_fn)，一个输入函数的实现例子参见：[wide and deep learning tutorial](https://github.com/tensorflow/models/tree/master/official/wide_deep)
 
 输入函数在调用 `train()` 和 `evaluate()` 初始化训练和测试时被传进去，
 这将在下一部分说明。
@@ -154,4 +154,4 @@ e = tf.estimator.DNNLinearCombinedClassifier(
     dnn_feature_columns=deep_columns,
     dnn_hidden_units=[100, 50])
 ```
-更多信息，参见 @{$wide_and_deep$Wide and Deep Learning tutorial}.
+更多信息，参见 [wide and deep learning tutorial](https://github.com/tensorflow/models/tree/master/official/wide_deep)。
