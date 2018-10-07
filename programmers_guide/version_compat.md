@@ -4,24 +4,24 @@
 
 ## 语义化版本 2.0
 
-TensorFlow 的公共 API 沿袭自语义化版本 2.0（[semver](http://semver.org)）。 每个 TensorFlow 发布版本号都以 `MAJOR.MINOR.PATCH` 的形式命名（译注：“主版本.副版本.补丁版本”）。
-例如，TensorFlow 1.2.3 版本的 `MAJOR` 为 1，`MINOR` 为 2，`PATCH` 为 3。每个版本号的更改具有以下含义：
+TensorFlow 的公共 API 沿袭自语义化版本 2.0（[semver](http://semver.org)）。 每个 TensorFlow 发布版本号都以 `MAJOR.MINOR.PATCH` 的形式命名（译注：“主版本.副版本.补丁版本”）。例如，TensorFlow 1.2.3 版本的 `MAJOR` 为 1，`MINOR` 为 2，`PATCH` 为 3。每个版本号的更改具有以下含义：
 
 * **MAJOR**： 更改可能不具有向后兼容性。之前发布的版本中所运行的代码和数据在新版本中用不上了。然而，有些情况下现有的 TensorFlow 图和检验点最好可以迁移到新版本。查看 [Compatibility of graphs and checkpoints](#compatibility_of_graphs_and_checkpoints) 以获取数据兼容性的细节。
 
 * **MINOR**：向后兼容特性和速度的改善等。之前发布的版本中所运行的代码和数据仅依赖于公共 API，它们将不加改动地继续运行。如果想查阅公共 API 和非公共 API 的细节信息，请移步 [What is covered](#what_is_covered)。
 
-* **PATCH**：向后兼容性bug的修复。
+* **PATCH**：向后兼容性 bug 的修复。
 
 例如 1.0.0 发布版本基于 0.12.1 发布版本引入了不具有向后兼容性的改动。然而，1.1.1 发布版本则向后兼容 1.0.0 发布版本。
 
 ## 涉及的内容
 
-TensorFlow 中只有公共 APIs 在副版本和补丁版本之间兼容。公共 APIs 由以下几部分组成：
+TensorFlow 中只有公共 API 在副版本和补丁版本之间兼容。公共 API 由以下几部分组成：
 
 * `tensorflow`模块及其子模块中记录在册的全部 [Python](../api_docs/python) 函数和类，除了：
-    * `tf.contrib` 中的函数和类；
-    * 以 `_` 开头命名的函数和类（因为它们是私有的）。
+    * `tf.contrib` 中的函数和类
+    * 以 `_` 开头命名的函数和类（因为它们是私有的）
+    * 名称以 `experimental` 开头的函数、参数、属性和类，或者限定名称必须包含 `experimental` 的模块
   请注意 `examples/` 和 `tools/` 路径下的代码无法通过 `tensorflow` 的 Python 模块访问，因此无法保证其兼容性。
 
   如果某个符号可以被 `tensorflow` 模块及其子模块调用但没有被记录在册，它被认为不属于公共 API 的一部分。
@@ -45,20 +45,20 @@ TensorFlow 中只有公共 APIs 在副版本和补丁版本之间兼容。公共
 
 某些 API 函数被显式标记为“实验性”，它们可以在不同副版本之间进行非兼容性改动，包括：
 
-* **实验性的 APIs**：Python 中的 @{tf.contrib} 模块及其子模块、C API 中的全部函数，以及 protocol buffers 中标记为实验性的字段。尤其是某个 protocol buffer 中被叫做“实验性”的域，其内的全部字段和子消息可以随时改动。
+* **实验性的 APIs**：Python 中的 `tf.contrib` 块及其子模块、C API 中的全部函数，以及 protocol buffers 中标记为实验性的字段。尤其是某个 protocol buffer 中被叫做“实验性”的域，其内的全部字段和子消息可以随时改动。
 
 * **其他语言**：除 Python 和 C 外的其他语言编写的 TensorFlow APIs，这些语言包括：
 
-  - @{$cc/guide$C++} (在头文件 
-    [`tensorflow/cc`](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/cc) 中公开)。
-  - [Java](../api_docs/java/reference/org/tensorflow/package-summary)，
+  - [C++](../api_guides/cc/guide.md)（通过头文件 [`tensorflow/cc`](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/cc) 公开）
+  - [Java](../api_docs/java/reference/org/tensorflow/package-summary)
   - [Go](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go)
+  - [JavaScript](https://js.tensorflow.org)
 
 * **组合操作的细节**：许多 Python 中的公共函数扩展为图中的若干原语，这些细节将会是任何以 `GraphDef` 形式保存到磁盘中的图的一部分。这些细节可能在副版本之间发生改动。 特别地，即使图的行为并未发生变化且存在将要运行的检验点，回归测试也可能跨副版本以检测各图之间的严格适配性。
 
 * **浮点数细节**：操作数计算所得的具体浮点数随时可能发生改变。使用者应该仅依赖于浮点数的大约的精度特性和数值稳定性，而不是具体的按位计算。在副版本或在补丁版本中改变数值计算公式应得到同样或更高的精度。额外说明一下，在机器学习中，提高特定公式的精度可能会使整体系统精度下降。
 
-* **随机数**：由 @{$python/constant_op#Random_Tensors$random ops} 计算所得的具体随机数随时可能发生改变。使用者应该仅依赖于随机数的大约的分布精确性和统计强度，而不是具体的按位计算。然而我们很少甚至绝不在补丁版本中改变随机数位，当然，相关文档会发生改变。
+* **随机数**：由 [random ops](../api_guides/python/constant_op.md#Random_Tensors) 计算所得的具体随机数随时可能发生改变。使用者应该仅依赖于随机数的大约的分布精确性和统计强度，而不是具体的按位计算。然而我们很少甚至绝不在补丁版本中改变随机数位，当然，相关文档会发生改变。
 
 * **分布式 Tensorflow 中的版本偏差**： 不支持在同一个群集中运行两种不同的 TensorFlow 版本。多从机通信有线协议不会保证向后兼容性。
 
@@ -68,8 +68,7 @@ TensorFlow 中只有公共 APIs 在副版本和补丁版本之间兼容。公共
 
 ## 图和检验点的兼容性
 
-有时你需要保留图形和检验点。
-图形描述训练期间将被执行的操作的数据流和训练结果，检验点包含图中已保存的变量的张量值。
+有时你需要保留图形和检验点。图形描述训练期间将被执行的操作的数据流和训练结果，检验点包含图中已保存的变量的张量值。
 
 许多 TensorFlow 使用者将图和训练好的模型保存到磁盘以期为后续评估或另外的训练所使用，最终却在后续发布版本中运行它们。遵从语义版本的约定，TensorFlow 生成的任何图或检验点能够被后续相同主版本号的 TensorFlow 加载和评估。然而，如果可能的话，我们甚至会在不同主版本号之间尽力保留向后兼容性，以使序列化文件能够长期使用。
 
@@ -91,6 +90,8 @@ TensorFlow 中只有公共 APIs 在副版本和补丁版本之间兼容。公共
 ## 扩展 TensorFlow 时的图和检验点兼容性
 
 只有 `GraphDef` 格式产生不兼容的更改时，本节内容才具有相关性。这些更改包括添加操作、移除操作以及更改现有操作的功能。对于多数使用者，前面几节已经足够。
+
+<a id="backward_forward"/>
 
 ### 向后兼容性和部分向前兼容性
 
@@ -134,8 +135,8 @@ versions`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/
 
 遵循下面的指导，只有 ops 集合未修改的情况下，才能给出前向兼容性：
 
-1. 如果需要向前兼容，请将 `strip_default_attrs` 设置为 `True`。在导出模型时，使用 @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph_and_variables$`add_meta_graph_and_variables`} 和 @{tf.saved_model.builder.SavedModelBuilder.add_meta_graph$`add_meta_graph`} 方法的 `SavedModelBuilder` 类，或者是 @{tf.estimator.Estimator.export_savedmodel$`Estimator.export_savedmodel`}。
-2. 这将在生成/导出模型时去掉默认值属性。这确保在使用默认值时导出的 @{tf.MetaGraphDef} 不包含新的 op 属性。
+1. 如果需要向前兼容，请将 `strip_default_attrs` 设置为 `True`。在导出模型时，使用 `tf.saved_model.builder.SavedModelBuilder.add_meta_graph_and_variables` 和 `tf.saved_model.builder.SavedModelBuilder.add_meta_graph` 方法的 `SavedModelBuilder` 类，或者是 `tf.estimator.Estimator.export_savedmodel`。
+2. 这将在生成/导出模型时去掉默认值属性。这确保在使用默认值时导出的 `tf.MetaGraphDef` 不包含新的 op 属性。
 3. 使用此控件可以允许过时的消费者（例如，提供落后于训练二进制文件的二进制文件）继续加载模型并防止模型服务中心的中断。
 
 ### GraphDef 版本更迭
@@ -161,7 +162,7 @@ versions`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/
 
 #### 更改某个操作的功能
 
-1. 增加一个新的名为 `SomethingV2` 或 similer 的相似操作，并经历添加且使现有 Python 包装器转而使用它的过程，如果希望保持向前兼容性，这将花费三周。
+1. 增加一个新的名为 `SomethingV2` 或 similer 的相似操作，并经历添加且使现有 Python 包装器转而使用它的过程。要确保向前兼容性，请在更改 Python 包装时进行 [compat.py](https://www.tensorflow.org/code/tensorflow/python/compat/compat.py) 中建议的检查。
 2. 移除旧操作（由于要保持向后兼容性，只能改变主版本号）。
 3. 递增 `min_consumer` 以使消费者无法使用旧操作，将旧操作以别名 `SomethingV2` 添加回去，并经历添加且使现有 Python 包装器转而使用它的过程。
 4. 经历移除 `SomethingV2` 的过程。
