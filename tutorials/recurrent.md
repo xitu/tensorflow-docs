@@ -2,7 +2,7 @@
 
 ## 介绍
 
-[这篇文章](https://colah.github.io/posts/2015-08-Understanding-LSTMs)详细介绍了循环神经网络(RNN)以及 LSTM 的介绍。
+[理解 LSTM Networks](https://colah.github.io/posts/2015-08-Understanding-LSTMs/){:.external} 详细介绍了循环神经网络(RNN)以及 LSTM 的介绍。
 
 ## 语言模型
 
@@ -53,9 +53,7 @@ batch_size = 2, time_steps = 5
 words_in_dataset = tf.placeholder(tf.float32, [time_steps, batch_size, num_features])
 lstm = tf.contrib.rnn.BasicLSTMCell(lstm_size)
 # 初始化 LSTM 存储状态。
-hidden_state = tf.zeros([batch_size, lstm.state_size])
-current_state = tf.zeros([batch_size, lstm.state_size])
-state = hidden_state, current_state
+state = lstm.zero_state(batch_size, dtype=tf.float32)
 probabilities = []
 loss = 0.0
 for current_batch_of_words in words_in_dataset:
@@ -80,7 +78,7 @@ words = tf.placeholder(tf.int32, [batch_size, num_steps])
 
 lstm = tf.contrib.rnn.BasicLSTMCell(lstm_size)
 # 初始化 LSTM 存储状态。
-initial_state = state = tf.zeros([batch_size, lstm.state_size])
+initial_state = state = lstm.zero_state(batch_size, dtype=tf.float32)
 
 for i in range(num_steps):
     # 每处理一批词语后更新状态值。
@@ -107,7 +105,7 @@ for current_batch_of_words in words_in_dataset:
 
 ### 输入
 
-在输入 LSTM 前，词语 ID 被嵌入到了一个密集的表示中(查看@{$word2vec$Vector Representations Tutorial})。这种方式允许模型高效地表示词语，也便于写代码：
+在输入 LSTM 前，词语 ID 被嵌入到了一个密集的表示中（查看[特征表示教程](../../tutorials/representation/word2vec.md)）。这种方式允许模型高效地表示词语，也便于写代码：
 
 ```python
 # embedding_matrix 是一个形状张量 [vocabulary_size, embedding size]
