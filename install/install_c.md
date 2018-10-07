@@ -13,12 +13,12 @@ TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/
 
 请按照以下步骤安装 TensorFlow C 语言库并启用 TensorFlow C 语言版：
 
-  1.确定你是只在 CPU(s) 上运行 TensorFlow C 语言版，还是在 GPU(s) 的协助下运行。如果无法确定，请在以下指南中阅读“决定安装哪个 TensorFlow”一节：
+1. 确定你是只在 CPU(s) 上运行 TensorFlow C 语言版，还是在 GPU(s) 的协助下运行。如果无法确定，请在以下指南中阅读“决定安装哪个 TensorFlow”一节：
 
- * [在 Ubuntu 上安装 TensorFlow](./install_linux.md)
- * [在 macOS 上安装 TensorFlow](./install_mac.md)
+  *  [在 Ubuntu 上安装 TensorFlow](./install_linux.md#determine_which_tensorflow_to_install)
+  *  [在 macOS 上安装 TensorFlow](./install_mac.md#determine_which_tensorflow_to_install)
 
-  2.通过调用下面的 shell 命令，下载并且解压 TensorFlow 的 C 语言库到 `/usr/local/lib`：
+2. 通过调用下面的 shell 命令，下载并且解压 TensorFlow 的 C 语言库到 `/usr/local/lib`：
   
          TF_TYPE="cpu" # Change to "gpu" for GPU support
          OS="linux" # Change to "darwin" for macOS
