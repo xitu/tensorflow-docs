@@ -1,4 +1,4 @@
-# 张量
+# 张量（Tensors）
 
 顾名思义，TensorFlow 是一个定义和运行张量计算的框架。**张量**是各种维度的向量和矩阵的统称。在内部，TensorFlow 用基本数据类型的多维数组来表示张量。
 
@@ -9,10 +9,9 @@
  * 一种数据类型（比如`float32`，`int32`， 或者是 `string`）
  * 一个形状
 
-
 张量中的每个元素有着相同的数据类型，并且是已知的。而张量的形状（也就是维度的数量和各个维度的大小）可能是部分已知。如果其输入形状是完全已知的，那么大部分操作会产生已知形状的张量，但有些时候只有在计算图执行时才能确定张量的形状。
 
-有些张量的类型比较特殊，会在其他的开发者指南单元中有所说明，主要有以下几种：
+有些张量的类型比较特殊，会在其他的 TensorFlow 指南章节中有所说明，主要有以下几种：
 
   * `tf.Variable`
   * `tf.constant`
@@ -133,7 +132,7 @@ TensorFlow 开发者指南中使用三种传统的表示方法来描述向量的
 | 3    | [维度 0, 维度 1, 维度 2]        | 3 维 | 一个形为 [1, 4, 3] 的 3-D 张量。          |
 | n    | [维度 0, 维度 1, ... 维度 n-1] | n 维 | 形为 [维度 0, 维度 1, ... 维度 n-1] 的张量。 |
 
-形状可以通过 Python int 类型的列表或者是元组来表示，或者是 @{tf.TensorShape}。
+形状可以通过 Python int 类型的列表或者是元组来表示，或者是 `tf.TensorShape`。
 
 ### 获取 `tf.Tensor` 对象的形状
 
@@ -171,7 +170,7 @@ yet_another = tf.reshape(matrixAlt, [13, 2, -1])  # 错误
 
 ## 数据类型
 
-除了维度以外，张量还有一个数据类型的属性。你可以通过参考开发者指南中的 `tf.DataType` 页面来了解所有的数据类型。
+除了维度以外，张量还有一个数据类型的属性。关于所有数据类型的完整列表，请参阅 `tf.DType` 页面。
 
 `tf.Tensor` 对象只能有一种数据类型。但是，可以将任意数据结构作为字符串序列化并将其存储在 `tf.Tensor` 对象中。
 
@@ -198,7 +197,7 @@ To inspect a `tf.Tensor`'s data type use the `Tensor.dtype` property.
 ```python
 constant = tf.constant([1, 2, 3])
 tensor = constant * constant
-print tensor.eval()
+print(tensor.eval())
 ```
 
 `eval` 方法只有当启用一个默认的 `tf.Session` 才能正常工作（你可以查看 Graphs 和 Sessions 开发者指南来了解更多）。
@@ -220,13 +219,13 @@ t.eval(feed_dict={p:2.0})  # 这就能够成功，因为我们通过 feed_dict �
 
 ## 打印张量
 
-你可能需要在调试的时候打印一个 `tf.Tensor` 对象的值。尽管 @{$debugger$tfdbg} 提供了非常高级的调试支持，但 TensorFlow 依旧有着一些可以直接打印 `tf.Tensor` 值的操作。
+你可能需要在调试的时候打印一个 `tf.Tensor` 对象的值。尽管 [tfdbg](../guide/debugger.md) 提供了非常高级的调试支持，但 TensorFlow 依旧有着一些可以直接打印 `tf.Tensor` 值的操作。
 
 注意，你可别用下面的这种方式打印 `tf.Tensor` ：
 
 ``` python
-t = <<某些 TensorFlow 操作>>
-print t  # 当计算图构建完成后，将会打印出这个张量
+t = <<some tensorflow operation>>
+print(t) # 当计算图构建完成后，将会打印出这个张量
          # 这个张量在这种情况下没有值
 ```
 
