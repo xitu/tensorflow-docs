@@ -24,8 +24,8 @@
   
 * **支持 GPU 的 TensorFlow**。TensorFlow 程序在 GPU 上运行会明显比在 CPU 上快。因此，如果你的系统有 NVIDIA 的 GPU，同时你需要运行对性能要求苛刻的程序时，你就需要安装这个版本的 TensorFlow，不仅需要 NVIDIA 的 GPU，你的系统还需要满足 NVIDIA 软件的要求，具体描述参考以下文档：
 
-    *   [在 Ubuntu 上安装 TensorFlow](./install_linux.md)
-    *   [在 macOS 上安装 TensorFlow](./install_mac)
+    *   [在 Ubuntu 上安装 TensorFlow](./install_linux.md#NVIDIARequirements)
+    *   [在 macOS 上安装 TensorFlow](./install_mac#NVIDIARequirements)
 
 ## 克隆 TensorFlow 仓库
 
