@@ -1,6 +1,6 @@
 # 使用特定的核方法改善线性模型
 
-注意：这篇文档使用的是已经被弃用了的 @{tf.estimator} 版本，具有 @{tf.contrib.learn.Estimator$different interface}。它还使用了 `contrib` 方法的 @{$version_compat#not_covered$API may not be stable}
+注意：这篇文档使用的是已经被弃用了的 `tf.estimator`，`tf.contrib.learn.Estimator`，他们的界面是不同的。它还使用了 `contrib` 方法的[可能不稳定的 API](../../guide/version_compat.md#not_covered)。
 
 在这篇教程里，我们将示范如何把特定核方法和线性模型结合起来在不明显增加训练和推理时间的情况下大幅度提升预测质量。与多核方法不同，特定核心方法对训练数据集的大小具有很好的可扩展性，不管是在训练和推理时间上还是在内存占用上。
 
@@ -12,7 +12,7 @@
 
 目前，TensorFlow 只支持对于密集特征的特定核映射。对于稀疏特征的支持将在后面的发布版本中提供。
 
-本教程使用 [tf.contrib.learn](https://www.tensorflow.org/code/tensorflow/contrib/learn/python/learn)（TensorFlow 机器学习高级接口）估测器作为我们的机器学习模型。如果你对这份 API 不熟悉，可以参考[tf.estimator Quickstart](https://www.tensorflow.org/get_started/estimator)。我们将使用 MNIST 数据集。本教程包含以下步骤：
+本教程使用 [tf.contrib.learn](https://www.tensorflow.org/code/tensorflow/contrib/learn/python/learn)（TensorFlow 机器学习高级接口）估测器作为我们的机器学习模型。如果你对这份 API 不熟悉，可以参考 [Estimator guide](../../guide/estimators.md)。我们将使用 MNIST 数据集。本教程包含以下步骤：
 
 * 为分类下载和准备 MNIST 数据。
 * 构建一个简单的线性模型，训练并在评估数据上评估。
@@ -28,7 +28,7 @@ data = tf.contrib.learn.datasets.mnist.load_mnist()
 
 上面的方法下载了整个 MNIST 数据集（包含 70K 的样本），并分成大小分别为 55K, 5K 和 10K 的训练，验证和测试集。每次分割包含一个 numpy 图像数组（维度大小为 [样本大小, 784]）和一个 numpy 标签数组（shape 为 [样本大小, 1])。在本教程中，我们仅使用训练和验证集来分别训练和验证我们的模型。
 
-为了将数据输入给 `tf.contrib.learn.Estimator`，将其转换为一个张量是很有必要的。为此，我们需要使用一个`输入函数`，将运算符添加至 TensorFlow 的计算图中。当计算图执行时，将张量的一个小批量创建为下游使用的数据。更多关于输入函数的背景，请查看 @{$get_started/premade_estimators#create_input_functions$this section on input functions}。在本例中，我们将使用 `tf.train.shuffle_batch` 运算符，它除了会将 numpy 数组转换为张量外，还允许我们指定 `batch_size` 以及是否每次都需要将输入数据随机化（随机化通常会加速训练的收敛）。下面是加载和准备数据的完整代码。在这个代码片段中，我们使用了 356 大小的小批量数据作为训练输入，以及整（5K）个样本用于评估。你也可以自行设置数据批量的大小
+为了将数据输入给 `tf.contrib.learn.Estimator`，将其转换为一个张量是很有必要的。为此，我们需要使用一个`输入函数`，将运算符添加至 TensorFlow 的计算图中。当计算图执行时，将张量的一个小批量创建为下游使用的数据。更多关于输入函数的背景，请查看[这一节的输出函数介绍](../../guide/premade_estimators.md#create_input_functions)。在本例中，我们将使用 `tf.train.shuffle_batch` 运算符，它除了会将 numpy 数组转换为张量外，还允许我们指定 `batch_size` 以及是否每次都需要将输入数据随机化（随机化通常会加速训练的收敛）。下面是加载和准备数据的完整代码。在这个代码片段中，我们使用了 356 大小的小批量数据作为训练输入，以及整（5K）个样本用于评估。你也可以自行设置数据批量的大小
 
 ```python
 import numpy as np
@@ -58,7 +58,7 @@ eval_input_fn = get_input_fn(data.validation, batch_size=5000)
 
 ## 训练一个简单的线性模型
 
-现在我们可以使用 MNIST 数据集训练一个线性模型。我们将使用 @{tf.contrib.learn.LinearClassifier}估测器，10 个分类分别用 0-9 表示。输入特征组成一个 784 维的密集向量，可以通过如下方式指定：
+现在我们可以使用 MNIST 数据集训练一个线性模型。我们将使用 `tf.contrib.learn.LinearClassifier` 估测器，10 个分类分别用 0-9 表示。输入特征组成一个 784 维的密集向量，可以通过如下方式指定：
 
 ```python
 image_column = tf.contrib.layers.real_valued_column('images', dimension=784)
@@ -135,7 +135,7 @@ $$
 
 ### 核分类器
 
-@{tf.contrib.kernel_methods.KernelLinearClassifier} 是一个预先打包的 `tf.contrib.learn` 估测器，结合了线性模型和特定核映射的优点。它的构造器几乎与可配置核映射的线性分类估测器相同。下面的代码演示如何使用线性核分类器替换线性分类器。
+`tf.contrib.kernel_methods.KernelLinearClassifier` 是一个预先打包的 `tf.contrib.learn` 估测器，结合了线性模型和特定核映射的优点。它的构造器几乎与可配置核映射的线性分类估测器相同。下面的代码演示如何使用线性核分类器替换线性分类器。
 
 ```python
 
