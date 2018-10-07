@@ -4,8 +4,7 @@ TensorBoard 直方图面板其实是在 TensorFlow 图表上显示 `Tensor` 的�
 
 ## 一个简单的例子
 
-一起看看一个简单例子：一个随时间变化的常分布的变量
-TensorFlow 的 [`tf.random_normal`](https://www.tensorflow.org/api_docs/python/tf/random_normal) 单元非常适用于这类问题。通常在 TensorBoard 里我们会先用一个 ['tf.summary.histogram'](https://www.tensorflow.org/api_docs/python/tf/summary/histogram) 单元来总结数据。如果想了解此总结单元的运行机制，请看 [TensorBoard 教程](https://www.tensorflow.org/get_started/summaries_and_tensorboard)。
+一起看看一个简单例子：一个随时间变化的常分布的变量 TensorFlow 的 [`tf.random_normal`](https://www.tensorflow.org/api_docs/python/tf/random_normal) 单元非常适用于这类问题。通常在 TensorBoard 里我们会先用一个 ['tf.summary.histogram'](https://www.tensorflow.org/api_docs/python/tf/summary/histogram) 单元来总结数据。如果想了解此总结单元的运行机制，请看 [TensorBoard 教程](./summaries_and_tensorboard.md)。
 
 这里是段能生成直方图总结的代码，这类总结含有常分布数据而且其平均值随时间增加而增加。
 
@@ -34,7 +33,6 @@ for step in range(N):
 ```
 
 一旦下面代码运行，我们可以用命令行将数据导入到 TensorBoard：
-
 
 ```sh
 tensorboard --logdir=/tmp/histogram_example
@@ -173,18 +171,23 @@ for step in range(N):
   summ = sess.run(summaries, feed_dict={k: k_val})
   writer.add_summary(summ, global_step=step)
 ```
+
 ### 伽马分布
+
 ![](https://www.tensorflow.org/images/tensorboard/histogram_dashboard/8_gamma.png)
 
 ### 均匀分布
+
 ![](https://www.tensorflow.org/images/tensorboard/histogram_dashboard/9_uniform.png)
 
 ### 泊松分布
+
 ![](https://www.tensorflow.org/images/tensorboard/histogram_dashboard/10_poisson.png)
+
 泊松分布的定义基于整数。因此，所有得出的值都是整数。直方图的压缩把数据移到浮点区间里，导致视觉上看到的是小突起而不是完美的高峰。
 
 ### 总结
+
 最后，我们可以把数据连接到一个形状奇特的曲线图。
 
 ![](https://www.tensorflow.org/images/tensorboard/histogram_dashboard/11_all_combined.png)
-
