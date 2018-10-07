@@ -1,4 +1,4 @@
-# 在 macOS 中安装 TensorFlow
+# 在 macOS 上安装 TensorFlow
 
 本指南介绍如何在 macOS 上安装 TensorFlow。虽然这些说明可能也适用于其他 macOS 版本，但我们只在满足以下要求的计算机上对这些说明中的内容进行过测试（并提供相关支持）：
 
@@ -77,7 +77,7 @@
 
      <pre>
      $ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0-py3-none-any.whl</b> </pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.10.0-py3-none-any.whl</b> </pre>
 
 如果你遇到了任何安装问题，请查看[常见安装问题](#常见安装问题).
 
@@ -170,7 +170,7 @@ $ <b>sudo easy_install --upgrade six</b> </pre>
 
      <pre>
      $ <b>pip3 install --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0-py3-none-any.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.10.0-py3-none-any.whl</b></pre>
 
 ### 下一步
 
@@ -247,7 +247,7 @@ Docker 会在第一次启动容器时下载对应的镜像。
      其中 <i>TF_PYTHON_URL</i>  是 [TensorFlow Python 包的 URL](#the_url_of_the_tensorflow_python_package)。例如，如下命令安装了仅支持 CPU 的 Python 2.7 版本下的 TensorFlow：
 
      <pre>(<i>targetDirectory</i>)$ <b>pip install --ignore-installed --upgrade \
-     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0-py2-none-any.whl</b></pre>
+     https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.10.0-py2-none-any.whl</b></pre>
 
 <a name="ValidateYourInstallation"></a>
 ## 验证安装
@@ -291,12 +291,7 @@ print(sess.run(hello))
 
 如果安装过程出现了错误，请看[常见安装问题](#常见安装问题)
 
-如果你是机器学习的新手，我们推荐以下内容：
-
-*  [机器学习速成课程](https://developers.google.com/machine-learning/crash-course)
-*  @{$get_started/get_started_for_beginners$Getting Started for ML Beginners}
-
-如果你有机器学习的经验，但刚刚接触 TensorFlow 请看 @{$get_started/premade_estimators$Getting Started with TensorFlow}。
+学习更多内容，请到 [TensorFlow 教程](../tutorials/)。
 
 ## 常见安装问题
 
@@ -396,11 +391,11 @@ RuntimeError: Broken toolchain: cannot link a simple C program</pre>
 ### Python 2.7
 
 <pre>
-https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0-py2-none-any.whl
+https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.10.0-py2-none-any.whl
 </pre>
 
 ### Python 3.4、3.5 或 3.6
 
 <pre>
-https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.8.0-py3-none-any.whl
+https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.10.0-py3-none-any.whl
 </pre>
