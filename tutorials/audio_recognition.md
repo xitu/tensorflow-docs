@@ -14,7 +14,7 @@
 python tensorflow/examples/speech_commands/train.py
 ```
 
-这个代码会先下载 [Speech Commands dataset](https://storage.cloud.google.com/download.tensorflow.org/data/speech_commands_v0.01.tar.gz)，这个数据集包含了 65,000 个 WAVE 声音文件，内容是人们说三十个不同词语的录音。这个数据集由谷歌收集并遵循知识共享协议发布，你能够通过[贡献你的五分钟语音项目](https://aiyprojects.withgoogle.com/open_speech_recording)来改进这个数据集。这个文件大小超过 1 GB，所以下载过程会花费一些时间，但为了防止出错，你也要不时查看一下运行日志。一旦下载完成，之后就不需要再做这一步了。
+这个代码会先下载 [Speech Commands dataset](https://storage.cloud.google.com/download.tensorflow.org/data/speech_commands_v0.02.tar.gz)，这个数据集包含了 105,000 个 WAVE 声音文件，内容是人们说三十个不同词语的录音。这个数据集由谷歌收集并遵循知识共享协议发布，你能够通过[贡献你的五分钟语音项目](https://aiyprojects.withgoogle.com/open_speech_recording)来改进这个数据集。这个文件大小超过 2 GB，所以下载过程会花费一些时间，但为了防止出错，你也要不时查看一下运行日志。一旦下载完成，之后就不需要再做这一步了。你可以在 [Speech Commands paper](https://arxiv.org/abs/1804.03209) 中找到有关此数据集的更多信息。
 
 下载完成后，你会看到如下的日志信息：
 
@@ -147,7 +147,7 @@ _unknown_ (score = 0.03808)
 ```
 bazel run tensorflow/examples/wav_to_spectrogram:wav_to_spectrogram -- \
 --input_wav=/tmp/speech_dataset/happy/ab00c4b2_nohash_0.wav \
---output_png=/tmp/spectrogram.png
+--output_image=/tmp/spectrogram.png
 ```
 
 如果你打开 `/tmp/spectrogram.png` 你能够看到这样的图像：
@@ -199,7 +199,7 @@ bazel run tensorflow/examples/speech_commands:test_streaming_accuracy -- \
 
 ### 定制训练数据集
 
-这个脚本默认会下载 [Speech Commands dataset](https://download.tensorflow.org/data/speech_commands_v0.01.tgz)，但是你也能提供你自己的训练数据。要训练你自己的数据，你要确保你至少有几百份语音记录，而且每一份记录你都要做识别并把他们按文件夹分类。例如，如果你要识别狗叫的“汪汪叫”和猫叫的“喵喵喵”，你需要先创建一个叫`动物叫声`的根目录，然后在其中建立两个子文件夹`汪汪叫`和`喵喵喵`，然后把你的音频文件放入相应的文件夹。
+这个脚本默认会下载 [Speech Commands dataset](https://download.tensorflow.org/data/speech_commands_v0.02.tgz)，但是你也能提供你自己的训练数据。要训练你自己的数据，你要确保你至少有几百份语音记录，而且每一份记录你都要做识别并把他们按文件夹分类。例如，如果你要识别狗叫的“汪汪叫”和猫叫的“喵喵喵”，你需要先创建一个叫`动物叫声`的根目录，然后在其中建立两个子文件夹`汪汪叫`和`喵喵喵`，然后把你的音频文件放入相应的文件夹。
 
 要让脚本文件找到你的新语音文件，你需要设置 `--data_url=` 来停用下载,并用 `--data_dir=/your/data/folder/` 来寻找到你刚才创建的文件。
 
