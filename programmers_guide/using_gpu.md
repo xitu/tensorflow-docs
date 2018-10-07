@@ -117,7 +117,7 @@ print(sess.run(c))
 ```
 InvalidArgumentError: Invalid argument: Cannot assign a device to node 'b':
 Could not satisfy explicit device specification '/device:GPU:2'
-   [[Node: b = Const[dtype=DT_FLOAT, value=Tensor<type: float shape: [3,2]
+   [[{{node b}} = Const[dtype=DT_FLOAT, value=Tensor<type: float shape: [3,2]
    values: 1 2 3...>, _device="/device:GPU:2"]()]]
 ```
 
@@ -181,4 +181,4 @@ AddN: /job:localhost/replica:0/task:0/cpu:0
  [  98.  128.]]
 ```
 
-作为一个优秀示例，@{$deep_cnn$cifar10 tutorial} 演示了如何使用多个 GPU 进行训练。
+作为一个优秀示例，[cifar10 教程](../tutorials/images/deep_cnn.md) 演示了如何使用多个 GPU 进行训练。
