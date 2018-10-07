@@ -10,12 +10,11 @@
 
 对 Android 而言，你只需要链接一个叫做 `libandroid_tensorflow_inference_java.jar` 的 JAR 文件即可。有三种方式：
 
-1. 在 jcenter AAR 中引入，例如
- [这个应用](https://github.com/googlecodelabs/tensorflow-for-poets-2/blob/master/android/build.gradle#L59-L65)
+1. 在 jcenter AAR 中引入，例如 [这个应用](https://github.com/googlecodelabs/tensorflow-for-poets-2/blob/master/android/tfmobile/build.gradle#L59-L65)
 
 2. 从 [ci.tensorflow.org](http://ci.tensorflow.org/view/Nightly/job/nightly-android/lastSuccessfulBuild/artifact/out/) 中下载编译好的开发版本。
 
-3. 根据我们 [Android Github 仓库](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/android)的指示自行构建 JAR 文件。
+3. 根据我们 [Android GitHub 仓库](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/android)的指示自行构建 JAR 文件。
 
 ### iOS
 
@@ -59,7 +58,7 @@ TensorFlow 整个框架被设计得相当模块化，其中包含了大量的独
 
 虽然听起来很合理，但可惜的是自定义的全局对象没有被任何其他代码使用，而链接器又被设计成在没有使用时就会将其代码删除的形式，从而导致的结果就是：构造函数从未被调用，并且该类也没有被注册。在 TensorFlow 中，所有模块都使用了这种模式，而在代码运行时，`Session` 的实现中就首次检查了这个构造，这也是为什么这个问题会发生的原因。
 
-解决方法就是强制链接器在即使代码没有使用的情况下，也不忽略库中的任何代码。在 iOS 中，可以中 `-force_load` 标志并制定库的路径，而在 Linux 中，你需要使用 `--whole-archive` 。它们指导了链接器不要积极的对编译作出精简，而是保留使用 TensorFlow 时所需的全局变量。
+解决方法就是强制链接器在即使代码没有使用的情况下，也不忽略库中的任何代码。在 iOS 中，可以中 `-force_load` 标志并制定库的路径，而在 Linux 中，你需要使用 `--whole-archive`。它们指导了链接器不要积极的对编译作出精简，而是保留使用 TensorFlow 时所需的全局变量。
 
 不同形式 `REGISTER_*` 宏的实际实现在实践中相当复杂，但它们都有着相同的底层问题。如果你对它们的工作方式感兴趣，[op_kernel.h](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/op_kernel.h#L1091) 是一个研究的起点。
 
