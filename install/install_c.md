@@ -1,4 +1,4 @@
-# 安装适用于 C 的 TensorFlow
+# 安装 TensorFlow for C 语言
 
 TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/c/c_api.h) 中定义了一套 C 语言 API，用于[构建其它语言的封装](https://www.tensorflow.org/extend/language_bindings)。这套 API 除了使用方便外，还将保持易用性与一致性。
 
