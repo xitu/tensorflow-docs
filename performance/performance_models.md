@@ -4,7 +4,7 @@
 
 ## 输入管道
 
-@{$performance_guide$性能指南} 解释了如何识别可能的输入管道问题和最佳实践。我们发现像类似采用 [AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 训练 ImageNet 这种使用大量输入并每秒处理大量采样的场景下，采用 @{tf.FIFOQueue} 和 @{tf.train.queue_runner} 不能充分利用目前的 GPU 计算资源。这是因为底层实现采用的 Python 线程引入的额外开销太大导致的。
+[性能指南](../performance/performance_guide.md)解释了如何识别可能的输入管道问题和最佳实践。我们发现像类似采用 [AlexNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) 训练 ImageNet 这种使用大量输入并每秒处理大量采样的场景下，采用 `tf.FIFOQueue` 和 `tf.train.queue_runner` 不能充分利用目前的 GPU 计算资源。这是因为底层实现采用的 Python 线程引入的额外开销太大导致的。
 
 我们在[脚本](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks)中采用的另一种方式是采用 TensorFlow 原生的并行机制来构建的输入管道。我们的实现由3个阶段构成：
 
@@ -12,7 +12,7 @@
 *   图像处理： 将图像记录解码成图像，预处理并组织成 小批量（mini-batch）。
 *   CPU-to-GPU 数据转移：将图像从 CPU 转移到 GPU。
 
-每个阶段的关键步骤可以采用 `data_flow_ops.StagingArea` 和其他阶段并行执行。 `StagingArea` 是类似于 @{tf.FIFOQueue} 的队列操作。不同之处在于 `StagingArea` 不保证先进先出的顺序，但提供了能在 CPU 和 GPU 上并行执行其他阶段的简单功能。将输入管道拆分为能并行执行的3个阶段是可扩展的，能充分发挥大量多核环境的优势。本章节后续将详细阐述这三个阶段以及使用 `data_flow_ops.StagingArea` 的细节。
+每个阶段的关键步骤可以采用 `data_flow_ops.StagingArea` 和其他阶段并行执行。 `StagingArea` 是类似于 `tf.FIFOQueue` 的队列操作。不同之处在于 `StagingArea` 不保证先进先出的顺序，但提供了能在 CPU 和 GPU 上并行执行其他阶段的简单功能。将输入管道拆分为能并行执行的3个阶段是可扩展的，能充分发挥大量多核环境的优势。本章节后续将详细阐述这三个阶段以及使用 `data_flow_ops.StagingArea` 的细节。
 
 ### 并行 I/O 读取
 
@@ -26,7 +26,7 @@
 
 256 条记录被独立并行地读取和处理。它起始于图中 256 个独立的 `RecordInput` 读操作。每个读操作之后是独立并行执行的一系列相同的图像前置处理操作。图像预处理操作包括对于图像的解码、变形、大小缩放等操作。
 
-经过预处理之后，图像被连结成 8 个批量大小为 32 的张量。完成这一操作使用的是 @{tf.parallel_stack} ，不使用 @{tf.concat} 则是因为它被实现成了单一操作需要等待所有输入就绪才能完成连接。@{tf.parallel_stack} 分配了一个未初始化的张量作为输出， 每个输入张量就绪时就写入到输出张量的指定部分。
+经过预处理之后，图像被连结成 8 个批量大小为 32 的张量。完成这一操作使用的是 `tf.parallel_stack`，不使用 `tf.concat` 则是因为它被实现成了单一操作需要等待所有输入就绪才能完成连接。`tf.parallel_stack` 分配了一个未初始化的张量作为输出， 每个输入张量就绪时就写入到输出张量的指定部分。
 
 当所有输入张量完成后，输出张量在图中传递。这样有效地降低了生成所有输入张量带来的长尾内存延时。
 
@@ -40,7 +40,7 @@ TensorFlow 允许一个设备上的张量被任意其他设备直接使用。Ten
 
 ### 软件管道
 
-因为所有的阶段能被不同的处理器执行，`data_flow_ops.StagingArea` 是其中用于并行执行，是类似 @{tf.FIFOQueue} 一样的队列操作，提供了能被 CPU 和 GPU 执行的简单函数。在模型开始跑所有阶段之前，输入管道阶段被启动来将数据加载到运行时缓存中。每一个运行步骤在每个阶段开始前将从运行时缓存读取一段数据，并在最后写入一段数据
+因为所有的阶段能被不同的处理器执行，`data_flow_ops.StagingArea` 是其中用于并行执行，是类似 `tf.FIFOQueue` 一样的队列操作，提供了能被 CPU 和 GPU 执行的简单函数。在模型开始跑所有阶段之前，输入管道阶段被启动来将数据加载到运行时缓存中。每一个运行步骤在每个阶段开始前将从运行时缓存读取一段数据，并在最后写入一段数据
 
 比如，有 A、B、C 三个阶段。有两个运行区域： S1 和 S2。在启动时，我们运行：
 
@@ -76,7 +76,7 @@ TensorFlow 允许一个设备上的张量被任意其他设备直接使用。Ten
 
 ### 采用混合标准化
 
-TensorFlow 采用的默认标准化是采用复合操作。这是很常见的，但它经常导致性能下降。一个替代方案是采用混合标准化，这在 GPU 上经常拥有更好的性能。下面是一个采用 @{tf.contrib.layers.batch_norm} 来实现复合标准化的实例。
+TensorFlow 采用的默认标准化是采用复合操作。这是很常见的，但它经常导致性能下降。一个替代方案是采用混合标准化，这在 GPU 上经常拥有更好的性能。下面是一个采用 `tf.contrib.layers.batch_norm` 来实现复合标准化的实例。
 
 ```python
 bn = tf.contrib.layers.batch_norm(
@@ -159,7 +159,7 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 
 为了在同一主机的不同 GPU 间传递变量和聚合梯度，我们采用了默认的 TensorFlow 隐式复制机制。
 
-然而，我们也可以采用可选的 NCCL (@{tf.contrib.nccl}) 支持。NCCL 是一个能在不同 GPU 间高效传播和聚合数据的 NVIDIA® 库。它在每个 GPU 中安排一个协作内核来知道如何最好利用底层的硬件拓扑。这个内核使用了 GPU 的一个单一的 SM 。
+然而，我们也可以采用可选的 NCCL（`tf.contrib.nccl`）支持。NCCL 是一个能在不同 GPU 间高效传播和聚合数据的 NVIDIA® 库。它在每个 GPU 中安排一个协作内核来知道如何最好利用底层的硬件拓扑。这个内核使用了 GPU 的一个单一的 SM 。
 
 在我们的实验中，我们展示了虽然 NCCL 经常自身能带来更快的数据聚合，它并不能带来更快的训练效果。我们假设隐式复制是无成本的，既然他们由 GPU 的复制引擎完成，并且它的延时能被主计算过程隐藏。虽然 NCCL 能更快地传输数据，它只使用了一个 SM，并且给依赖的 L2 缓存带来了更大的压力。我们的结果显示对于 8 个 GPU 来说，NCCL 经常能带来更好的性能。然而，对于更少的 GPU 来说，隐式复制反而表现更加出色。
 
@@ -171,7 +171,7 @@ TensorFlow 模型管理训练变量的最常用方式是参数服务器模式。
 
 ## 执行脚本
 
-这一部分将列出核心的命令行参数和主要脚本([tf_cnn_benchmarks.py](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks/tf_cnn_benchmarks.py))的一些基本用法示例。
+这一部分将列出核心的命令行参数和主要脚本（[tf_cnn_benchmarks.py](https://github.com/tensorflow/benchmarks/tree/master/scripts/tf_cnn_benchmarks/tf_cnn_benchmarks.py)）的一些基本用法示例。
 
 > 说明： `tf_cnn_benchmarks.py` 采用 TensorFlow 1.1 后引入的 `force_gpu_compatible` 配置。直到 TensorFlow 1.2 之后，才建议从源码进行编译。
 
@@ -214,7 +214,7 @@ python tf_cnn_benchmarks.py --local_parameter_device=gpu --num_gpus=8 \
 
 #### 分布式示例
 
-以下是在 2 台主机上训练 ResNet-50的示例，主机分别为： host_0 (10.0.0.1) 和 host_1 (10.0.0.2)。这个示例采用了人造数据。可以传入 `--data_dir` 参数来使用真实数据。
+以下是在 2 台主机上训练 ResNet-50的示例，主机分别为：host_0 (10.0.0.1) 和 host_1 (10.0.0.2)。这个示例采用了人造数据。可以传入 `--data_dir` 参数来使用真实数据。
 
 ```bash
 # 在 host_0 (10.0.0.1) 上运行以下命令:
