@@ -5,7 +5,7 @@
 ## 何为广播？
 
 
-广播是使不同形状的数组具有用于算术运算的兼容形状的过程。这个术语来自于 Numpy [(广播)](http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html)。
+广播是使不同形状的数组具有用于算术运算的兼容形状的过程。这个术语来自于 Numpy[（广播）](http://docs.scipy.org/doc/numpy/user/basics.broadcasting.html)。
 
 广播在一些操作中可能会用到，比如不同阶的多维数组之间的操作，或者在具有不同但兼容的形状的多维数组之间的操作。以加法 `X+v` 为例，这里 `X` 是一个矩阵（2 阶数组），`v` 是一个矢量（1 阶数组）。为执行逐个元素的加法，XLA 需要将矢量 `v` "广播" 为和 `X` 一样的秩，即将 `v` 复制多次。此矢量的长度必须至少与矩阵的某一维度相同。
 
@@ -59,7 +59,7 @@ XLA 语言尽可能严格和明确，避免了隐含的和“不可思议的”�
 
 广播维度可以是一个元组，用于描述秩更小的形状如何广播为一个更大秩的形状。比如，给定一个 2x3x4 的方阵和一个 3x4 矩阵，广播元组 (1,2) 表示让矩阵的维度匹配到方阵的第 1 维和第 2 维。
 
-这种广播类型用于 `ComputationBuilder` 中的二元操作，使用时需要指定 `broadcast_dimensions` 参数。比如，参见源码 [ComputationBuilder::Add](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/computation_builder.cc)。在 XLA 源码中，这种广播类型有时候称为 "InDim" 广播。
+这种广播类型用于 `XlaBuilder` 中的二元操作，使用时需要指定 `broadcast_dimensions` 参数。比如，参见源码 [XlaBuilder::Add](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.cc)。在 XLA 源码中，这种广播类型有时候称为 "InDim" 广播。
 
 ### 正式定义
 
