@@ -6,8 +6,8 @@ TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/
 
 本指南解释了如何安装 TensorFlow C 语言版。尽管本指南也可能适用于其它的安装环境，但我们仅测试（也仅确保）了本指南在以下环境机器中的适用性：
 
- * Linux, 64-bit, x86
- * macOS X, Version 10.12.6 (Sierra) 或更高版本
+  * Linux, 64-bit, x86
+  * macOS X, Version 10.12.6 (Sierra) 或更高版本
 
 ## 安装
 
@@ -15,8 +15,8 @@ TensorFlow 在 [`c_api.h`](https://github.com/tensorflow/tensorflow/blob/master/
 
   1.确定你是只在 CPU(s) 上运行 TensorFlow C 语言版，还是在 GPU(s) 的协助下运行。如果无法确定，请在以下指南中阅读“决定安装哪个 TensorFlow”一节：
 
- * @{$install_linux#determine_which_tensorflow_to_install$Installing TensorFlow on Linux}
- * @{$install_mac#determine_which_tensorflow_to_install$Installing TensorFlow on macOS}
+ * [在 Ubuntu 上安装 TensorFlow](./install_linux.md)
+ * [在 macOS 上安装 TensorFlow](./install_mac.md)
 
   2.通过调用下面的 shell 命令，下载并且解压 TensorFlow 的 C 语言库到 `/usr/local/lib`：
   
