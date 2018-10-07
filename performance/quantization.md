@@ -8,7 +8,6 @@
 
 ## 量化的优势
 
-
 使用 8 位定点量化表示的计算可以加速模型的运行速度，同时也能降低功耗。这点对于无法高效运行浮点计算的移动设备和嵌入式应用是非常有用的。比如物联网（IoT）和机器人设备。此外，在后端扩展这种支持、研究更低精度的神经网络还有很多机遇。
 
 ### 更小的文件大小 {: .hide-from-toc}
@@ -60,7 +59,7 @@ optimizer.minimize(loss)
 
 ```Python
 # 构建 eval 图
-logits = tf.nn.softmax_cross_entropy_with_logits(...)
+logits = tf.nn.softmax_cross_entropy_with_logits_v2(...)
 
 # 调用 eval 重写，在 FakeQuantization 节点重写图并使用 fold batchnorm 技术
 tf.contrib.quantize.create_eval_graph()
@@ -103,7 +102,7 @@ bazel build tensorflow/contrib/lite/toco:toco && \
   --std_value=127.5 --mean_value=127.5
 ```
 
-See the documentation for @{tf.contrib.quantize} and [TensorFlow Lite](/mobile/tflite/).
+请查看 `tf.contrib.quantize` 和 [TensorFlow Lite](/mobile/tflite/) 文档。
 
 ## 量化模型的精度
 
@@ -149,8 +148,8 @@ See the documentation for @{tf.contrib.quantize} and [TensorFlow Lite](/mobile/t
   <table>
     <tr><th>量化的</th><th>浮点的</th></tr>
     <tr><td>0</td><td>-10.0</td></tr>
-    <tr><td>255</td><td>30.0</td></tr>
     <tr><td>128</td><td>10.0</td></tr>
+    <tr><td>255</td><td>30.0</td></tr>
   </table>
   <figcaption>
     <b>表 2</b>：量化值的平均的例子
