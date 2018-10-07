@@ -114,7 +114,7 @@ Android 上的安装说明在单独的 [Android TensorFlow 支持页面](https:/
 </dependency>
 ```
 
-只有当你的系统是 Linux 且满足 [GPU 的要求](./install_linux.md)时，才能通过 Maven 使用 GPU 加速。
+只有当你的系统是 Linux 且满足 [GPU 的要求](./install_linux.md#determine_which_tensorflow_to_install)时，才能通过 Maven 使用 GPU 加速。
 
 ## 在 JDK 中使用 TensorFlow
 
@@ -124,27 +124,26 @@ Android 上的安装说明在单独的 [Android TensorFlow 支持页面](https:/
 
 采取以下步骤在 Linux 或 macOS 上安装 TensorFlow for Java：
 
-  1. 下载
-     [libtensorflow.jar](https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-1.10.0.jar)，它是 TensorFlow Java Archive (JAR)。
+1. 下载 [libtensorflow.jar](https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-1.10.0.jar)，它是 TensorFlow Java Archive (JAR)。
 
-  2. 决定你要只在 CPU 上运行 TensorFlow for Java 还是要在 GPU 的协助下运行。为了帮助你决定，请阅读以下指南中标题为“决定要安装哪个 TensorFlow”的部分：
+2. 决定你要只在 CPU 上运行 TensorFlow for Java 还是要在 GPU 的协助下运行。为了帮助你决定，请阅读以下指南中标题为“决定要安装哪个 TensorFlow”的部分：
 
-    * [在 Ubuntu 上安装 TensorFlow](./install_linux.md)
-    * [在 macOS 上安装 TensorFlow](./install_mac.md)
+* [在 Ubuntu 上安装 TensorFlow](./install_linux.md#determine_which_tensorflow_to_install)
+* [在 macOS 上安装 TensorFlow](./install_mac.md#determine_which_tensorflow_to_install)
 
-  3. 通过运行以下 shell 命令，下载并提取相应的 Java Native Interface（JNI）文件，来为你的操作系统和处理器提供支持：
+3. 通过运行以下 shell 命令，下载并提取相应的 Java Native Interface（JNI）文件，来为你的操作系统和处理器提供支持：
 
-
-         TF_TYPE="cpu" # 默认处理器是 CPU 。如果你想要使用 GPU ，就将它设置成 "gpu" 。
-         OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-         mkdir -p ./jni
-         curl -L \
-           "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow_jni-${TF_TYPE}-${OS}-x86_64-1.10.0.tar.gz" |
-           tar -xz -C ./jni
+       TF_TYPE="cpu" # 默认处理器是 CPU。如果你想要使用 GPU，就将它设置成 "gpu"。
+       OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+       mkdir -p ./jni
+       curl -L \
+         "https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow_jni-${TF_TYPE}-${OS}-x86_64-1.10.0.tar.gz" |
+         tar -xz -C ./jni
 
 ### 在 Windows 上安装
 
 用如下几步在 Windows 上安装 TensorFlow for Java ：
+
   1. 下载 [libtensorflow.jar](https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-1.10.0.jar)，它是 TensorFlow Java Archive (JAR)。
   2. 下载适合 Windows 上的 TensorFlow for Java 的 [Java Native Interface (JNI) 文件](https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow_jni-cpu-windows-x86_64-1.10.0.zip)。
   3. 解压此 .zip 文件。
@@ -190,7 +189,6 @@ public class HelloTF {
 在编译一个使用 TensorFlow 的 Java 程序时，下载的 `.jar` 文件必须在你的 `classpath` 中。例如，你可以通过使用类似如下的指令，使用编译标志 `-cp` 将下载的 `.jar` 文件包含在你的 `classpath` 中：
 
 <pre><b>javac -cp libtensorflow-1.10.0.jar HelloTF.java</b></pre>
-
 
 ### 运行
 
