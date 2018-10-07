@@ -395,7 +395,7 @@ print(sess.run(hello))
 
 如果你是机器学习的新手，我们推荐以下内容：
 
-请查看 [TensorFlow 教程](../tutorials/)学习更多内容。
+学习更多内容，请到 [TensorFlow 教程](../tutorials/)。
 
 <a name="NVIDIARequirements"></a>
 
