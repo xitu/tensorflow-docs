@@ -1,12 +1,8 @@
-# API Documentation
+# 接口文档
 
-TensorFlow has APIs available in several languages both for constructing and
-executing a TensorFlow graph.  The Python API is at present the most complete
-and the easiest to use, but other language APIs may be easier to integrate
-into projects and may offer some performance advantages in graph execution.
+TensorFlow 支持多种语言接口用于创建和运行 TensorFlow 图模型。Python 接口目前最完善且最易用，但是其他语言的接口也更加容易集成到项目中并且在图运算中表现出性能上的优势。
 
-A word of caution: the APIs in languages other than Python are not yet
-covered by the [API stability promises](../programmers_guide/version_semantics).
+注意一点： [接口稳定性承诺](../programmers_guide/version_semantics) 尚未覆盖除 Python 以外其他语言的接口.
 
 * [Python](python)
 * [JavaScript](https://js.tensorflow.org/api/latest/)
@@ -16,17 +12,15 @@ covered by the [API stability promises](../programmers_guide/version_semantics).
 * [Swift (Early Release)](swift)
 
 
-We encourage the community to develop and maintain support for other languages
-with the [approach recommended by the TensorFlow maintainers](../extend/language_bindings).
-For example, see the bindings for:
+我们鼓励社区使用 [TensorFlow 维护者推荐的方法](../extend/language_bindings) 开发和维护其他语言。例如，请参考以下约束信息：
 
-* [C#](https://github.com/migueldeicaza/TensorFlowSharp),
-* [Haskell](https://github.com/tensorflow/haskell),
-* [Julia](https://github.com/malmaud/TensorFlow.jl),
-* [Ruby](https://github.com/somaticio/tensorflow.rb),
-* [Rust](https://github.com/tensorflow/rust), and
-* [Scala](https://github.com/eaplatanios/tensorflow_scala).
+* [C#](https://github.com/migueldeicaza/TensorFlowSharp)，
+* [Haskell](https://github.com/tensorflow/haskell)，
+* [Julia](https://github.com/malmaud/TensorFlow.jl)，
+* [Ruby](https://github.com/somaticio/tensorflow.rb)，
+* [Rust](https://github.com/tensorflow/rust)，和
+* [Scala](https://github.com/eaplatanios/tensorflow_scala)。
 
-We also provide the C++ API reference for TensorFlow Serving:
+我们也提供 C++ 版本的 TensorFlow 服务接口文档：
 
-* [TensorFlow Serving](/api_docs/serving)
+* [TensorFlow 服务](/api_docs/serving)
