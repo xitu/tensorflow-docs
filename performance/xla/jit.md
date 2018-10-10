@@ -10,7 +10,7 @@ TensorFlow / XLA 即时编译器通过 XLA 编译和运行 TensorFlow 图的各�
 
 有两种方式通过 XLA 运行 TensorFlow 计算图：一是用 CPU 或 GPU 设备上的即时编译操作，二是把操作放到 `XLA_CPU` 或 `XLA_GPU` TensorFlow 设备上。将操作直接放到一个 TensorFlow XLA 设备上强制执行，因此这种方法主要用于测试。
 
-> 注意：The XLA CPU backend supports intra-op parallelism (i.e. it can shard a single operation across multiple cores) but it does not support inter-op parallelism (i.e. it cannot execute independent operations concurrently across multiple cores). XLA GPU 后端与标准的 TensorFlow 后端充分竞争，运行速度时快时慢。
+> 注意：XLA CPU 后端支持外部运算并行化（比如它支持单个运算符并行计算），但是它不支持内部运算并行化（比如它无法执行多个独立运算符的并行计算）。XLA GPU 后端与标准的 TensorFlow 后端充分竞争，运行速度时快时慢。
 
 ### 开启即时编译
 
