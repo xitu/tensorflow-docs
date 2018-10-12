@@ -1,81 +1,79 @@
 # Keras
 
-Keras is a high-level API to build and train deep learning models. It's used for fast prototyping, advanced research, and production, with three key advantages:
+Keras 是一个用于构建和训练深度学习模型的高级程序接口。它被应用与快速原型设计，高级研究和生产环境，依赖于三大核心优势：
 
-- *User friendly*<br>
-  Keras has a simple, consistent interface optimized for common use cases. It provides clear and actionable feedback for user errors.
-- *Modular and composable*<br>
-  Keras models are made by connecting configurable building blocks together, with few restrictions.
-- *Easy to extend*<br> Write custom building blocks to express new ideas for research. Create new layers, loss functions, and develop state-of-the-art models.
+- *用户友好*<br>
+  Keras 为常见用例优化了一套简单一致的接口。它给用户错误提供清晰且可操作的反馈。
+- *模块化和组件化*<br>
+  Keras 模型将可配置的模块连接在一起，几乎没有任何限制。
+- *易扩展*<br> 编写自定义模块用于研究新想法。创建新的网络层，代价函数和研发先进的模型。
 
-## Import tf.keras
+## 导入 tf.keras
 
-`tf.keras` is TensorFlow's implementation of the [Keras API specification](https://keras.io){:.external}. This is a high-level API to build and train models that includes first-class support for TensorFlow-specific functionality, such as [eager execution](#eager_execution),
-`tf.data` pipelines, and [Estimators](./estimators.md).
-`tf.keras` makes TensorFlow easier to use without sacrificing flexibility and performance.
+`tf.keras` 是 [Keras 接口规范](https://keras.io){:.external} 的 TensorFlow 实现。这是一个用于构建和训练模型的高级接口，其中包括对 TensorFlow 特定功能的一流支持，比如 [Eager execution](#eager_execution),
+`tf.data` 管道和 [估计器](./estimators.md).
+`tf.keras` 使得 TensorFlow 在不牺牲灵活性和性能的基础上更加易于使用。
 
-To get started, import `tf.keras` as part of your TensorFlow program setup:
+首先，在你的 TensorFlow 程序开始导入 `tf.keras` ：
 
 ```python
 import tensorflow as tf
 from tensorflow import keras
 ```
 
-`tf.keras` can run any Keras-compatible code, but keep in mind:
+`tf.keras` 能够运行任何 Keras 兼容代码，但是要记住：
+* `tf.keras` 版本在最新的 TensorFlow 发布中可能和 PyPI 中最新的 `keras` 版本不一样。请检查 `tf.keras.__version__`。
+* 当 [保存模型权重](#weights_only)，`tf.keras` 默认 [检查点格式](./checkpoints.md)。传参 `save_format='h5'` 使用 HDF5 文件格式.
 
-* The `tf.keras` version in the latest TensorFlow release might not be the same as the latest `keras` version from PyPI. Check `tf.keras.__version__`.
-* When [saving a model's weights](#weights_only), `tf.keras` defaults to the [checkpoint format](./checkpoints.md). Pass `save_format='h5'` to use HDF5.
+## 构建简单模型
 
-## Build a simple model
+### 序列模型
 
-### Sequential model
+在 Keras 中, 你可以拼接 *网络层* 来构建 *模型*。模型（通常）是包含多个网络层的图。最常见的模型就是一堆网络层：`tf.keras.Sequential` 模型.
 
-In Keras, you assemble *layers* to build *models*. A model is (usually) a graph of layers. The most common type of model is a stack of layers: the `tf.keras.Sequential` model.
-
-To build a simple, fully-connected network (i.e. multi-layer perceptron):
+构建简单的全连接网络（比如多层感知器）：
 
 ```python
 model = keras.Sequential()
-# Adds a densely-connected layer with 64 units to the model:
+# 模型中添加包含64个节点的稠密连接层：
 model.add(keras.layers.Dense(64, activation='relu'))
-# Add another:
+# 添加另外一个：
 model.add(keras.layers.Dense(64, activation='relu'))
-# Add a softmax layer with 10 output units:
+# 添加包含10个节点 softmax 层：
 model.add(keras.layers.Dense(10, activation='softmax'))
 ```
 
-### Configure the layers
+### 配置网络层
 
-There are many `tf.keras.layers` available with some common constructor parameters:
+许多 `tf.keras.layers` 具有相同的构造参数：
 
-* `activation`: Set the activation function for the layer. This parameter is specified by the name of a built-in function or as a callable object. By default, no activation is applied.
-* `kernel_initializer` and `bias_initializer`: The initialization schemes that create the layer's weights (kernel and bias). This parameter is a name or a callable object. This defaults to the `"Glorot uniform"` initializer.
-* `kernel_regularizer` and `bias_regularizer`: The regularization schemes that apply the layer's weights (kernel and bias), such as L1 or L2 regularization. By default, no regularization is applied.
-
-The following instantiates `tf.keras.layers.Dense` layers using constructor arguments:
+* `activation`：设置网络层的激活函数。Set the activation function for the layer。此参数由内置函数或可调用对象指定。默认情况下，不应用任何激活函数。
+* `kernel_initializer` and `bias_initializer`：初始化网络层的权重（核和偏差）。该参数是一个名字或者可调用对象。默认是 `"Glorot uniform"` 初始值。
+* `kernel_regularizer` and `bias_regularizer`：正则化方案应用于网络层的权重（核和偏差），比如 L1 和 L2 正则化。默认不适用任何正则化。
+下面使用构造函数参数实例化 `tf.keras.layers.Dense`：
 
 ```python
-# Create a sigmoid layer:
+# 创建 sigmoid 网络层：
 layers.Dense(64, activation='sigmoid')
-# Or:
+# 或者:
 layers.Dense(64, activation=tf.sigmoid)
 
-# A linear layer with L1 regularization of factor 0.01 applied to the kernel matrix:
+# 将L1正则化因子为 0.01 的线性层应用于核矩阵：
 layers.Dense(64, kernel_regularizer=keras.regularizers.l1(0.01))
-# A linear layer with L2 regularization of factor 0.01 applied to the bias vector:
+# 将L1正则化因子为 0.01 的线性层应用于偏差向量：
 layers.Dense(64, bias_regularizer=keras.regularizers.l2(0.01))
 
-# A linear layer with a kernel initialized to a random orthogonal matrix:
+# 线性层核矩阵初始化为随机正交矩阵：
 layers.Dense(64, kernel_initializer='orthogonal')
-# A linear layer with a bias vector initialized to 2.0s:
+# 线性层偏置向量初始化为常数值 2.0：
 layers.Dense(64, bias_initializer=keras.initializers.constant(2.0))
 ```
 
-## Train and evaluate
+## 训练和评估
 
-### Set up training
+### 开始训练
 
-After the model is constructed, configure its learning process by calling the `compile` method:
+构建模型后，通过调用 `compile` 方法配置其学习过程：
 
 ```python
 model.compile(optimizer=tf.train.AdamOptimizer(0.001),
@@ -83,29 +81,29 @@ model.compile(optimizer=tf.train.AdamOptimizer(0.001),
               metrics=['accuracy'])
 ```
 
-`tf.keras.Model.compile` takes three important arguments:
+`tf.keras.Model.compile` 包含三个重要参数：
 
-* `optimizer`: This object specifies the training procedure. Pass it optimizer instances from the `tf.train` module, such as [`AdamOptimizer`](/api_docs/python/tf/train/AdamOptimizer), [`RMSPropOptimizer`](/api_docs/python/tf/train/RMSPropOptimizer), or [`GradientDescentOptimizer`](/api_docs/python/tf/train/GradientDescentOptimizer).
-* `loss`: The function to minimize during optimization. Common choices include mean square error (`mse`), `categorical_crossentropy`, and `binary_crossentropy`. Loss functions are specified by name or by passing a callable object from the `tf.keras.losses` module.
-* `metrics`: Used to monitor training. These are string names or callables from the `tf.keras.metrics` module.
+* `optimizer`: 这个参数指定训练过程。从 `tf.train` 传递优化器实例，比如 [`Adam优化器`](/api_docs/python/tf/train/AdamOptimizer)，[`RMSProp优化器`](/api_docs/python/tf/train/RMSPropOptimizer) 或者 [`梯度下降优化器`](/api_docs/python/tf/train/GradientDescentOptimizer)。
+* `loss`: 优化期间的目标最小化的函数。常见的有均方误差（`mse`），`categorical_crossentropy` 和 `binary_crossentropy`。损失函数由名称或通过从 `tf.keras.losses` 模块传递可调用对象来指定。
+* `metrics`: 用于监督训练。可由名称或通过从 `tf.keras.metrics` 模块传递可调用对象。
 
-The following shows a few examples of configuring a model for training:
+以下提供了配置训练模型的几个示例：
 
 ```python
-# Configure a model for mean-squared error regression.
+# 配置以均方误差作为损失函数的回归模型。
 model.compile(optimizer=tf.train.AdamOptimizer(0.01),
               loss='mse',       # mean squared error
               metrics=['mae'])  # mean absolute error
 
-# Configure a model for categorical classification.
+# 配置类别分类模型。
 model.compile(optimizer=tf.train.RMSPropOptimizer(0.01),
               loss=keras.losses.categorical_crossentropy,
               metrics=[keras.metrics.categorical_accuracy])
 ```
 
-### Input NumPy data
+### 输入 NumPy 数据
 
-For small datasets, use in-memory [NumPy](https://www.numpy.org/){:.external} arrays to train and evaluate a model. The model is "fit" to the training data using the `fit` method:
+对于小型数据集，使用内存型数组 [NumPy](https://www.numpy.org/){:.external} 训练和评估模型。模型使用 `fit` 方法 “拟合” 训练数据：
 
 ```python
 import numpy as np
@@ -116,13 +114,13 @@ labels = np.random.random((1000, 10))
 model.fit(data, labels, epochs=10, batch_size=32)
 ```
 
-`tf.keras.Model.fit` takes three important arguments:
+`tf.keras.Model.fit` 包含三个重要参数:
 
-* `epochs`: Training is structured into *epochs*. An epoch is one iteration over the entire input data (this is done in smaller batches).
-* `batch_size`: When passed NumPy data, the model slices the data into smaller batches and iterates over these batches during training. This integer specifies the size of each batch. Be aware that the last batch may be smaller if the total number of samples is not divisible by the batch size.
-* `validation_data`: When prototyping a model, you want to easily monitor its performance on some validation data. Passing this argument—a tuple of inputs and labels—allows the model to display the loss and metrics in inference mode for the passed data, at the end of each epoch.
+* `epochs`：训练过程被划分到 *epochs*。一个 epoch 是对整个输入数据的一次迭代（这是以较小的批次完成的）。
+* `batch_size`：当传递 NumPy 数据时，模型将数据分成较小的批次，并在训练期间迭代这些批次。 此整数指定每个批次的大小。请注意，如果样本总数不能被批次大小整除，则最后一批可能会更小。
+* `validation_data`：在对模型进行原型设计时，您希望轻松监控其在某些验证数据上的性能。传递包含输入数据和标签的元组，让模型在每个 epoch 的结束后计算并打印损失和度量值。
 
-Here's an example using `validation_data`:
+这里有个例子使用了 `validation_data`:
 
 ```python
 import numpy as np
@@ -137,23 +135,23 @@ model.fit(data, labels, epochs=10, batch_size=32,
           validation_data=(val_data, val_labels))
 ```
 
-### Input tf.data datasets
+### 输入 tf.data datasets
 
-Use the [Datasets API](./datasets.md) to scale to large datasets or multi-device training. Pass a `tf.data.Dataset` instance to the `fit` method:
+使用 [数据集接口](./datasets.md) 扩展到大型数据集或者多设备训练。传递 `tf.data.Dataset` 实例 `fit` 方法：
 
 ```python
-# Instantiates a toy dataset instance:
+# 实例化玩具数据集实例。
 dataset = tf.data.Dataset.from_tensor_slices((data, labels))
 dataset = dataset.batch(32)
 dataset = dataset.repeat()
 
-# Don't forget to specify `steps_per_epoch` when calling `fit` on a dataset.
+# 在数据集上调用 `fit` 方法不要忘记指定 `steps_per_epoch` 参数值。
 model.fit(dataset, epochs=10, steps_per_epoch=30)
 ```
 
-Here, the `fit` method uses the `steps_per_epoch` argument—this is the number of training steps the model runs before it moves to the next epoch. Since the `Dataset` yields batches of data, this snippet does not require a `batch_size`.
+这里，`fit` 方法使用 `steps_per_epoch` 参数，该参数是模型在移动到下一个 epoch 之前训练步数。由 `Dataset` 产生批量数据，因此该代码片段不需要 `batch_size`。
 
-Datasets can also be used for validation:
+数据集同样可以被用来验证：
 
 ```python
 dataset = tf.data.Dataset.from_tensor_slices((data, labels))
@@ -167,11 +165,11 @@ model.fit(dataset, epochs=10, steps_per_epoch=30,
           validation_steps=3)
 ```
 
-### Evaluate and predict
+### 评价和预测
 
-The `tf.keras.Model.evaluate` and `tf.keras.Model.predict` methods can use NumPy data and a `tf.data.Dataset`.
+`tf.keras.Model.evaluate` 和 `tf.keras.Model.predict` 方法可以传递 NumPy 数据和 `tf.data.Dataset` 对象。
 
-To *evaluate* the inference-mode loss and metrics for the data provided:
+*评估* 在提供的数据集上的代价损失和指标：
 
 ```python
 model.evaluate(x, y, batch_size=32)
@@ -179,7 +177,7 @@ model.evaluate(x, y, batch_size=32)
 model.evaluate(dataset, steps=30)
 ```
 
-And to *predict* the output of the last layer in inference for the data provided, as a NumPy array:
+并且 *预测* 提供的 NumPy 数据在最后一层输出结果：
 
 ```
 model.predict(x, batch_size=32)
@@ -188,54 +186,55 @@ model.predict(dataset, steps=30)
 ```
 
 
-## Build advanced models
+## 构建高级模型
 
-### Functional API
+### 函数式接口
 
-The `tf.keras.Sequential` model is a simple stack of layers that cannot represent arbitrary models. Use the [Keras functional API](https://keras.io/getting-started/functional-api-guide/){:.external} to build complex model topologies such as:
+`tf.keras.Sequential` 模型是一个简单的网络层拼接，不能代表任意模型。使用[Keras 函数式接口](https://keras.io/getting-started/functional-api-guide/){:.external}构建复杂的模型拓扑，比如：
 
-* Multi-input models,
-* Multi-output models,
-* Models with shared layers (the same layer called several times),
-* Models with non-sequential data flows (e.g. residual connections).
+* 多输入模型，
+* 多输出模型，
+* 包含共享层模型（相同层被调用多次），
+* 不包含序列化数据流的模型 (比如残余神经网络模型）。
 
-Building a model with the functional API works like this:
+使用函数式接口构建模型的工作方式如下：
 
-1. A layer instance is callable and returns a tensor.
-2. Input tensors and output tensors are used to define a `tf.keras.Model` instance.
-3. This model is trained just like the `Sequential` model.
+1. 网络层实例可调用并返回张量。
+2. 输入张量和输出张量用于定义 `tf.keras.Model` 实例。
+3. 模型像 `Sequential` 序列模型一样训练。
 
-The following example uses the functional API to build a simple, fully-connected network:
+以下示例使用函数式接口构建一个简单，完全连接的网络：
 
 ```python
-inputs = keras.Input(shape=(32,))  # Returns a placeholder tensor
+inputs = keras.Input(shape=(32,))  # 返回占位张量
 
-# A layer instance is callable on a tensor, and returns a tensor.
+# 网络层可调用张量并且返回张量。
 x = keras.layers.Dense(64, activation='relu')(inputs)
 x = keras.layers.Dense(64, activation='relu')(x)
 predictions = keras.layers.Dense(10, activation='softmax')(x)
 
-# Instantiate the model given inputs and outputs.
+# 给定输入和输出实例化模型。
 model = keras.Model(inputs=inputs, outputs=predictions)
 
-# The compile step specifies the training configuration.
+# 编译步骤指定训练的配置。
 model.compile(optimizer=tf.train.RMSPropOptimizer(0.001),
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-# Trains for 5 epochs
+# 训练 5 个 epoch
 model.fit(data, labels, batch_size=32, epochs=5)
 ```
 
-### Model subclassing
+### 模型子类化
 
-Build a fully-customizable model by subclassing `tf.keras.Model` and defining your own forward pass. Create layers in the `__init__` method and set them as attributes of the class instance. Define the forward pass in the `call` method.
+通过继承 `tf.keras.Model` 并定义自己的前向传播来构建一个完全自定义的模型。在 `__init__` 方法中创建图层并将它们设置为类实例的属性。在 `call` 方法中定义前向传播。
 
-Model subclassing is particularly useful when [eager execution](./eager.md) is enabled since the forward pass can be written imperatively.
+当 [Eager execution](./eager.md) 被启用时，对子类化模型特别有用，因为可以强制写入前向传播。
 
-Key Point: Use the right API for the job. While model subclassing offers flexibility, it comes at a cost of greater complexity and more opportunities for user errors. If possible, prefer the functional API.
+关键点：工作中使用正确的接口。虽然模型子类化提供了灵活性，但其代价是更高的复杂性和更多的用户错误机会。如果可能，请选择函数式接口。
 
-The following example shows a subclassed `tf.keras.Model` using a custom forward pass:
+下面的示例使用自定义前向传播展示了一个子类化 `tf.keras.Model`：
+
 
 ```python
 class MyModel(keras.Model):
@@ -262,29 +261,29 @@ class MyModel(keras.Model):
     return tf.TensorShape(shape)
 
 
-# Instantiates the subclassed model.
+# 实例化子类化模型。
 model = MyModel(num_classes=10)
 
-# The compile step specifies the training configuration.
+# 编译步骤指定训练配置。
 model.compile(optimizer=tf.train.RMSPropOptimizer(0.001),
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-# Trains for 5 epochs.
+# 训练 5 epochs。
 model.fit(data, labels, batch_size=32, epochs=5)
 ```
 
 
 ### Custom layers
 
-Create a custom layer by subclassing `tf.keras.layers.Layer` and implementing the following methods:
+通过继承 `tf.keras.layers.Layer` 创建自定义网络层并且实现以下方法：
 
-* `build`: Create the weights of the layer. Add weights with the `add_weight` method.
-* `call`: Define the forward pass.
-* `compute_output_shape`: Specify how to compute the output shape of the layer given the input shape.
-* Optionally, a layer can be serialized by implementing the `get_config` method and the `from_config` class method.
+* `build`：创建网络层的权重。 使用 `add_weight` 方法添加权重。
+* `call`：定义前向传播
+* `compute_output_shape`：指定在给定输入大小的情况下如何计算网络层的输出大小。
+* 另外，可以通过实现 `get_config` 和 `from_config` 类方法实现序列化。
 
-Here's an example of a custom layer that implements a `matmul` of an input with a kernel matrix:
+这是一个自定义网络层的示例，它实现了带有内核矩阵输入的 `matmul`：
 
 ```python
 class MyLayer(keras.layers.Layer):
@@ -321,30 +320,30 @@ class MyLayer(keras.layers.Layer):
     return cls(**config)
 
 
-# Create a model using the custom layer
+# 使用自定义网络层构建模型
 model = keras.Sequential([MyLayer(10),
                           keras.layers.Activation('softmax')])
 
-# The compile step specifies the training configuration
+# 编译步骤指定训练模型配置
 model.compile(optimizer=tf.train.RMSPropOptimizer(0.001),
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-# Trains for 5 epochs.
+# 训练 5 个epochs.
 model.fit(data, targets, batch_size=32, epochs=5)
 ```
 
 
-## Callbacks
+## 回调
 
-A callback is an object passed to a model to customize and extend its behavior during training. You can write your own custom callback, or use the built-in `tf.keras.callbacks` that include:
+回调是传递给模型的对象，用于在训练期间自定义和扩展其行为。您可以编写自己的自定义回调，或使用内置的 `tf.keras.callbacks`，其中包括：
 
-* `tf.keras.callbacks.ModelCheckpoint`: Save checkpoints of your model at regular intervals.
-* `tf.keras.callbacks.LearningRateScheduler`: Dynamically change the learning rate.
-* `tf.keras.callbacks.EarlyStopping`: Interrupt training when validation performance has stopped improving.
-* `tf.keras.callbacks.TensorBoard`: Monitor the model's behavior using [TensorBoard](./summaries_and_tensorboard.md).
+* `tf.keras.callbacks.ModelCheckpoint`：定期保存模型的检查点。
+* `tf.keras.callbacks.LearningRateScheduler`：动态调整学习率。
+* `tf.keras.callbacks.EarlyStopping`：当验证上表现停止增长时终端训练。
+* `tf.keras.callbacks.TensorBoard`：使用 [TensorBoard](./summaries_and_tensorboard.md) 监控模型行为。
 
-To use a `tf.keras.callbacks.Callback`, pass it to the model's `fit` method:
+要使用 `tf.keras.callbacks.Callback`，将其传递给模型的 `fit` 方法：
 
 ```python
 callbacks = [
@@ -358,59 +357,59 @@ model.fit(data, labels, batch_size=32, epochs=5, callbacks=callbacks,
 ```
 
 
-## Save and restore
+## 保存与恢复
 
-### Weights only
+### 仅权重
 
-Save and load the weights of a model using `tf.keras.Model.save_weights`:
+使用 `tf.keras.Model.save_weights` 保存和加载模型的权重：
 
 ```python
-# Save weights to a TensorFlow Checkpoint file
+# 保存权重到 TensorFlow 检查点文件
 model.save_weights('./my_model')
 
-# Restore the model's state,
-# this requires a model with the same architecture.
+# 恢复模型的状态，
+# 这需要具有相同架构的模型。
 model.load_weights('my_model')
 ```
 
-By default, this saves the model's weights in the [TensorFlow checkpoint](./checkpoints.md) file format. Weights can also be saved to the Keras HDF5 format (the default for the multi-backend implementation of Keras):
+默认情况下，这会将模型的权重保存在 [TensorFlow 检查点](./checkpoints.md) 文件格式中。权重也可以保存为 Keras HDF5 格式（Keras 的多后端实现的默认值）：
 
 ```python
-# Save weights to a HDF5 file
+# 保存权重到 HDF5 文件
 model.save_weights('my_model.h5', save_format='h5')
 
-# Restore the model's state
+# 恢复模型状态
 model.load_weights('my_model.h5')
 ```
 
 
-### Configuration only
+### 仅配置
 
-A model's configuration can be saved—this serializes the model architecture without any weights. A saved configuration can recreate and initialize the same model, even without the code that defined the original model. Keras supports JSON and YAML serialization formats:
+可以保存模型的配置 — 这可以在没有任何权重的情况下序列化模型体系结构。即使没有定义原始模型的代码，保存的配置也可以重新创建和初始化相同的模型。
 
 ```python
-# Serialize a model to JSON format
+# 使用 JSON 格式序列化模型
 json_string = model.to_json()
 
-# Recreate the model (freshly initialized)
+# 重新创建模型（首次初始化）
 fresh_model = keras.models.model_from_json(json_string)
 
-# Serializes a model to YAML format
+# 使用 YAML 格式序列化模型
 yaml_string = model.to_yaml()
 
-# Recreate the model
+# 重建模型
 fresh_model = keras.models.model_from_yaml(yaml_string)
 ```
 
-Caution: Subclassed models are not serializable because their architecture is defined by the Python code in the body of the `call` method.
+注意：子类化模型不可序列化，因为它们的体系结构是由 `call` 方法中的 Python 代码定义的。
 
 
-### Entire model
+### 全模型
 
-The entire model can be saved to a file that contains the weight values, the model's configuration, and even the optimizer's configuration. This allows you to checkpoint a model and resume training later—from the exact same state—without access to the original code.
+整个模型都可以保存到文件，包含权重值，模型配置甚至优化器配置。这允许您检查模型并稍后从完全相同的状态恢复训练 — 无需访问原始代码。
 
 ```python
-# Create a trivial model
+# 创建一个简单的模型
 model = keras.Sequential([
   keras.layers.Dense(10, activation='softmax', input_shape=(32,)),
   keras.layers.Dense(10, activation='softmax')
@@ -421,30 +420,30 @@ model.compile(optimizer='rmsprop',
 model.fit(data, targets, batch_size=32, epochs=5)
 
 
-# Save entire model to a HDF5 file
+# 保存整个模型到 HDF5 文件中
 model.save('my_model.h5')
 
-# Recreate the exact same model, including weights and optimizer.
+# 重建完全一样的模型，包含权重和优化器。
 model = keras.models.load_model('my_model.h5')
 ```
 
 
 ## Eager execution
 
-[Eager execution](./eager.md) is an imperative programming environment that evaluates operations immediately. This is not required for Keras, but is supported by `tf.keras` and useful for inspecting your program and debugging.
+[Eager execution](./eager.md) 是一个命令式编程环境，可立即评估操作。这不是Keras所必需的，但是 `tf.keras` 支持，对于检查程序和调试很有用。
 
-All of the `tf.keras` model-building APIs are compatible with eager execution. And while the `Sequential` and functional APIs can be used, eager execution especially benefits *model subclassing* and building *custom layers*—the APIs that require you to write the forward pass as code (instead of the APIs that create models by assembling existing layers).
+所有 `tf.keras` 模型构建接口都与 eager execution 兼容。虽然可以使用 `Sequential`和函数式接口，但是 eager execution 对 *子类化模型* 和构建 *自定义层* 有特别友好 — 仅需要您编写前向传播的接口代码（而不是使用现有的创建模型的接口）。
 
-See the [eager execution guide](./eager.md#build_a_model) for examples of using Keras models with custom training loops and `tf.GradientTape`.
+有关使用自定义训练和 `tf.GradientTape` 的 Keras 模型示例，请参阅 [eager execution 指引](./eager.md#build_a_model)。
 
 
-## Distribution
+## 分布式
 
-### Estimators
+### 估计器
 
-The [Estimators](./estimators.md) API is used for training models for distributed environments. This targets industry use cases such as distributed training on large datasets that can export a model for production.
+[估计器](./estimators.md) 接口可以用于分布式环境的训练模型。应用对象主要是工业界，例如可以导出模型进行生产的大型数据集的分布式训练。
 
-A `tf.keras.Model` can be trained with the `tf.estimator` API by converting the model to an `tf.estimator.Estimator` object with `tf.keras.estimator.model_to_estimator`. See [Creating Estimators from Keras models](./estimators.md#creating_estimators_from_keras_models).
+通过 `tf.keras.estimator.model_to_estimator` 将 `tf.keras.Model` 转化为   `tf.estimator.Estimator` 对象，使用 `tf.estimator` 接口训练。详见 [从 Keras 模型中创建估计器](./estimators.md#creating_estimators_from_keras_models).
 
 ```python
 model = keras.Sequential([layers.Dense(10,activation='softmax'),
@@ -457,17 +456,17 @@ model.compile(optimizer=tf.train.RMSPropOptimizer(0.001),
 estimator = keras.estimator.model_to_estimator(model)
 ```
 
-Note: Enable [eager execution](./eager.md) for debugging [Estimator input functions](./premade_estimators.md#create_input_functions) and inspecting data.
+注意： 开启 [eager execution](./eager.md) 可以调试 [估计器输入函数](./premade_estimators.md#create_input_functions) 和 观察数据。
 
-### Multiple GPUs
+### GPU 集群
 
-`tf.keras` models can run on multiple GPUs using `tf.contrib.distribute.DistributionStrategy`. This API provides distributed training on multiple GPUs with almost no changes to existing code.
+可以使用 `tf.contrib.distribute.DistributionStrategy` 在多个GPU上运行。 此接口在多个GPU上提供分布式训练，几乎不需要对现有代码进行任何更改。
 
-Currently, `tf.contrib.distribute.MirroredStrategy` is the only supported distribution strategy. `MirroredStrategy` does in-graph replication with synchronous training using all-reduce on a single machine. To use `DistributionStrategy` with Keras, convert the `tf.keras.Model` to a `tf.estimator.Estimator` with `tf.keras.estimator.model_to_estimator`, then train the estimator
+目前，`tf.contrib.distribute.MirroredStrategy` 是唯一受支持的分发策略。 `MirroredStrategy` 使用 all-reduce 在一台机器上进行图模型内部的复制与同步。 要使用 Keras 的 `DistributionStrategy`，将 `tf.keras.Model` 转换为`tf.estimator.Estimator` 与 `tf.keras.estimator.model_to_estimator`，然后训练估算器。
 
-The following example distributes a `tf.keras.Model` across multiple GPUs on a single machine.
+以下示例在单个计算机上的多个GPU之间分发 `tf.keras.Model`。
 
-First, define a simple model:
+首先，定义一个简单的模型：
 
 ```python
 model = keras.Sequential()
@@ -480,7 +479,7 @@ model.compile(loss='binary_crossentropy', optimizer=optimizer)
 model.summary()
 ```
 
-Define an *input pipeline*. The `input_fn` returns a `tf.data.Dataset` object used to distribute the data across multiple devices—with each device processing a slice of the input batch.
+定义 *输入管道*。`input_fn` 返回一个 `tf.data.Dataset` 对象，用于在多个设备之间分配数据 — 每个设备处理一个批处理输入分片。
 
 ```python
 def input_fn():
@@ -493,14 +492,14 @@ def input_fn():
   return dataset
 ```
 
-Next, create a `tf.estimator.RunConfig` and set the `train_distribute` argument to the `tf.contrib.distribute.MirroredStrategy` instance. When creating `MirroredStrategy`, you can specify a list of devices or set the `num_gpus` argument. The default uses all available GPUs, like the following:
+接下来，创建一个 `tf.estimator.RunConfig` 并将 `train_distribute` 参数设置为 `tf.contrib.distribute.MirroredStrategy` 实例。创建 `MirroredStrategy` 时，可以指定设备列表或设置 `num_gpus` 参数。默认使用所有可用的 GPU，如下所示：
 
 ```python
 strategy = tf.contrib.distribute.MirroredStrategy()
 config = tf.estimator.RunConfig(train_distribute=strategy)
 ```
 
-Convert the Keras model to a `tf.estimator.Estimator` instance:
+Keras 模型转化为 `tf.estimator.Estimator` 实例：
 
 ```python
 keras_estimator = keras.estimator.model_to_estimator(
@@ -509,7 +508,7 @@ keras_estimator = keras.estimator.model_to_estimator(
   model_dir='/tmp/model_dir')
 ```
 
-Finally, train the `Estimator` instance by providing the `input_fn` and `steps` arguments:
+最后，提供 `input_fn` 和 `steps` 参数训练 `估计器` 实例：
 
 ```python
 keras_estimator.train(input_fn=input_fn, steps=10)
