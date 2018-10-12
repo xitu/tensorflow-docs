@@ -11,7 +11,7 @@ Keras 是一个用于构建和训练深度学习模型的高级程序接口。�
 ## 导入 tf.keras
 
 `tf.keras` 是 [Keras 接口规范](https://keras.io){:.external} 的 TensorFlow 实现。这是一个用于构建和训练模型的高级接口，其中包括对 TensorFlow 特定功能的一流支持，比如 [Eager execution](#eager_execution),
-`tf.data` 管道和 [估计器](./estimators.md).
+`tf.data` 管道和 [估计器](./estimators.md)。
 `tf.keras` 使得 TensorFlow 在不牺牲灵活性和性能的基础上更加易于使用。
 
 首先，在你的 TensorFlow 程序开始导入 `tf.keras` ：
@@ -23,13 +23,13 @@ from tensorflow import keras
 
 `tf.keras` 能够运行任何 Keras 兼容代码，但是要记住：
 * `tf.keras` 版本在最新的 TensorFlow 发布中可能和 PyPI 中最新的 `keras` 版本不一样。请检查 `tf.keras.__version__`。
-* 当 [保存模型权重](#weights_only)，`tf.keras` 默认 [检查点格式](./checkpoints.md)。传参 `save_format='h5'` 使用 HDF5 文件格式.
+* 当 [保存模型权重](#weights_only)，`tf.keras` 默认 [检查点格式](./checkpoints.md)。传参 `save_format='h5'` 使用 HDF5 文件格式。
 
 ## 构建简单模型
 
 ### 序列模型
 
-在 Keras 中, 你可以拼接 *网络层* 来构建 *模型*。模型（通常）是包含多个网络层的图。最常见的模型就是一堆网络层：`tf.keras.Sequential` 模型.
+在 Keras 中, 你可以拼接 *网络层* 来构建 *模型*。模型（通常）是包含多个网络层的图。最常见的模型就是一堆网络层：`tf.keras.Sequential` 模型。
 
 构建简单的全连接网络（比如多层感知器）：
 
@@ -274,12 +274,12 @@ model.fit(data, labels, batch_size=32, epochs=5)
 ```
 
 
-### Custom layers
+### 自定义网络层
 
 通过继承 `tf.keras.layers.Layer` 创建自定义网络层并且实现以下方法：
 
 * `build`：创建网络层的权重。 使用 `add_weight` 方法添加权重。
-* `call`：定义前向传播
+* `call`：定义前向传播。
 * `compute_output_shape`：指定在给定输入大小的情况下如何计算网络层的输出大小。
 * 另外，可以通过实现 `get_config` 和 `from_config` 类方法实现序列化。
 
