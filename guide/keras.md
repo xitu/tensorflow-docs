@@ -1,6 +1,6 @@
 # Keras
 
-Keras 是一个用于构建和训练深度学习模型的高级程序接口。它被应用与快速原型设计，高级研究和生产环境，依赖于三大核心优势：
+Keras 是一个用于构建和训练深度学习模型的高级程序接口。它被应用于快速原型设计，高级研究和生产环境，有着三大核心优势：
 
 - *用户友好*<br>
   Keras 为常见用例优化了一套简单一致的接口。它给用户错误提供清晰且可操作的反馈。
@@ -10,7 +10,7 @@ Keras 是一个用于构建和训练深度学习模型的高级程序接口。�
 
 ## 导入 tf.keras
 
-`tf.keras` 是 [Keras 接口规范](https://keras.io){:.external} 的 TensorFlow 实现。这是一个用于构建和训练模型的高级接口，其中包括对 TensorFlow 特定功能的一流支持，比如 [Eager execution](#eager_execution),
+`tf.keras` 是 [Keras 接口规范](https://keras.io){:.external} 的 TensorFlow 实现。这是一个用于构建和训练模型的高级接口，其中包括对 TensorFlow 特定功能的一流支持，比如 [Eager execution](#eager_execution)，
 `tf.data` 管道和 [估计器](./estimators.md)。
 `tf.keras` 使得 TensorFlow 在不牺牲灵活性和性能的基础上更加易于使用。
 
@@ -23,23 +23,23 @@ from tensorflow import keras
 
 `tf.keras` 能够运行任何 Keras 兼容代码，但是要记住：
 * `tf.keras` 版本在最新的 TensorFlow 发布中可能和 PyPI 中最新的 `keras` 版本不一样。请检查 `tf.keras.__version__`。
-* 当 [保存模型权重](#weights_only)，`tf.keras` 默认 [检查点格式](./checkpoints.md)。传参 `save_format='h5'` 使用 HDF5 文件格式。
+* 当[保存模型权重](#weights_only)，`tf.keras` 默认[检查点格式](./checkpoints.md)。传参 `save_format='h5'` 使用 HDF5 文件格式。
 
 ## 构建简单模型
 
 ### 序列模型
 
-在 Keras 中, 你可以拼接 *网络层* 来构建 *模型*。模型（通常）是包含多个网络层的图。最常见的模型就是一堆网络层：`tf.keras.Sequential` 模型。
+在 Keras 中, 你可以拼接<b>网络层</b>来构建<b>模型</b>。模型（通常）是包含多个网络层的图。最常见的模型就是由多个网络层堆叠而成的：`tf.keras.Sequential` 模型。
 
 构建简单的全连接网络（比如多层感知器）：
 
 ```python
 model = keras.Sequential()
-# 模型中添加包含64个节点的稠密连接层：
+# 模型中添加包含64个节点的全连接层：
 model.add(keras.layers.Dense(64, activation='relu'))
 # 添加另外一个：
 model.add(keras.layers.Dense(64, activation='relu'))
-# 添加包含10个节点 softmax 层：
+# 添加包含 10 个输出单元的 softmax 层：
 model.add(keras.layers.Dense(10, activation='softmax'))
 ```
 
@@ -47,9 +47,9 @@ model.add(keras.layers.Dense(10, activation='softmax'))
 
 许多 `tf.keras.layers` 具有相同的构造参数：
 
-* `activation`：设置网络层的激活函数。Set the activation function for the layer。此参数由内置函数或可调用对象指定。默认情况下，不应用任何激活函数。
-* `kernel_initializer` and `bias_initializer`：初始化网络层的权重（核和偏差）。该参数是一个名字或者可调用对象。默认是 `"Glorot uniform"` 初始值。
-* `kernel_regularizer` and `bias_regularizer`：正则化方案应用于网络层的权重（核和偏差），比如 L1 和 L2 正则化。默认不适用任何正则化。
+* `activation`：设置网络层的激活函数。此参数由内置函数或可调用对象指定。默认情况下，不应用任何激活函数。
+* `kernel_initializer` 与 `bias_initializer`：初始化网络层的权重（核和偏差）。该参数是一个名字或者可调用对象。默认是 `"Glorot uniform"` 初始值。
+* `kernel_regularizer` 与 `bias_regularizer`：将正则化方案应用于网络层的权重（核和偏差），比如 L1 和 L2 正则化。默认不使用任何正则化。
 下面使用构造函数参数实例化 `tf.keras.layers.Dense`：
 
 ```python
@@ -58,7 +58,7 @@ layers.Dense(64, activation='sigmoid')
 # 或者:
 layers.Dense(64, activation=tf.sigmoid)
 
-# 将L1正则化因子为 0.01 的线性层应用于核矩阵：
+# 将 L1 正则化因子为 0.01 的线性层应用于核矩阵：
 layers.Dense(64, kernel_regularizer=keras.regularizers.l1(0.01))
 # 将L1正则化因子为 0.01 的线性层应用于偏差向量：
 layers.Dense(64, bias_regularizer=keras.regularizers.l2(0.01))
@@ -83,7 +83,7 @@ model.compile(optimizer=tf.train.AdamOptimizer(0.001),
 
 `tf.keras.Model.compile` 包含三个重要参数：
 
-* `optimizer`: 这个参数指定训练过程。从 `tf.train` 传递优化器实例，比如 [`Adam优化器`](/api_docs/python/tf/train/AdamOptimizer)，[`RMSProp优化器`](/api_docs/python/tf/train/RMSPropOptimizer) 或者 [`梯度下降优化器`](/api_docs/python/tf/train/GradientDescentOptimizer)。
+* `optimizer`: 这个参数指定训练过程。从 `tf.train` 传递优化器实例，比如 [`Adam 优化器`](/api_docs/python/tf/train/AdamOptimizer)，[`RMSProp 优化器`](/api_docs/python/tf/train/RMSPropOptimizer) 或者 [`梯度下降优化器`](/api_docs/python/tf/train/GradientDescentOptimizer)。
 * `loss`: 优化期间的目标最小化的函数。常见的有均方误差（`mse`），`categorical_crossentropy` 和 `binary_crossentropy`。损失函数由名称或通过从 `tf.keras.losses` 模块传递可调用对象来指定。
 * `metrics`: 用于监督训练。可由名称或通过从 `tf.keras.metrics` 模块传递可调用对象。
 
@@ -117,7 +117,7 @@ model.fit(data, labels, epochs=10, batch_size=32)
 `tf.keras.Model.fit` 包含三个重要参数:
 
 * `epochs`：训练过程被划分到 *epochs*。一个 epoch 是对整个输入数据的一次迭代（这是以较小的批次完成的）。
-* `batch_size`：当传递 NumPy 数据时，模型将数据分成较小的批次，并在训练期间迭代这些批次。 此整数指定每个批次的大小。请注意，如果样本总数不能被批次大小整除，则最后一批可能会更小。
+* `batch_size`：当传递 NumPy 数据时，模型将数据分成较小的批次，并在训练期间迭代这些批次。此整数指定每个批次的大小。请注意，如果样本总数不能被批次大小整除，则最后一批可能会更小。
 * `validation_data`：在对模型进行原型设计时，您希望轻松监控其在某些验证数据上的性能。传递包含输入数据和标签的元组，让模型在每个 epoch 的结束后计算并打印损失和度量值。
 
 这里有个例子使用了 `validation_data`:
@@ -137,7 +137,7 @@ model.fit(data, labels, epochs=10, batch_size=32,
 
 ### 输入 tf.data datasets
 
-使用 [数据集接口](./datasets.md) 扩展到大型数据集或者多设备训练。传递 `tf.data.Dataset` 实例 `fit` 方法：
+使用[数据集接口](./datasets.md)扩展到大型数据集或者多设备训练。将 `tf.data.Dataset` 实例传递给 `fit` 方法：
 
 ```python
 # 实例化玩具数据集实例。
@@ -169,7 +169,7 @@ model.fit(dataset, epochs=10, steps_per_epoch=30,
 
 `tf.keras.Model.evaluate` 和 `tf.keras.Model.predict` 方法可以传递 NumPy 数据和 `tf.data.Dataset` 对象。
 
-*评估* 在提供的数据集上的代价损失和指标：
+<b>评估</b>在提供的数据集上的代价损失和指标：
 
 ```python
 model.evaluate(x, y, batch_size=32)
@@ -177,7 +177,7 @@ model.evaluate(x, y, batch_size=32)
 model.evaluate(dataset, steps=30)
 ```
 
-并且 *预测* 提供的 NumPy 数据在最后一层输出结果：
+并且<b>预测</b>提供的 NumPy 数据在最后一层输出结果：
 
 ```
 model.predict(x, batch_size=32)
@@ -278,7 +278,7 @@ model.fit(data, labels, batch_size=32, epochs=5)
 
 通过继承 `tf.keras.layers.Layer` 创建自定义网络层并且实现以下方法：
 
-* `build`：创建网络层的权重。 使用 `add_weight` 方法添加权重。
+* `build`：创建网络层的权重。使用 `add_weight` 方法添加权重。
 * `call`：定义前向传播。
 * `compute_output_shape`：指定在给定输入大小的情况下如何计算网络层的输出大小。
 * 另外，可以通过实现 `get_config` 和 `from_config` 类方法实现序列化。
@@ -329,7 +329,7 @@ model.compile(optimizer=tf.train.RMSPropOptimizer(0.001),
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
-# 训练 5 个epochs.
+# 训练 5 个 epoch。
 model.fit(data, targets, batch_size=32, epochs=5)
 ```
 
@@ -441,9 +441,9 @@ model = keras.models.load_model('my_model.h5')
 
 ### 估计器
 
-[估计器](./estimators.md) 接口可以用于分布式环境的训练模型。应用对象主要是工业界，例如可以导出模型进行生产的大型数据集的分布式训练。
+[估计器](./estimators.md)接口可以用于分布式环境的训练模型。应用对象主要是工业界，例如可以导出模型进行生产的大型数据集的分布式训练。
 
-通过 `tf.keras.estimator.model_to_estimator` 将 `tf.keras.Model` 转化为   `tf.estimator.Estimator` 对象，使用 `tf.estimator` 接口训练。详见 [从 Keras 模型中创建估计器](./estimators.md#creating_estimators_from_keras_models).
+通过 `tf.keras.estimator.model_to_estimator` 将 `tf.keras.Model` 转化为 `tf.estimator.Estimator` 对象，使用 `tf.estimator` 接口训练。详见[从 Keras 模型中创建估计器](./estimators.md#creating_estimators_from_keras_models).
 
 ```python
 model = keras.Sequential([layers.Dense(10,activation='softmax'),
@@ -456,15 +456,15 @@ model.compile(optimizer=tf.train.RMSPropOptimizer(0.001),
 estimator = keras.estimator.model_to_estimator(model)
 ```
 
-注意： 开启 [eager execution](./eager.md) 可以调试 [估计器输入函数](./premade_estimators.md#create_input_functions) 和 观察数据。
+注意：开启 [eager execution](./eager.md) 可以调试[估计器输入函数](./premade_estimators.md#create_input_functions)和观察数据。
 
 ### GPU 集群
 
-可以使用 `tf.contrib.distribute.DistributionStrategy` 在多个GPU上运行。 此接口在多个GPU上提供分布式训练，几乎不需要对现有代码进行任何更改。
+可以使用 `tf.contrib.distribute.DistributionStrategy` 在多个 GPU 上运行。 此接口在多个 GPU 上提供分布式训练，几乎不需要对现有代码进行任何更改。
 
-目前，`tf.contrib.distribute.MirroredStrategy` 是唯一受支持的分发策略。 `MirroredStrategy` 使用 all-reduce 在一台机器上进行图模型内部的复制与同步。 要使用 Keras 的 `DistributionStrategy`，将 `tf.keras.Model` 转换为`tf.estimator.Estimator` 与 `tf.keras.estimator.model_to_estimator`，然后训练估算器。
+目前，`tf.contrib.distribute.MirroredStrategy` 是唯一受支持的分发策略。 `MirroredStrategy` 使用 all-reduce 在一台机器上进行图模型内部的复制与同步。要使用 Keras 的 `DistributionStrategy`，将 `tf.keras.Model` 转换为`tf.estimator.Estimator` 与 `tf.keras.estimator.model_to_estimator`，然后训练估算器。
 
-以下示例在单个计算机上的多个GPU之间分发 `tf.keras.Model`。
+以下示例在单个计算机上的多个 GPU 之间分发 `tf.keras.Model`。
 
 首先，定义一个简单的模型：
 
@@ -479,7 +479,7 @@ model.compile(loss='binary_crossentropy', optimizer=optimizer)
 model.summary()
 ```
 
-定义 *输入管道*。`input_fn` 返回一个 `tf.data.Dataset` 对象，用于在多个设备之间分配数据 — 每个设备处理一个批处理输入分片。
+定义<b>输入管道</b>。`input_fn` 返回一个 `tf.data.Dataset` 对象，用于在多个设备之间分配数据 — 每个设备处理一个批处理输入分片。
 
 ```python
 def input_fn():
