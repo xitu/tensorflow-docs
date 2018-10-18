@@ -2,11 +2,11 @@
 
 Keras 是一个用于构建和训练深度学习模型的高级程序接口。它被应用于快速原型设计，高级研究和生产环境，有着三大核心优势：
 
-- *用户友好*<br>
+- <b>用户友好</b><br>
   Keras 为常见用例优化了一套简单一致的接口。它给用户错误提供清晰且可操作的反馈。
-- *模块化和组件化*<br>
+- <b>模块化和组件化</b><br>
   Keras 模型将可配置的模块连接在一起，几乎没有任何限制。
-- *易扩展*<br> 编写自定义模块用于研究新想法。创建新的网络层，代价函数和研发先进的模型。
+- <b>易扩展</b><br> 编写自定义模块用于研究新想法。创建新的网络层，代价函数和研发先进的模型。
 
 ## 导入 tf.keras
 
@@ -22,8 +22,8 @@ from tensorflow import keras
 ```
 
 `tf.keras` 能够运行任何 Keras 兼容代码，但是要记住：
-* `tf.keras` 版本在最新的 TensorFlow 发布中可能和 PyPI 中最新的 `keras` 版本不一样。请检查 `tf.keras.__version__`。
-* 当[保存模型权重](#weights_only)，`tf.keras` 默认[检查点格式](./checkpoints.md)。传参 `save_format='h5'` 使用 HDF5 文件格式。
+* 在 TensorFlow 最新发布的版本中，`tf.keras` 的版本可能和 PyPI 中 `keras` 最新的版本不一样。请检查 `tf.keras.__version__`。
+* 当[保存模型权重](#weights_only)，`tf.keras` 默认[检查点格式](./checkpoints.md)。将 `save_format='h5'` 作为参数传入，以使用 HDF5 文件格式。
 
 ## 构建简单模型
 
