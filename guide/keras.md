@@ -35,7 +35,7 @@ from tensorflow import keras
 
 ```python
 model = keras.Sequential()
-# 模型中添加包含64个节点的全连接层：
+# 模型中添加包含 64 个节点的全连接层：
 model.add(keras.layers.Dense(64, activation='relu'))
 # 添加另外一个：
 model.add(keras.layers.Dense(64, activation='relu'))
@@ -83,7 +83,7 @@ model.compile(optimizer=tf.train.AdamOptimizer(0.001),
 
 `tf.keras.Model.compile` 包含三个重要参数：
 
-* `optimizer`: 这个参数指定训练过程。从 `tf.train` 传递优化器实例，比如 [`Adam 优化器`](/api_docs/python/tf/train/AdamOptimizer)，[`RMSProp 优化器`](/api_docs/python/tf/train/RMSPropOptimizer) 或者 [`梯度下降优化器`](/api_docs/python/tf/train/GradientDescentOptimizer)。
+* `optimizer`: 这个参数指定训练过程。从 `tf.train` 模块传递优化器实例，比如 [`Adam 优化器`](/api_docs/python/tf/train/AdamOptimizer)，[`RMSProp 优化器`](/api_docs/python/tf/train/RMSPropOptimizer) 或者 [`梯度下降优化器`](/api_docs/python/tf/train/GradientDescentOptimizer)。
 * `loss`: 优化期间的目标最小化的函数。常见的有均方误差（`mse`），`categorical_crossentropy` 和 `binary_crossentropy`。损失函数由名称或通过从 `tf.keras.losses` 模块传递可调用对象来指定。
 * `metrics`: 用于监督训练。可由名称或通过从 `tf.keras.metrics` 模块传递可调用对象。
 
@@ -229,7 +229,7 @@ model.fit(data, labels, batch_size=32, epochs=5)
 
 通过继承 `tf.keras.Model` 并定义自己的前向传播来构建一个完全自定义的模型。在 `__init__` 方法中创建图层并将它们设置为类实例的属性。在 `call` 方法中定义前向传播。
 
-当 [Eager execution](./eager.md) 被启用时，对子类化模型特别有用，因为可以强制写入前向传播。
+当 [Eager execution](./eager.md) 被启用时，对模型子类化特别有用，因为可以强制写入前向传播。
 
 关键点：工作中使用正确的接口。虽然模型子类化提供了灵活性，但其代价是更高的复杂性和更多的用户错误机会。如果可能，请选择函数式接口。
 
@@ -340,7 +340,7 @@ model.fit(data, targets, batch_size=32, epochs=5)
 
 * `tf.keras.callbacks.ModelCheckpoint`：定期保存模型的检查点。
 * `tf.keras.callbacks.LearningRateScheduler`：动态调整学习率。
-* `tf.keras.callbacks.EarlyStopping`：当验证上表现停止增长时终端训练。
+* `tf.keras.callbacks.EarlyStopping`：当验证性能停止增长时，中断训练。
 * `tf.keras.callbacks.TensorBoard`：使用 [TensorBoard](./summaries_and_tensorboard.md) 监控模型行为。
 
 要使用 `tf.keras.callbacks.Callback`，将其传递给模型的 `fit` 方法：
@@ -385,7 +385,7 @@ model.load_weights('my_model.h5')
 
 ### 仅配置
 
-可以保存模型的配置 — 这可以在没有任何权重的情况下序列化模型体系结构。即使没有定义原始模型的代码，保存的配置也可以重新创建和初始化相同的模型。
+可以保存模型的配置 — 这可以在没有任何权重的情况下序列化模型体系结构。即使没有定义原始模型的代码，保存的配置也可以重新创建和初始化相同的模型。Keras 支持 JSON 和 YAML 序列化格式。
 
 ```python
 # 使用 JSON 格式序列化模型
@@ -430,9 +430,9 @@ model = keras.models.load_model('my_model.h5')
 
 ## Eager execution
 
-[Eager execution](./eager.md) 是一个命令式编程环境，可立即评估操作。这不是Keras所必需的，但是 `tf.keras` 支持，对于检查程序和调试很有用。
+[Eager execution](./eager.md) 是一个命令式编程环境，可立即评估操作。这不是 Keras 所必需的，但是 `tf.keras` 支持，对于检查程序和调试很有用。
 
-所有 `tf.keras` 模型构建接口都与 eager execution 兼容。虽然可以使用 `Sequential`和函数式接口，但是 eager execution 对 *子类化模型* 和构建 *自定义层* 有特别友好 — 仅需要您编写前向传播的接口代码（而不是使用现有的创建模型的接口）。
+所有 `tf.keras` 模型构建接口都与 eager execution 兼容。虽然可以使用 `Sequential` 和函数式接口，但是 eager execution 对<b>子类化模型</b>和构建<b>自定义层</b>有特别友好 — 仅需要您编写前向传播的接口代码（而不是使用现有的创建模型的接口）。
 
 有关使用自定义训练和 `tf.GradientTape` 的 Keras 模型示例，请参阅 [eager execution 指引](./eager.md#build_a_model)。
 
