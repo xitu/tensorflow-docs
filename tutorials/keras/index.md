@@ -4,7 +4,7 @@
 
 发布者注：*Deep Learning with Python* 介绍了 Python 语言和强大的 Keras 库在深度学习领域的应用。该书由 Keras 作者和 Google AI 研究员 FrançoisChollet 撰写，通过直观的解释和实际例子帮助你理解。
 
-想要了解机器学习的基本原理和概念，请考虑参加 [机器学习速成课程](https://developers.google.com/machine-learning/crash-course/)。其他 TensorFlow 和机器学习资源列在 [后续部分](../next_steps)。
+想要了解机器学习的基本原理和概念，请考虑参加[机器学习速成课程](https://developers.google.com/machine-learning/crash-course/)。其他 TensorFlow 和机器学习资源列在 [后续部分](../next_steps)。
 
 1. [基本分类](./basic_classification)
 2. [文本分类](./basic_text_classification)
