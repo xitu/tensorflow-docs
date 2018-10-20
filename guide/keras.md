@@ -14,7 +14,7 @@ Keras 是一个用于构建和训练深度学习模型的高级程序接口。�
 `tf.data` 管道和 [估计器](./estimators.md)。
 `tf.keras` 使得 TensorFlow 在不牺牲灵活性和性能的基础上更加易于使用。
 
-首先，在你的 TensorFlow 程序开始导入 `tf.keras` ：
+首先，在你的 TensorFlow 程序开始导入 `tf.keras`：
 
 ```python
 import tensorflow as tf
@@ -55,12 +55,12 @@ model.add(keras.layers.Dense(10, activation='softmax'))
 ```python
 # 创建 sigmoid 网络层：
 layers.Dense(64, activation='sigmoid')
-# 或者:
+# 或者：
 layers.Dense(64, activation=tf.sigmoid)
 
 # 将 L1 正则化因子为 0.01 的线性层应用于核矩阵：
 layers.Dense(64, kernel_regularizer=keras.regularizers.l1(0.01))
-# 将L1正则化因子为 0.01 的线性层应用于偏差向量：
+# 将 L1 正则化因子为 0.01 的线性层应用于偏差向量：
 layers.Dense(64, bias_regularizer=keras.regularizers.l2(0.01))
 
 # 线性层核矩阵初始化为随机正交矩阵：
@@ -83,9 +83,9 @@ model.compile(optimizer=tf.train.AdamOptimizer(0.001),
 
 `tf.keras.Model.compile` 包含三个重要参数：
 
-* `optimizer`: 这个参数指定训练过程。从 `tf.train` 模块传递优化器实例，比如 [`Adam 优化器`](/api_docs/python/tf/train/AdamOptimizer)，[`RMSProp 优化器`](/api_docs/python/tf/train/RMSPropOptimizer) 或者 [`梯度下降优化器`](/api_docs/python/tf/train/GradientDescentOptimizer)。
-* `loss`: 优化期间的目标最小化的函数。常见的有均方误差（`mse`），`categorical_crossentropy` 和 `binary_crossentropy`。损失函数由名称或通过从 `tf.keras.losses` 模块传递可调用对象来指定。
-* `metrics`: 用于监督训练。可由名称或通过从 `tf.keras.metrics` 模块传递可调用对象。
+* `optimizer`：这个参数指定训练过程。从 `tf.train` 模块传递优化器实例，比如 [`Adam 优化器`](/api_docs/python/tf/train/AdamOptimizer)，[`RMSProp 优化器`](/api_docs/python/tf/train/RMSPropOptimizer) 或者 [`梯度下降优化器`](/api_docs/python/tf/train/GradientDescentOptimizer)。
+* `loss`：优化期间的目标最小化的函数。常见的有均方误差（`mse`），`categorical_crossentropy` 和 `binary_crossentropy`。损失函数由名称或通过从 `tf.keras.losses` 模块传递可调用对象来指定。
+* `metrics`：用于监督训练。可由名称或通过从 `tf.keras.metrics` 模块传递可调用对象。
 
 以下提供了配置训练模型的几个示例：
 
@@ -114,13 +114,13 @@ labels = np.random.random((1000, 10))
 model.fit(data, labels, epochs=10, batch_size=32)
 ```
 
-`tf.keras.Model.fit` 包含三个重要参数:
+`tf.keras.Model.fit` 包含三个重要参数：
 
 * `epochs`：训练过程被划分到 *epochs*。一个 epoch 是对整个输入数据的一次迭代（这是以较小的批次完成的）。
 * `batch_size`：当传递 NumPy 数据时，模型将数据分成较小的批次，并在训练期间迭代这些批次。此整数指定每个批次的大小。请注意，如果样本总数不能被批次大小整除，则最后一批可能会更小。
 * `validation_data`：在对模型进行原型设计时，您希望轻松监控其在某些验证数据上的性能。传递包含输入数据和标签的元组，让模型在每个 epoch 的结束后计算并打印损失和度量值。
 
-这里有个例子使用了 `validation_data`:
+这里有个例子使用了 `validation_data`：
 
 ```python
 import numpy as np
@@ -443,7 +443,7 @@ model = keras.models.load_model('my_model.h5')
 
 [估计器](./estimators.md)接口可以用于分布式环境的训练模型。应用对象主要是工业界，例如可以导出模型进行生产的大型数据集的分布式训练。
 
-通过 `tf.keras.estimator.model_to_estimator` 将 `tf.keras.Model` 转化为 `tf.estimator.Estimator` 对象，使用 `tf.estimator` 接口训练。详见[从 Keras 模型中创建估计器](./estimators.md#creating_estimators_from_keras_models).
+通过 `tf.keras.estimator.model_to_estimator` 将 `tf.keras.Model` 转化为 `tf.estimator.Estimator` 对象，使用 `tf.estimator` 接口训练。详见[从 Keras 模型中创建估计器](./estimators.md#creating_estimators_from_keras_models)。
 
 ```python
 model = keras.Sequential([layers.Dense(10,activation='softmax'),
@@ -462,7 +462,7 @@ estimator = keras.estimator.model_to_estimator(model)
 
 可以使用 `tf.contrib.distribute.DistributionStrategy` 在多个 GPU 上运行。 此接口在多个 GPU 上提供分布式训练，几乎不需要对现有代码进行任何更改。
 
-目前，`tf.contrib.distribute.MirroredStrategy` 是唯一受支持的分发策略。 `MirroredStrategy` 使用 all-reduce 在一台机器上进行图模型内部的复制与同步。要使用 Keras 的 `DistributionStrategy`，将 `tf.keras.Model` 转换为`tf.estimator.Estimator` 与 `tf.keras.estimator.model_to_estimator`，然后训练估算器。
+目前，`tf.contrib.distribute.MirroredStrategy` 是唯一受支持的分发策略。`MirroredStrategy` 使用 all-reduce 在一台机器上进行图模型内部的复制与同步。要使用 Keras 的 `DistributionStrategy`，将 `tf.keras.Model` 转换为`tf.estimator.Estimator` 与 `tf.keras.estimator.model_to_estimator`，然后训练估算器。
 
 以下示例在单个计算机上的多个 GPU 之间分发 `tf.keras.Model`。
 
