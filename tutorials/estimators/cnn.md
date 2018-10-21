@@ -1,4 +1,4 @@
-# Build a Convolutional Neural Network using Estimators
+# 用 Estimators 构建卷积神经网络（CNN）
 
 `tf.layers` 模块提供的高层 API 能让构建神经网络变得简单。它提供了一些便利的方法来创建全连接层和卷积层，添加激活函数，以及应用 dropout 正则化。在这篇教程中，你将会学习到如何使用 `layers` 来创建一个识别手写数字图片（来自于 MNIST 数据集）的卷积神经网络模型。
 
@@ -304,9 +304,9 @@ loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
 
 让我们清楚地了解一下上面的代码做了什么。
 
-Our `labels` tensor contains a list of prediction indices for our examples, e.g. `[1, 9, ...]`. `logits` contains the linear outputs of our last layer. 
+`labels` 张量中包含了我们样例的预测值的索引值，比如 `[1, 9, ...]`。`logits` 中则包含了我们最后一层线性层得到的输出。
 
-`tf.losses.sparse_softmax_cross_entropy`, calculates the softmax crossentropy (aka: categorical crossentropy, negative log-likelihood) from these two inputs in an efficient, numerically stable way.
+`tf.losses.sparse_softmax_cross_entropy` 将高效、稳定地计算两个输入值的 softmax 交叉熵（又名分类交叉熵、负对数似然）。
 
 ### 配置训练操作
 
@@ -321,7 +321,7 @@ if mode == tf.estimator.ModeKeys.TRAIN:
   return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 ```
 
-> functions, see ["Defining the training op for the model"](../../guide/custom_estimators.md#defining-the-training-op-for-the-model) in the ["Creating Estimations in tf.estimator"](../../guide/custom_estimators.md) tutorial.
+> 请在 ["Creating Estimations in tf.estimator"](../../guide/custom_estimators.md) 教程中阅读 ["Defining the training op for the model"](../../guide/custom_estimators.md#defining-the-training-op-for-the-model) 一节，了解更多关于训练函数的内容。
 
 ### 添加评价指标
 
@@ -337,7 +337,7 @@ return tf.estimator.EstimatorSpec(
 
 <a id="train_eval_mnist"></a>
 
-## Training and Evaluating the CNN MNIST Classifier
+## 训练并评价此 CNN MNIST 分类器
 
 我们已经完成了 CNN 模型的代码工作；现在我们准备训练和评价它。
 
