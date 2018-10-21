@@ -10,114 +10,114 @@
 有以下的 TensorFlow 版本可供安装：
 
   * **仅有 CPU 支持的 TensorFlow**。如果你的系统中没有 NVIDIA®&nbsp;GPU，你必须安装这个版本。此版本的 TensorFlow 通常更易于安装，因此即使你拥有NVIDIA GPU，我们也建议你先安装此版本。
-  * **含有 GPU 支持的 TensorFlow**。TensorFlow programs usually run much faster on a GPU instead of a CPU. If you run performance-critical applications and your system has an NVIDIA®&nbsp;GPU that meets the prerequisites, you should install this version. See [TensorFlow GPU support](#NVIDIARequirements) for details.
-
+  * **含有 GPU 支持的 TensorFlow**。 TensorFlow 在 GPU 上运行通常要比在 CPU 上快。如果是在运行存在性能瓶颈应用而正好系统中有 NVIDIA GPU 符合要求，你应安装这个版本。详情请查看 [TensorFlow GPU 支持](#NVIDIARequirements)。
+  
 ## 如何安装 TensorFlow
 
-There are a few options to install TensorFlow on your machine:
+安装 TensorFlow 有如下几个可选方式：
 
-*   [Use pip in a virtual environment](#InstallingVirtualenv) *(recommended)*
-*   [Use pip in your system environment](#InstallingNativePip)
-*   [Configure a Docker container](#InstallingDocker)
-*   [Use pip in Anaconda](#InstallingAnaconda)
-*   [Install TensorFlow from source](/install/install_sources)
+*   [在虚拟环境中使用 pip 安装](#InstallingVirtualenv) **(推荐)**
+*   [在系统环境中使用 pip 安装](#InstallingNativePip)
+*   [配置一个 Docker 容器](#InstallingDocker)
+*   [在 Anacoda 下使用 pip](#InstallingAnaconda)
+*   [由源码安装 TensorFlow](/install/install_sources)
 
 <a name="InstallingVirtualenv"></a>
 
-### Use `pip` in a virtual environment
+### 在虚拟环境中使用 `pip`
 
-Key Point: Using a virtual environment is the recommended install method.
+要点：使用虚拟环境是推荐安装方式。
 
-The [Virtualenv](https://virtualenv.pypa.io/en/stable/) tool creates virtual Python environments that are isolated from other Python development on the same machine. In this scenario, you install TensorFlow and its dependencies within a virtual environment that is available when *activated*. Virtualenv provides a reliable way to install and run TensorFlow while avoiding conflicts with the rest of the system.
+[Virtualenv](https://virtualenv.pypa.io/en/stable/) 工具是用于创建虚拟 Python 环境以与同台物理机中的其他 Python 隔离开。在这个情景中，会在虚拟环境中安装 TensorFlow 及其依赖并只在虚拟环境 **activated（激活）**时可用。Virtualenv 提供了一种避免与系统其他部分产生冲突来安装运行 TensorFlow 的可靠方式。
 
-##### 1. Install Python, `pip`, and `virtualenv`.
+##### 1. 安装 Python, `pip`，以及 `virtualenv`。
 
-On Ubuntu, Python is automatically installed and `pip` is *usually* installed.
-Confirm the `python` and `pip` versions:
+在 Ubuntu 上，Python 是自动安装的而 `pip` **通常** 也已安装。
+确认 `python` 和 `pip` 版本：
 
 <pre class="prettyprint lang-bsh">
   <code class="devsite-terminal">python -V  # or: python3 -V</code>
   <code class="devsite-terminal">pip -V     # or: pip3 -V</code>
 </pre>
 
-To install these packages on Ubuntu:
+安装以下包到 Ubuntu 中：
 
 <pre class="prettyprint lang-bsh">
   <code class="devsite-terminal">sudo apt-get install python-pip python-dev python-virtualenv   # for Python 2.7</code>
   <code class="devsite-terminal">sudo apt-get install python3-pip python3-dev python-virtualenv # for Python 3.n</code>
 </pre>
 
-We *recommend* using `pip` version 8.1 or higher. If using a release before version 8.1, upgrade `pip`:
+我们**推荐**使用 8.1 及以上版本的 `pip`。如果当前使用版本低于 8.1， 请升级 `pip`:
 
 <pre class="prettyprint lang-bsh">
   <code class="devsite-terminal">sudo pip install -U pip</code>
 </pre>
 
-If not using Ubuntu and [setuptools](https://pypi.org/project/setuptools/) is installed, use `easy_install` to install `pip`:
+如果不是 Ubuntu 系统但安装有 [setuptools](https://pypi.org/project/setuptools/) ，使用 `easy_install` 来安装 `pip`：
 
 <pre class="prettyprint lang-bsh">
   <code class="devsite-terminal">easy_install -U pip</code>
 </pre>
 
-##### 2. Create a directory for the virtual environment and choose a Python interpreter.
+##### 2. 为虚拟环境创建一个目录并选择一个 Python 解释器。
 
 <pre class="prettyprint lang-bsh">
-  <code class="devsite-terminal">mkdir ~/tensorflow  # somewhere to work out of</code>
+  <code class="devsite-terminal">mkdir ~/tensorflow  # 工作目录</code>
   <code class="devsite-terminal">cd ~/tensorflow</code>
   <code># Choose one of the following Python environments for the ./venv directory:</code>
-  <code class="devsite-terminal">virtualenv --system-site-packages <var>venv</var>            # Use python default (Python 2.7)</code>
-  <code class="devsite-terminal">virtualenv --system-site-packages -p python3 <var>venv</var> # Use Python 3.n</code>
+  <code class="devsite-terminal">virtualenv --system-site-packages <var>venv</var>            # 使用默认 Python (Python 2.7)</code>
+  <code class="devsite-terminal">virtualenv --system-site-packages -p python3 <var>venv</var> # 使用 Python 3.n</code>
 </pre>
 
-##### 3. Activate the Virtualenv environment.
+##### 3. 激活虚拟环境。
 
-Use one of these shell-specific commands to activate the virtual environment:
+按照以下不同 shell 使用特定命令激活虚拟环境：
 
 <pre class="prettyprint lang-bsh">
-  <code class="devsite-terminal">source ~/tensorflow/<var>venv</var>/bin/activate      # bash, sh, ksh, or zsh</code>
-  <code class="devsite-terminal">source ~/tensorflow/<var>venv</var>/bin/activate.csh  # csh or tcsh</code>
+  <code class="devsite-terminal">source ~/tensorflow/<var>venv</var>/bin/activate      # bash，sh，ksh，或 zsh</code>
+  <code class="devsite-terminal">source ~/tensorflow/<var>venv</var>/bin/activate.csh  # csh 或 tcsh</code>
   <code class="devsite-terminal">. ~/tensorflow/<var>venv</var>/bin/activate.fish      # fish</code>
 </pre>
 
-When the Virtualenv is activated, the shell prompt displays as `(venv) $`.
+当虚拟环境激活后，shell 提示会显示为 `(venv) $`。
 
-##### 4. Upgrade `pip` in the virtual environment.
+##### 4. 在虚拟环境中升级 `pip`。
 
-Within the active virtual environment, upgrade `pip`:
+在激活虚拟环境后，升级 `pip`：
 
 <pre class="prettyprint lang-bsh">
 (venv)$ pip install -U pip
 </pre>
 
-You can install other Python packages within the virtual environment without affecting packages outside the `virtualenv`.
+在虚拟环境中安装其他 Python 包并不会影响 `vurtualenv` 外的包。
 
-##### 5. Install TensorFlow in the virtual environment.
+##### 5. 在虚拟环境中安装 TensorFlow。
 
-Choose one of the available TensorFlow packages for installation:
+选择一个可用的 TensorFlow 包进行安装：
 
-*   `tensorflow` —Current release for CPU
-*   `tensorflow-gpu` —Current release with GPU support
-*   `tf-nightly` —Nightly build for CPU
-*   `tf-nightly-gpu` —Nightly build with GPU support
+*   `tensorflow` —适用于 CPU 的当前发布版本
+*   `tensorflow-gpu` —支持 GPU 的当前发布版本
+*   `tf-nightly` —适用于 CPU 的最新构建版本
+*   `tf-nightly-gpu` —支持 GPU 的最新构建版本
 
-Within an active Virtualenv environment, use `pip` to install the package:
+在激活虚拟环境后，使用 `pip` 安装包：
 
 <pre class="prettyprint lang-bsh">
   <code class="devsite-terminal">pip install -U tensorflow</code>
 </pre>
 
-Use `pip list` to show the packages installed in the virtual environment.
-[Validate the install](#ValidateYourInstallation) and test the version:
+使用 `pip list` 查看虚拟环境中所有已安装包。
+[验证安装](#ValidateYourInstallation)并查看版本：
 
 <pre class="prettyprint lang-bsh">
 (venv)$ python -c "import tensorflow as tf; print(tf.__version__)"
 </pre>
 
-Success: TensorFlow is now installed.
+成功：TensorFlow 现已安装完成。
 
-Use the `deactivate` command to stop the Python virtual environment.
+使用 `deactivate` 命令停用 Python 虚拟环境。
 
-#### Problems
+#### 问题
 
 If the above steps failed, try installing the TensorFlow binary using the remote URL of the `pip` package:
 
