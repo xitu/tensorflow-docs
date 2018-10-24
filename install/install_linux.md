@@ -437,7 +437,7 @@ sudo apt-get install libnvinfer4=4.1.2-1+cuda9.0
 我们依赖于 Stack Overflow 来编写 TensorFlow 的安装问题和它们的解决方案。下面的表格包含了 Stack Overflow 关于常见安装问题的回答。如果你遇见了其他的错误信息或者没有在表格中列出的安装问题，请在 Stack Overflow 上搜索。如果 Stack Overflow 中没有显示相关的错误信息，创建一个新的问题并加上 `tensorflow` 标签。
 
 <table>
-<tr> <th>Link to GitHub or Stack&nbsp;Overflow</th> <th>Error Message</th> </tr>
+<tr> <th>GitHub 或 Stack&nbsp;Overflow 链接</th> <th>报错信息</th> </tr>
 
 <tr>
   <td><a href="https://stackoverflow.com/q/36159194">36159194</a></td>
@@ -453,7 +453,7 @@ sudo apt-get install libnvinfer4=4.1.2-1+cuda9.0
 
 <tr>
   <td><a href="http://stackoverflow.com/q/36371137">36371137</a> and
-  <a href="#Protobuf31">here</a></td>
+  <a href="#Protobuf31">这里</a></td>
   <td><pre>libprotobuf ERROR google/protobuf/src/google/protobuf/io/coded_stream.cc:207] A
   protocol message was rejected because it was too big (more than 67108864 bytes).
   To increase the limit (or to disable these warnings), see
