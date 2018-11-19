@@ -354,29 +354,29 @@ dataset = dataset.flat_map(
         .filter(lambda line: tf.not_equal(tf.substr(line, 0, 1), "#"))))
 ```
 
-### Consuming CSV data
+### 使用 CSV 数据
 
-The CSV file format is a popular format for storing tabular data in plain text. The `tf.contrib.data.CsvDataset` class provides a way to extract records from one or more CSV files that comply with [RFC 4180](https://tools.ietf.org/html/rfc4180). Given one or more filenames and a list of defaults, a `CsvDataset` will produce a tuple of elements whose types correspond to the types of the defaults provided, per CSV record. Like `TFRecordDataset` and `TextLineDataset`, `CsvDataset` accepts `filenames` as a `tf.Tensor`, so you can parameterize it by passing a  `tf.placeholder(tf.string)`.
+CSV 文件格式是以纯文本格式存储表格数据的常用格式。`tf.contrib.data.CsvDataset` 类提供了一种从一个或多个符合 [RFC 4180](https://tools.ietf.org/html/rfc4180) 的 CSV 文件中提取记录的方法。给定一个或多个文件名和一个默认列表，`CsvDataset` 将生成一个元组，其元素对应于每个 CSV 记录提供的默认类型。像 `TFRecordDataset` 和 `TextLineDataset`，`CsvDataset` 接受 `filenames` 作为 `tf.Tensor`，所以你可以通过传递 `tf.placeholder(tf.string)` 初始化参数。
 
 ```
-# Creates a dataset that reads all of the records from two CSV files, each with eight float columns
+# 创建一个数据集，该数据集读取两个 CSV 文件中的所有记录，每个文件包含八个浮点列
 filenames = ["/var/data/file1.csv", "/var/data/file2.csv"]
 record_defaults = [tf.float32] * 8   # Eight required float columns
 dataset = tf.contrib.data.CsvDataset(filenames, record_defaults)
 ```
 
-If some columns are empty, you can provide defaults instead of types.
+如果某些列为空，则可以提供默认值而不是类型。
 
 ```
-# Creates a dataset that reads all of the records from two CSV files, each with four float columns which may have missing values
+# 创建一个数据集，该数据集读取两个 CSV 文件中的所有记录，每个文件包含四个可能缺少值的浮点列
 record_defaults = [[0.0]] * 8
 dataset = tf.contrib.data.CsvDataset(filenames, record_defaults)
 ```
 
-By default, a `CsvDataset` yields *every* column of *every* line of the file, which may not be desirable, for example if the file starts with a header line that should be ignored, or if some columns are not required in the input. These lines and fields can be removed with the `header` and `select_cols` arguments respectively.
+默认情况下，`CsvDataset` 会读取文件的<b>每</b>行的<b>每</b>列，这可能是不可取的，例如，如果文件以应忽略的标题行开头，或者如果不需要某些列。这些行和字段可以分别用 `header` 和 `select_cols` 参数删除。
 
 ```
-# Creates a dataset that reads all of the records from two CSV files with headers, extracting float data from columns 2 and 4.
+# 创建一个数据集，该数据集读取带有标题的两个 CSV 文件中的所有记录，从第 2 列和第 4 列中提取浮点数据。
 record_defaults = [[0.0]] * 2  # Only provide defaults for the selected columns
 dataset = tf.contrib.data.CsvDataset(filenames, record_defaults, header=True, select_cols=[2,4])
 ```
