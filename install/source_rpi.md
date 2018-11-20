@@ -10,7 +10,7 @@
 
 ### 安装 Docker
 
-为了简化依赖管理，构建脚本使用 [Docker](https://docs.docker.com/install/){:.external} 为编译去创建一个虚拟的 Linux 开发环境。通过执行以下命令验证你 Dokcer 的安装： `docker run --rm hello-world`
+为了简化依赖管理，构建脚本使用 [Docker](https://docs.docker.com/install/){:.external} 为编译创建一个虚拟的 Linux 开发环境。通过执行以下命令验证你的 Dokcer 是否安装成功： `docker run --rm hello-world`
 
 ### 下载 TensorFlow 源码
 
@@ -31,7 +31,7 @@ git checkout <em>branch_name</em>  # r1.9, r1.10, etc.
 
 ## 从源码构建
 
-使用 ARMv7 [NEON 指南](https://developer.arm.com/technologies/neon){:.external}交叉编译 TensorFlow 源码去构建一个 Python *pip* 包，运行在 树莓派 2 和 3 设备上。构建脚本启动一个 Docker 容器进行编译。 为编译出来的包在 Python 3 和 Python 2.7 之间进行选择：
+使用 ARMv7 [NEON 指南](https://developer.arm.com/technologies/neon){:.external}交叉编译 TensorFlow 源码去构建一个 Python *pip* 包，其可以运行在 树莓派 2 和 3 设备上。构建脚本启动一个 Docker 容器进行编译。 为编译出来的包在 Python 3 和 Python 2.7 之间进行选择：
 
 <div class="ds-selector-tabs">
   <section>
