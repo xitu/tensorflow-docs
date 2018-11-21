@@ -25,7 +25,7 @@
 ## 低级 APIs
 
   * [简介](../guide/low_level_intro.md)，介绍了如何在高级 API 之外使用 TensorFlow 的基础知识。
-  * [张量](../guide/tensors.md)，解释了如何创建，操作和访问张量（Tensors） —— TensorFlow 中的基本对象。
+  * [张量](../guide/tensors.md)，解释了如何创建，操作和访问张量（Tensors）—— TensorFlow 中的基本对象。
   * [变量](../guide/variables.md)，详细说明了如何在程序中表示共享的持久状态。
   * [图和会话](../guide/graphs.md)，即：
       * 数据流图，它是 TensorFlow 表示的计算作为操作之间的依赖关系。
