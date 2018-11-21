@@ -356,7 +356,7 @@ dataset = dataset.flat_map(
 
 ### 使用 CSV 数据
 
-CSV 文件格式是以纯文本格式存储表格数据的常用格式。`tf.contrib.data.CsvDataset` 类提供了一种从一个或多个符合 [RFC 4180](https://tools.ietf.org/html/rfc4180) 的 CSV 文件中提取记录的方法。给定一个或多个文件名和一个默认列表，`CsvDataset` 将生成一个元组，其元素对应于每个 CSV 记录提供的默认类型。像 `TFRecordDataset` 和 `TextLineDataset`，`CsvDataset` 接受 `filenames` 作为 `tf.Tensor`，所以你可以通过传递 `tf.placeholder(tf.string)` 初始化参数。
+CSV 是一种以纯文本形式存储的常用表格数据格式。`tf.contrib.data.CsvDataset` 类提供了一种从一个或多个符合 [RFC 4180](https://tools.ietf.org/html/rfc4180) 规范的 CSV 文件中提取记录的方法。给定一个或多个文件名和一个默认列表，`CsvDataset` 将生成一个元组，其元素对应于每个 CSV 记录提供的默认类型。与 `TFRecordDataset` 和 `TextLineDataset` 一样，`CsvDataset` 接受 `filenames` 参数，然后以 `tf.Tensor` 的形式接受，所以你可以通过传递 `tf.placeholder(tf.string)` 的方式初始化参数。
 
 ```
 # 创建一个数据集，该数据集读取两个 CSV 文件中的所有记录，每个文件包含八个浮点列
@@ -365,7 +365,7 @@ record_defaults = [tf.float32] * 8   # Eight required float columns
 dataset = tf.contrib.data.CsvDataset(filenames, record_defaults)
 ```
 
-如果某些列为空，则可以提供默认值而不是类型。
+如果某些列为空，则可以提供默认值。
 
 ```
 # 创建一个数据集，该数据集读取两个 CSV 文件中的所有记录，每个文件包含四个可能缺少值的浮点列
@@ -373,7 +373,7 @@ record_defaults = [[0.0]] * 8
 dataset = tf.contrib.data.CsvDataset(filenames, record_defaults)
 ```
 
-默认情况下，`CsvDataset` 会读取文件的<b>每</b>行的<b>每</b>列，这可能是不可取的，例如，如果文件以应忽略的标题行开头，或者如果不需要某些列。这些行和字段可以分别用 `header` 和 `select_cols` 参数删除。
+默认情况下，`CsvDataset` 会读取文件的<b>每</b>行的<b>每</b>列，这是不可取的，例如，如果文件以应忽略的标题行开头，或者如果不需要某些列。这些行和字段可以分别用 `header` 和 `select_cols` 参数删除。
 
 ```
 # 创建一个数据集，该数据集读取带有标题的两个 CSV 文件中的所有记录，从第 2 列和第 4 列中提取浮点数据。
