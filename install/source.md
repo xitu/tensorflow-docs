@@ -1,15 +1,15 @@
 # 源码编译
 
-从源代码构建 TensorFlow <b>pip</b> 包并将其安装在 Ubuntu Linux 和 macOS 上。虽然这些说明可能适用于其他系统，但它仅针对 Ubuntu 和 macOS 进行测试和支持。
+从源代码构建 TensorFlow <b>pip</b> 安装包并将其安装在 Ubuntu Linux 和 macOS 系统上。虽然这些说明可能适用于其他系统，但它仅针对 Ubuntu 和 macOS 进行测试和支持。
 
 注意：我们已经为 Linux 和 macOS 系统提供了经过充分测试的，预先构建的 [TensorFlow 软件包](./pip.md)。
 
 
-## Linux 和 macOS 安装程序
+## Linux 和 macOS 系统设置
 
-安装以下构建工具来配置开发环境。
+安装以下编译工具来配置开发环境。
 
-### 安装 Python 和 TensorFlow 依赖包
+### 安装 Python 和 TensorFlow 的相关依赖包
 
 <div class="ds-selector-tabs">
 <section>
@@ -30,7 +30,7 @@
 </section>
 </div><!--/ds-selector-tabs-->
 
-安装 TensorFlow <b>pip</b> 包依赖（如果使用虚拟环境，忽略 `--user` 参数）：
+安装 TensorFlow <b>pip</b> 安装包的依赖模块（如果使用虚拟环境，忽略 `--user` 参数）：
 
 <pre class="prettyprint lang-bsh">
 <code class="devsite-terminal">pip install -U --user pip six numpy wheel mock</code>
@@ -38,7 +38,7 @@
 <code class="devsite-terminal">pip install -U --user keras_preprocessing==1.0.3 --no-deps</code>
 </pre>
 
-在 `REQUIRED_PACKAGES` 下的 <a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/pip_package/setup.py" class="external"><code>setup.py</code></a> 文件罗列了所有的依赖包。
+在 `REQUIRED_PACKAGES` 下的 <a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/pip_package/setup.py" class="external"><code>setup.py</code></a> 文件中罗列了所有的依赖包。
 
 ### 安装 Bazel
 
@@ -50,9 +50,9 @@
 
 GPU 现在还<b>不</b>支持 macOS。
 
-阅读 [GPU 支持](./ gpu.md)指南，以安装在 GPU上 运行 TensorFlow 所需的驱动程序和其他软件。
+阅读 [GPU 支持](./ gpu.md)指南，以安装在 GPU 上运行 TensorFlow 所需的驱动程序和其它软件。
 
-注意：设置一个支持 GPU 的 TensorFlow 版本的 [Docker 镜像](＃docker_linux_builds)更容易。
+注意：设置一个支持 GPU 的 TensorFlow [Docker 镜像](＃docker_linux_builds)更容易。
 
 ### 下载 TensorFlow 源码
 
@@ -75,24 +75,24 @@ git checkout <em>branch_name</em>  # r1.9, r1.10, etc.
 bazel test -c opt -- //tensorflow/... -//tensorflow/compiler/... -//tensorflow/contrib/lite/...
 </pre>
 
-关键点：如果您在最新的开发分支上遇到构建问题，请尝试已知可用的发布分支。
+关键点：如果在最新的开发分支上遇到构建问题，请尝试已知可用的发布分支。
 
 
 ## 编译配置
 
-通过在 TensorFlow 源代码树的根目录下运行以下命令来配置系统构建：
+在 TensorFlow 源码根目录下运行以下命令来配置系统编译参数：
 
 <pre class="devsite-terminal devsite-click-to-copy">
 ./configure
 </pre>
 
-此脚本会提示您输入 TensorFlow 依赖项的位置，并询问其他构建配置选项（例如，编译器标志）。以下显示了 `./configure` 的示例运行（您的会话可能不同）：
+此脚本会提示输入 TensorFlow 依赖项的位置，并询问其它编译配置选项（例如，编译器标志）。以下显示了 `./configure` 的示例运行（你的会话可能不同）：
 
 <section class="expandable">
 <h4 class="showalways">查看示例配置会话</h4>
 <pre class="devsite-terminal">
 ./configure
-您已经安装 bazel 0.15.0。
+You have bazel 0.15.0 installed。
 请指定 python 的位置。[默认是 /usr/bin/python]: <b>/usr/bin/python2.7</b>
 
 找到可用的 Python 库路径:
@@ -169,14 +169,14 @@ nvcc 将作为 CUDA 编译器。
 
 ### 配置选项
 
-对于 [GPU 支持](./ gpu.md)，请指定 CUDA 和 cuDNN 的版本。如果您的系统安装了多个版本的 CUDA 或 cuDNN，请显式设置版本而不是依赖于默认版本。`./configure` 创建指向系统 CUDA 库的符号链接—因此，如果更新 CUDA 库路径，则必须在构建之前再次运行此配置步骤。
+对于 [GPU 支持](./ gpu.md)，请指定 CUDA 和 cuDNN 的版本。如果系统安装了多个版本的 CUDA 或 cuDNN，请显式设置版本而不是依赖于默认版本。`./configure` 创建指向系统 CUDA 库的符号链接—因此，如果更新 CUDA 库路径，则必须在构建之前再次运行此配置步骤。
 
 对于编译优化标志，默认（`-march = native`）优化机器 CPU 类型的生成代码。但是，如果为不同的 CPU 类型构建 TensorFlow，请考虑更具体的优化标志。有关示例，请参阅 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc-4.5.3/gcc/i386-and-x86_002d64-Options.html){:.external}。
 
 有一些预先配置的构建配置可以添加到 `bazel build` 命令中，例如：
 
 * `--config=mk1` —支持 [Intel® MKL-DNN](https://github.com/intel/mkl-dnn){:.external}.
-* `--config=monolithic` —配置主要是静态整体构造。
+* `--config=monolithic` —配置为静态统一编译。
 
 注意：从 TensorFlow 1.6 开始，二进制文件使用 AVX 指令，这些指令可能无法在较旧的 CPU 上运行。
 
@@ -202,7 +202,7 @@ bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_
 
 #### Bazel 编译选项
 
-从源代码构建 TensorFlow 可以使用大量的 RAM。如果您的系统受内存限制，请将 Bazel的 RAM 使用限制为：`--local_resources 2048，.5,1.0`。
+从源代码构建 TensorFlow 会使用大量的 RAM。如果系统受内存限制，请将 Bazel 的 RAM 使用限制为：`--local_resources 2048，.5,1.0`。
 
 [官方 TensorFlow 软件包](./pip.md)使用 GCC 4 构建并使用较旧的 ABI。对于 GCC 5 及更高版本，使用以下命令使您的构建与旧 ABI 兼容：`--cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0"`。ABI 兼容性确保针对官方 TensorFlow 包构建的自定义操作继续与 GCC 5 构建的包一起使用。
 
@@ -232,7 +232,7 @@ TensorFlow 的 Docker 开发镜像是一种设置环境以从源代码构建 Lin
 
 ### 仅支持 CPU
 
-以下示例使用 `:nightly-devel` 镜像从最新的 TensorFlow 源代码编译仅支持 CPU 的 Python 2 包。有关可用的 TensorFlow `-devel` 标签，请参阅 [Docker 指南](./docker.md)。
+以下示例使用 `:nightly-devel` 镜像从最新的 TensorFlow 源代码编译仅支持 CPU 的 Python 2 的安装包。有关可用的 TensorFlow `-devel` 标签，请参阅 [Docker 指南](./docker.md)。
 
 下载最新的开发镜像并启动我们将用于构建 <b>pip</b> 包的 Docker 容器：
 
@@ -244,9 +244,9 @@ TensorFlow 的 Docker 开发镜像是一种设置环境以从源代码构建 Lin
 <code class="devsite-terminal tfo-terminal-root">git pull  # within the container, download the latest source code</code>
 </pre>
 
-上面的 `docker run` 命令在 `/tensorflow` 目录中启动一个 shell --源代码的根目录。它将主机的当前目录安装在容器的 `/mnt` 目录中，并通过环境变量将主机用户的信息传递给容器（用于设置权限—Docker 可以使这一点变得简单）。
+上面的 `docker run` 命令将在源代码的根目录 `/tensorflow` 中启动一个 shell --源代码的根目录。它将主机的当前目录安装在容器的 `/mnt` 中，并通过环境变量将主机用户的信息传递给容器（用于设置权限—Docker 可以使这一点变得简单）。
 
-或者，要在容器中构建 TensorFlow 的主机副本，请将主机源树挂载到容器的 `/tensorflow` 目录：
+或者，要在容器中构建主机上的 TensorFlow 副本，请将主机的源码目录树挂载到容器的 `/tensorflow` 目录：
 
 <pre class="devsite-terminal devsite-click-to-copy prettyprint lang-bsh">
 docker run -it -w /tensorflow -v <var>/path/to/tensorflow</var>:/tensorflow -v $PWD:/mnt \
