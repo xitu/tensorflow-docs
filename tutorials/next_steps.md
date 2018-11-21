@@ -7,7 +7,7 @@
 * [TensorFlow.js](https://js.tensorflow.org/) 允许 Web 开发人员在浏览器中使用 Node.js 训练和部署机器学习模型。
 * [TF Lite](../lite) 允许移动开发人员在移动设备上高效开发。
 * [TensorFlow Serving](../serving) 是一个开源项目，可以将 TensorFlow 模型快速投入生产。
-* [ecosystem](../ecosystem) 包含很多项目，其中包括 [Magenta](https://magenta.tensorflow.org/)，[TFX](../tfx)，[Swift for TensorFlow](https://github.com/tensorflow/swift) 等。
+* [ecosystem](../ecosystem) 包含很多项目，其中包括 [Magenta](https://magenta.tensorflow.org/)、[TFX](../tfx) 和 [Swift for TensorFlow](https://github.com/tensorflow/swift) 等。
 
 ## 了解有关机器学习更多信息
 
