@@ -21,7 +21,7 @@
 <section>
 <h3>mac OS</h3>
 <p>要求 Xcode 8.3 或者更新版本。</p>
-<p>使用 <a href="https://brew.sh/" class="external">Homebrew</a>  包管理工具安装：</p>
+<p>使用 <a href="https://brew.sh/" class="external">Homebrew</a> 包管理工具安装：</p>
 <pre class="prettyprint lang-bsh">
 <code class="devsite-terminal">/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"</code>
 <code class="devsite-terminal">export PATH="/usr/local/bin:/usr/local/sbin:$PATH"</code>
@@ -50,9 +50,9 @@
 
 GPU 现在还<b>不</b>支持 macOS。
 
-阅读 [GPU 支持](./ gpu.md)指南，以安装在 GPU 上运行 TensorFlow 所需的驱动程序和其它软件。
+阅读 [GPU 支持](./gpu.md)指南，以安装在 GPU 上运行 TensorFlow 所需的驱动程序和其它软件。
 
-注意：设置一个支持 GPU 的 TensorFlow [Docker 镜像](＃docker_linux_builds)更容易。
+注意：设置一个支持 GPU 的 TensorFlow [Docker 镜像](#docker_linux_builds)更容易。
 
 ### 下载 TensorFlow 源码
 
@@ -63,7 +63,7 @@ GPU 现在还<b>不</b>支持 macOS。
 <code class="devsite-terminal">cd tensorflow</code>
 </pre>
 
-仓库默认是 `master` 开发分支。你可以检出 [release 分支](https://github.com/tensorflow/tensorflow/releases){:.external} 来编译:
+仓库默认是 `master` 开发分支。你可以检出 [release 分支](https://github.com/tensorflow/tensorflow/releases){:.external} 来编译：
 
 <pre class="devsite-terminal prettyprint lang-bsh">
 git checkout <em>branch_name</em>  # r1.9, r1.10, etc.
@@ -93,90 +93,90 @@ bazel test -c opt -- //tensorflow/... -//tensorflow/compiler/... -//tensorflow/c
 <pre class="devsite-terminal">
 ./configure
 You have bazel 0.15.0 installed。
-请指定 python 的位置。[默认是 /usr/bin/python]: <b>/usr/bin/python2.7</b>
+请指定 python 的位置。[默认是 /usr/bin/python]：<b>/usr/bin/python2.7</b>
 
-找到可用的 Python 库路径:
+找到可用的 Python 库路径：
   /usr/local/lib/python2.7/dist-packages
   /usr/lib/python2.7/dist-packages
 请输入指定想要使用的 Python 库路径。默认是 [/usr/lib/python2.7/dist-packages]
 
-您是否希望使用 jemalloc 构建 TensorFlow 作为 malloc 支持？ [Y/n]：
+您是否希望使用 jemalloc 构建 TensorFlow 作为 malloc 支持？[Y/n]：
 将为 TensorFlow 启用 jemalloc 作为 malloc 支持。
 
-您是否希望通过 Google Cloud 平台支持构建 TensorFlow？ [Y/n]：
+您是否希望通过 Google Cloud 平台支持构建 TensorFlow？[Y/n]：
 将为 TensorFlow 启用 Google Cloud 平台支持。
 
-您是否希望使用 Hadoop 文件系统支持构建 TensorFlow？ [Y/n]：
+您是否希望使用 Hadoop 文件系统支持构建 TensorFlow？[Y/n]：
 将为 TensorFlow 启用 Hadoop 文件系统支持。
 
-您是否希望通过 Amazon AWS 平台支持构建 TensorFlow？ [Y/n]：
+您是否希望通过 Amazon AWS 平台支持构建 TensorFlow？[Y/n]：
 将为 TensorFlow 启用 Amazon AWS 平台支持。
 
-您是否希望使用 Apache Kafka 平台支持构建 TensorFlow？ [Y/n]：
+您是否希望使用 Apache Kafka 平台支持构建 TensorFlow？[Y/n]：
 将为 TensorFlow 启用 Apache Kafka 平台支持。
 
-您是否希望使用 XLA JIT 支持构建 TensorFlow？ [y/N]：
+您是否希望使用 XLA JIT 支持构建 TensorFlow？[y/N]：
 不会为 TensorFlow 启用 XLA JIT 支持。
 
-您是否希望使用 GDR 支持构建 TensorFlow？ [y/N]：
+您是否希望使用 GDR 支持构建 TensorFlow？[y/N]：
 不会为 TensorFlow 启用 GDR 支持。
 
-您是否希望使用 VERBS 支持构建 TensorFlow？ [y/N]：
+您是否希望使用 VERBS 支持构建 TensorFlow？[y/N]：
 不会为 TensorFlow 启用 VERBS 支持。
 
-您是否希望使用 OpenCL SYCL 支持构建 TensorFlow？ [y/N]：
+您是否希望使用 OpenCL SYCL 支持构建 TensorFlow？[y/N]：
 不会为 TensorFlow 启用 OpenCL SYCL 支持。
 
-您是否希望使用 CUDA 支持构建 TensorFlow？ [y/N]： <b>Y</b>
+您是否希望使用 CUDA 支持构建 TensorFlow？[y/N]：<b>Y</b>
 将为 TensorFlow 启用 CUDA 平台支持。
 
-请指定您想使用的 CUDA SDK 版本。 [留空则默认使用 CUDA 9.0]： <b>9.0</b>
+请指定您想使用的 CUDA SDK 版本。[留空则默认使用 CUDA 9.0]：<b>9.0</b>
 
 请指定安装 CUDA 9.0 工具包的位置。有关更多详细信息，请参阅 README.md。[默认 /usr/local/cuda]：
 
-请指定您想使用的 cuDNN 版本。 [留空默认使用 cuDNN 7.0]： <b>7.0</b>
+请指定您想使用的 cuDNN 版本。[留空默认使用 cuDNN 7.0]：<b>7.0</b>
 
-请指定安装 cuDNN 7 工具包的位置。有关更多详细信息，请参阅 README.md。 [默认 /usr/local/cuda]：
+请指定安装 cuDNN 7 工具包的位置。有关更多详细信息，请参阅 README.md。[默认 /usr/local/cuda]：
 
-您是否希望使用 TensorRT 支持构建 TensorFlow？ [y/N]：
+您是否希望使用 TensorRT 支持构建 TensorFlow？[y/N]：
 不会为 TensorFlow 启用 TensorRT 支持。
 
-请指定您要使用的 NCCL 版本。如果未安装 NCLL 2.2，则可以使用可以自动获取的版本1.3，但是使用多个 GPU 可能性能更差。[默认 2.2]： 1.3
+请指定您要使用的 NCCL 版本。如果未安装 NCLL 2.2，则可以使用可以自动获取的版本 1.3，但是使用多个 GPU 可能性能更差。[默认 2.2]：1.3
 
 请指定要构建的以逗号分隔的 CUDA 计算功能的列表。
-您可以在以下位置找到设备的计算能力：https://developer.nvidia.com/cuda-gpus.
-请注意每一个额外的计算功能都会明显的增加编译时间以及生成的二进制文件大小。 [默认是：3.5,7.0] <b>6.1</b>
+您可以在以下位置找到设备的计算能力：https://developer.nvidia.com/cuda-gpus。
+请注意每一个额外的计算功能都会明显的增加编译时间以及生成的二进制文件大小。[默认是：3.5,7.0] <b>6.1</b>
 
-您是否想要使用 clang 作为 CUDA 编译器？ [y/N]：
+您是否想要使用 clang 作为 CUDA 编译器？[y/N]：
 nvcc 将作为 CUDA 编译器。
 
 请指定 nvcc 应使用哪个 gcc 作为主机编译器。[默认 /usr/bin/gcc]：
 
-您是否希望使用 MPI 支持构建 TensorFlow？ [y/N]：
+您是否希望使用 MPI 支持构建 TensorFlow？[y/N]：
 不会为 TensorFlow 启用 MPI 支持。
 
-当指定 bazel 选项 “--config = opt” 时，请指定在编译期间使用的优化标志[默认 -march = native]：
+当指定 bazel 选项 "--config=opt" 时，请指定在编译期间使用的优化标志[默认 -march=native]：
 
-您是否要以交互方式为 Android 版本配置 ./WORKSPACE？ [y/N]：
+您是否要以交互方式为 Android 版本配置 ./WORKSPACE？[y/N]：
 不会为 Android 编译 WORKSPACE。
 
-预先配置 Bazel 构建配置信息。您可以通过在构建命令中添加“--config = <>”来使用以下任何一项。有关更多详细信息，请参阅 tools/bazel.rc。
-    --config=mkl            # 构建 MKL 支持.
-    --config=monolithic     # 配置主要是静态整体构造
+预先配置 Bazel 构建配置信息。您可以通过在构建命令中添加 "--config=<>" 来使用以下任何一项。有关更多详细信息，请参阅 tools/bazel.rc。
+    --config=mkl            # 构建 MKL 支持。
+    --config=monolithic     # 配置主要是静态整体构造。
 配置结束
 </pre>
 </section>
 
 ### 配置选项
 
-对于 [GPU 支持](./ gpu.md)，请指定 CUDA 和 cuDNN 的版本。如果系统安装了多个版本的 CUDA 或 cuDNN，请显式设置版本而不是依赖于默认版本。`./configure` 创建指向系统 CUDA 库的符号链接—因此，如果更新 CUDA 库路径，则必须在构建之前再次运行此配置步骤。
+对于 [GPU 支持](./gpu.md)，请指定 CUDA 和 cuDNN 的版本。如果系统安装了多个版本的 CUDA 或 cuDNN，请显式设置版本而不是依赖于默认版本。`./configure` 创建指向系统 CUDA 库的符号链接 — 因此，如果更新 CUDA 库路径，则必须在构建之前再次运行此配置步骤。
 
-对于编译优化标志，默认（`-march = native`）优化机器 CPU 类型的生成代码。但是，如果为不同的 CPU 类型构建 TensorFlow，请考虑更具体的优化标志。有关示例，请参阅 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc-4.5.3/gcc/i386-and-x86_002d64-Options.html){:.external}。
+对于编译优化标志，默认（`-march=native`）优化机器 CPU 类型的生成代码。但是，如果为不同的 CPU 类型构建 TensorFlow，请考虑更具体的优化标志。有关示例，请参阅 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc-4.5.3/gcc/i386-and-x86_002d64-Options.html){:.external}。
 
 有一些预先配置的构建配置可以添加到 `bazel build` 命令中，例如：
 
-* `--config=mk1` —支持 [Intel® MKL-DNN](https://github.com/intel/mkl-dnn){:.external}.
-* `--config=monolithic` —配置为静态统一编译。
+* `--config=mk1` — 支持 [Intel® MKL-DNN](https://github.com/intel/mkl-dnn){:.external}。
+* `--config=monolithic` — 配置为静态统一编译。
 
 注意：从 TensorFlow 1.6 开始，二进制文件使用 AVX 指令，这些指令可能无法在较旧的 CPU 上运行。
 
@@ -202,13 +202,13 @@ bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_
 
 #### Bazel 编译选项
 
-从源代码构建 TensorFlow 会使用大量的 RAM。如果系统受内存限制，请将 Bazel 的 RAM 使用限制为：`--local_resources 2048，.5,1.0`。
+从源代码构建 TensorFlow 会使用大量的 RAM。如果系统受内存限制，请将 Bazel 的 RAM 使用限制为：`--local_resources 2048,.5,1.0`。
 
 [官方 TensorFlow 软件包](./pip.md)使用 GCC 4 构建并使用较旧的 ABI。对于 GCC 5 及更高版本，使用以下命令使您的构建与旧 ABI 兼容：`--cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0"`。ABI 兼容性确保针对官方 TensorFlow 包构建的自定义操作继续与 GCC 5 构建的包一起使用。
 
 ### 编译包
 
-`bazel build` 命令创建一个名为 `build_pip_package` 的可执行文件 - 这是构建 `pip` 包的程序。 例如，下面在 `/tmp/tensorflow_pkg` 目录中构建一个 `.whl` 包：
+`bazel build` 命令创建一个名为 `build_pip_package` 的可执行文件 — 这是构建 `pip` 包的程序。例如，下面在 `/tmp/tensorflow_pkg` 目录中构建一个 `.whl` 包：
 
 <pre class="devsite-terminal devsite-click-to-copy">
 ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
@@ -244,7 +244,7 @@ TensorFlow 的 Docker 开发镜像是一种设置环境以从源代码构建 Lin
 <code class="devsite-terminal tfo-terminal-root">git pull  # within the container, download the latest source code</code>
 </pre>
 
-上面的 `docker run` 命令将在源代码的根目录 `/tensorflow` 中启动一个 shell --源代码的根目录。它将主机的当前目录安装在容器的 `/mnt` 中，并通过环境变量将主机用户的信息传递给容器（用于设置权限—Docker 可以使这一点变得简单）。
+上面的 `docker run` 命令将在源代码的根目录 `/tensorflow` 中启动一个 shell — 源代码的根目录。它将主机的当前目录安装在容器的 `/mnt` 中，并通过环境变量将主机用户的信息传递给容器（用于设置权限 — Docker 可以使这一点变得简单）。
 
 或者，要在容器中构建主机上的 TensorFlow 副本，请将主机的源码目录树挂载到容器的 `/tensorflow` 目录：
 
@@ -282,11 +282,11 @@ docker run -it -w /tensorflow -v <var>/path/to/tensorflow</var>:/tensorflow -v $
 
 成功：TensorFlow 已安装。
 
-在你的主机上，TensorFlow <b>pip</b> 包在当前的目录下（拥有主机使用者权限）： <code>./tensorflow-<var>version</var>-cp27-cp27mu-linux_x86_64.whl</code>
+在你的主机上，TensorFlow <b>pip</b> 包在当前的目录下（拥有主机使用者权限）：<code>./tensorflow-<var>version</var>-cp27-cp27mu-linux_x86_64.whl</code>
 
 ### 支持 GPU 
 
-Docker 是为 TensorFlow 构建 GPU 支持的最简单方法，因为<b>主机</b>机器只需要 [NVIDIA®驱动程序](https://github.com/NVIDIA/nvidia-docker/wiki/Frequently-Asked-Questions# 怎么做-in-install-the-nvidia-driver){:.external} <b>不需要安装 NVIDIA®CUDA®Toolkit</b>。请参阅 [GPU 支持指南](./gpu.md)和 TensorFlow [Docker 指南](./ docker.md)以设置 [nvidia-docker](https://github.com/NVIDIA/nvidia-docker){:.external}（仅限 Linux）。
+Docker 是为 TensorFlow 构建 GPU 支持的最简单方法，因为<b>主机</b>机器只需要 [NVIDIA®驱动程序](https://github.com/NVIDIA/nvidia-docker/wiki/Frequently-Asked-Questions#how-do-i-in-install-the-nvidia-driver){:.external} <b>不需要安装 NVIDIA®CUDA®Toolkit</b>。请参阅 [GPU 支持指南](./gpu.md)和 TensorFlow [Docker 指南](./docker.md)以设置 [nvidia-docker](https://github.com/NVIDIA/nvidia-docker){:.external}（仅限 Linux）。
 
 下面的示例下载 TensorFlow `:nightly-devel-gpu-py3` 镜像，并使用 `nvidia-docker` 来运行支持 GPU 的容器。此开发镜像配置为构建具有 GPU 支持的 Python 3 <b>pip</b> 包：
 
