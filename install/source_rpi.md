@@ -2,7 +2,7 @@
 
 本指南为运行 [Raspbian 9.0](https://www.raspberrypi.org/downloads/raspbian/){:.external} 的[树莓派](https://www.raspberrypi.org/){:.external} 设备构建了 TensorFlow 安装包。同时该指南可能也适用于其他版本的树莓派，但是只对这个配置的版本进行了测试和适配。
 
-我们推荐使用 *交叉编译* TensorFlow 的 Raspbian 的安装包。交叉编译是使用不同平台去构建包而不去部署。不使用树莓派有限的内存和相当慢的处理器，使用运行着 Linux、macOS 或者 Windows 系统，性能更强的主机构建 TensorFlow 会更容易。
+我们推荐使用**交叉编译** TensorFlow 的 Raspbian 的安装包。交叉编译是使用不同平台去构建包而不去部署。不使用树莓派有限的内存和相当慢的处理器，使用运行着 Linux、macOS 或者 Windows 系统，性能更强的主机构建 TensorFlow 会更容易。
 
 注意：我们已经为 Raspbian 系统提供了测试好，预编译的 [TensorFlow 包](./pip.md)。
 
@@ -10,18 +10,18 @@
 
 ### 安装 Docker
 
-为了简化依赖管理，构建脚本使用 [Docker](https://docs.docker.com/install/){:.external} 为编译创建一个虚拟的 Linux 开发环境。通过执行以下命令验证你的 Dokcer 是否安装成功： `docker run --rm hello-world`
+为了简化依赖管理，构建脚本使用 [Docker](https://docs.docker.com/install/){:.external} 为编译创建一个虚拟的 Linux 开发环境。通过执行以下命令验证你的 Dokcer 是否安装成功：`docker run --rm hello-world`
 
 ### 下载 TensorFlow 源码
 
-使用 [Git](https://git-scm.com/){:.external} 克隆 [TensorFlow 仓库](https://github.com/tensorflow/tensorflow){:.external}:
+使用 [Git](https://git-scm.com/){:.external} 克隆 [TensorFlow 仓库](https://github.com/tensorflow/tensorflow){:.external}：
 
 <pre class="devsite-click-to-copy">
 <code class="devsite-terminal">git clone https://github.com/tensorflow/tensorflow.git</code>
 <code class="devsite-terminal">cd tensorflow</code>
 </pre>
 
-仓库默认在 `master` 开发分支. 你同样可以切换到一个 [release 分支](https://github.com/tensorflow/tensorflow/releases){:.external} 去构建:
+仓库默认在 `master` 开发分支. 你同样可以切换到一个 [release 分支](https://github.com/tensorflow/tensorflow/releases){:.external} 去构建：
 
 <pre class="devsite-terminal prettyprint lang-bsh">
 git checkout <em>branch_name</em>  # r1.9, r1.10, etc.
@@ -49,11 +49,9 @@ tensorflow/tools/ci_build/ci_build.sh PI \\
     tensorflow/tools/ci_build/pi/build_raspberry_pi.sh
 </pre>
   </section>
-</div>
+</div><!--/ds-selector-tabs-->
 
-<!--/ds-selector-tabs-->
-
-如果需要构建一个适用于全部树莓派设备的包，包括 Pi 1 和 Zero，通过 `PI_ONE` 参数（译者注：原文中是 *To build a package that supports all Raspberry Pi devices—including the Pi 1 and Zero—pass the PI_ONE argument*,译者认为有误，*—* 应该是 *,*），举个栗子：
+如果需要构建一个适用于全部树莓派设备的包 — 包括 Pi 1 和 Zero，通过 `PI_ONE` 参数，举个例子：
 
 <pre class="devsite-terminal prettyprint lang-bsh">
 tensorflow/tools/ci_build/ci_build.sh PI \
