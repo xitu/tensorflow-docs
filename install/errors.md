@@ -1,8 +1,8 @@
-# Build and install error messages
+# 构建及安装过程中的错误信息
 
-TensorFlow uses [GitHub issues](https://github.com/tensorflow/tensorflow/issues){:.external} and [Stack Overflow](https://stackoverflow.com/questions/tagged/tensorflow){:.external} to track and document build and installation problems.
+TensorFlow 使用 [GitHub issues](https://github.com/tensorflow/tensorflow/issues){:.external} 以及 [Stack Overflow](https://stackoverflow.com/questions/tagged/tensorflow){:.external} 跟踪和记录构建和安装问题。
 
-The following list links error messages to a solution or discussion. If you find an installation or build problem that is not listed, please search the GitHub issues and Stack Overflow. If you still can't find the error message, ask a new question on Stack Overflow with the `tensorflow` tag.
+以下列表将错误消息链接到解决方案或讨论。如果发现未列出的安装或构建问题，请搜索GitHub issues 和 Stack Overflow。如果仍然找不到错误消息，请在 Stack Overflow 上附带 `tensorflow` 标签提出你的问题。
 
 <table>
 <tr><th>GitHub issue or Stack&nbsp;Overflow</th> <th>Error Message</th></tr>
@@ -109,14 +109,13 @@ ImportError: cannot import name 'descriptor'</pre>
 </tr>
 <tr>
   <td><a href="http://stackoverflow.com/q/37810228">37810228</a></td>
-  <td>During a <tt>pip install</tt> operation, the system returns:
+  <td>使用 <tt>pip install</tt> 命令时, 系统返回:
   <pre>OSError: [Errno 1] Operation not permitted</pre>
   </td>
 </tr>
 <tr>
   <td><a href="http://stackoverflow.com/q/33622842">33622842</a></td>
-  <td>An <tt>import tensorflow</tt> statement triggers an error such as the
-  following:<pre>Traceback (most recent call last):
+  <td>使用 <tt>import tensorflow</tt> 语句导入时会触发如下错误：<pre>Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
   File "/usr/local/lib/python2.7/site-packages/tensorflow/__init__.py",
     line 4, in <module>
@@ -133,7 +132,7 @@ ImportError: cannot import name 'descriptor'</pre>
 </tr>
 <tr>
   <td><a href="http://stackoverflow.com/q/42075397">42075397</a></td>
-  <td>A <tt>pip install</tt> command triggers the following error:
+  <td>使用 <tt>pip install</tt> 命令是出发如下错误:
 <pre>...<lots of warnings and errors>
 You have not agreed to the Xcode license agreements, please run
 'xcodebuild -license' (for user-level acceptance) or
@@ -224,14 +223,13 @@ ImportError: cannot import name 'descriptor'</pre>
 </tr>
 <tr>
   <td><a href="http://stackoverflow.com/q/37810228">37810228</a></td>
-  <td>During a <tt>pip install</tt> operation, the system returns:
+  <td>使用 <tt>pip install</tt> 命令是,系统返回:
   <pre>OSError: [Errno 1] Operation not permitted</pre>
   </td>
 </tr>
 <tr>
   <td><a href="http://stackoverflow.com/q/33622842">33622842</a></td>
-  <td>An <tt>import tensorflow</tt> statement triggers an error such as the
-  following:<pre>Traceback (most recent call last):
+  <td>使用 <tt>import tensorflow</tt> 触发如下错误：<pre>Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
   File "/usr/local/lib/python2.7/site-packages/tensorflow/__init__.py",
     line 4, in <module>
@@ -265,7 +263,7 @@ ImportError: cannot import name 'descriptor'</pre>
 </tr>
 <tr>
   <td><a href="http://stackoverflow.com/q/35953210">35953210</a></td>
-  <td>Invoking `python` or `ipython` generates the following error:
+  <td>调用 <tt>python</tt> 或 <tt>ipython</tt> 会产生以下错误：
   <pre>ImportError: cannot import name pywrap_tensorflow</pre></td>
 </tr>
 <tr>
