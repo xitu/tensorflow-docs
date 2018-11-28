@@ -28,11 +28,11 @@
 
 要点：使用虚拟环境是推荐安装方式。
 
-[Virtualenv](https://virtualenv.pypa.io/en/stable/) 工具是用于创建虚拟 Python 环境以与同台物理机中的其他 Python 隔离开。在这个情景中，会在虚拟环境中安装 TensorFlow 及其依赖并只在虚拟环境 **activated（激活）**时可用。Virtualenv 提供了一种避免与系统其他部分产生冲突来安装运行 TensorFlow 的可靠方式。
+[Virtualenv](https://virtualenv.pypa.io/en/stable/) 工具是用于创建虚拟 Python 环境以便与同台物理机中的其他 Python 隔离开。在这个情景中，会在虚拟环境中安装 TensorFlow 及其依赖并只在虚拟环境 **activated（激活）**时可用。Virtualenv 提供了一种避免与系统其他部分产生冲突来安装运行 TensorFlow 的可靠方式。
 
 ##### 1. 安装 Python, `pip`，以及 `virtualenv`。
 
-在 Ubuntu 上，Python 是自动安装的而 `pip` **通常** 也已安装。
+在 Ubuntu 上，Python 是自动安装的并且 `pip` **通常** 也已安装。
 确认 `python` 和 `pip` 版本：
 
 <pre class="prettyprint lang-bsh">
@@ -229,14 +229,14 @@
 
 ### 配置一个 Docker 容器
 
-Docker 能将 TensorFlow 安装环境与宿主机中的已有包完全隔离开。这个 Docker 容器包含 TensorFlow 以及其所有依赖。需要注意的是这个 Docker 镜像可能会相当大（数百 MB）。如果在已在使用 Docker 时需要将 TensorFlow 并入一个更大的应用架构中你可以选择使用 Docker 安装。
+Docker 能将 TensorFlow 安装环境与宿主机中的已有包完全隔离开。这个 Docker 容器包含 TensorFlow 及其所有依赖。需要注意的是这个 Docker 镜像可能会相当大（数百 MB）。如果在使用 Docker 时需要将 TensorFlow 并入一个更大的应用架构中你可以选择使用 Docker 安装。
 
 使用以下步骤来使用 Docker 安装 TensorFlow：
 
 1.  按照 [Docker 文档](http://docs.docker.com/engine/installation/)的描述在你的机器上安装 Docker。
 2.  可选项，按照 [Docker 文档](https://docs.docker.com/engine/installation/linux/linux-postinstall/)的描述创建一个 <code>docker</code> 用户组以便不使用 sudo 操作容器。（如果省略此步骤，你每次调用 Docker 命令时都需要使用 sudo。）
 3.  要想安装能够支持 GPU 的 TensorFlow 版本，需要先安装 [nvidia-docker](https://github.com/NVIDIA/nvidia-docker)，这个存储在 github。
-4.  启动一个包含以下 [TensorFlow 已编译镜像](https://hub.docker.com/r/tensorflow/tensorflow/tags/)的镜像。
+4.  启动一个包含以下 [已编译TensorFlow 镜像](https://hub.docker.com/r/tensorflow/tensorflow/tags/)的镜像。
 
 本节的余下部分将讲解如何启动一个 Docker 容器。
 
@@ -253,26 +253,26 @@ $ docker run -it <i>-p hostPort:containerPort TensorFlowCPUImage</i>
 *   <tt><i>-p 宿主机端口:容器端口</i></tt> 可选项，如果你准备以 Jupyter notebook 的方式运行 TensorFlow，要将<tt><i>宿主机端口</i></tt>和<tt><i>容器端口</i></tt>都设为 <tt>8888</tt>。如果你想在容器中运行 TensorBoard，添加第二个 `-p` 参数，将<tt><i>宿主机端口</i></tt>和<tt><i>容器端口</i></tt>都设为 <tt>6066</tt>。
 *   <tt><i>TensorFlowCPUImage</i></tt> 必须项。决定 Docker 容器。指定为以下选项之一：
 
-    *   <tt>tensorflow/tensorflow</tt>， TensorFlow 支持 CPU 的已编译镜像。
-    *   <tt>tensorflow/tensorflow:latest-devel</tt>， 最新的 TensorFlow 支持 CPU 的已编译镜像和源码。
-    *   <tt>tensorflow/tensorflow:<i>version</i></tt>， 特定版本（例如，1.1.0rc1）的 TensorFlow 支持 CPU 的已编译镜像。
-    *   <tt>tensorflow/tensorflow:<i>version</i>-devel</tt>， 特定版本（例如，1.1.0rc1）的 TensorFlow 支持 CPU 的已编译镜像和源码。
+    *   <tt>tensorflow/tensorflow</tt>， 已编译 TensorFlow 支持 CPU 的镜像。
+    *   <tt>tensorflow/tensorflow:latest-devel</tt>， 最新的支持 CPU 的已编译 TensorFlow 镜像和源码。
+    *   <tt>tensorflow/tensorflow:<i>version</i></tt>， 特定版本（例如，1.1.0rc1）的支持 CPU 的已编译 TensorFlow 镜像。
+    *   <tt>tensorflow/tensorflow:<i>version</i>-devel</tt>， 特定版本（例如，1.1.0rc1）的支持 CPU 的已编译 TensorFlow 镜像和源码。
 
     TensorFlow 镜像可在 [dockerhub](https://hub.docker.com/r/tensorflow/tensorflow/) 找到。
 
-例如，下面的命令将最新的 TensorFlow 支持 CPU 的已编译镜像启动在一个能够在命令行中运行 TensorFlow 程序的 Docker 容器中：
+例如，下面的命令将最新的支持 CPU 的已编译 TensorFlow 镜像启动在一个能够在命令行中运行 TensorFlow 程序的 Docker 容器中：
 
 <pre>
 $ <b>docker run -it tensorflow/tensorflow bash</b>
 </pre>
 
-下面的命令也将最新的 TensorFlow 支持 CPU 的已编译镜像启动在 Docker 容器中。只不过，在这个 Docker 容器中，你可以在一个 Jupyter notebook 中运行 TensorFlow 程序：
+下面的命令也将最新的支持 CPU 的已编译 TensorFlow 镜像启动在 Docker 容器中。只不过，在这个 Docker 容器中，你可以在一个 Jupyter notebook 中运行 TensorFlow 程序：
 
 <pre>
 $ <b>docker run -it -p 8888:8888 tensorflow/tensorflow</b>
 </pre>
 
-Docker 会在你第一次启动这个容器时下载 TensorFlow 已编译镜像。
+Docker 会在你第一次启动这个容器时下载已编译 TensorFlow 镜像。
 
 #### GPU 支持
 
@@ -286,18 +286,18 @@ $ <b>nvidia-docker run -it</b> <i>-p hostPort:containerPort TensorFlowGPUImage</
 
 *   <tt><i>-p 宿主机端口:容器端口</i></tt> 可选项，如果你准备以 Jupyter notebook 的方式运行 TensorFlow，要将<tt><i>宿主机端口</i></tt>和<tt><i>容器端口</i></tt>都设为 <tt>8888</tt>。
 *   <i>TensorFlowGPUImage</i> 决定 Docker 容器。指定为以下选项之一：
-    *   <tt>tensorflow/tensorflow:latest-gpu</tt>， 最新的 TensorFlow 支持 GPU 的已编译镜像。
-    *   <tt>tensorflow/tensorflow:latest-devel-gpu</tt>， 最新的 TensorFlow 支持 GPU 的已编译镜像和源码。
-    *   <tt>tensorflow/tensorflow:<i>version</i>-gpu</tt>， 特定版本（例如，0.12.1）的 TensorFlow 支持 GPU 的已编译镜像。
-    *   <tt>tensorflow/tensorflow:<i>version</i>-devel-gpu</tt>， 特定版本（例如，0.12.1）的 TensorFlow 支持 GPU 的已编译镜像和源码。
+    *   <tt>tensorflow/tensorflow:latest-gpu</tt>， 最新的支持 GPU 的已编译 TensorFlow 镜像。
+    *   <tt>tensorflow/tensorflow:latest-devel-gpu</tt>， 最新的支持 GPU 的已编译 TensorFlow 镜像和源码。
+    *   <tt>tensorflow/tensorflow:<i>version</i>-gpu</tt>， 特定版本（例如，0.12.1）的支持 GPU 的已编译 TensorFlow 镜像。
+    *   <tt>tensorflow/tensorflow:<i>version</i>-devel-gpu</tt>， 特定版本（例如，0.12.1）的支持 GPU 的已编译 TensorFlow 镜像和源码。
 
-我们推荐安装 `latest` 版本。例如，下面的命令将最新的 TensorFlow 支持 GPU 的已编译镜像启动在一个能够在命令行中运行 TensorFlow 程序的 Docker 容器中：
+我们推荐安装 `latest` 版本。例如，下面的命令将最新的支持 GPU 的已编译 TensorFlow 镜像启动在一个能够在命令行中运行 TensorFlow 程序的 Docker 容器中：
 
 <pre>
 $ <b>nvidia-docker run -it tensorflow/tensorflow:latest-gpu bash</b>
 </pre>
 
-下面的命令也将最新的 TensorFlow 支持 GPU 的已编译镜像启动在 Docker 容器中。只不过，在这个 Docker 容器中，你可以在一个 Jupyter notebook 中运行 TensorFlow 程序：
+下面的命令也将最新的支持 GPU 的已编译 TensorFlow 镜像启动在 Docker 容器中。只不过，在这个 Docker 容器中，你可以在一个 Jupyter notebook 中运行 TensorFlow 程序：
 
 <pre>
 $ <b>nvidia-docker run -it -p 8888:8888 tensorflow/tensorflow:latest-gpu</b>
@@ -309,7 +309,7 @@ $ <b>nvidia-docker run -it -p 8888:8888 tensorflow/tensorflow:latest-gpu</b>
 $ <b>nvidia-docker run -it -p 8888:8888 tensorflow/tensorflow:0.12.1-gpu</b>
 </pre>
 
-Docker 会在你第一次启动容器时下载 TensorFlow 已编译镜像。更多细节请查看 [TensorFlow docker 自述](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/tools/docker)。
+Docker 会在你第一次启动容器时下载已编译 TensorFlow 镜像。更多细节请查看 [TensorFlow docker 自述](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/tools/docker)。
 
 #### 下一步
 
