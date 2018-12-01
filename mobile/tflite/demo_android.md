@@ -1,6 +1,6 @@
 # Android 示例应用
 
-该 TensorFLow Lite 示例可以在 [GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo) 上被找到。 这是一个使用量子化的 MobileNet 模型或是浮点 Inception-v3 模型对图片进行持续分类的相机应用。示例的最低运行要求是 Android 5.0（API 21）。
+该 TensorFLow Lite 示例可以在 [GitHub](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo) 上被找到。 这是一个使用量化的 MobileNet 模型或是浮点 Inception-v3 模型对图片进行持续分类的相机应用。示例的最低运行要求是 Android 5.0（API 21）。
 
 在示例中，应用会使用 TensorFlow Lite Java API 来预测。应用会为每一帧都进行实时分类，并将可能性最高的类别和检测对象的时间一同显示出来。
 
@@ -27,19 +27,19 @@
 
 现在你可以构建并运行演示程序。
 
-The build process downloads the quantized [Mobilenet TensorFlow Lite model](https://storage.googleapis.com/download.tensorflow.org/models/tflite/mobilenet_v1_224_android_quant_2017_11_08.zip), and unzips it into the assets directory: `tensorflow/contrib/lite/java/demo/app/src/main/assets/`.
+构建过程会下载已量化的 [Mobilenet TensorFlow Lite 模型](https://storage.googleapis.com/download.tensorflow.org/models/tflite/mobilenet_v1_224_android_quant_2017_11_08.zip)，并将其解压到 assets 目录下：`tensorflow/contrib/lite/java/demo/app/src/main/assets/`。
 
-Some additional details are available on the [TF Lite Android App page](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/README.md).
+更多的详细细节可在 [TF Lite Android App 页面](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/README.md) 中查看。
 
-### Using other models
+### 使用其他模型
 
-To use a different model:
+要使用其他模型：
 
-* Download the floating point [Inception-v3 model](https://storage.googleapis.com/download.tensorflow.org/models/tflite/inception_v3_slim_2016_android_2017_11_10.zip).
-* Unzip and copy `inceptionv3_non_slim_2015.tflite` to the assets directory. 
-* Change the chosen classifier in [Camera2BasicFragment.java](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/java/demo/app/src/main/java/com/example/android/tflitecamerademo/Camera2BasicFragment.java)<br>
-  from: `classifier = new ImageClassifierQuantizedMobileNet(getActivity());`<br>
-  to: `classifier = new ImageClassifierFloatInception(getActivity());`.
+* 下载浮点模型 [Inception-v3](https://storage.googleapis.com/download.tensorflow.org/models/tflite/inception_v3_slim_2016_android_2017_11_10.zip)。
+* 解压并拷贝 `inceptionv3_non_slim_2015.tflite` 到 assets 目录。 
+* 变更 [Camera2BasicFragment.java](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/java/demo/app/src/main/java/com/example/android/tflitecamerademo/Camera2BasicFragment.java)<br> 中特定的分类器
+  由: `classifier = new ImageClassifierQuantizedMobileNet(getActivity());`<br>
+  改为: `classifier = new ImageClassifierFloatInception(getActivity());`.
 
 ## 使用源码编译 TensorFlow Lite 和示例应用
 
@@ -94,6 +94,6 @@ bazel build --cxxopt=--std=c++11 //tensorflow/contrib/lite/java/demo/app/src/mai
 
 ## 关于示例
 
-示例应用会缩放每一帧相机获取的图像（224 宽 * 224 高）来匹配量子化的 MobileNets 模型（Inception-v3 是 299 * 299）。缩放后的图像被逐行放进[缓冲区](https://developer.android.com/reference/java/nio/ByteBuffer.html)。它的大小是 1 * 224 * 224 * 3 字节，其中 1 代表该批次中图像的数量。224 * 224（299 * 299）是图像的宽和高。3 字节代表一个像素有 3 种颜色。
+示例应用会缩放每一帧相机获取的图像（224 宽 * 224 高）来匹配量化的 MobileNets 模型（Inception-v3 是 299 * 299）。缩放后的图像被逐行放进[缓冲区](https://developer.android.com/reference/java/nio/ByteBuffer.html)。它的大小是 1 * 224 * 224 * 3 字节，其中 1 代表该批次中图像的数量。224 * 224（299 * 299）是图像的宽和高。3 字节代表一个像素有 3 种颜色。
 
 示例中使用了单进单出的 TensorFlow Lite Java inference API。它输出一个二维数组，第一个维度表示类别索引，第二个维度表示分类的置信度。 两种模型都有 1001 种不同的类别，应用将所有目录的可能性排序，并显示可能性最高的三种。模型文件必须被下载下来并打包到应用的资源目录。

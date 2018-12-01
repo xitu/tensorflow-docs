@@ -1,16 +1,17 @@
-# Performance
+# 性能
 
-This document lists TensorFlow Lite performance benchmarks when running well known models on some Android and iOS devices.
+此文档罗列了在 Android 和 iOS 设备上运行一些知名的模型时 TensorFlow Lite 性能基准。
 
-These performance benchmark numbers were generated with the [Android TFLite benchmark binary](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark) and the [iOS benchmark app](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark/ios).
+这些性能基准值由 [Android TFLite benchmark binary](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark) 和 [iOS benchmark app](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark/ios) 生成。
 
-# Android performance benchmarks
 
-For Android benchmarks, the CPU affinity is set to use big cores on the device to reduce variance (see [details](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark#reducing-variance-between-runs-on-android)).
+# Android 性能基准
 
-It assumes that models were download and unzipped to the `/data/local/tmp/tflite_models` directory. The benchmark binary is built using [these instructions](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark#on-android) and assumed in the `/data/local/tmp` directory.
+在测试 Android 基准时，为了减少差异 CPU 关联都设定到使用设备上最多的核心（[详细](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark#reducing-variance-between-runs-on-android)请查看）
 
-To run the benchmark:
+它假定模型都是下载并解压到 `/data/local/tmp/tflite_models` 目录下。基准程序按照[这些说明](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark#on-android)构建并假定位于 `/data/local/tmp` 目录下。
+
+使用以下命令运行基准程序：
 
 ```
 adb shell taskset ${CPU_MASK} /data/local/tmp/benchmark_model \
@@ -21,9 +22,9 @@ adb shell taskset ${CPU_MASK} /data/local/tmp/benchmark_model \
   --use_nnapi=false
 ```
 
-Here, `${GRAPH}` is the name of model and `${CPU_MASK}` is the CPU affinity chosen according to the following table:
+这里，`${GRAPH}` 是模型的名字，`${CPU_MASK}` 是按照下表选择的 CPU 关联：
 
-Device | CPU_MASK |
+设备 | CPU_MASK |
 -------| ----------
 Pixel 2 | f0 |
 Pixel xl | 0c |
@@ -32,9 +33,9 @@ Pixel xl | 0c |
 <table>
   <thead>
     <tr>
-      <th>Model Name</th>
-      <th>Device </th>
-      <th>Mean inference time (std dev)</th>
+      <th>模型名</th>
+      <th>设备 </th>
+      <th>推论所用平均时间（std dev）</th>
     </tr>
   </thead>
   <tr>
@@ -106,16 +107,16 @@ Pixel xl | 0c |
 
  </table>
 
-# iOS benchmarks
+# iOS 基准
 
-To run iOS benchmarks, the [benchmark app](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark/ios) was modified to include the appropriate model and `benchmark_params.json` was modified  to set `num_threads` to 1.
+为了测试 iOS 基准，修改了 [benchmark app](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark/ios) 以包含合适的模型并且`benchmark_params.json` 中  `num_threads` 设定为 1。
 
 <table>
   <thead>
     <tr>
-      <th>Model Name</th>
-      <th>Device </th>
-      <th>Mean inference time (std dev)</th>
+      <th>模型名</th>
+      <th>设备 </th>
+      <th>推论所用平均时间（std dev）</th>
     </tr>
   </thead>
   <tr>

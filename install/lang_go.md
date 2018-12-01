@@ -1,42 +1,43 @@
-# Install TensorFlow for Go
+# 安装 TensorFlow for Go
 
-TensorFlow provides a [Go API](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go){:.external} — particularly useful for loading models created with Python and running them within a Go application.
+TensorFlow 提供了 [Go API](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go){:.external}， 这对于加载由 Python 创建的模型并在 Go 应用中运行它们特别有用。
 
-Caution: The TensorFlow Go API is *not* covered by the TensorFlow
-[API stability guarantees](../guide/version_compat.md).
+注意：TensorFlow GO API **并不**包含在  TensorFlow 中。
+[API 稳定性说明](../guide/version_compat.md).
 
-## Supported Platforms
 
-TensorFlow for Go is supported on the following systems:
+## 支持平台
+
+TensorFlow for Go 支持以下系统：
 
 * Linux, 64-bit, x86
 * macOS X, Version 10.12.6 (Sierra) or higher
 
-## Setup
+## 步骤
 
 ### TensorFlow C library
 
-Install the [TensorFlow C library](./lang_c.md) which is required for the TensorFlow Go package.
+安装 [TensorFlow C 函数库](./lang_c.md)，它是 TensorFlow Go 包所必需的.
 
-### Download
+### 下载
 
-Download and install the TensorFlow Go package and its dependencies:
+下载并安装 TensorFlow Fo 包和其依赖：
 
 <pre class="devsite-terminal devsite-click-to-copy">
 go get github.com/tensorflow/tensorflow/tensorflow/go
 </pre>
 
-And validate your installation:
+并验证安装成功：
 
 <pre class="devsite-terminal devsite-click-to-copy">
 go test github.com/tensorflow/tensorflow/tensorflow/go
 </pre>
 
-## Build
+## 构建
 
-### Example program
+### 示例程序
 
-With the TensorFlow Go package installed, create an example program with the following source code (`hello_tf.go`):
+在 TensorFlow Go 包安装完成后，按照以下源码创建一个示例程序（`hello_tf.go`）：
 
 ```go
 package main
@@ -69,24 +70,24 @@ func main() {
 }
 ```
 
-### Run
+### 运行
 
-Run the example program:
+运行示例程序：
 
 <pre class="devsite-terminal devsite-click-to-copy">
 go run hello_tf.go
 </pre>
 
-The command outputs: <code>Hello from TensorFlow version <em>number</em></code>
+此命令会输出： <code>Hello from TensorFlow version <em>number</em></code>
 
-Success: The TensorFlow for Go is configured.
+成功：TensorFlow for Go 配置完成。
 
-The program may generate the following warning messages, which you can ignore:
+程序可能会产生如下的警告，可忽视：
 
 <pre>
 W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use *Type* instructions, but these are available on your machine and could speed up CPU computations.
 </pre>
 
-## Build from source
+## 由源码构建
 
-TensorFlow is open source. Read [the instructions](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/go/README.md){:.external} to build TensorFlow for Go from source code.
+TensorFlow 已开源。查看[说明](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/go/README.md){:.external}来有源码构建 TensorFlow for Go。
