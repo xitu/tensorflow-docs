@@ -10,8 +10,8 @@
 有以下的 TensorFlow 版本可供安装：
 
   * **仅有 CPU 支持的 TensorFlow**。如果你的系统中没有 NVIDIA®&nbsp;GPU，你必须安装这个版本。此版本的 TensorFlow 通常更易于安装，因此即使你拥有NVIDIA GPU，我们也建议你先安装此版本。
-  * **含有 GPU 支持的 TensorFlow**。 TensorFlow 在 GPU 上运行通常要比在 CPU 上快。如果是在运行存在性能瓶颈应用而正好系统中有 NVIDIA GPU 符合要求，你应安装这个版本。详情请查看 [TensorFlow GPU 支持](#NVIDIARequirements)。
-  
+  * **含有 GPU 支持的 TensorFlow**。TensorFlow 在 GPU 上运行通常要比在 CPU 上快。如果是在运行存在性能瓶颈应用而正好系统中有 NVIDIA GPU 符合要求，你应安装这个版本。详情请查看 [TensorFlow GPU 支持](#NVIDIARequirements)。
+
 ## 如何安装 TensorFlow
 
 安装 TensorFlow 有如下几个可选方式：
