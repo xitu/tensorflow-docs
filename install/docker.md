@@ -1,13 +1,13 @@
 # Docker
 
- [Docker](https://docs.docker.com/install/){:.external} 使用**容器**创建了一个与外部系统隔离开的 TensorFlow 运行环境。TensorFlow 可**运行在**这个虚拟环境中并使用宿主机的资源（比如目录访问，使用 GPU，网络连接等等）。[TensorFlow Docker 镜像](https://hub.docker.com/r/tensorflow/tensorflow/){:.external}已在各个 release 版本上测试可用。
+[Docker](https://docs.docker.com/install/){:.external} 使用**容器**创建了一个与外部系统隔离开的 TensorFlow 运行环境。TensorFlow 可**运行在**这个虚拟环境中并使用宿主机的资源（比如目录访问，使用 GPU，网络连接等等）。[TensorFlow Docker 镜像](https://hub.docker.com/r/tensorflow/tensorflow/){:.external} 已在各个 release 版本上测试可用。
 
 因为只需在宿主机上安装 [NVIDIA® GPU 驱动](https://github.com/NVIDIA/nvidia-docker/wiki/Frequently-Asked-Questions#how-do-i-install-the-nvidia-driver){:.external}（**NVIDIA® CUDA® Toolkit** 不需安装），所以在 Linux 上使用 Docker 是启用 TensorFlow [GPU 支持](./gpu.md)最简单的方法。   
 
 ## TensorFlow Docker 安装要求
 
 1. 在本地宿主机[安装 Docker](https://docs.docker.com/install/){:.external}。
-2. 在 Linux 环境下获取 GPU 支持， [安装 nvidia-docker](https://github.com/NVIDIA/nvidia-docker){:.external}。
+2. 在 Linux 环境下获取 GPU 支持，[安装 nvidia-docker](https://github.com/NVIDIA/nvidia-docker){:.external}。
 
 注意：想要不使用 `sudo` 运行 `docker` 命令，需要创建 `docker` 用户组并将你的用户加入此用户组。详细步骤请查看 [Linux 安装后配置](https://docs.docker.com/install/linux/linux-postinstall/){:.external}。
 
