@@ -47,13 +47,13 @@
   <code class="devsite-terminal">sudo apt-get install python3-pip python3-dev python-virtualenv # for Python 3.n</code>
 </pre>
 
-我们**推荐**使用 8.1 及以上版本的 `pip`。如果当前使用版本低于 8.1， 请升级 `pip`:
+我们**推荐**使用 8.1 及以上版本的 `pip`。如果当前使用版本低于 8.1，请升级 `pip`：
 
 <pre class="prettyprint lang-bsh">
   <code class="devsite-terminal">sudo pip install -U pip</code>
 </pre>
 
-如果不是 Ubuntu 系统但安装有 [setuptools](https://pypi.org/project/setuptools/) ，使用 `easy_install` 来安装 `pip`：
+如果不是 Ubuntu 系统但安装有 [setuptools](https://pypi.org/project/setuptools/)，使用 `easy_install` 来安装 `pip`：
 
 <pre class="prettyprint lang-bsh">
   <code class="devsite-terminal">easy_install -U pip</code>
@@ -74,7 +74,7 @@
 按照以下不同 shell 使用特定命令激活虚拟环境：
 
 <pre class="prettyprint lang-bsh">
-  <code class="devsite-terminal">source ~/tensorflow/<var>venv</var>/bin/activate      # bash，sh，ksh，或 zsh</code>
+  <code class="devsite-terminal">source ~/tensorflow/<var>venv</var>/bin/activate      # bash、sh、ksh 或 zsh</code>
   <code class="devsite-terminal">source ~/tensorflow/<var>venv</var>/bin/activate.csh  # csh 或 tcsh</code>
   <code class="devsite-terminal">. ~/tensorflow/<var>venv</var>/bin/activate.fish      # fish</code>
 </pre>
@@ -95,10 +95,10 @@
 
 选择一个可用的 TensorFlow 包进行安装：
 
-*   `tensorflow` —适用于 CPU 的当前发布版本
-*   `tensorflow-gpu` —支持 GPU 的当前发布版本
-*   `tf-nightly` —适用于 CPU 的最新构建版本
-*   `tf-nightly-gpu` —支持 GPU 的最新构建版本
+*   `tensorflow` — 适用于 CPU 的当前发布版本
+*   `tensorflow-gpu` — 支持 GPU 的当前发布版本
+*   `tf-nightly` — 适用于 CPU 的最新构建版本
+*   `tf-nightly-gpu` — 支持 GPU 的最新构建版本
 
 在激活虚拟环境后，使用 `pip` 安装包：
 
@@ -149,7 +149,7 @@
 .
 查看 [setup.py 必备包](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/pip_package/setup.py)了解 TensorFlow 安装必需的包。
 
-##### 1. 安装 Python， `pip`，和 `virtualenv`.
+##### 1. 安装 Python、`pip` 和 `virtualenv`。
 
 在 Ubuntu 上，Python 是自动安装的而 `pip` **通常** 也已安装。
 确认 `python` 和 `pip` 版本：
@@ -166,13 +166,13 @@
   <code class="devsite-terminal">sudo apt-get install python3-pip python3-dev # for Python 3.n</code>
 </pre>
 
-我们**推荐**使用 8.1 及以上版本的 `pip`。如果当前使用版本低于 8.1， 请升级 `pip`:
+我们**推荐**使用 8.1 及以上版本的 `pip`。如果当前使用版本低于 8.1，请升级 `pip`：
 
 <pre class="prettyprint lang-bsh">
   <code class="devsite-terminal">sudo pip install -U pip</code>
 </pre>
 
-如果不是 Ubuntu 系统但安装有 [setuptools](https://pypi.org/project/setuptools/) ，使用 `easy_install` 来安装 `pip`：
+如果不是 Ubuntu 系统但安装有 [setuptools](https://pypi.org/project/setuptools/)，使用 `easy_install` 来安装 `pip`：
 
 <pre class="prettyprint lang-bsh">
   <code class="devsite-terminal">easy_install -U pip</code>
@@ -182,10 +182,10 @@
 
 选择一个可用的 TensorFlow 包进行安装：
 
-*   `tensorflow` —适用于 CPU 的当前发布版本
-*   `tensorflow-gpu` —支持 GPU 的当前发布版本
-*   `tf-nightly` —适用于 CPU 的最新构建版本
-*   `tf-nightly-gpu` —支持 GPU 的最新构建版本
+*   `tensorflow` — 适用于 CPU 的当前发布版本
+*   `tensorflow-gpu` — 支持 GPU 的当前发布版本
+*   `tf-nightly` — 适用于 CPU 的最新构建版本
+*   `tf-nightly-gpu` — 支持 GPU 的最新构建版本
 
 然后使用 `pip` 为 Python 2 或 3 安装以下包：
 
@@ -250,13 +250,13 @@ $ docker run -it <i>-p hostPort:containerPort TensorFlowCPUImage</i>
 
 详细解释：
 
-*   <tt><i>-p 宿主机端口:容器端口</i></tt> 可选项，如果你准备以 Jupyter notebook 的方式运行 TensorFlow，要将<tt><i>宿主机端口</i></tt>和<tt><i>容器端口</i></tt>都设为 <tt>8888</tt>。如果你想在容器中运行 TensorBoard，添加第二个 `-p` 参数，将<tt><i>宿主机端口</i></tt>和<tt><i>容器端口</i></tt>都设为 <tt>6066</tt>。
+*   <tt><i>-p 宿主机端口（hostPort）:容器端口（containerPort）</i></tt>可选项，如果你准备以 Jupyter notebook 的方式运行 TensorFlow，要将<tt><i>宿主机端口</i></tt>和<tt><i>容器端口</i></tt>都设为 <tt>8888</tt>。如果你想在容器中运行 TensorBoard，添加第二个 `-p` 参数，将<tt><i>宿主机端口</i></tt>和<tt><i>容器端口</i></tt>都设为 <tt>6066</tt>。
 *   <tt><i>TensorFlowCPUImage</i></tt> 必须项。决定 Docker 容器。指定为以下选项之一：
 
-    *   <tt>tensorflow/tensorflow</tt>， 已编译 TensorFlow 支持 CPU 的镜像。
-    *   <tt>tensorflow/tensorflow:latest-devel</tt>， 最新的支持 CPU 的已编译 TensorFlow 镜像和源码。
-    *   <tt>tensorflow/tensorflow:<i>version</i></tt>， 特定版本（例如，1.1.0rc1）的支持 CPU 的已编译 TensorFlow 镜像。
-    *   <tt>tensorflow/tensorflow:<i>version</i>-devel</tt>， 特定版本（例如，1.1.0rc1）的支持 CPU 的已编译 TensorFlow 镜像和源码。
+    *   <tt>tensorflow/tensorflow</tt>，已编译 TensorFlow 支持 CPU 的镜像。
+    *   <tt>tensorflow/tensorflow:latest-devel</tt>，最新的支持 CPU 的已编译 TensorFlow 镜像和源码。
+    *   <tt>tensorflow/tensorflow:<i>version</i></tt>，特定版本（例如，1.1.0rc1）的支持 CPU 的已编译 TensorFlow 镜像。
+    *   <tt>tensorflow/tensorflow:<i>version</i>-devel</tt>，特定版本（例如，1.1.0rc1）的支持 CPU 的已编译 TensorFlow 镜像和源码。
 
     TensorFlow 镜像可在 [dockerhub](https://hub.docker.com/r/tensorflow/tensorflow/) 找到。
 
@@ -284,12 +284,12 @@ $ <b>nvidia-docker run -it</b> <i>-p hostPort:containerPort TensorFlowGPUImage</
 
 详细解释:
 
-*   <tt><i>-p 宿主机端口:容器端口</i></tt> 可选项，如果你准备以 Jupyter notebook 的方式运行 TensorFlow，要将<tt><i>宿主机端口</i></tt>和<tt><i>容器端口</i></tt>都设为 <tt>8888</tt>。
+*   <tt><i>-p 宿主机端口（hostPort）:容器端口（containerPort）</i></tt>可选项，如果你准备以 Jupyter notebook 的方式运行 TensorFlow，要将<tt><i>宿主机端口</i></tt>和<tt><i>容器端口</i></tt>都设为 <tt>8888</tt>。
 *   <i>TensorFlowGPUImage</i> 决定 Docker 容器。指定为以下选项之一：
-    *   <tt>tensorflow/tensorflow:latest-gpu</tt>， 最新的支持 GPU 的已编译 TensorFlow 镜像。
-    *   <tt>tensorflow/tensorflow:latest-devel-gpu</tt>， 最新的支持 GPU 的已编译 TensorFlow 镜像和源码。
-    *   <tt>tensorflow/tensorflow:<i>version</i>-gpu</tt>， 特定版本（例如，0.12.1）的支持 GPU 的已编译 TensorFlow 镜像。
-    *   <tt>tensorflow/tensorflow:<i>version</i>-devel-gpu</tt>， 特定版本（例如，0.12.1）的支持 GPU 的已编译 TensorFlow 镜像和源码。
+    *   <tt>tensorflow/tensorflow:latest-gpu</tt>，最新的支持 GPU 的已编译 TensorFlow 镜像。
+    *   <tt>tensorflow/tensorflow:latest-devel-gpu</tt>，最新的支持 GPU 的已编译 TensorFlow 镜像和源码。
+    *   <tt>tensorflow/tensorflow:<i>version</i>-gpu</tt>，特定版本（例如，0.12.1）的支持 GPU 的已编译 TensorFlow 镜像。
+    *   <tt>tensorflow/tensorflow:<i>version</i>-devel-gpu</tt>，特定版本（例如，0.12.1）的支持 GPU 的已编译 TensorFlow 镜像和源码。
 
 我们推荐安装 `latest` 版本。例如，下面的命令将最新的支持 GPU 的已编译 TensorFlow 镜像启动在一个能够在命令行中运行 TensorFlow 程序的 Docker 容器中：
 
@@ -313,7 +313,7 @@ Docker 会在你第一次启动容器时下载已编译 TensorFlow 镜像。更�
 
 #### 下一步
 
-现在你需要[验证安装](#ValidateYourInstallation).
+现在你需要[验证安装](#ValidateYourInstallation)。
 
 <a name="InstallingAnaconda"></a>
 
@@ -406,14 +406,14 @@ print(sess.run(hello))
 *   GPU 卡拥有 CUDA Compute Capability 3.5 或以上。查看 [NVIDIA 文档](https://developer.nvidia.com/cuda-gpus)获取受支持 GPU 卡列表。
 
 以下 NVIDIA <i>软件</i>必须安装在你的系统中：
-*   [GPU drivers](http://nvidia.com/driver)。 CUDA 9.0 需要 384.x 或更高。
+*   [GPU drivers](http://nvidia.com/driver)。CUDA 9.0 需要 384.x 或更高。
 *   [CUDA Toolkit 9.0](http://nvidia.com/cuda)。
-*   [cuDNN SDK](http://developer.nvidia.com/cudnn) (>= 7.0)。 推荐使用 7.1 版本 is recommended.
+*   [cuDNN SDK](http://developer.nvidia.com/cudnn) (>= 7.0)。推荐使用 7.1 版本 is recommended。
 *   [CUPTI](http://docs.nvidia.com/cuda/cupti/) 随 CUDA Toolkit 一起，但你需要将它的路径添加到系统环境变量 `LD_LIBRARY_PATH` 中：`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64`。
-*   **可选**: [NCCL 2.2](https://developer.nvidia.com/nccl) 在多块 GPU 中使用 TensorFlow。
-*   **可选**: [TensorRT](http://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html) 理论上可以为一些模型降低延时和吞吐。
+*   **可选**：[NCCL 2.2](https://developer.nvidia.com/nccl) 在多块 GPU 中使用 TensorFlow。
+*   **可选**：[TensorRT](http://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html) 理论上可以为一些模型降低延时和吞吐。
 
-要使用带有 CUDA Compute Capability 3.0 的 GPU，或其他较早版本的 NVIDIA 库，请查看[通过源码安装 TensorFlow](./install_sources.md)。如果使用 Ubuntu 16.04 或其他基于 Debian 的发行版 Linux，可通过 NVIDIA 安装包仓库使用 `apt-get` 简便地安装。  
+要使用带有 CUDA Compute Capability 3.0 的 GPU，或其他较早版本的 NVIDIA 库，请查看[通过源码安装 TensorFlow](./install_sources.md)。如果使用 Ubuntu 16.04 或其他基于 Debian 的发行版 Linux，可通过 NVIDIA 安装包仓库使用 `apt-get` 简便地安装。
 
 ```bash
 # 添加 NVIDIA 安装包仓库。
