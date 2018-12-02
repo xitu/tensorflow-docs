@@ -1,9 +1,8 @@
 # 在 Raspbian 系统上安装 TensorFlow
 
-This guide explains how to install TensorFlow on a Raspberry Pi running Raspbian. Although these instructions might also work on other Pi variants, we have only tested (and we only support) these instructions on machines meeting the following requirements:
 这篇指南将讲解如何在安装 Raspbian 系统的树莓派（Raspberry Pi）上安装 TensorFlow。尽管这些方式可能也能在其他树莓派系统上成功安装，但我们只在以下规格的的机器上进行了测试（这是我们唯一支持）：
 
-*   运行 Raspbian 9.0 或更高版本的树莓派设备。 devices running Raspbian 9.0 or higher
+*   运行 Raspbian 9.0 或更高版本的树莓派设备。
 
 ## 决定如何安装 TensorFlow
 
