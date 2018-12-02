@@ -17,17 +17,17 @@
 
 <table>
   <tr><th>Tag</th><th>描述</th></tr>
-  <tr><td><code>latest</code></td><td>最新发布的已编译 TensorFlow CPU 镜像. 默认.</td></tr>
-  <tr><td><code>nightly</code></td><td>最新构建 TensorFlow 镜像. (不稳定)</td></tr>
+  <tr><td><code>latest</code></td><td>最新发布的已编译 TensorFlow CPU 镜像。默认。</td></tr>
+  <tr><td><code>nightly</code></td><td>最新构建 TensorFlow 镜像。（不稳定）</td></tr>
   <tr><td><code><em>version</em></code></td><td>特定<em>版本</em>的已编译 TensorFlow 镜像，例如：<em>1.11</em></td></tr>
   <tr class="alt"><td colspan="2">Tag 后缀</td></tr>
   <tr><td><code><em>tag</em>-devel<code></td><td>特定 <em>tag</em> 的发布版本和源码。</td></tr>
-  <tr><td><code><em>tag</em>-gpu<code></td><td>特定 <em>tag</em> 的带有 GPU-支持的发布版本。 (<a href="#gpu_support">查看</a>)</td></tr>
+  <tr><td><code><em>tag</em>-gpu<code></td><td>特定 <em>tag</em> 的带有 GPU 支持的发布版本。 (<a href="#gpu_support">查看</a>)</td></tr>
   <tr><td><code><em>tag</em>-py3<code></td><td>特定 <em>tag</em> 的支持 Python 3 的发布版本。</td></tr>
   <tr><td><code><em>tag</em>-gpu-py3<code></td><td>特定 <em>tag</em> 的带有 GPU-支持并支持 Python 3 的发布版本。</td></tr>
   <tr><td><code><em>tag</em>-devel-py3<code></td><td>特定 <em>tag</em> 的支持 Python 3 的发布版本和源码。</td></tr>
   <tr><td><code><em>tag</em>-devel-gpu<code></td><td>特定 <em>tag</em> 的带有 GPU-支持 的发布版本和源码。</td></tr>
-  <tr><td><code><em>tag</em>-devel-gpu-py3<code></td><td>特定 <em>tag</em> 的带有 GPU-支持并支持 Python 3 的发布版本以及源码。td></tr>
+  <tr><td><code><em>tag</em>-devel-gpu-py3<code></td><td>特定 <em>tag</em> 的带有 GPU 支持并支持 Python 3 的发布版本以及源码。td></tr>
 </table>
 
 For example, the following downloads TensorFlow release images to your machine:
@@ -35,7 +35,7 @@ For example, the following downloads TensorFlow release images to your machine:
 
 <pre class="devsite-click-to-copy prettyprint lang-bsh">
 <code class="devsite-terminal">docker pull tensorflow/tensorflow                    # 最新稳定发布版本</code>
-<code class="devsite-terminal">docker pull tensorflow/tensorflow:nightly-devel-gpu  # 最新开发版本 w/ GPU-支持</code>
+<code class="devsite-terminal">docker pull tensorflow/tensorflow:nightly-devel-gpu  # 最新开发版本 w/ GPU 支持</code>
 </pre>
 
 ## 启动 TensorFlow Docker 容器
@@ -115,7 +115,7 @@ docker run --runtime=nvidia -it --rm tensorflow/tensorflow:latest-gpu \
 
 配置已启用 GPU 的镜像可能会花费很长时间。如果需要重复运行基于 GPU 的脚本，你可以使用 `docker exec` 来重用容器。
 
-使用最新的 TensorFlow GPU 镜像并在容器中运行一个 'bash' 命令行会话：
+使用最新的 TensorFlow GPU 镜像并在容器中运行一个 `bash` 命令行会话：
 
 <pre class="devsite-terminal devsite-click-to-copy">
 docker run --runtime=nvidia -it tensorflow/tensorflow:latest-gpu bash
