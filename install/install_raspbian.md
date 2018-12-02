@@ -32,7 +32,7 @@
 
 [pip](https://en.wikipedia.org/wiki/Pip_\(package_manager\)) 用于安装和管理 Python 包。如果你想用原生 pip 安装，那么以下一个版本的 pip 必须安装在你的系统中：
 
-*   `pip3`，适用于 Python 3.n （推荐）。
+*   `pip3`，适用于 Python 3.n（推荐）。
 *   `pip`，适用于 Python 2.7。
 
 `pip` 或 `pip3` 很可能在你安装 Python 时已同时安装。检查系统中是否已安装 pip 或 pip3，使用以下命令之一检查：
@@ -40,15 +40,14 @@
 <pre>$ <b>pip3 -V</b> # for Python 3.n
 $ <b>pip -V</b>  # for Python 2.7</pre>
 
-如果返回错误“Command not found”。此包尚未安装。如要第一次安装它，请运行：
+如果返回错误 "Command not found"。此包尚未安装。如要第一次安装它，请运行：
 
 <pre>$ sudo apt-get install python3-pip # for Python 3.n
 sudo apt-get install python-pip # for Python 2.7</pre>
 
-You can find more help on installing and upgrading pip in [the Raspberry Pi documentation](https://www.raspberrypi.org/documentation/linux/software/python.md).
-如果在安装和升级 pip 的过程中需要更多帮助，请参阅[ Raspberry Pi 文档](https://www.raspberrypi.org/documentation/linux/software/python.md)
+如果在安装和升级 pip 的过程中需要更多帮助，请参阅 [Raspberry Pi 文档](https://www.raspberrypi.org/documentation/linux/software/python.md)
 
-### 必备项： Atlas
+### 必备项：Atlas
 
 [Atlas](http://math-atlas.sourceforge.net/) 是 numpy 依赖的一个线性代数库，所以需要在 TensorFlow 前安装。使用以下命令将其添加到系统中：
 
@@ -61,7 +60,7 @@ You can find more help on installing and upgrading pip in [the Raspberry Pi docu
      <pre> $ <b>pip3 install tensorflow</b>     # Python 3.n
      $ <b>pip install tensorflow</b>      # Python 2.7</pre>
 
-由于一些 TensorFlow 依赖的 Python 包（比如 scipy）需要在安装过程中编译，所以在某些平台（比如 树莓派 zero）上会花费些时间。因为  piwheels.org 已将这些依赖的包进行了预编译，所以 Python 3 版本通常安装速度较快，这也是我们推荐的方式。
+由于一些 TensorFlow 依赖的 Python 包（比如 scipy）需要在安装过程中编译，所以在某些平台（比如 树莓派 zero）上会花费些时间。因为 piwheels.org 已将这些依赖的包进行了预编译，所以 Python 3 版本通常安装速度较快，这也是我们推荐的方式。
 
 ### 下一步
 
@@ -128,7 +127,7 @@ tensorflow/tools/ci_build/ci_build.sh PI-PYTHON3 tensorflow/tools/ci_build/pi/bu
 
 构建脚本使用 Docker 创建一个 Linux 虚拟机在内部处理构建过程。如果运行脚本出现问题，首先在系统上检查 Docker 是否可用（比如 `docker run hello-world` ）。
 
-如果你由最新开发分支进行构建，请尝试同步到最近可用的版本，例如， release 1.9，使用如下命令：
+如果你由最新开发分支进行构建，请尝试同步到最近可用的版本，例如，release 1.9，使用如下命令：
 
 <pre>$ <b>git checkout r1.0</b></pre>
 
@@ -171,7 +170,7 @@ print(sess.run(hello))
 
 如果你使用 Python3.5，第一次导入 TensorFlow 可能会产生一条警告。这不是一个错误，TensorFlow 也能正常运行，可以忽视这个日志信息。
 
-如果系统输出了报错信息，请查看  [一般安装问题](#common_installation_problems)
+如果系统输出了报错信息，请查看 [一般安装问题](#common_installation_problems)。
 
 想要学习更多，请查看 [TensorFlow 教程](../tutorials/)。
 
