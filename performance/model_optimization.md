@@ -1,40 +1,41 @@
-# Model optimization
+# 模型优化
 
-Inference efficiency is a critical issue when deploying machine learning models to mobile devices. Where the computational demand for *training* grows with the number of models trained on different architectures, the computational demand for *inference* grows in proportion to the number of users. The *Tensorflow Model Optimization Toolkit* minimizes the complexity of inference—the model size, the latency and power consumption.
+在将机器学习模型部署到移动设备时，推理效率是一个关键问题。当训练的计算需求随着在不同体系结构上训练的模型的数量而增长时，推理的计算需求与用户的数量成比例地增长。Tensorflow模型优化工具包最大限度地降低了推理的复杂性 - 模型大小，延迟和功耗。
 
-## Use cases
+## 用例
 
-Model optimization is useful for:
+模型优化适用于：
 
-* Deploying models to edge devices with restrictions on processing, memory, or power-consumption. For example, mobile and Internet of Things (IoT) devices.
-* Reduce the payload size for over-the-air model updates.
-* Execution on hardware constrained by fixed-point operations.
-* Optimize models for special purpose hardware accelerators.
+- 将模型部署到边缘设备，限制处理，内存或功耗。例如，移动设备和物联网（IoT）设备。
+- 减少无线模型更新的有效负载大小。
+- 在由定点操作约束的硬件上执行。
+- 优化专用硬件加速器的模型。
 
 
-## Optimization methods
 
-Model optimization uses multiple techniques:
+## 优化方法
 
-* Reduced parameter count, for example, pruning and structured pruning.
-* Reduced representational precision, for example, quantization.
-* Update the original model topology to a more efficient one, with reduced parameters or faster execution, for example, tensor decomposition methods and distillation.
+模型优化使用多种技术：
 
-## Model quantization
+- 减少参数的数量，例如剪枝和结构化剪枝。
+- 降低表示精度，例如量化。
+- 通过减少参数或快速执行将原始模型拓扑更新为更有效的拓扑，例如，张量分解方法和蒸馏。
 
-Quantizing deep neural networks uses techniques that allow for reduced precision representations of weights and, optionally, activations for both storage and computation. Quantization provides several benefits:
+## 模型量化
 
-* Support on existing CPU platforms.
-* Quantizing activations reduces memory access costs for reading and storing intermediate activations.
-* Many CPU and hardware accelerator implementations provide SIMD instruction capabilities, which are especially beneficial for quantization.
+使用允许降低权重的精确表示并且可选地，存储和计算的激活方式来量化深度神经网络。量化有以下几个好处：
 
-[TensorFlow Lite](../lite) provides several levels of support for quantization.
+- 支持在已有的 CPU 平台上运行。
+- 量化激活降低了读取和存储中间激活的存储器访问成本。
+- 许多 CPU 和硬件加速器实现提供 SIMD 指令功能，这对量化特别有帮助。
 
-[Post-training quantization](post_training_quantization.md) quantizes weights and activations post training and is very easy to use. [Quantization-aware training](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/quantize/README.md){:.external} allows for training networks that can be quantized with minimal accuracy drop and is only available for a subset of convolutional neural network architectures.
+[TensorFlow Lite](../lite)  为量化提供了几个级别的支持。
 
-### Latency and accuracy results
+[Post-training quantization](post_training_quantization.md) 将权重和激活量化为训练后，且使用简单。 [Quantization-aware training](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/quantize/README.md){:.额外的} 考虑到训练网络可以以最小的准确率下降来量化，而且只是对卷积神经网络结构的一个子集有用。
 
-Below are the results of the latency and accuracy of post-training quantization and quantization-aware training on a few models. All latency numbers are measured on Pixel&nbsp;2 devices using a single big core. As the toolkit improves, so will the numbers here:
+### **延迟和准确率结果**
+
+下边是在几个模型上进行了 post-training quantization 和 quantization-aware training 的延迟和准确率的结结果。 所有的延迟数量是在两个设备上测试的用单一大的那个。 随着工具包的改进，这里的数据也会变化：
 
 <figure>
   <table>
@@ -59,12 +60,12 @@ Below are the results of the latency and accuracy of post-training quantization 
       <td>3973</td><td>2868</td><td>N/A</td><td>178.3</td><td>44.9</td></tr>
  </table>
   <figcaption>
-    <b>Table 1</b> Benefits of model quantization for select CNN models
+    <b>表格 1</b> 选择 CNN 模型的模型量化的好处
   </figcaption>
 </figure>
 
-## Choice of quantization tool
+## 量化工具的选择
 
-As a starting point, check if the models in the TensorFlow Lite model repository can work for your application. If not, we recommend that users start with the post-training quantization tool since this is broadly applicable and does not require training data. For cases where the accuracy and latency targets are not met, or hardware accelerator support is important, quantization-aware training is the better option.
- 
-Note: Quantization-aware training supports a subset of convolutional neural network architectures.
+作为起点，检查 tensorflow lite 模型存储库中的模型是否适用于你的应用。如果不适用，我们建议用户从 post-training quantization 工具开始，因为它是是广泛适用的且不需要训练数据。对于那些不满足准确率和延迟目标的，或硬件加速器支持很重要的情况的，quantization-aware training 是一个更好的选择。
+
+注意： Quantization-aware training 支持卷积神经网络架构的子集。
