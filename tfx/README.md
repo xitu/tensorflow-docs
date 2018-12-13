@@ -1,9 +1,9 @@
-Welcome to the warp zone!
+欢迎来到传送门!
 
-# TensorFlow Extended (TFX)
+# TensorFlow 扩展 (TFX)
 
-These docs are available here:
+这些文档可以在这里获得：
 
-* Data Validation: https://github.com/tensorflow/data-validation/tree/master/g3doc
-* Transform: https://github.com/tensorflow/transform
-* Model Analysis: https://github.com/tensorflow/model-analysis/tree/master/g3doc
+* 数据验证： https://github.com/tensorflow/data-validation/tree/master/g3doc
+* 转换： https://github.com/tensorflow/transform
+* 模型分析： https://github.com/tensorflow/model-analysis/tree/master/g3doc
