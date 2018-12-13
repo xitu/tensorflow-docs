@@ -1,18 +1,18 @@
-# Build from source on Windows
+# 在 Windows 上编译源码
 
-Build a TensorFlow *pip* package from source and install it on Windows.
+利用源码在 Windows 上构建 TensorFlow *pip* 包。
 
-Note: We already provide well-tested, pre-built [TensorFlow packages](./pip.md) for Windows systems.
+注意：我们已经为 Windows 系统提供了经过完善测试和预编译的 [TensorFlow 包](./pip.md)。
 
-## Setup for Windows
+## Windows 设置
 
-Install the following build tools to configure your Windows development environment.
+安装下列编译工具来配置你的 Windows 开发环境。
 
-### Install Python and the TensorFlow package dependencies
+### 安装 Python 和 TensorFlow 的依赖包
 
-Install a [Python 3.5.x or Python 3.6.x 64-bit release for Windows](https://www.python.org/downloads/windows/){:.external}. Select *pip* as an optional feature and add it to your `%PATH%` environmental variable.
+安装 [Python 3.5.x 或者 Python 3.6.x 64-bit Windows 发行版](https://www.python.org/downloads/windows/){:.external}。勾选 *pip* 安装选项并把它添加到 `%PATH%` 环境变量。
 
-Install the TensorFlow *pip* package dependencies:
+安装 TensorFlow *pip* 依赖包：
 
 <pre class="devsite-click-to-copy">
 <code class="devsite-terminal tfo-terminal-windows">pip3 install six numpy wheel</code>
@@ -20,70 +20,70 @@ Install the TensorFlow *pip* package dependencies:
 <code class="devsite-terminal tfo-terminal-windows">pip3 install keras_preprocessing==1.0.3 --no-deps</code>
 </pre>
 
-The dependencies are listed in the <a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/pip_package/setup.py" class="external"><code>setup.py</code></a> file under `REQUIRED_PACKAGES`.
+依赖项在 `REQUIRED_PACKAGES` 下的 <a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/pip_package/setup.py" class="external"><code>setup.py</code></a> 文件中列出。
 
-### Install Bazel
+### 安装 Bazel
 
-[Install Bazel](https://docs.bazel.build/versions/master/install-windows.html){:.external}, the build tool used to compile TensorFlow.
+[安装 Bazel](https://docs.bazel.build/versions/master/install-windows.html){:.external}，TensorFlow 的编译工具。
 
-Add the location of the Bazel executable to your `%PATH%` environment variable.
+将 Bazel 可执行文件的位置添加到 `%PATH%` 环境变量。
 
-### Install MSYS2
+### 安装 MSYS2
 
-[Install MSYS2](https://www.msys2.org/){:.external} for the bin tools needed to build TensorFlow. If MSYS2 is installed to `C:\msys64`, add `C:\msys64\usr\bin` to your `%PATH%` environment variable. Then, using `cmd.exe`, run:
+[安装 MSYS2](https://www.msys2.org/){:.external}，里面包含了编译 TensorFlow 需要用到的工具。如果 MSYS2 安装在 `C:\msys64` 路径，将 `C:\msys64\usr\bin` 添加到 `%PATH%` 环境变量。 然后运行 `cmd.exe`：
 
 <pre class="devsite-terminal tfo-terminal-windows devsite-click-to-copy">
 pacman -S git patch unzip
 </pre>
 
-### Install Visual C++ Build Tools 2015
+### 安装 Visual C++ Build Tools 2015
 
-Install the *Visual C++ build tools 2015*. This comes with *Visual Studio 2015* but can be installed separately:
+安装 *Visual C++ build tools 2015*。这个安装包属于 *Visual Studio 2015*，但可以被独立安装：
 
-1. Go to the [Visual Studio downloads](https://visualstudio.microsoft.com/vs/older-downloads/){:.external},
-2. Select *Redistributables and Build Tools*,
-3. Download the *Microsoft Build Tools 2015 Update 3*, and
-4. Run the installer.
+1. 进入 [Visual Studio 下载页面](https://visualstudio.microsoft.com/vs/older-downloads/){:.external}，
+2. 选择**重发行包和编译工具**，
+3. 下载 *Microsoft Build Tools 2015 Update 3*，
+4. 运行安装包。
 
-Note: TensorFlow is tested against *Visual Studio 2015 Update 3*, but it's possible a more recent version of the Visual C++ build tools works.
+注意：TensorFlow 在 *Visual Studio 2015 Update 3* 经过测试，但它也可能在一些更新版本的 Visual C++ 编译工具上工作。
 
-### Install GPU support (optional)
+### 安装 GPU 支持（可选）
 
-See the Windows [GPU support](./gpu.md) guide to install the drivers and additional software required to run TensorFlow on a GPU.
+参看 Windows 下的 [GPU 支持](./gpu.md)指南，安装驱动和需要的附加软件来在 GPU 上运行 TensorFlow。
 
-### Download the TensorFlow source code
+### 下载 TensorFlow 源码
 
-Use [Git](https://git-scm.com/){:.external} to clone the [TensorFlow repository](https://github.com/tensorflow/tensorflow){:.external} (`git` in installed with MSYS2):
+用 [Git](https://git-scm.com/){:.external} 克隆 [TensorFlow 仓库](https://github.com/tensorflow/tensorflow){:.external}（`git` 在 MSYS2 中附带）：
 
 <pre class="devsite-click-to-copy">
 <code class="devsite-terminal tfo-terminal-windows">git clone https://github.com/tensorflow/tensorflow.git</code>
 <code class="devsite-terminal tfo-terminal-windows">cd tensorflow</code>
 </pre>
 
-The repo defaults to the `master` development branch. You can also checkout a [release branch](https://github.com/tensorflow/tensorflow/releases){:.external} to build:
+仓库默认为 `master` 分支。你也可以检出到 [release 分支](https://github.com/tensorflow/tensorflow/releases){:.external}来构建：
 
 <pre class="devsite-terminal tfo-terminal-windows prettyprint lang-bsh">
 git checkout <em>branch_name</em>  # r1.9, r1.10, etc.
 </pre>
 
-To test your copy of the source tree, run the following test (this may take a while):
+要测试你的源码版本，运行以下测试（可能需要一小会）：
 
 <pre class="devsite-terminal tfo-terminal-windows devsite-click-to-copy">
 bazel test -c opt -- //tensorflow/... -//tensorflow/compiler/... -//tensorflow/contrib/lite/...
 </pre>
 
-Key Point: If you're having build problems on the latest development branch, try a release branch that is known to work.
+关键点：如果你在最新的开发分支上遇到了编译问题，试着切换到一个已知可行的发行分支。
 
 
-## Configure the build
+## 编译配置
 
-Configure your system build by running the following at the root of your TensorFlow source tree:
+在你的 TensorFlow 源码根目录下运行以下命令来配置系统编译：
 
 <pre class="devsite-terminal tfo-terminal-windows devsite-click-to-copy">
 python ./configure.py
 </pre>
 
-This script prompts you for the location of TensorFlow dependencies and asks for additional build configuration options (compiler flags, for example). The following shows a sample run of `python ./configure.py` (your session may differ):
+这个脚本会提示你 TensorFlow 依赖的路径并请求附加的编译配置项（比如编译器标识）。下面展示了运行 `python ./configure.py` 的示例（你的会话可能会有所不同）：
 
 <section class="expandable">
 <h4 class="showalways">View sample configuration session</h4>
@@ -122,74 +122,74 @@ Configuration finished
 </pre>
 </section>
 
-### Configuration options
+### 可选配置
 
-For [GPU support](./gpu.md), specify the versions of CUDA and cuDNN. If your system has multiple versions of CUDA or cuDNN installed, explicitly set the version instead of relying on the default. `./configure.py` creates symbolic links to your system's CUDA libraries—so if you update your CUDA library paths, this configuration step must be run again before building.
+如果要开启 [GPU 支持](./gpu.md)，指定 CUDA 和 cuDNN 的版本。如果你的系统安装了多个版本的 CUDA 或者 cuDNN，明确指定版本号，而不要依赖默认配置。`./configure.py` 将会对你的系统的 CUDA 库创建符号连接 —— 所以如果你更新了你的 CUDA 库路径，需要在编译前重新执行这一步。
 
-Note: Starting with TensorFlow 1.6, binaries use AVX instructions which may not run on older CPUs.
+注意：自 TensorFlow 1.6 起，二进制文件使用 AVX 指令集，这会导致旧的 CPU 不被兼容。
 
-## Build the pip package
+## 编译 pip 包
 
-### Bazel build
+### Bazel 编译
 
 #### CPU-only
 
-Use `bazel` to make the TensorFlow package builder with CPU-only support:
+使用 `bazel` 来让 TensorFlow 包编译器仅支持 CPU：
 
 <pre class="devsite-terminal tfo-terminal-windows devsite-click-to-copy">
 bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
 </pre>
 
-#### GPU support
+#### GPU 支持
 
-To make the TensorFlow package builder with GPU support:
+如果要让 TensorFlow 包编译器支持 GPU：
 
 <pre class="devsite-terminal tfo-terminal-windows devsite-click-to-copy">
 bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_package
 </pre>
 
-#### Bazel build options
+#### Bazel 编译选项
 
-Building TensorFlow from source can use a lot of RAM. If your system is memory-constrained, limit Bazel's RAM usage with: `--local_resources 2048,.5,1.0`.
+从源码编译 TensorFlow 很占内存。如果你的系统内存有限，通过 `--local_resources 2048,.5,1.0` 选项来限制 Bazel 的内存占用。
 
-If building with GPU support, add `--copt=-nvcc_options=disable-warnings` to suppress nvcc warning messages.
+如果开启了 GPU 支持，添加 `--copt=-nvcc_options=disable-warnings` 来忽略 nvcc 警告信息。
 
-### Build the package
+### 包编译
 
-The `bazel build` command creates an executable named `build_pip_package` — this is the program that builds the `pip` package. For example, the following builds a `.whl` package in the `C:/tmp/tensorflow_pkg` directory:
+`bazel build` 命令创建了一个叫做 `build_pip_package` 的可执行文件 —— 这是用来构建 `pip` 包的程序。举个例子，下面的命令在 `C:/tmp/tensorflow_pkg` 目录下构建了一个 `.whl` 包：
 
 <pre class="devsite-terminal tfo-terminal-windows devsite-click-to-copy">
 bazel-bin\tensorflow\tools\pip_package\build_pip_package C:/tmp/tensorflow_pkg
 </pre>
 
-Although it is possible to build both CUDA and non-CUDA configs under the same source tree, we recommend running `bazel clean` when switching between these two configurations in the same source tree.
+尽管在同一个源代码根目录下同时构建 CUDA 和非 CUDA 配置是可行的，但我们推荐在两种配置间切换时运行 `bazel clean`。
 
-### Install the package
+### 包安装
 
-The filename of the generated `.whl` file depends on the TensorFlow version and your platform. Use `pip3 install` to install the package, for example:
+生成的 `.whl` 文件名取决于 TensorFlow 的版本和你的平台。使用 `pip3 install` 来安装包，示例如下：
 
 <pre class="devsite-terminal tfo-terminal-windows prettyprint lang-bsh">
 pip3 install C:/tmp/tensorflow_pkg/tensorflow-<var>version</var>-cp36-cp36m-win_amd64.whl
 </pre>
 
-Success: TensorFlow is now installed.
+成功：TensorFlow 已被安装。
 
-## Build using the MSYS shell
+## 使用 MSYS shell 编译
 
-TensorFlow can also be built using the MSYS shell. Make the changes listed below, then follow the previous instructions for the Windows native command line (`cmd.exe`).
+TensorFlow 可以使用 MSYS shell 编译。只要作下列更改，然后照着上文的步骤使用 Windows 的原生命令行（`cmd.exe`）。
 
-### Disable MSYS path conversion {:.hide-from-toc}
+### 关闭 MSYS 路径转换 {:.hide-from-toc}
 
-MSYS automatically converts arguments that look like Unix paths to Windows paths, and this doesn't work with `bazel`. (The label `//foo/bar:bin` is considered a Unix absolute path since it starts with a slash.)
+MSYS 会自动将 Unix 路径转换成 Windows 路径，这会导致 `bazel` 无法正常工作（`//foo/bar:bin` 被视作 Unix 绝对路径因为它以斜杠开始。）
 
 <pre class="prettyprint lang-bsh">
 <code class="devsite-terminal">export MSYS_NO_PATHCONV=1</code>
 <code class="devsite-terminal">export MSYS2_ARG_CONV_EXCL="*"</code>
 </pre>
 
-### Set your PATH {:.hide-from-toc}
+### 设置 PATH {:.hide-from-toc}
 
-Add the Bazel and Python installation directories to your `$PATH` environmental variable. If Bazel is installed to `C:\tools\bazel.exe`, and Python to `C:\Python36\python.exe`, set your `PATH` with:
+将 Bazel 和 Python 安装文件夹添加到 `$PATH` 环境变量。假设 Bazel 安装在 `C:\tools\bazel.exe`，Python 安装在 `C:\Python36\python.exe`，将 `PATH` 设置成：
 
 <pre class="prettyprint lang-bsh">
 # Use Unix-style with ':' as separator
@@ -197,7 +197,7 @@ Add the Bazel and Python installation directories to your `$PATH` environmental 
 <code class="devsite-terminal">export PATH="/c/Python36:$PATH"</code>
 </pre>
 
-For GPU support, add the CUDA and cuDNN bin directories to your `$PATH`:
+对于 GPU 支持版本，将 CUDA 和 cuDNN 的 bin 目录添加到 `$PATH`：
 
 <pre class="prettyprint lang-bsh">
 <code class="devsite-terminal">export PATH="/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v9.0/bin:$PATH"</code>
@@ -205,7 +205,7 @@ For GPU support, add the CUDA and cuDNN bin directories to your `$PATH`:
 <code class="devsite-terminal">export PATH="/c/tools/cuda/bin:$PATH"</code>
 </pre>
 
-## Tested build configurations
+## 可用编译配置
 
 <table>
 <tr><th>Version</th><th>CPU/GPU</th><th>Python version</th><th>Compiler</th><th>Build tools</th><th>cuDNN</th><th>CUDA</th></tr>
