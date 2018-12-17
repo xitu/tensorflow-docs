@@ -1,124 +1,124 @@
 toc:
-- title: Get started with TensorFlow
+- title: 开始使用 TensorFlow
   path: /tutorials/
 
-- title: Learn and use ML
+- title: 学习和使用机器学习
   style: accordion
   section:
-  - title: Overview
+  - title: 概述
     path: /tutorials/keras/
-  - title: Basic classification
+  - title: 基本分类
     path: /tutorials/keras/basic_classification
-  - title: Text classification
+  - title: 文本分类
     path: /tutorials/keras/basic_text_classification
-  - title: Regression
+  - title: 回归
     path: /tutorials/keras/basic_regression
-  - title: Overfitting and underfitting
+  - title: 过拟合和欠拟合
     path: /tutorials/keras/overfit_and_underfit
-  - title: Save and restore models
+  - title: 保存和加载模型
     path: /tutorials/keras/save_and_restore_models
 
-- title: Research and experimentation
+- title: 研究和实验
   style: accordion
   section:
-  - title: Overview
+  - title: 概述
     path: /tutorials/eager/
-  - title: Eager execution
+  - title: 动态图机制
     path: /tutorials/eager/eager_basics
-  - title: Automatic differentiation
+  - title: 自动微分法
     path: /tutorials/eager/automatic_differentiation
-  - title: "Custom training: basics"
+  - title: "自定义训练：基础"
     path: /tutorials/eager/custom_training
-  - title: Custom layers
+  - title: 自定义层
     path: /tutorials/eager/custom_layers
-  - title: "Custom training: walkthrough"
+  - title: "自定义训练：实战"
     path: /tutorials/eager/custom_training_walkthrough
 
-- title: ML at production scale
+- title: 大规模的机器学习
   style: accordion
   section:
-  - title: Linear model with Estimators
+  - title: 线性模型评估器
     path: /tutorials/estimators/linear
-  - title: Wide and deep learning
+  - title: 广度和深度学习
     path: https://github.com/tensorflow/models/tree/master/official/wide_deep
     status: external
-  - title: Boosted trees
+  - title: 提升树
     path: https://github.com/tensorflow/models/tree/master/official/boosted_trees
     status: external
-  - title: Text classifier with TF-Hub
+  - title: 使用TF-Hub进行文本分类
     path: /hub/tutorials/text_classification_with_tf_hub
-  - title: Build a CNN using Estimators
+  - title: 使用评估器构建卷积神经网络
     path: /tutorials/estimators/cnn
 
-- title: Generative models
+- title: 生成模型
   style: accordion
   section:
-  - title: Text generation
+  - title: 文本生成
     path: https://github.com/tensorflow/tensorflow/blob/r1.11/tensorflow/contrib/eager/python/examples/generative_examples/text_generation.ipynb
     status: external
-  - title: Translation with attention
+  - title: 基于注意力机制的翻译
     path: https://github.com/tensorflow/tensorflow/blob/r1.11/tensorflow/contrib/eager/python/examples/nmt_with_attention/nmt_with_attention.ipynb
     status: external
-  - title: Image captioning
+  - title: 图片字幕
     path: https://github.com/tensorflow/tensorflow/blob/r1.11/tensorflow/contrib/eager/python/examples/generative_examples/image_captioning_with_attention.ipynb
     status: external
-  - title: DCGAN
+  - title: 深度卷积对抗生成网络 DCGAN
     path: https://github.com/tensorflow/tensorflow/blob/r1.11/tensorflow/contrib/eager/python/examples/generative_examples/dcgan.ipynb
     status: external
-  - title: VAE
+  - title: 变分自编码器 VAE
     path: https://github.com/tensorflow/tensorflow/blob/r1.11/tensorflow/contrib/eager/python/examples/generative_examples/cvae.ipynb
     status: external
 
-- title: Images
+- title: 图片
   style: accordion
   section:
-  - title: Pix2Pix
+  - title: Pix2Pix 图像翻译
     path: https://github.com/tensorflow/tensorflow/blob/r1.11/tensorflow/contrib/eager/python/examples/pix2pix/pix2pix_eager.ipynb
     status: external
-  - title: Neural Style Transfer
+  - title: 图像风格迁移
     path: https://github.com/tensorflow/models/blob/master/research/nst_blogpost/4_Neural_Style_Transfer_with_Eager_Execution.ipynb
     status: external
-  - title: Image Segmentation
+  - title: 图像分割
     path: https://github.com/tensorflow/models/blob/master/samples/outreach/blogs/segmentation_blogpost/image_segmentation.ipynb
     status: external
-  - title: Image recognition
+  - title: 图像识别
     path: /tutorials/images/image_recognition
-  - title: Image retraining
+  - title: 图像再训练
     path: /hub/tutorials/image_retraining
-  - title: Advanced CNN
+  - title: 高级卷积神经网络
     path: /tutorials/images/deep_cnn
 
-- title: Sequences
+- title: 序列
   style: accordion
   section:
-  - title: Recurrent neural network
+  - title: 递归神经网络
     path: /tutorials/sequences/recurrent
-  - title: Drawing classification
+  - title: 涂鸦分类
     path: /tutorials/sequences/recurrent_quickdraw
-  - title: Simple audio recognition
+  - title: 简单音频识别
     path: /tutorials/sequences/audio_recognition
-  - title: Neural machine translation
+  - title: 神经机器翻译
     path: https://github.com/tensorflow/nmt
     status: external
 
-- title: Data representation
+- title: 数据的表示
   style: accordion
   section:
-  - title: Vector representations of words
+  - title: 单词的向量表示
     path: /tutorials/representation/word2vec
-  - title: Kernel methods
+  - title: 核心方法
     path: /tutorials/representation/kernel_methods
-  - title: Large-scale linear models
+  - title: 大规模线性模型
     path: /tutorials/representation/linear
 
-- title: Non-ML
+- title: 非机器学习
   style: accordion
   section:
-  - title: Mandelbrot set
+  - title: 曼德尔布罗特集
     path: /tutorials/non-ml/mandelbrot
-  - title: Partial differential equations
+  - title: 偏微分方程
     path: /tutorials/non-ml/pdes
 
 - break: true
-- title: Next steps
+- title: 后续
   path: /tutorials/next_steps
