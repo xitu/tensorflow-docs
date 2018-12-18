@@ -45,7 +45,7 @@ toc:
   - title: 提升树
     path: https://github.com/tensorflow/models/tree/master/official/boosted_trees
     status: external
-  - title: 使用TF-Hub进行文本分类
+  - title: 使用 TF-Hub 进行文本分类
     path: /hub/tutorials/text_classification_with_tf_hub
   - title: 使用评估器构建卷积神经网络
     path: /tutorials/estimators/cnn
@@ -106,7 +106,7 @@ toc:
   section:
   - title: 单词的向量表示
     path: /tutorials/representation/word2vec
-  - title: 核心方法
+  - title: 核方法
     path: /tutorials/representation/kernel_methods
   - title: 大规模线性模型
     path: /tutorials/representation/linear
@@ -114,7 +114,7 @@ toc:
 - title: 非机器学习
   style: accordion
   section:
-  - title: 曼德尔布罗特集
+  - title: 曼德博集合
     path: /tutorials/non-ml/mandelbrot
   - title: 偏微分方程
     path: /tutorials/non-ml/pdes
