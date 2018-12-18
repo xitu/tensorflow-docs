@@ -13,10 +13,10 @@ landing_page:
     items:
     - custom_html: >
         <div class="devsite-landing-row-item-description">
-          <h3 class="hide-from-toc">学习使用机器学习</h3>
+          <h3 class="hide-from-toc">学习和使用机器学习</h3>
           <div class="devsite-landing-row-item-description-content">
             <p>
-              高级的 Keras API 可以提供创建和训练深度学习模型的模块。从这些适于初学者的 notebook 格式的例子开始，请阅读
+              高级的 Keras API 可以提供创建和训练深度学习模型的模块。首先从这些适于初学者的 notebook 格式的例子开始，之后请阅读
               <a href="/guide/keras">TensorFlow Keras 教程</a>。
             </p>
             <ol style="padding-left:20px;">
@@ -54,7 +54,7 @@ landing_page:
         model.evaluate(x_test, y_test)
         </pre>
         {% dynamic if request.tld != 'cn' %}
-        <a class="colab-button" target="_blank" href="https://colab.research.google.com/github/tensorflow/docs/blob/master/site/en/tutorials/_index.ipynb">在<span>Notebook</span>中运行</a>
+        <a class="colab-button" target="_blank" href="https://colab.research.google.com/github/tensorflow/docs/blob/master/site/en/tutorials/_index.ipynb">在<span> Notebook </span>中运行</a>
         {% dynamic endif %}
 
   - items:
@@ -108,9 +108,9 @@ landing_page:
         </div>
 
   - description: >
-      <h2 class="hide-from-toc">Google Colab&#58; 一个简单学习和使用 TensorFlow 的方式</h2>
+      <h2 class="hide-from-toc">Google Colab&#58; 一个简单的学习和使用 TensorFlow 的方式</h2>
       <p>
-        是 Google 实验室创建的一个帮助传播机器学习教学和研究的项目。它的运行环境是 Jupyter notebook ，使用不需要安装，运行完全在云端。
+        是 Google 实验室创建的一个帮助传播机器学习的教学和研究项目。它的运行环境是 Jupyter notebook ，使用不需要安装，运行完全在云端。
         <a href="https://medium.com/tensorflow/colab-an-easy-way-to-learn-and-use-tensorflow-d74d1686e309" class="external">阅读博客文章</a>。
       </p>
 
