@@ -2,7 +2,7 @@
 
 TensorFlow 使用 [GitHub issues](https://github.com/tensorflow/tensorflow/issues){:.external} 以及 [Stack Overflow](https://stackoverflow.com/questions/tagged/tensorflow){:.external} 跟踪和记录构建和安装问题。
 
-以下列表将错误消息链接到解决方案或讨论。如果发现未列出的安装或构建问题，请搜索GitHub issues 和 Stack Overflow。如果仍然找不到错误消息，请在 Stack Overflow 上附带 `tensorflow` 标签提出你的问题。
+下面的列表是错误消息及相应的解决方案或讨论。如果发现未列出的安装或构建问题，请搜索 GitHub issues 和 Stack Overflow。如果仍然找不到错误消息，请在 Stack Overflow 上附带 `tensorflow` 标签提出你的问题。
 
 <table>
 <tr><th>GitHub issue or Stack&nbsp;Overflow</th> <th>Error Message</th></tr>
@@ -109,7 +109,7 @@ ImportError: cannot import name 'descriptor'</pre>
 </tr>
 <tr>
   <td><a href="http://stackoverflow.com/q/37810228">37810228</a></td>
-  <td>使用 <tt>pip install</tt> 命令时, 系统返回:
+   <td>使用 <tt>pip install</tt> 命令时，系统返回：
   <pre>OSError: [Errno 1] Operation not permitted</pre>
   </td>
 </tr>
@@ -132,7 +132,7 @@ ImportError: cannot import name 'descriptor'</pre>
 </tr>
 <tr>
   <td><a href="http://stackoverflow.com/q/42075397">42075397</a></td>
-  <td>使用 <tt>pip install</tt> 命令是出发如下错误:
+  <td>使用 <tt>pip install</tt> 命令时触发如下错误：
 <pre>...<lots of warnings and errors>
 You have not agreed to the Xcode license agreements, please run
 'xcodebuild -license' (for user-level acceptance) or
@@ -223,13 +223,13 @@ ImportError: cannot import name 'descriptor'</pre>
 </tr>
 <tr>
   <td><a href="http://stackoverflow.com/q/37810228">37810228</a></td>
-  <td>使用 <tt>pip install</tt> 命令是,系统返回:
+  <td>使用 <tt>pip install</tt> 命令时，系统返回：
   <pre>OSError: [Errno 1] Operation not permitted</pre>
   </td>
 </tr>
 <tr>
   <td><a href="http://stackoverflow.com/q/33622842">33622842</a></td>
-  <td>使用 <tt>import tensorflow</tt> 触发如下错误：<pre>Traceback (most recent call last):
+  <td>使用 <tt>import tensorflow</tt> 命令时触发如下错误：<pre>Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
   File "/usr/local/lib/python2.7/site-packages/tensorflow/__init__.py",
     line 4, in <module>
