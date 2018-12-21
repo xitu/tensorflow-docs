@@ -110,7 +110,7 @@ mvn -q compile exec:java  # Use -q to hide logging
 
 命令行将输出: <code>Hello from <em>version</em></code>
 
-搞掂: TensorFlow for Java 已经配置好了。
+完成: TensorFlow for Java 已经配置好了。
 
 ## 使用 JDK 的 TensorFlow
 
@@ -175,8 +175,8 @@ javac -cp libtensorflow-1.10.1.jar HelloTensorFlow.java
 
 命令行输出: <code>Hello from <em>version</em></code>
 
-搞掂：TensorFlow for Java 以及配置好。
+完成：TensorFlow for Java 已经配置好了。
 
-## 源码构建
+## 从源码构建
 
 TensorFlow是开源的. 阅读[说明书](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/java/README.md){:.external}，了解如何从源代码构建 TensorFlow 的 Java 和本机库。
