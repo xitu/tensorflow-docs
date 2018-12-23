@@ -1,18 +1,18 @@
 # 安装 TensorFlow for Java
 
-TensorFlow 为 Java 程序提供了 [API](https://www.tensorflow.org/api_docs/java/reference/org/tensorflow/package-summary) -  对于加载 Python 构建的模型并在 Java 应用程序中运行加载（这些模型）特别有用。
+TensorFlow 为 Java 程序提供了 [API](https://www.tensorflow.org/api_docs/java/reference/org/tensorflow/package-summary) — 对于加载 Python 构建的模型并在 Java 应用程序中运行加载（这些模型）特别有用。
 
 注意：TensorFlow 的 Java API **不**包含在 [TensorFlow API 稳定性保证](../guide/version_compat.md)中。
 
 ## 支持平台
 
-TensorFlow for Java 支持以下操作系统:
+TensorFlow for Java 支持以下操作系统：
 
 * Ubuntu 16.04 或更高版本；64 位、x86 架构
 * macOS 10.12.6 (Sierra) 或更高版本
 * Windows 7 或更高版本；64 位、x86 架构
 
-如果需要在 Android 上安装 TensorFlow，请看[Android TensorFlow 支持页面](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/android){:.external} 或者 [TensorFlow Android 相机 Demo](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android){:.external}.
+如果需要在 Android 上安装 TensorFlow，请看 [Android TensorFlow 支持页面](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/android){:.external} 或者 [TensorFlow Android 相机 Demo](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android){:.external}。
 
 ## 使用 Apache Maven 的 TensorFlow
 
@@ -70,7 +70,7 @@ TensorFlow for Java 支持以下操作系统:
 </project>
 ```
 
-创建源文件(`src/main/java/HelloTensorFlow.java`):
+创建源文件 (`src/main/java/HelloTensorFlow.java`)：
 
 ```java
 import org.tensorflow.Graph;
@@ -108,7 +108,7 @@ public class HelloTensorFlow {
 mvn -q compile exec:java  # Use -q to hide logging
 </pre>
 
-命令行将输出: <code>Hello from <em>version</em></code>
+命令行将输出：<code>Hello from <em>version</em></code>
 
 完成: TensorFlow for Java 已经配置好了。
 
@@ -148,7 +148,7 @@ TensorFlow 可以通过 Java Native Interface (JNI) 与 JDK 一起使用。
   </tr>
 </table>
 
-注意: 在 Windows 上，本地库（`tensorflow_jni.dll`）在运行时需要 `msvcp140.dll`。参见 [Windows 源码安装](./source_windows.md)指南，了解如何安装 [Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=48145){:.external}。
+注意：在 Windows 上，本地库（`tensorflow_jni.dll`）在运行时需要 `msvcp140.dll`。参见 [Windows 源码安装](./source_windows.md)指南，了解如何安装 [Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=48145){:.external}。
 
 ### 编译
 
@@ -164,7 +164,7 @@ javac -cp libtensorflow-1.10.1.jar HelloTensorFlow.java
 
 <div class="ds-selector-tabs">
 <section>
-<h3>在 Linux / mac OS上</h3>
+<h3>在 Linux / mac OS 上</h3>
 <pre class="devsite-terminal devsite-click-to-copy">java -cp libtensorflow-1.10.1.jar:. -Djava.library.path=./jni HelloTensorFlow</pre>
 </section>
 <section>
@@ -173,10 +173,10 @@ javac -cp libtensorflow-1.10.1.jar HelloTensorFlow.java
 </section>
 </div><!--/ds-selector-tabs-->
 
-命令行输出: <code>Hello from <em>version</em></code>
+命令行输出：<code>Hello from <em>version</em></code>
 
 完成：TensorFlow for Java 已经配置好了。
 
 ## 从源码构建
 
-TensorFlow是开源的. 阅读[说明书](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/java/README.md){:.external}，了解如何从源代码构建 TensorFlow 的 Java 和本机库。
+TensorFlow 是开源的。阅读[说明书](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/java/README.md){:.external}，了解如何从源代码构建 TensorFlow 的 Java 和本机库。
