@@ -1,6 +1,6 @@
-## **训练后量化**
+## **Post-training 量化**
 
-训练后量化是一种可以减小模型大小，同时降低 3 倍延迟并且仍然保持模型精度的一般方法。训练后量化将权重从浮点量化为 8 位精度。此技术在 [TensorFlow Lite model converter](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco) 中作为一个功能选项被使用。
+Post-training 量化是一种可以减小模型大小，同时降低 3 倍延迟并且仍然能够保持模型精度的一般方法。Post-training量化将权重从浮点量化为 8 位精度。此技术在 [TensorFlow Lite model converter](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/toco) 中作为一个功能选项被使用。
 
 ```
 import tensorflow as tf
@@ -10,9 +10,9 @@ tflite_quantized_model = converter.convert()
 open("quantized_model.tflite", "wb").write(tflite_quantized_model)
 ```
 
-上述代码中，使用浮点内核计算将权重从 8 位精度转换为浮点数。此转换只执行一次并缓存以减少延迟。
+在推理时，权重值从 8 位精度转换为浮点数，并使用浮点内核进行计算。此转换只执行一次并进行缓存以减少延迟。
 
-为了进一步改善延迟效果，混合运算符动态地将激活量化为 8 位，并使用 8 位权重和激活函数执行计算。此种优化方式可以提供接近完全定点推断时的延迟。但是，输出仍然使用浮点存储，因此混合运算的加速效果仍然小于完全定点计算。混合操作可用于大多数计算密集型网络：
+为了进一步改善延迟，混合运算符动态地将激活量化为 8 位，并使用 8 位权重和激活函数执行计算。此种优化方式可以提供接近完全定点推断时的延迟。但是，输出仍然使用浮点存储，因此混合运算的加速效果仍然小于完全定点计算。混合操作可用于大多数计算密集型网络：
 
 - [tf.contrib.layers.fully_connected](https://www.tensorflow.org/api_docs/python/tf/contrib/layers/fully_connected)
 - [tf.nn.conv2d](https://www.tensorflow.org/api_docs/python/tf/nn/conv2d)
@@ -23,7 +23,7 @@ open("quantized_model.tflite", "wb").write(tflite_quantized_model)
 
 由于权重在训练后被量化，因此可能存在精度损失，特别是对于较小的网络。[TensorFlow Lite model repository](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/g3doc/models.md#image-classification-quantized-models)提供了为特定网络提供预训练的完全量化模型。检查量化模型的准确性以验证任何精度上的降低是否在可接受的限度内是很重要的。这里有一个工具可以评估 [TensorFlow Lite 模型精确度](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/tools/accuracy/README.md)。
 
-如果精确度下降幅度过大，可以考虑使用 [quantization aware training](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/quantize/README.md)。
+如果精确度下降幅度过大，可以考虑使用[注重量化的训练](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/quantize/README.md)。
 
 ### 量化张量的表示
 
@@ -43,9 +43,11 @@ TensorFlow 将数字浮点数组转换为 8 位表示形式作为压缩问题。
   </figcaption>
 </figure>
 
+
+
 这种表示方式的好处有：
 
-- 它有效地表示任意范围的范围。
+- 它有效地表示任意大小的范围。。
 - 数值无需对称。
 - 有符号数和无符号数均可被表示。
 - 线性扩展使乘法变得简单。
