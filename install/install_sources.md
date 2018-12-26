@@ -93,16 +93,17 @@ $ <b>sudo apt-get install python3-numpy python3-dev python3-pip python3-wheel</b
 
 *   [GPU drivers](http://nvidia.com/driver)。CUDA 9.0 要求 384.x 或更高的版本。
 *   [CUDA Toolkit](http://nvidia.com/cuda) (>= 8.0)。我们建议使用 9.0 版本。
-*   [cuDNN SDK](http://developer.nvidia.com/cudnn) (>= 6.0). We recommend version 7.1.x.
-*   [CUPTI](http://docs.nvidia.com/cuda/cupti/) ships with the CUDA Toolkit, but you also need to append its path to the `LD_LIBRARY_PATH` environment
-    variable: `export
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64`
-*   *OPTIONAL*: [NCCL 2.2](https://developer.nvidia.com/nccl) to use TensorFlow with multiple GPUs.
-*   *OPTIONAL*: [TensorRT](http://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html) which can improve latency and throughput for inference for some models.
+*   [cuDNN SDK](http://developer.nvidia.com/cudnn) (>= 6.0)。我们建议使用 7.1.x。
+*   [CUPTI](http://docs.nvidia.com/cuda/cupti/) 搭载在 CUDA Toolkit 中，但你仍需将它的文件路径追加给环境变量 `LD_LIBRARY_PATH`：`export
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64`。
+*   **可选**：[NCCL 2.2](https://developer.nvidia.com/nccl) 使用多块 GPU 运行 TensorFlow。
+*   **可选**：[TensorRT](http://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html) 在处理某些模型时可提升推理过程的潜在性能和数据吞吐。
 
-While it is possible to install the NVIDIA libraries via `apt-get` from the NVIDIA repository, the libraries and headers are installed in locations that make it difficult to configure and debug build issues. Downloading and installing the libraries manually or using docker ([latest-devel-gpu](https://hub.docker.com/r/tensorflow/tensorflow/tags/)) is recommended.
+虽然可以通过 `apt-get` 从 NVIDIA 仓库中安装 NVIDIA 函数库，但是以这种方式安装这些库和头文件会导致配置困难以及调试或构建问题。推荐手动下载并安装这些库或使用 docker（[latest-devel-gpu](https://hub.docker.com/r/tensorflow/tensorflow/tags/)）。
 
-    <pre> $ <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64</b> </pre>
+<pre>
+$ <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64</b>
+</pre>
 
 ### 接下来
 
@@ -135,9 +136,11 @@ While it is possible to install the NVIDIA libraries via `apt-get` from the NVID
 
 安装完 pip，调用以下命令：
 
-<pre> $ <b>sudo pip install six numpy wheel</b> </pre>
+<pre>
+$ <b>sudo pip install six numpy wheel</b>
+</pre>
 
-注意：这些只是构建 TensorFlow 的最低要求。安装 pip 软件包时还将下载运行该 pip 所需的其他软件包。如果你计划不安装 pip，直接使用 bazel 执行任务，则可能需要安装其他 Python 软件包。例如，在使用 `bazel` 运行 TensorFlow 的测试之前，您应该先执行 `pip install mock enum34`。
+注意：这些只是构建 TensorFlow 的最低要求。安装 pip 软件包时还将下载运行该 pip 所需的其它软件包。如果不安装 pip，而是直接使用 bazel 执行任务，则可能需要安装其它 Python 软件包。例如，在使用 `bazel` 运行 TensorFlow 的测试之前，应该先执行 `pip install mock enum34`。
 
 <a name="ConfigureInstallation"></a>
 
@@ -207,25 +210,25 @@ Configuration finished
 
 ## 构建 pip 包
 
-Note: If you're only interested in building the libraries for the TensorFlow C or Java APIs, see [Build the C or Java libraries](#BuildCorJava), you do not need to build the pip package in that case.
+注意：如果只对用这些库构建 TensorFlow C 或 JAVA API 感兴趣，请查看[构建 C 或 Java 库](#BuildCorJava)，在这种情况下不需要构建 pip 安装包。
 
-### CPU-only support
+### 仅包含 CPU 支持
 
-To build a pip package for TensorFlow with CPU-only support:
+构建一个仅包含 CPU 支持的 TensorFlow pip 安装包：
 
 <pre>
 $ bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
 </pre>
 
-To build a pip package for TensorFlow with CPU-only support for the Intel® MKL-DNN:
+构建一个仅包含 CPU 支持但拥有 Intel® MKL-DNN 支持的 TensorFlow pip 安装包：
 
 <pre>
 $ bazel build --config=mkl --config=opt //tensorflow/tools/pip_package:build_pip_package
 </pre>
 
-### GPU support
+### GPU 支持
 
-To build a pip package for TensorFlow with GPU support:
+构建一个包含 GPU 支持的 TensorFlow pip 安装包：
 
 <pre>
 $ bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_package
@@ -272,7 +275,9 @@ print(sess.run(hello))
 
 如果系统输出以下内容，你就可以开始编写 TensorFlow 程序了：
 
-<pre>Hello, TensorFlow!</pre>
+<pre>
+Hello, TensorFlow!
+</pre>
 
 学习更多内容，请到 [TensorFlow 教程](../tutorials/)。
 
@@ -336,7 +341,7 @@ print(sess.run(hello))
 
 **Linux**
 <table>
-<tr><th>Version:</th><th>CPU/GPU:</th><th>Python Version:</th><th>Compiler:</th><th>Build Tools:</th><th>cuDNN:</th><th>CUDA:</th></tr>
+<tr><th>版本：</th><th>CPU/GPU：</th><th>Python 版本：</th><th>编译器：</th><th>构建工具：</th><th>cuDNN：</th><th>CUDA：</th></tr>
 <tr><td>tensorflow-1.10.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.15.0</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow_gpu-1.10.0</td><td>GPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.15.0</td><td>7</td><td>9</td></tr>
 <tr><td>tensorflow-1.9.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>GCC 4.8</td><td>Bazel 0.11.0</td><td>N/A</td><td>N/A</td></tr>
@@ -363,7 +368,7 @@ print(sess.run(hello))
 
 **Mac**
 <table>
-<tr><th>Version:</th><th>CPU/GPU:</th><th>Python Version:</th><th>Compiler:</th><th>Build Tools:</th><th>cuDNN:</th><th>CUDA:</th></tr>
+<tr><th>版本：</th><th>CPU/GPU：</th><th>Python 版本：</th><th>编译器：</th><th>构建工具：</th><th>cuDNN：</th><th>CUDA：</th></tr>
 <tr><td>tensorflow-1.10.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.15.0</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow-1.9.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.11.0</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow-1.8.0</td><td>CPU</td><td>2.7, 3.3-3.6</td><td>Clang from xcode</td><td>Bazel 0.10.1</td><td>N/A</td><td>N/A</td></tr>
@@ -381,7 +386,7 @@ print(sess.run(hello))
 
 **Windows**
 <table>
-<tr><th>Version:</th><th>CPU/GPU:</th><th>Python Version:</th><th>Compiler:</th><th>Build Tools:</th><th>cuDNN:</th><th>CUDA:</th></tr>
+<tr><th>版本：th><th>CPU/GPU：</th><th>Python 版本：</th><th>编译器：</th><th>构建工具：</th><th>cuDNN：</th><th>CUDA：</th></tr>
 <tr><td>tensorflow-1.10.0</td><td>CPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>N/A</td><td>N/A</td></tr>
 <tr><td>tensorflow_gpu-1.10.0</td><td>GPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>7</td><td>9</td></tr>
 <tr><td>tensorflow-1.9.0</td><td>CPU</td><td>3.5-3.6</td><td>MSVC 2015 update 3</td><td>Cmake v3.6.3</td><td>N/A</td><td>N/A</td></tr>
@@ -408,14 +413,14 @@ print(sess.run(hello))
 
 <a name="BuildCorJava"></a>
 
-## Build the C or Java libraries
+## 构建 C 或 JAVA 库
 
-The instructions above are tailored to building the TensorFlow Python packages. If you're interested in building the libraries for the TensorFlow C API, do the following:
+以上的内容都是针对如何构建 TensorFlow Python 包。如果你对构建 TensorFlow C API 感兴趣，按如下步骤操作：
 
-1.  Follow the steps up to [Configure the installation](#ConfigureInstallation)
-2.  Build the C libraries following instructions in the [README](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/lib_package/README.md).
+1.  按[安装配置](#ConfigureInstallation)中步骤操作
+2.  按 [README](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/lib_package/README.md) 文件中说明构建 C 函数库.
 
-If you're interested inv building the libraries for the TensorFlow Java API, do the following:
+如果你对构建 TensorFlow JAVA API 感兴趣，按如下步骤操作：
 
-1.  Follow the steps up to [Configure the installation](#ConfigureInstallation)
-2.  Build the Java library following instructions in the [README](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/lib_package/README.md).
+1.  按[安装配置](#ConfigureInstallation)中步骤操作
+2.  按 [README](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/lib_package/README.md) 文件中说明构建 JAVA 函数库。
