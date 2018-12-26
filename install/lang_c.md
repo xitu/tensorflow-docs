@@ -6,15 +6,15 @@ TensorFlow 提供了用于构建[绑定其他语言](../extend/language_bindings
 
 TensorFlow C API 支持以下系统:
 
-* Linux， 64-bit， x86
-* macOS X， 10.12.6 版本（Sierra）或更高
+* Linux，64-bit，x86
+* macOS X，10.12.6 版本（Sierra）或更高
 
 ## 步骤
 
 ### 下载
 
 <table>
-  <tr><th>TensorFlow C 函数库</th><th>URL</th></tr>
+  <tr><th>TensorFlow C 函数库 </th><th>URL</th></tr>
   <tr class="alt"><td colspan="2">Linux</td></tr>
   <tr>
     <td>Linux 下仅支持 CPU </td>
@@ -94,7 +94,7 @@ int main() {
 
 这个命令会输出：<code>Hello from TensorFlow C library version <em>number</em></code>
 
-成功： TensorFlow C 函数库配置完成。
+成功：TensorFlow C 函数库配置完成。
 
 如果程序没能够构建成功，确定 `gcc` 可以访问 TensorFlow C 函数库。如果提取到 `/usr/local`，请将函数的库的目录地址传递给编译器：
 
