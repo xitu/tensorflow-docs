@@ -1,10 +1,10 @@
-# 安装 TensorFlow for C
+# 安装 TensorFlow C API
 
-TensorFlow 提供了用于构建[绑定其他语言](../extend/language_bindings.md)的 C API。这些 API 定义在 <a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/c/c_api.h" class="external"><code>c_api.h</code></a> 中并且优先考虑其设计得简洁与一致而非便利。
+TensorFlow 提供了用于构建[绑定其他语言](../extend/language_bindings.md)的 C API。这些 API 定义在 <a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/c/c_api.h" class="external"><code>c_api.h</code></a> 中，并且优先考虑其设计得简洁与一致而非便利。
 
 ## 支持平台
 
-TensorFlow for C 支持以下系统:
+TensorFlow C API 支持以下系统:
 
 * Linux， 64-bit， x86
 * macOS X， 10.12.6 版本（Sierra）或更高
