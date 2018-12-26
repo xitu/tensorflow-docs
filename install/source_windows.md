@@ -30,7 +30,7 @@
 
 ### 安装 MSYS2
 
-[安装 MSYS2](https://www.msys2.org/){:.external}，里面包含了编译 TensorFlow 需要用到的工具。如果 MSYS2 安装在 `C:\msys64` 路径，将 `C:\msys64\usr\bin` 添加到 `%PATH%` 环境变量。 然后运行 `cmd.exe`：
+[安装 MSYS2](https://www.msys2.org/){:.external}，里面包含了编译 TensorFlow 需要用到的工具。如果 MSYS2 安装在 `C:\msys64` 路径，将 `C:\msys64\usr\bin` 添加到 `%PATH%` 环境变量。然后运行 `cmd.exe`：
 
 <pre class="devsite-terminal tfo-terminal-windows devsite-click-to-copy">
 pacman -S git patch unzip
@@ -60,7 +60,7 @@ pacman -S git patch unzip
 <code class="devsite-terminal tfo-terminal-windows">cd tensorflow</code>
 </pre>
 
-仓库默认为 `master` 分支。你也可以检出到 [release 分支](https://github.com/tensorflow/tensorflow/releases){:.external}来构建：
+仓库默认为 `master` 分支。你也可以检出到 [release 分支](https://github.com/tensorflow/tensorflow/releases){:.external} 来构建：
 
 <pre class="devsite-terminal tfo-terminal-windows prettyprint lang-bsh">
 git checkout <em>branch_name</em>  # r1.9, r1.10, etc.
