@@ -37,10 +37,10 @@ TensorFlow 是一个频繁更新并且社区活跃的项目。这份文档旨在
 * 内建了一组跨图像识别、对象检测、语音、翻译、推荐和增强学习的[模型](https://github.com/tensorflow/models/tree/master/official)，这些模型能够展示最佳效果，并作为高性能模型开发的起点。
 * 扩大了高性能[云 TPU 参考模型](https://github.com/tensorflow/tpu)的规模。
 
-#### 软件库
+#### 扩展包
 
 * 废弃 `tf.contrib` 中有更好的外部实现的部分。
-* 尽可能地讲 `tf.contrib` 中的大型项目移到单独的仓库中。
+* 尽可能地将 `tf.contrib` 中的大型项目移到单独的仓库中。
 * TensorFlow 2.0 中，`tf.contrib` 将不再维护。将来会在其它仓库进行一系列试验性的开发。
 
 ### 平台
@@ -82,7 +82,7 @@ TensorFlow 是一个频繁更新并且社区活跃的项目。这份文档旨在
 * 集成 CUDA 10（计划跳过 CUDA 9.2 版本因为跟 CUDA 9.0 相比它在相同版本的 cuDNN 下的改进太小了）。
 * 优化对 DGX-2 的支持。
 
-#### 云 TPU 和云 TPU Pod
+#### 云 TPU 和云 TPU Pods
 
 * 在云 TPU 上扩展对 Keras 的支持，并进一步优化性能。
 * 扩展对图像分割的支持 —— 在现有的 [RetinaNet](https://github.com/tensorflow/tpu/tree/master/models/official/retinanet) 和 [DeepLab](https://github.com/tensorflow/tpu/tree/master/models/experimental/deeplab) 语义分割参考模型中加入 Mask R-CNN。
@@ -99,7 +99,7 @@ TensorFlow 是一个频繁更新并且社区活跃的项目。这份文档旨在
 
 ### 其它模块
 
-#### TensorFlow 概率
+#### TensorFlow 概率编程工具箱
 
 * 高斯过程的详细实现，包括超参数优化方面的应用。
 * 新增贝叶斯结构时间序列模型。
