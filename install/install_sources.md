@@ -93,7 +93,7 @@ $ <b>sudo apt-get install python3-numpy python3-dev python3-pip python3-wheel</b
 
 *   [GPU drivers](http://nvidia.com/driver)。CUDA 9.0 要求 384.x 或更高的版本。
 *   [CUDA Toolkit](http://nvidia.com/cuda) (>= 8.0)。我们建议使用 9.0 版本。
-*   [cuDNN SDK](http://developer.nvidia.com/cudnn) (>= 6.0). 我们建议使用 7.1.x.
+*   [cuDNN SDK](http://developer.nvidia.com/cudnn) (>= 6.0)。 我们建议使用 7.1.x。
 *   [CUPTI](http://docs.nvidia.com/cuda/cupti/) 搭载在 CUDA Toolkit 中，但你仍需将它的文件路径追加给环境变量  `LD_LIBRARY_PATH`：`export
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64`。
 *   **可选**： [NCCL 2.2](https://developer.nvidia.com/nccl) 使用多块 GPU 运行 TensorFlow。
@@ -141,7 +141,7 @@ $ <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64<
 $ <b>sudo pip install six numpy wheel</b>
 </pre>
 
-注意：这些只是构建 TensorFlow 的最低要求。安装 pip 软件包时还将下载运行该 pip 所需的其他软件包。如果你计划不安装 pip，直接使用 bazel 执行任务，则可能需要安装其他 Python 软件包。例如，在使用 `bazel` 运行 TensorFlow 的测试之前，您应该先执行 `pip install mock enum34`。
+注意：这些只是构建 TensorFlow 的最低要求。安装 pip 软件包时还将下载运行该 pip 所需的其它软件包。如果不安装 pip，而是直接使用 bazel 执行任务，则可能需要安装其它 Python 软件包。例如，在使用 `bazel` 运行 TensorFlow 的测试之前，应该先执行 `pip install mock enum34`。
 
 <a name="ConfigureInstallation"></a>
 
@@ -211,25 +211,25 @@ Configuration finished
 
 ## 构建 pip 包
 
-注意：如果你只对用这些库构建 TensorFlow C 或 JAVA API 感兴趣，清查看  [Build the C or Java libraries](#BuildCorJava)，在这种情况下你不需要构建 pip 安装包。
+注意：如果只对用这些库构建 TensorFlow C 或 JAVA API 感兴趣，请查看[构建 C 或 Java 库](#BuildCorJava)，在这种情况下不需要构建 pip 安装包。
 
-### 仅支持 CPU
+### 仅包含 CPU 支持
 
-构建一个仅支持 CPU 的 TensorFlow pip 安装包：
+构建一个仅包含 CPU 支持的 TensorFlow pip 安装包：
 
 <pre>
 $ bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
 </pre>
 
-构建一个仅支持 CPU 但拥有 Intel® MKL-DNN 支持的 TensorFlow pip 安装包：
+构建一个仅包含 CPU 支持但拥有 Intel® MKL-DNN 支持的 TensorFlow pip 安装包：
 
 <pre>
 $ bazel build --config=mkl --config=opt //tensorflow/tools/pip_package:build_pip_package
 </pre>
 
-### GPU support
+### GPU 支持
 
-构建一个支持 GPU 的 TensorFlow pip 安装包：
+构建一个包含 GPU 支持的 TensorFlow pip 安装包：
 
 <pre>
 $ bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_package
