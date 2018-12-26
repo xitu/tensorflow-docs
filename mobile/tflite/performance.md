@@ -109,7 +109,7 @@ Pixel xl | 0c |
 
 # iOS 基准
 
-为了测试 iOS 基准，修改了 [benchmark app](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark/ios) 以包含合适的模型并且`benchmark_params.json` 中  `num_threads` 设定为 1。
+为了测试 iOS 基准，修改了 [benchmark app](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark/ios) 以包含合适的模型并且`benchmark_params.json` 中 `num_threads` 设定为 1。
 
 <table>
   <thead>
