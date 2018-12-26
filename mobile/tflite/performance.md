@@ -1,6 +1,6 @@
 # 性能
 
-此文档罗列了在 Android 和 iOS 设备上运行一些知名的模型时 TensorFlow Lite 性能基准。
+此文档罗列了在 Android 和 iOS 设备上运行一些经典的模型时 TensorFlow Lite 性能基准。
 
 这些性能基准值由 [Android TFLite benchmark binary](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark) 和 [iOS benchmark app](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/tools/benchmark/ios) 生成。
 
@@ -35,7 +35,7 @@ Pixel xl | 0c |
     <tr>
       <th>模型名</th>
       <th>设备 </th>
-      <th>推论所用平均时间（std dev）</th>
+      <th>推理所用平均时间（std dev）</th>
     </tr>
   </thead>
   <tr>
@@ -116,7 +116,7 @@ Pixel xl | 0c |
     <tr>
       <th>模型名</th>
       <th>设备 </th>
-      <th>推论所用平均时间（std dev）</th>
+      <th>推理所用平均时间（std dev）</th>
     </tr>
   </thead>
   <tr>
