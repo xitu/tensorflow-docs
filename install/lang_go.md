@@ -1,4 +1,4 @@
-# 安装 TensorFlow for Go
+# 安装 TensorFlow Go API
 
 TensorFlow 提供了 [Go API](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go){:.external}， 这对于加载由 Python 创建的模型并在 Go 应用中运行它们特别有用。
 
@@ -17,11 +17,11 @@ TensorFlow for Go 支持以下系统：
 
 ### TensorFlow C library
 
-安装 [TensorFlow C 函数库](./lang_c.md)，它是 TensorFlow Go 包所必需的.
+安装 [TensorFlow C 函数库](./lang_c.md)，它是 TensorFlow Go 包所必需的。
 
 ### 下载
 
-下载并安装 TensorFlow Fo 包和其依赖：
+下载并安装 TensorFlow Go 包和其依赖：
 
 <pre class="devsite-terminal devsite-click-to-copy">
 go get github.com/tensorflow/tensorflow/tensorflow/go
