@@ -93,14 +93,13 @@ $ <b>sudo apt-get install python3-numpy python3-dev python3-pip python3-wheel</b
 
 *   [GPU drivers](http://nvidia.com/driver)。CUDA 9.0 要求 384.x 或更高的版本。
 *   [CUDA Toolkit](http://nvidia.com/cuda) (>= 8.0)。我们建议使用 9.0 版本。
-*   [cuDNN SDK](http://developer.nvidia.com/cudnn) (>= 6.0)。 我们建议使用 7.1.x。
-*   [CUPTI](http://docs.nvidia.com/cuda/cupti/) 搭载在 CUDA Toolkit 中，但你仍需将它的文件路径追加给环境变量  `LD_LIBRARY_PATH`：`export
+*   [cuDNN SDK](http://developer.nvidia.com/cudnn) (>= 6.0)。我们建议使用 7.1.x。
+*   [CUPTI](http://docs.nvidia.com/cuda/cupti/) 搭载在 CUDA Toolkit 中，但你仍需将它的文件路径追加给环境变量 `LD_LIBRARY_PATH`：`export
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64`。
-*   **可选**： [NCCL 2.2](https://developer.nvidia.com/nccl) 使用多块 GPU 运行 TensorFlow。
-*   **可选**： [TensorRT](http://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html) 在处理某些模型时可提升推理过程的潜在性能和数据吞吐。
+*   **可选**：[NCCL 2.2](https://developer.nvidia.com/nccl) 使用多块 GPU 运行 TensorFlow。
+*   **可选**：[TensorRT](http://docs.nvidia.com/deeplearning/sdk/tensorrt-install-guide/index.html) 在处理某些模型时可提升推理过程的潜在性能和数据吞吐。
 
-While it is possible to install the NVIDIA libraries via `apt-get` from the NVIDIA repository, the libraries and headers are installed in locations that make it difficult to configure and debug build issues. Downloading and installing the libraries manually or using docker ([latest-devel-gpu](https://hub.docker.com/r/tensorflow/tensorflow/tags/)) is recommended.
-虽然可以通过 `apt-get` 从 NVIDIA 仓库中安装 NVIDIA 函数库，但是以这种方式安装这些库和头文件会导致配置困难以及调试或构建问题。推荐手动下载并安装这些库或使用 docker ([latest-devel-gpu](https://hub.docker.com/r/tensorflow/tensorflow/tags/))。
+虽然可以通过 `apt-get` 从 NVIDIA 仓库中安装 NVIDIA 函数库，但是以这种方式安装这些库和头文件会导致配置困难以及调试或构建问题。推荐手动下载并安装这些库或使用 docker（[latest-devel-gpu](https://hub.docker.com/r/tensorflow/tensorflow/tags/)）。
 
 <pre>
 $ <b>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64</b>
@@ -424,4 +423,4 @@ Hello, TensorFlow!
 如果你对构建 TensorFlow JAVA API 感兴趣，按如下步骤操作：
 
 1.  按[安装配置](#ConfigureInstallation)中步骤操作
-2.  按 [README](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/lib_package/README.md) 文件中说明构建 JAVA 函数库.
+2.  按 [README](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/lib_package/README.md) 文件中说明构建 JAVA 函数库。
