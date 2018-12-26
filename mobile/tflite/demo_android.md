@@ -31,15 +31,15 @@
 
 更多的详细细节可在 [TF Lite Android App 页面](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite/java/demo/README.md) 中查看。
 
-### 使用其他模型
+### 使用其它模型
 
-要使用其他模型：
+要使用其它模型：
 
 * 下载浮点模型 [Inception-v3](https://storage.googleapis.com/download.tensorflow.org/models/tflite/inception_v3_slim_2016_android_2017_11_10.zip)。
 * 解压并拷贝 `inceptionv3_non_slim_2015.tflite` 到 assets 目录。 
 * 变更 [Camera2BasicFragment.java](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/java/demo/app/src/main/java/com/example/android/tflitecamerademo/Camera2BasicFragment.java)<br> 中特定的分类器
   由: `classifier = new ImageClassifierQuantizedMobileNet(getActivity());`<br>
-  改为: `classifier = new ImageClassifierFloatInception(getActivity());`.
+  改为: `classifier = new ImageClassifierFloatInception(getActivity());`。
 
 ## 使用源码编译 TensorFlow Lite 和示例应用
 
