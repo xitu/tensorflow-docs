@@ -1,10 +1,9 @@
 # 安装 TensorFlow Go API
 
-TensorFlow 提供了 [Go API](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go){:.external}， 这对于加载由 Python 创建的模型并在 Go 应用中运行它们特别有用。
+TensorFlow 提供了 [Go API](https://godoc.org/github.com/tensorflow/tensorflow/tensorflow/go){:.external}，这对于加载由 Python 创建的模型并在 Go 应用中运行它们特别有用。
 
 注意：TensorFlow GO API **并不**包含在  TensorFlow 中。
-[API 稳定性说明](../guide/version_compat.md).
-
+[API 稳定性说明](../guide/version_compat.md)。
 
 ## 支持平台
 
@@ -78,7 +77,7 @@ func main() {
 go run hello_tf.go
 </pre>
 
-此命令会输出： <code>Hello from TensorFlow version <em>number</em></code>
+此命令会输出：<code>Hello from TensorFlow version <em>number</em></code>
 
 成功：TensorFlow for Go 配置完成。
 
@@ -90,4 +89,4 @@ W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn'
 
 ## 由源码构建
 
-TensorFlow 已开源。查看[说明](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/go/README.md){:.external}来有源码构建 TensorFlow for Go。
+TensorFlow 已开源。查看[说明](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/go/README.md){:.external} 来有源码构建 TensorFlow for Go。
