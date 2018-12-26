@@ -50,13 +50,13 @@ srcs_version = "PY2AND3",
 
 ## Tensor
 
-* 在假设 Tensor 的第一维度是 batche 维度的情况下对 batches 操作的处理函数。
+* 批处理操作通常假设 Tensor 的第一个维度是批处理维度。
 
-* In most models the *last dimension* is the number of channels.
+* 在大多数模型中**最后一个维度**是通道的数量。
 
-* Dimensions excluding the first and last usually make up the "space" dimensions: Sequence-length or Image-size.
+* 除了第一个和最后一个之外的维度通常组成「空间」维度：代表序列长度或是图片尺寸。
 
-* Prefer using a Tensor's overloaded operators rather than TensorFlow functions. For example, prefer `**`, `+`, `/`, `*`, `-`, `and/or` over `tf.pow`, `tf.add`, `tf.div`, `tf.mul`, `tf.subtract`, and `tf.logical*` unless a specific name for the operation is desired.
+* 尽量使用 Tensor 的重载运算符，而不是 TensorFlow 函数。比如说，尽量使用 `**`、`+`、`/`、`*`、`-`、`and/or` 来代替 `tf.pow`、`tf.add`、`tf.div`、`tf.mul`、`tf.subtract` 和 `tf.logical*`，除非需要特定的操作名称。
 
 ## Python 处理函数
 
@@ -76,7 +76,7 @@ srcs_version = "PY2AND3",
 
 * 为了提升可用性，示例部分应该包含一个含有处理函数输入与输出的用例。
 
-* Avoid making explicit use of `tf.Tensor.eval` or `tf.Session.run`. For example, to write logic that depends on the Tensor value, use [TensorFlow control flow](https://www.tensorflow.org/api_guides/python/control_flow_ops). Alternatively, restrict the operation to only run when eager execution is enabled (`tf.executing_eagerly()`).
+* 尽量避免直接使用 `tf.Tensor.eval` 或 `tf.Session.run`。例如，要编写依赖于 Tensor 的值的逻辑，就应该使用 [TensorFlow 流控制](https://www.tensorflow.org/api_guides/python/control_flow_ops)。或者，只在动态执行（`tf.executing_eagerly()`）打开时使用。
 
 示例：
 
@@ -113,8 +113,8 @@ srcs_version = "PY2AND3",
     output = my_op(t1, t2, my_param=0.5, other_param=0.6,
                    output_collections=['MY_OPS'], name='add_t1t2')
 
-## Layers
+## 网络层
 
-Use `tf.keras.layers`, not `tf.layers`.
+记得使用 `tf.keras.layers`，而非 `tf.layers`。
 
-See `tf.keras.layers` and [the Keras guide](../guide/keras.md#custom_layers) for details on how to sub-class layers.
+关于如何继承网络层的详细信息请看 `tf.keras.layers` 和 [Keras 指南](../guide/keras.md#custom_layers)。

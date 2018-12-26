@@ -46,13 +46,13 @@ landing_page:
     - classname: tfo-landing-row-item-code-block
       code_block: |
         <pre class="prettyprint lang-bsh devsite-disable-click-to-copy">
-        # Current release for CPU-only
+        # 当前的 CPU-only 发布版本
         <code class="devsite-terminal">pip install tensorflow</code><br/>
-        # Nightly build for CPU-only (unstable)
+        # CPU-only 的每日构建版本（不稳定）
         <code class="devsite-terminal">pip install tf-nightly</code><br/>
-        # GPU package for CUDA-enabled GPU cards
+        # 支持 CUDA 显卡加速的 GPU 版本
         <code class="devsite-terminal">pip install tensorflow-gpu</code><br/>
-        # Nightly build with GPU support (unstable)
+        # 支持 GPU 的每日构建版本（不稳定）
         <code class="devsite-terminal">pip install tf-nightly-gpu</code><br/>
         </pre>
 
@@ -62,8 +62,8 @@ landing_page:
         The <a href="https://hub.docker.com/r/tensorflow/tensorflow/" class="external">TensorFlow Docker images</a> are already configured to run TensorFlow. A <a href="https://docs.docker.com/install/" class="external">Docker</a> container runs in a virtual environment and is the easiest way to set up <a href="./gpu">GPU support</a>.
       </p>
       <pre class="prettyprint lang-bsh">
-      <code class="devsite-terminal">docker pull tensorflow/tensorflow                  # Download latest image</code><br/>
-      <code class="devsite-terminal">docker run -it -p 8888:8888 tensorflow/tensorflow  # Start a Jupyter notebook server</code>
+      <code class="devsite-terminal">docker pull tensorflow/tensorflow                  # 下载最新的镜像</code><br/>
+      <code class="devsite-terminal">docker run -it -p 8888:8888 tensorflow/tensorflow  # 启动 Jupyter notebook 服务器</code>
       </pre>
       <a class="button button-primary tfo-button-primary" href="./docker">Read the Docker install guide</a>
 
