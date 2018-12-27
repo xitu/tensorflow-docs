@@ -1,34 +1,34 @@
 toc:
-- title: Performance
+- title: 性能
   path: /performance/
-- title: Performance guide
+- title: 性能指南
   path: /performance/performance_guide
-- title: Input pipeline performance guide
+- title: 输入管道性能指南
   path: /performance/datasets_performance
-- title: Benchmarks
+- title: 基准
   path: /performance/benchmarks
 
-- heading: Model optimization toolkit
-- title: Model optimization methods
+- heading: 模型优化工具包
+- title: 模型优化方法
   path: /performance/model_optimization
-- title: Post-training quantization
+- title: 训练后量化
   path: /performance/post_training_quantization
-- title: Post-training quantization example
+- title: 训练后量化示例
   path: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/lite/tutorials/post_training_quant.ipynb
   status: external
 
-- heading: XLA
-- title: XLA overview
+- heading: 加速线性代数 XLA
+- title: 加速线性代数 XLA 概述
   path: /performance/xla/
-- title: Broadcasting semantics
+- title: 广播语义
   path: /performance/xla/broadcasting
-- title: Developing a new backend for XLA
+- title: 开发一个全新 XLA 后端
   path: /performance/xla/developing_new_backend
-- title: Using JIT compilation
+- title: 使用 JIT 编译
   path: /performance/xla/jit
-- title: Operation semantics
+- title: 操作语义
   path: /performance/xla/operation_semantics
-- title: Shapes and layout
+- title: 形状和布局
   path: /performance/xla/shapes
-- title: Using AOT compilation
+- title: 使用 AOT 编译
   path: /performance/xla/tfcompile
