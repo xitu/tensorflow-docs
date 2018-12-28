@@ -22,7 +22,7 @@ toc:
   path: /performance/xla/
 - title: 广播语义
   path: /performance/xla/broadcasting
-- title: 开发一个全新 XLA 后端
+- title: 开发一个全新的 XLA 后端
   path: /performance/xla/developing_new_backend
 - title: 使用 JIT 编译
   path: /performance/xla/jit
