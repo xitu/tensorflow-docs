@@ -6,47 +6,37 @@
 
 ## AllToAll
 
-See also [`XlaBuilder::AllToAll`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h).
+也可查看 [`XlaBuilder::AllToAll`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
-Alltoall is a collective operation that sends data from all cores to all cores. It has two phases:
+Alltoall 是一个将数据在所有核心间互相传送的集合操作。它可分为两个阶段：
 
-1.  the scatter phase. On each core, the operand is split into `split_count` number of blocks along the `split_dimensions`, and the blocks are scattered to all cores, e.g., the ith block is send to the ith core.
-2.  the gather phase. Each core concatenates the received blocks along the `concat_dimension`.
+1. 分散阶段。在每个核心上，操作数会按 `split_dimensisons` 分割成 `split_count` 个块，并且这些块会分散到所有核心上，比如，第 i 个块会被送至第 i 个核心。
+2. 聚合阶段。每个核心会根据 `concat_dimension` 联结所收到的块。
 
-The participating cores can be configured by:
+参与的核心可由以下参数进行配置：
 
--   `replica_groups`: each ReplicaGroup contains a list of replica id. If empty, all replicas belong to one group in the order of 0 - (n-1). Alltoall will be applied within subgroups in the specified order. For example, replica groups = {{1,2,3},{4,5,0}} means, an Alltoall will be applied within replica 1, 2, 3, and in the gather phase, the received blocks will be concatenated in the order of 1, 2, 3; another Alltoall will be applied within replica 4, 5, 0, and the concatenation order is 4, 5, 0.
+-   `replica_groups`：每个 ReplicaGroup 都有一个包含所有副本 id 的数组。如果其为空，所有副本会按照 0-(n-1) 的顺序编入一个组中。Alltoall 将会按照特定的顺序应用到子组中。例如： 副本组为 {{1, 2, 3}, {4, 5, 0}}，Alltoall 操作会应用到副本 1, 2, 3 中，并在聚合阶段 ，所有收到的块会按照 1, 2, 3 的顺序联结；另一个 Alltoall 则会应用到副本 4, 5, 0 中，并按 4, 5, 0 的顺序联结。
 
-Prerequisites:
 
--   The dimension size of the operand on the split_dimension is divisible by split_count.
--   The operand's shape is not tuple.
+先决条件：
+
+-   split_dimission 中操作数的维度大小要能被 split_count 整除。
+-   操作数的形状不能是 tuple。
+
 
 <b> `AllToAll(operand, split_dimension, concat_dimension, split_count,
 replica_groups)` </b>
 
-| Arguments          | Type                  | Semantics                       |
+| 参数               | 类型                   | 语义                            |
 | ------------------ | --------------------- | ------------------------------- |
-| `operand`          | `XlaOp`               | n dimensional input array       |
-| `split_dimension`  | `int64`               | A value in the interval `[0,    |
-:                    :                       : n)` that names the dimension    :
-:                    :                       : along which the operand is      :
-:                    :                       : split                           :
-| `concat_dimension` | `int64`               | a value in the interval `[0,    |
-:                    :                       : n)` that names the dimension    :
-:                    :                       : along which the split blocks    :
-:                    :                       : are concatenated                :
-| `split_count`      | `int64`               | the number of cores that        |
-:                    :                       : participate this operation. If  :
-:                    :                       : `replica_groups` is empty, this :
-:                    :                       : should be the number of         :
-:                    :                       : replicas; otherwise, this       :
-:                    :                       : should be equal to the number   :
-:                    :                       : of replicas in each group.      :
-| `replica_groups`   | `ReplicaGroup` vector | each group contains a list of   |
-:                    :                       : replica id.                     :
+| `operand`          | `XlaOp`               | n 维输入操作数                   |
+| `split_dimension`  | `int64`               | 要将操作数分割成的维度数，其介于 `[0,  n]` 间  |
 
-Below shows an example of Alltoall.
+| `concat_dimension` | `int64`               | 将分割块联结起来的维度数，其介于 `[0, n]` 间  |
+| `split_count`      | `int64`               | 参与操作的核心数，如果 `replica_groups` 为空，其为副本数；否则，其为每个组中的副本数。|
+| `replica_groups`   | `ReplicaGroup` 向量   | 每一个组中包含一个副本 id 的数组  |
+
+下面是 Alltoall 的一个样例。
 
 ```
 XlaBuilder b("alltoall");
@@ -58,7 +48,7 @@ AllToAll(x, /*split_dimension=*/1, /*concat_dimension=*/0, /*split_count=*/4);
   <img style="width:100%" src="../../images/xla/ops_alltoall.png">
 </div>
 
-In this example, there are 4 cores participating the Alltoall. On each core, the operand is split into 4 parts along dimension 0, so each part has shape f32[4,4]. The 4 parts are scattered to all cores. Then each core concatenates the received parts along dimension 1, in the order or core 0-4. So the output on each core has shape f32[16,4].
+这个例子中，共有 4 个核心参与到 Alltoall 操作中。在每个核心上，操作数会按维度 0 被切割成 4 份，所以每一部分的形状是 f32[4,4]。这 4 部分会分散到所有核心中。然后每个核心会按维度 1 联结接收到的数据，这里的顺序为核心 0-4,。所以每个核心的输出的形状都应该是 f32[16,4]。
 
 ## BatchNormGrad
 
@@ -68,7 +58,7 @@ In this example, there are 4 cores participating the Alltoall. On each core, the
 
 <b> `BatchNormGrad(operand, scale, mean, variance, grad_output, epsilon, feature_index)` </b>
 
-| 类型             | 类型   | 语义                              |
+| 参数             | 类型   | 语义                              |
 | --------------- | ----------------------- | -------------------------------- |
 | `operand`       | `XlaOp` | 待归一化的 n 维数组 （x）            |
 | `scale`         | `XlaOp` | 1 维数组 (\\(\gamma\\))           |
@@ -80,7 +70,7 @@ In this example, there are 4 cores participating the Alltoall. On each core, the
 
 对于特征维数中的每一个特征（`feature_index` 即 `operand` 中特征维度的索引），此操作计算 `operand` 的梯度、在所有其他维度上的 `offset` 和 `scale`。`feature_index` 必须是 `operand` 中特征维度的合法索引。
 
-The three gradients are defined by the following formulas (assuming a 4-dimensional tensor as `operand` and with feature dimension index \\(l\\), batch size `m` and spatial sizes `w` and `h`):
+这三个梯度按照以下规则定义（假设一个 `operand` 的四维张量并有特征维度索引 \\(l\\)，批大小 `m` 和空间大小 `w` 和 `h`。
 
 \\[ \begin{split} c_l&=
 \frac{1}{mwh}\sum_{i=1}^m\sum_{j=1}^w\sum_{k=1}^h
@@ -411,9 +401,9 @@ Concat({a, b}, 0)
 
 rhs 的扩张也称为无功卷积。有关更多细节，请参见 `tf.nn.atrous_conv2d`。lhs 的扩张也称为转置卷积。要了解更多细节，请参见`tf.nn.conv2d_transpose`。
 
-The `feature_group_count` argument (default value 1) can be used for grouped convolutions. `feature_group_count` needs to be a divisor of both the input and the output feature dimension. If `feature_group_count` is greater than 1, it means that conceptually the input and output feature dimension and the `rhs` output feature dimension are split evenly into `feature_group_count` many groups, each group consisting of a consecutive subsequence of features. The input feature dimension of `rhs` needs to be equal to the `lhs` input feature dimension divided by `feature_group_count` (so it already has the size of a group of input features). The i-th groups are used together to compute `feature_group_count` many separate convolutions. The results of these convolutions are concatenated together in the output feature dimension.
+`feature_group_count` 参数（默认值为 1）可被用于分组卷积。`feature_group_count` 应为一个结合输入和输出特征维度的因数。如果 `feature_group_count` 大于 1，其意味着理论上输入和输出特征维度以及 `rhs` 输出特征维度均匀的分散在 `feature_group_count` 个分组中，并且这些组都包含连贯的特征序列。`rhs` 的输入特征维度需要等于 `lhs` 输入特征维度按 `feature_group_count` 分割而得的维度(所以它已经包含输入特征的分组大小)。这 i 个分组会一起计算 `feature_group_count` 分离的卷积。这些卷积额输出会在输出特征维度上联结起来。
 
-For depthwise convolution the `feature_group_count` argument would be set to the input feature dimension, and the filter would be reshaped from `[filter_height, filter_width, in_channels, channel_multiplier]` to `[filter_height, filter_width, 1, in_channels * channel_multiplier]`. For more details, see `tf.nn.depthwise_conv2d`.
+对 depthwise 卷积而言，`feature_group_count` 参数将会被设为输入特征维度，并且过滤器会从 `[filter_height, filter_width, in_channels, channel_multiplier]` 重整为 `[filter_height, filter_width, 1, in_channels * channel_multiplier]`。更多细节请参考 `tf.nn.depthwise_conv2d`。
 
 输出形状的维度含义依次为：
 
@@ -483,7 +473,7 @@ then b == f32[3]{0.0, 1.0, 2.0}
 
 输出的维度形状与输入形状一样。比如，如果有两个副本，而操作数在这两个副本上的值分别为 `(1.0, 2.5)` 和 `(3.0, 5.25)`，则此操作在两个副本上的输出值都是 `(4.0, 7.75)`。
 
-`replica_group_ids` identifies the group ID of each replica. The group ID must either be empty (all replicas belong to a single group), or contain the same number of elements as the number of replicas. For example, if `replica_group_ids` = {0, 1, 2, 3, 0, 1, 2, 3} has eight replicas, there are four subgroups of replica IDs: {0, 4}, {1, 5}, {2, 6}, and {3, 7}. The size of each subgroup *must* be identical, so, for example, using: `replica_group_ids` = {0, 1, 2, 0} for four replicas is invalid.
+`replica_group_ids` 明确每一个副本的分组 id。分组 id 必须为空（所有副本都属于同一组）或每组包含相同数量的副本数。例如，如果 `replica_group_ids` = {0, 1, 2, 3, 0, 1, 2, 3} 既有八个副本，且有四个副本 ID 的子组：{0, 4}、{1, 5}、{2, 6} 和 {3, 7}。每一个子组的大小**必须**一致，例如，对四个副本使用：`replica_group_ids` = {0, 1, 2, 0} 是无效的。
 
 计算 CrossReplicaSum 的结果需要从每个副本中获得一个输入，所以，如果一个副本执行一个 CrossReplicaSum 结点的次数多于其它副本，则前一个副本将永久等待。因此这些副本都运行的是同一个程序，这种情况发生的机会并不多，其中一种可能的情况是，一个 while 循环的条件依赖于输入的数据，而被输入的数据导致此循环在一个副本上执行的次数多于其它副本。
 
@@ -630,10 +620,10 @@ DotGeneral(lhs, rhs, dnums) -> { { {1.0, 2.0},
                                    {7.0, 8.0} } }
 ```
 
-| Input                               | Output            | Semantics        |
+| 输入                               | 输出            | 语义        |
 | ----------------------------------- | ----------------- | ---------------- |
-| [b0, m, k] `dot` [b0, k, n]         | [b0, m, n]        |  batch matmul    |
-| [b0, b1, m, k] `dot` [b0, b1, k, n] | [b0, b1, m, n]    |  batch matmul    |
+| [b0, m, k] `dot` [b0, k, n]         | [b0, m, n]        |  批进行矩阵相乘    |
+| [b0, b1, m, k] `dot` [b0, b1, k, n] | [b0, b1, m, n]    |  批进行矩阵相乘    |
 
 由此得出的结果维数是从批处理维度开始，然后是 `lhs` 非收缩/非批处理维数，最后是 `rhs` 非收缩/非批处理维数。
 
