@@ -1,23 +1,23 @@
 # 性能
 
-性能是训练机器学习模型时一个十分值得关注的问题。Performance speeds up and scales research while also providing end users with near instant predictions. This section provides details on the high level APIs to use along with best practices to build and train high performance models, and quantize models for the least latency and highest throughput for inference.
+性能是训练机器学习模型时一个十分值得关注的问题。性能让研究速度加快并且使研究规模化，同时还为最终用户提供近乎即时的预测。这部分提供了利用高级 API 构建和训练高性能模型最佳实践的详细信息，以及用于推断最小延迟和最高吞吐量的量化模型。
 
-* [Performance Guide](../performance/performance_guide.md) contains a collection of best practices for optimizing your TensorFlow code.
-* [Data input pipeline guide](../performance/datasets_performance.md) describes the tf.data API for building efficient data input pipelines for TensorFlow.
-* [Benchmarks](../performance/benchmarks.md) contains a collection of benchmark results for a variety of hardware configurations.
-* For optimizing inference on GPUs, refer to [NVIDIA TensorRT™ integration with TensorFlow.](https://medium.com/tensorflow/speed-up-tensorflow-inference-on-gpus-with-tensorrt-13b49f3db3fa)
+* [性能指南](../performance/performance_guide.md) 包括一系列优化你的 TensorFlow 代码的最佳实践。
+* [数据输入管道指南](../performance/datasets_performance.md) 描述了构建有效的 TensorFlow 数据输入管道的 tf.data API。
+* [基准](../performance/benchmarks.md) 包括一系列针对不同种类硬件配置的基准结果。
+* 针对优化 GPU 的推断，请参考[集成 TensorFlow 的 NVIDIA TensorRT™。](https://medium.com/tensorflow/speed-up-tensorflow-inference-on-gpus-with-tensorrt-13b49f3db3fa)
 
-Tensorflow Model Optimization Toolkit is a set of techniques for optimizing models for inference:
+Tensorflow 模型优化工具包是一组用于推理优化模型的技术：
 
-* [Overview](../performance/model_optimization.md), which introduces the model optimization toolkit.
-* [Post-training quantization](../performance/post_training_quantization.md), describes post training quantization.
+* [概述](../performance/model_optimization.md)，介绍了模型优化工具包。
+* [训练后量化](../performance/post_training_quantization.md)，描述了训练后量化。
 
-XLA (Accelerated Linear Algebra) is an experimental compiler for linear algebra that optimizes TensorFlow computations. The following guides explore XLA:
+XLA（加速线性代数）是一个用于优化 TensorFlow 线性代数计算的试验编译器。下面的教程对 XLA 进行了详细的阐述：
 
-* [XLA Overview](../performance/xla/index.md), which introduces XLA.
-* [Broadcasting Semantics](../performance/xla/broadcasting.md), which describes XLA's broadcasting semantics.
-* [Developing a new back end for XLA](../performance/xla/developing_new_backend.md), which explains how to re-target TensorFlow in order to optimize the performance of the computational graph for particular hardware.
-* [Using JIT Compilation](../performance/xla/jit.md), which describes the XLA JIT compiler that compiles and runs parts of TensorFlow graphs via XLA in order to optimize performance.
-* [Operation Semantics](../performance/xla/operation_semantics.md), which is a reference manual describing the semantics of operations in the `ComputationBuilder` interface.
-* [Shapes and Layout](../performance/xla/shapes.md), which details the `Shape` protocol buffer.
-* [Using AOT compilation](../performance/xla/tfcompile.md), which explains `tfcompile`, a standalone tool that compiles TensorFlow graphs into executable code in order to optimize performance.
+* [XLA 概述](../performance/xla/index.md)，介绍加速线性代数 XLA。
+* [广播语义](../performance/xla/broadcasting.md)，描述了 XLA 的广播语义。
+* [开发一个全新 XLA 后端](../performance/xla/developing_new_backend.md)，这解释了如何重新定位 TensorFlow 以优化特定硬件的计算图的性能。
+* [使用 JIT 编译](../performance/xla/jit.md)，它描述了 XLA JIT 编译器，它通过 XLA 编译和运行部分 TensorFlow 图，以优化性能。
+* [操作语义](../performance/xla/operation_semantics.md)，这是一个参考手册，描述了 `ComputationBuilder` 接口中操作的语义。
+* [形状和布局](../performance/xla/shapes.md)，详细介绍了 `Shape` 协议的缓存。
+* [使用 AOT 编译](../performance/xla/tfcompile.md)，这解释了 `tfcompile`，这是一个独立的工具，可以将 TensorFlow 图编译成可执行代码，以优化性能。
