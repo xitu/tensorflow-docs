@@ -184,10 +184,10 @@ operand 和 目标形状的维度必须匹配。源和目标元素类型的位�
 
 <b> `Broadcast(operand, broadcast_sizes)` </b>
 
-参数               | 类型                    | 语义
------------------ | ----------------------- | -------------------------------
-`operand`         | `XlaOp`                 | 待复制的数组
-`broadcast_sizes` | `ArraySlice<int64>`     | 新维度的形状大小
+|参数               | 类型                    | 语义|
+|----------------- | ----------------------- | -------------------------------|
+|`operand`         | `XlaOp`                 | 待复制的数组|
+|`broadcast_sizes` | `ArraySlice<int64>`     | 新维度的形状大小|
 
 新的维度被插入在操作数（operand）的左侧，即，若 `broadcast_sizes` 的值为 `{a0, ..., aN}`，而操作数（operand）的维度形状为 `{b0, ..., bM}`，则广播后输出的维度形状为 `{a0, ..., aN, b0, ..., bM}`。
 
@@ -441,10 +441,10 @@ for (b, oz, oy, ox) {  // 输出坐标
 
 <b> `ConvertElementType(operand, new_element_type)` </b>
 
-参数          | 类型                 | 语义
------------------- | --------------- | ------------------
-`operand`          | `XlaOp`         | D 维类型为 T 的数组
-`new_element_type` | `PrimitiveType` | 类型 U
+|参数                | 类型           | 语义               |
+|------------------ | --------------- | ------------------|
+|`operand`          | `XlaOp`         | D 维类型为 T 的数组|
+|`new_element_type` | `PrimitiveType` | 类型 U            |
 
 操作数和目标形状的维度必须匹配。源和目标元素类型不能是元组。
 
@@ -466,7 +466,7 @@ then b == f32[3]{0.0, 1.0, 2.0}
 
 <b> `CrossReplicaSum(operand)` </b>
 
-| 参数 | 类型 | 语义                      |
+| 参数         |类型       | 语义                      |
 | ------------ | ------- | ---------------- |
 | `operand`    | `XlaOp` | 跨多个副本待求和的数组。  |
 | `replica_group_ids`    | `int64` 向量 | 每个副本的 Group ID |
@@ -485,7 +485,7 @@ then b == f32[3]{0.0, 1.0, 2.0}
 
 <b> `CustomCall(target_name, args..., shape)` </b>
 
-| 参数 | 类型 | 语义                                         |
+| 参数          | 类型                | 语义                                 |
 | ------------- | ------------------ | -------------------------------- |
 | `target_name` | `string`           | 函数名称。一个指向这个符号名称的调用指令会被发出 |
 | `args`        | N 个 `XlaOp` 的序列 | 传递给此函数的 N 个任意类型的参数 |
@@ -536,10 +536,10 @@ extern "C" void myfunc(void* out, void** in) {
 
 <b> `Dot(lhs, rhs)` </b>
 
- 参数 | 类型 | 语义                                     
---------- | ------- | ---------------
-`lhs`     | `XlaOp` | 类型为 T 的数组
-`rhs`     | `XlaOp` | 类型为 T 的数组
+| 参数 | 类型 | 语义 |
+|--------- | ------- | ---------------|
+|`lhs`     | `XlaOp` | 类型为 T 的数组|
+|`rhs`     | `XlaOp` | 类型为 T 的数组|
 
 此操作的具体语义由它的两个操作数的秩来决定：
 
@@ -557,11 +557,11 @@ extern "C" void myfunc(void* out, void** in) {
 
 <b> `DotGeneral(lhs, rhs, dimension_numbers)` </b>
 
-| 参数 | 类型                    | 语义
-| --------- | ----------------------- | ---------------
-| `lhs`     | `XlaOp` | 类型为 T 的数组
-| `rhs`     | `XlaOp` | 类型为 T 的数组
-| `dimension_numbers` | `DotDimensionNumbers` | 类型为 T 的数组
+| 参数 | 类型                    | 语义|
+| --------- | ----------------------- | ---------------|
+| `lhs`     | `XlaOp` | 类型为 T 的数组|
+| `rhs`     | `XlaOp` | 类型为 T 的数组|
+| `dimension_numbers` | `DotDimensionNumbers` | 类型为 T 的数组|
 
 和点乘一样，但是对于 'lhs' 和 'rhs' 允许收缩和指定批处理维数。
 
@@ -641,13 +641,13 @@ DynamicSlice 从动态 `start_indices` 输入数组中提取子数组。`size_in
 | `start_indices` | `XlaOp`                 | N 个整数组成的秩为 1 的数组，其中包含每个维度的起始切片索引。值必须大于等于0      |
 | `size_indices`  | `ArraySlice<int64>`     | N 个整数组成的列表，其中包含每个维度的切片大小。值必须大于 0，且 start + size 必须小于等于维度大小，从而避免封装维数大小的模运算    |
 
-The effective slice indices are computed by applying the following transformation for each index `i` in `[1, N)` before performing the slice:
+在执行切片操作之前，通过对 `[1, N)` 中的每个索引 `i`  应用以下转换来计算有效切片索引： 
 
 ```
 start_indices[i] = clamp(start_indices[i], 0, operand.dimension_size[i] - size_indices[i])
 ```
 
-This ensures that the extracted slice is always in-bounds with respect to the operand array. If the slice is in-bounds before the transformation is applied, the transformation has no effect.
+这可确保提取的切片相对于操作数组处于边界内。如果切片在应用变换之前处于边界内，则变换不起作用。
 
 1 维示例如下：
 
@@ -690,13 +690,13 @@ DynamicUpdateSlice 是在输入数组 `operand` 上，通过切片 `update` 操�
 | `update`        | `XlaOp` | 类型为 T 的包含切片更新的 N 维数组，每个维度的更新形状必须大于 0 ，且 start + update 必须小于维度大小，从而避免越界更新索引    |
 | `start_indices` | `XlaOp` | N 个整数组成的秩为 1 的数组，其中包含每个维度的起始切片索引。值必须大于等于0       |
 
-The effective slice indices are computed by applying the following transformation for each index `i` in `[1, N)` before performing the slice:
+在执行切片操作之前，通过对 `[1, N)` 中的每个索引 `i`  应用以下转换来计算有效切片索引： 
 
 ```
 start_indices[i] = clamp(start_indices[i], 0, operand.dimension_size[i] - update.dimension_size[i])
 ```
 
-This ensures that the updated slice is always in-bounds with respect to the operand array. If the slice is in-bounds before the transformation is applied, the transformation has no effect.
+这可确保更新后的切片始终相对于操作组处于边界内。如果切片在应用变换之前处于边界内，则变换不起作用。
 
 1 维示例如下：
 
@@ -741,16 +741,16 @@ XLA 支持多个逐个元素的二元算术操作。
 
 其中 `Op` 可以是如下操作之一：`Add` (加法), `Sub` (减法), `Mul` (乘法), `Div` (除法), `Rem` (余数), `Max` (最大值), `Min` (最小值), `LogicalAnd` (逻辑且), 或 `LogicalOr` (逻辑或)。
 
- 参数 | 类型 | 语义                                     
---------- | ----------------------- | ----------------------------------------
-`lhs`     | `XlaOp` | 左操作数：类型为 T 的数组
-`rhs`     | `XlaOp` | 右操作数：类型为 T 的数组
+|参数 | 类型 | 语义|                                     
+| ------------ | ------- | ------ |
+|`lhs`     | `XlaOp` | 左操作数：类型为 T 的数组|
+|`rhs`     | `XlaOp` | 右操作数：类型为 T 的数组|
 
 这两个参数的维度形状要么相似，要么兼容。关于维度形状相似或兼容的准确含义，参见[广播](../../performance/xla/broadcasting.md)文档。二元操作的结果有一个形状，它是广播两个输入数组的结果。虽然可以广播，但不同秩的数组之间的运算是不支持的，除非其中之一是标量。
 
 当 `Op` 为 `Rem` 时，结果的符号与被除数一致，而结果的绝对值总是小于除数的绝对值。
 
-Integer division overflow (signed/unsigned division/remainder by zero or signed divison/remainder of `INT_SMIN` with `-1`) produces an implementation defined value.
+整数除法溢出（有符号/无符号除或取余零或有符号数除或取余使用 `-1` 的 `INT_SMIN`）会产生一个由实现过程定义的值。
 
 不过，还是可以用如下接口来支持不同秩操作数的广播：
 
@@ -816,9 +816,9 @@ $$\text{sgn}(x) = \begin{cases} -1 & x < 0\\ 0 & x = 0\\ 1 & x > 0 \end{cases}$$
 <b>`Tanh(operand)`</b> 逐个元素的双曲正切 `x -> tanh(x)`。
 
 
- 参数 | 类型 | 语义                                     
---------- | ----------------------- | ---------------------------
-`operand` | `XlaOp` | 函数的操作数
+| 参数 | 类型 | 语义|                                     
+|--------- | ----------------------- | ---------------------------|
+|`operand` | `XlaOp` | 函数的操作数|
 
 该函数应用于 `operand` 数组的每个元素，从而形成具有相同形状的数组。它允许操作数为标量（秩 0 ）
 
@@ -835,33 +835,34 @@ XLA 收集操作将一个输入数组的几个片（每个片在一个可能不�
 |参数      | 类型                    | 语义                       |
 |----------------- | ----------------------- | --------------------------------|
 |`operand`         | `XlaOp` | 我们收集的数组。|
-|`start_indices`   | `XlaOp`                 | Array containing the starting indices of the slices we gather.:
-|`index_vector_dim` | `int64`                | The dimension in `start_indices` that "contains" the starting indices. See below for a description.  |
-|`offset_dims`     | `ArraySlice<int64>`     | The set of dimensions in  the output shape that offset into a array sliced from operand. |
-|`slice_sizes`     | `ArraySlice<int64>`      | `slice_sizes[i]` is the bounds for the slice on dimension `i`. |
-|`collapsed_slice_dims` | `ArraySlice<int64>` | The set of dimensions in each slice that are collapsed away. These dimensions must have size: 1.                             |
-|`start_index_map` | `ArraySlice<int64>`      | A map that describes how to map indices in `start_indices` to to legal indices into operand. |
+|`start_indices`   | `XlaOp`                 | 包含我们收集的切片的起始索引。|
+|`index_vector_dim` | `int64`                | `start_indices` 中的维度，其中“包含”了起始索引，请参考下面的详细解释。|
+|`offset_dims`     | `ArraySlice<int64>`     | 输出形状中从操作数分割成数组的一组维数。 |
+|`slice_sizes`     | `ArraySlice<int64>`      | `slice_sizes[i]` 是维度 `i` 上切片的界限。|
+|`collapsed_slice_dims` | `ArraySlice<int64>` | 折叠起来的每个切片中的一组维度。这些标注的尺寸必须为：1。   |
+|`start_index_map` | `ArraySlice<int64>`      | 描述如何将 `start_indices` 中的索引映射到操作数中合法索引的一个映射。 |
 
-For convenience, we label dimensions in the output array not in `offset_dims` as `batch_dims`.
+为了方便起见，我们将输出数组中的维度标记为 `batch_dims`，而不是 `offset_dims`。
 
-The output is an array of rank `batch_dims.size` + `operand.rank` - `collapsed_slice_dims`.size.
+输出是一个数组，其大小为秩 `batch_dims.size` + `operand.rank` - `collapsed_slice_dims`.size。
 
-If `index_vector_dim` is equal to `start_indices.rank` we implicitly consider `start_indices` to have a trailing `1` dimension (i.e. if `start_indices` was of shape `[6,7]` and `index_vector_dim` is `2` then we implicitly consider the shape of `start_indices` to be `[6,7,1]`).
+如果 `index_vector_dim` 等于 `start_indices.rank` ，我们默认 `start_indices` 其后会有一个 `1` 维度（即如果 `start_indices` 形状为 `[6,7]` 且 `index_vector_dim` 为 `2`，那么我们默认  `start_indices` 形状为 `[6,7,1]`）。
 
-The bounds for the output array along dimension `i` is computed as follows:
+输出数组沿维度 `i` 的界限计算如下：
 
-   1. If `i` is present in `batch_dims` (i.e. is equal to `batch_dims[k]` for some `k`) then we pick the corresponding dimension bounds out of `start_indices.shape`, skipping `index_vector_dim` (i.e. pick `start_indices.shape.dims`[`k`] if `k` < `index_vector_dim` and  `start_indices.shape.dims`[`k`+`1`] otherwise).
-   2. If `i` is present in `offset_dims` (i.e. equal to `offset_dims`[`k`] for some `k`) then we pick the corresponding bound out of `slice_sizes` after accounting for `collapsed_slice_dims` (i.e. we pick `adjusted_slice_sizes`[`k`] where `adjusted_slice_sizes` is `slice_sizes` with the bounds at indices `collapsed_slice_dims` removed).
+   1. 如果 `i` 存在于 `batch_dims` 中（例如，对于某些 `k`，等于 `batch_dims[k]`），则我们从 `start_indices,shape` 中选择相应的维边界，跳过 `index_vector_dim`（即如果是 `k` < `index_vector_dim`，选择 `start_indices.shape.dims`[`k`]，否则选择 `start_indices.shape.dims`[`k`+`1`]）。
+   2. 如果 `i` 出现在 `offset_dims`（例如，对于某些 `k`，等于  `offset_dims`[`k`]），那么在考虑 `collapsed_slice_dims` 后我们从 `slice_sizes` 选择相应的绑定（即我们选择 `adjusted_slice_sizes`[`k`] ，其中 `adjusted_slice_sizes` 是将索引 `collapsed_slice_dims` 界限外移除后的 `slice_sizes`）。 
 
-Formally, the operand index `In` corresponding to an output index `Out` is computed as follows:
+形式上，对应与输出索引的 `Out` 的操作数索引 `In` 按照以下方式计算：
 
-   1. Let `G` = { `Out`[`k`] for `k` in `batch_dims` }.  Use `G` to slice out vector `S` such that `S`[`i`] = `start_indices`[Combine(`G`, `i`)] where Combine(A, b) inserts b at position `index_vector_dim` into A.  Note that this is well defined even if `G` is empty -- if `G` is empty then `S` = `start_indices`.
-   2. Create a starting index, `S`<sub>`in`</sub>, into `operand` using `S` by scattering `S` using `start_index_map`.  More precisely:
-       1. `S`<sub>`in`</sub>[`start_index_map`[`k`]] = `S`[`k`] if `k` < `start_index_map.size`.
-       2. `S`<sub>`in`</sub>[`_`] = `0` otherwise.
+   1. 使 `G` = { `Out`[`k`] for `k` in `batch_dims` }。用 `G` 将 向量 `S` 分离，比如 `S`[`i`] = `start_indices`[Combine(`G`, `i`)]，其中 Combine(A, b)  将 b 插入 A 中的 `index_vector_dim` 位置。注意这在 `G` 为空时也成立，如果 `G` 为空则 `S` = `start_indices`。
+   2. 创建一个起始索引，`S`<sub>`in`</sub>，通过 `start_index_map` 分散 `S` 来将 `S` 插入 `operand`。更确切得来说：
+       1. `S`<sub>`in`</sub>[`start_index_map`[`k`]] = `S`[`k`] 如果 `k` < `start_index_map.size`。
+       2. 否则，`S`<sub>`in`</sub>[`_`] = `0`。
    3. Create an index `O`<sub>`in`</sub> into `operand` by scattering the indices at the offset dimensions in `Out` according to the `collapsed_slice_dims` set.  More precisely:
        1. `O`<sub>`in`</sub>[`expand_offset_dims`(`k`)] = `Out`[`offset_dims`[`k`]] if `k` < `offset_dims.size` (`expand_offset_dims` is defined below).
        2. `O`<sub>`in`</sub>[`_`] = `0` otherwise.
+  3. 创建索引 `O`<sub>`in`</sub>，通过将
   4. `In` 是 `O`<sub>`in`</sub> + `S`<sub>`in`</sub>，是元素级加法。
 
 `expand_offset_dims` is the monotonic function with domain [`0`, `offset.size`) and range [`0`, `operand.rank`) \ `collapsed_slice_dims`.  So if, e.g., `offset.size` is `4`, `operand.rank` is `6` and `collapsed_slice_dims` is {`0`, `2`} then `expand_offset_dims` is {`0`→`1`, `1`→`3`, `2`→`4`, `3`→`5`}.
@@ -942,7 +943,7 @@ let element_1: s32 = gettupleelement(t, 1);  // 推断出的形状匹配 s32.
 
 <b> `Infeed(shape)` </b>
 
-| 参数 | 类型 | 语义                                              |
+| 参数      | 类型    | 语义                                              |
 | -------- | ------- | ----------------------------------------------------- |
 | `shape`  | `Shape` | 从 Infeed 接口读取数据的维度形状。此形状的数据布局必须与发送到设备上的数据相匹配；否则行为是未定义的 |
 
@@ -968,11 +969,10 @@ result2 = while (condition, init = result1) {
 
 Builds a constant literal on device rather than a potentially large host transfer.  Creates a rank 1 tensor of values starting at zero and incrementing by one.
 
-Arguments          | Type            | Semantics
------------------- | --------------- | ---------------------------
-`type`             | `PrimitiveType` | type U
-`size`             | `int64`         | The number of elements in the tensor.
-
+|参数               | 类型            | 语义            |
+|------------------ | --------------- | ---------------------------
+|`type`             | `PrimitiveType` | 类型 U |
+|`size`             | `int64`         | 张量中的元素个数。|
 ## 映射（Map）
 
 另请参阅 [`XlaBuilder::Map`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
@@ -1049,13 +1049,12 @@ computation(elem1, elem2, elem3, par1)` 将输入数组中的每个（多维）�
 
 <b> `Reduce(operands..., init_values..., computation, dimensions)` </b>
 
-Arguments     | Type                  | Semantics
-------------- | --------------------- | ---------------------------------------
-`operands`    | Sequence of N `XlaOp` | N arrays of types `T_0, ..., T_N`.
-`init_values` | Sequence of N `XlaOp` | N scalars of types `T_0, ..., T_N`.
-`computation` | `XlaComputation`      | computation of type
-              :                       : `T_0, ..., T_N, T_0, ..., T_N -> Collate(T_0, ..., T_N)`
-`dimensions`  | `int64` array         | unordered array of dimensions to reduce
+|参数     | 类型                  |语义                                       |
+|------------- | --------------------- | ---------------------------------------|
+|`operands`    | Sequence of N `XlaOp` | N arrays of types `T_0, ..., T_N`.|
+|`init_values` | Sequence of N `XlaOp` | N scalars of types `T_0, ..., T_N`.|
+|`computation` | `XlaComputation`      | computation of type `T_0, ..., T_N, T_0, ..., T_N -> Collate(T_0, ..., T_N)`|
+|`dimensions`  | `int64` array         | unordered array of dimensions to reduce|
 
 Where:
 
@@ -1244,11 +1243,11 @@ builder.ReduceWindow(
 <b> `Reshape(operand, new_sizes)` </b>
 <b> `Reshape(operand, dimensions, new_sizes)` </b>
 
-参数 | 类型 | 语义
------------- | ----------------------- | ---------------------------------------
-`operand`    | `XlaOp` | 类型为 T 的数组
-`dimensions` | `int64` vector          | 维度折叠的顺序
-`new_sizes`  | `int64` vector          | 新维度大小的矢量
+|参数       | 类型                   | 语义                   |
+|------------ | ----------------------- | --------------------|
+|`operand`    | `XlaOp` | 类型为 T 的数组|
+|`dimensions` | `int64` vector          | 维度折叠的顺序|
+|`new_sizes`  | `int64` vector          | 新维度大小的矢量|
 
 从概念上看，变形操作首先将一个数组拉平为一个一维矢量，然后将此矢量展开为一个新的形状。输入参数是一个类型为 T 的任意数组，一个编译时常量的维度指标数组，以及表示结果维度大小的一个编译时常量的数组。如果给出了 `dimensions` 参数，这个矢量中的值必须是 T 的所有维度的一个置换，其默认值为 `{0, ..., rank - 1}`。`dimensions` 中的维度的顺序是从最慢变化维（最主序）到最快变化维（最次序），按照这个顺序依次将所有元素折叠到一个维度上。`new_sizes` 矢量决定了输出数组的维度大小。`new_sizes[0]` 表示第 0 维的大小，`new_sizes[1]` 表示的是第 1 维的大小，依此类推。`new_sizes` 中的维度值的乘积必须等于 operand 的维度值的乘积。将折叠的一维数组展开为由 `new_sizes` 定义的多维数组时，`new_sizes` 中的维度的顺序也是最慢变化维（最主序）到最快变化维（最次序）。
 
@@ -1305,10 +1304,10 @@ Reshape(5, {}, {1,1}) == f32[1x1] {{5}};
 
 <b>`Rev(operand, dimensions)`</b>
 
-参数 | 类型 | 语义
------------- | ----------------------- | ---------------------
-`operand`    | `XlaOp` | 类型为 T 的数组 
-`dimensions` | `ArraySlice<int64>`     | 待反转的维度
+|参数 | 类型 | 语义|
+|------------ | ----------------------- | ---------------------|
+|`operand`    | `XlaOp` | 类型为 T 的数组 |
+|`dimensions` | `ArraySlice<int64>`     | 待反转的维度|
 
 反转操作是将 `operand` 数组沿指定的维度 `dimensions` 对元素的顺序反转，产生一个形状相同的数组。operand 数组的每个元素被存储在输出数组的变换后的位置上。元素的原索引位置在每个待倒置维度上都被反转了，得到其在输出数组中的索引位置（即，如果一个大小为 N 的维度是待倒置的，则索引 i 被变换为 N-i-i）。
 
@@ -1323,7 +1322,7 @@ Constructs an output of a given shape with random numbers generated following th
 
 <b>`RngNormal(mu, sigma, shape)`</b>
 
-| Arguments | Type    | Semantics                                           |
+| 参数 | 类型    |语义                                           |
 | --------- | ------- | --------------------------------------------------- |
 | `mu`      | `XlaOp` | Scalar of type T specifying mean of generated numbers |
 | `sigma`   | `XlaOp` | Scalar of type T specifying standard deviation of generated numbers |
@@ -1337,7 +1336,7 @@ Constructs an output of a given shape with random numbers generated following th
 
 <b>`RngUniform(a, b, shape)`</b>
 
-| Arguments | Type                    | Semantics                         |
+| 参数 | 类型                    | 语义                         |
 | --------- | ----------------------- | --------------------------------- |
 | `a`       | `XlaOp`                 | Scalar of type T specifying lower limit of interval |
 | `b`       | `XlaOp`                 | Scalar of type T specifying upper limit of interval |
