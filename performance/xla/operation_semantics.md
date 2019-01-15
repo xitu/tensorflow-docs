@@ -859,24 +859,24 @@ XLA 收集操作将一个输入数组的几个片（每个片在一个可能不�
    2. 创建一个起始索引，`S`<sub>`in`</sub>，通过 `start_index_map` 分散 `S` 来将 `S` 插入 `operand`。更确切得来说：
        1. `S`<sub>`in`</sub>[`start_index_map`[`k`]] = `S`[`k`] 如果 `k` < `start_index_map.size`。
        2. 否则，`S`<sub>`in`</sub>[`_`] = `0`。
-   3. Create an index `O`<sub>`in`</sub> into `operand` by scattering the indices at the offset dimensions in `Out` according to the `collapsed_slice_dims` set.  More precisely:
-       1. `O`<sub>`in`</sub>[`expand_offset_dims`(`k`)] = `Out`[`offset_dims`[`k`]] if `k` < `offset_dims.size` (`expand_offset_dims` is defined below).
-       2. `O`<sub>`in`</sub>[`_`] = `0` otherwise.
-  3. 创建索引 `O`<sub>`in`</sub>，通过将
+  3. 创建索引 `O`<sub>`in`</sub>，通过将 `Out` 中偏移维度中的索引按照 `collapsed_slice_dims` 分散到 `operand` 中。更确切的来说：
+       1. `O`<sub>`in`</sub>[`expand_offset_dims`(`k`)] = `Out`[`offset_dims`[`k`]] 如果 `k` < `offset_dims.size` (`expand_offset_dims`  的定义在下方)。
+       2. 否则，`O`<sub>`in`</sub>[`_`] = `0`。
   4. `In` 是 `O`<sub>`in`</sub> + `S`<sub>`in`</sub>，是元素级加法。
 
-`expand_offset_dims` is the monotonic function with domain [`0`, `offset.size`) and range [`0`, `operand.rank`) \ `collapsed_slice_dims`.  So if, e.g., `offset.size` is `4`, `operand.rank` is `6` and `collapsed_slice_dims` is {`0`, `2`} then `expand_offset_dims` is {`0`→`1`, `1`→`3`, `2`→`4`, `3`→`5`}.
+`expand_offset_dims` 是定义域为 [`0`, `offset.size`) 且值域为 [`0`, `operand.rank`) \ `collapsed_slice_dims` 的单调函数。所以如果，`offset.size` 是 `4`，`operand.rank` 是 `6` 且 `collapsed_slice_dims`为 {`0`, `2`} 那么 `expand_offset_dims` 则为 {`0`→`1`, `1`→`3`, `2`→`4`, `3`→`5`}。
 
 ### 非正式说明和实例
 
-Informally, every index `Out` in the output array corresponds to an element `E` in the operand array, computed as follows:
-   - We use the batch dimensions in `Out` to look up a starting index from `start_indices`.
-   - We use `start_index_map` to map the starting index (which may have size less than operand.rank) to a "full" starting index into operand.
-   - We dynamic-slice out a slice with size `slice_sizes` using the full starting index.
-   - We reshape the slice by collapsing the `collapsed_slice_dims` dimensions. Since all collapsed slice dimensions have to have bound 1 this reshape is always legal.
-   - We use the offset dimensions in `Out` to index into this slice to get the input element, `E`, corresponding to output index `Out`.
 
-`index_vector_dim` is set to `start_indices.rank` - `1` in all of the examples that follow.  More interesting values for `index_vector_dim` does not change the operation fundamentally, but makes the visual representation more cumbersome.
+非正式情况下，输出数组中的每个索引 `Out` 对应于操作数组中的元素 `E`， 计算方法如下：
+    - 我们使用 `Out` 中的批处理维度从 `start_indedices` 中查找起始索引。
+    - 我们使用 `start_index_map` 将起始索引（其大小可能小于 operand.rank）映射到“完整”的起始索引到操作数。
+    - 我们使用完整的起始索引动态切片大小为 `Slice_sizes` 的切片。
+    - 我们通过折叠 `collapsed_slice_dims` 维度来重塑切片。因为所有折叠的切片维度都必须绑定为 1，所以这种重塑总是合法的。
+    - 我们使用 `Out` 中的偏移量维度索引到此切片中，以获取与输出索引 `Out` 对应的输入元素 `E`。
+    
+在下面的所有示例中，`index_vector_dim` 被设置为 `start_indices.rank` - `1`，`index_vector_dim`的更有趣的值不会从根本上改变操作，但会使可视化表示更麻烦。
 
 为了直观地了解所有上述情况如何结合在一起，我们来看一个例子，它从一个 `[16,11]` 数组中收集 5 片形状为 `[8,6]` 的数组。切片到 `[16,11]` 数组中的位置可以表示为形状为 `S64[2]` 的索引向量，所有以 5 个位置的集合可以表示 `S64[5,2]` 数组。
 
@@ -886,7 +886,7 @@ Informally, every index `Out` in the output array corresponds to an element `E` 
   <img style="width:100%" src="https://www.tensorflow.org/images/ops_xla_gather_1.svg">
 </div>
 
-We first select an (`X`,`Y`) vector from the gather indices array using `G`. The element in the output array at index [`G`,`O`<sub>`0`</sub>,`O`<sub>`1`</sub>] is then the element in the input array at index [`X`+`O`<sub>`0`</sub>,`Y`+`O`<sub>`1`</sub>].
+我们首先使用 `G` 从聚集索引数组中选择一个 (`X`,`Y`) 向量。索引处的输出数组 [`G`,`O`<sub>`0`</sub>,`O`<sub>`1`</sub>]；]中的元素是索引 [`X`+`O`<sub>`0`</sub>,`Y`+`O`<sub>`1`</sub>] 处的输入数组中的元素。
 
 `slice_sizes` 是 `[8,6]`，它决定 W<sub>`0`</sub> 和 W<sub>`1`</sub> 的范围，这反过来决定切片的边界。
 
@@ -914,7 +914,8 @@ XLA 中收集的数据操作概括了以上概述的非正式语义：
   <img style="width:100%" src="../../images/ops_xla_gather_2.svg">
 </div>
 
-from the gather indices array as usual, except the starting index has only one element, `X`. Similarly, there is only one output offset index with the value `O`<sub>`0`</sub>.  However, before being used as indices into the input array, these are expanded in accordance to "Gather Index Mapping" (`start_index_map` in the formal description) and "Offset Mapping" (`expand_offset_dims` in the formal description) into  [`X`,`0`] and [`0`,`O`<sub>`0`</sub>] respectively, adding up to [`X`,`O`<sub>`0`</sub>].  In other words, the output index [`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`O`<sub>`0`</sub>] maps to the input index [`GatherIndices`[`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`0`],`X`] which gives us the semantics for `tf.gather_nd`.
+除了起始索引只有一个元素 `X` 之外，其他元素通常都来自聚集索引数组。类似地，只有一个输出偏移量索引的值为 `O`<sub>`0`</sub>。但是，在将它们用作输入数组的索引之前，将根据 “Gather Index Mapping”(正式描述中的 `start_index_map`)和 “Offset Mapping”(正式描述中的 `expand_offset_dims`)扩展为 [`X`,`0`] and [`0`,`O`<sub>`0`</sub>]，加起来分别为 [`X`,`O`<sub>`0`</sub>]。换句话说，输出索引为 [`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`O`<sub>`0`</sub>] 映射到输入索引 [`GatherIndices`[`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`0`],`X`]，它为我们提供了 `tf.gather_nd` 的语义。
+
 
 在这种情况下，`slice_sizes` 是 `[1,11]`。直觉上这意味着集合索引数组中的每一个索引 `X` 都会选择整行，结果是所有这些行连在一起。
 
@@ -971,7 +972,7 @@ Builds a constant literal on device rather than a potentially large host transfe
 
 |参数               | 类型            | 语义            |
 |------------------ | --------------- | ---------------------------
-|`type`             | `PrimitiveType` | 类型 U |
+|`type`             | `PrimitiveType` | 类型 U           |
 |`size`             | `int64`         | 张量中的元素个数。|
 ## 映射（Map）
 
@@ -1051,21 +1052,21 @@ computation(elem1, elem2, elem3, par1)` 将输入数组中的每个（多维）�
 
 |参数     | 类型                  |语义                                       |
 |------------- | --------------------- | ---------------------------------------|
-|`operands`    | Sequence of N `XlaOp` | N arrays of types `T_0, ..., T_N`.|
-|`init_values` | Sequence of N `XlaOp` | N scalars of types `T_0, ..., T_N`.|
-|`computation` | `XlaComputation`      | computation of type `T_0, ..., T_N, T_0, ..., T_N -> Collate(T_0, ..., T_N)`|
-|`dimensions`  | `int64` array         | unordered array of dimensions to reduce|
+|`operands`    | Sequence of N `XlaOp` | 类型为 `T_0, ..., T_N` 的 N 维数组。 |
+|`init_values` | Sequence of N `XlaOp` | 类型为 `T_0, ..., T_N` 的 N 标量。|
+|`computation` | `XlaComputation`      | 类型 `T_0, ..., T_N, T_0, ..., T_N -> Collate(T_0, ..., T_N)` 的计算|
+|`dimensions`  | `int64` array         | 降维数量的无序数组 |
 
-Where:
+这里：
 
-* N is required to be greater or equal to 1.
-* All input arrays must have the same dimensions.
-* If `N = 1`, `Collate(T)` is `T`.
-* If `N > 1`, `Collate(T_0, ..., T_N)` is a tuple of `N` elements of type `T`.
+* N必须大于或等于1。
+* 所有输入数组必须具有相同的维度。
+* 如果 `N = 1`，`Collate(T)` 为 `T`。
+* 如果 `N > 1`，`Collate(T_0, ..., T_N)` 是 `N` 类型为 `T` 元素的元组。
 
-The output of the op is `Collate(Q_0, ..., Q_N)` where `Q_i` is an array of type `T_i`, the dimensions of which are described below.
+OP的输出是 `Collate(Q_0, ..., Q_N)`，其中 `Q_i` 是一个类型为 `T_i` 的数组，其维数如下所述。
 
-This operation reduces one or more dimensions of each input array into scalars. The rank of each returned array is `rank(operand) - len(dimensions)`. `init_value` is the initial value used for every reduction and may be inserted anywhere during computation by the back-end. In most cases, `init_value` is an identity of the reduction function (for example, 0 for addition). The applied `computation` is always passed the `init_value` on the left-hand side.
+此操作将每个输入数组的一个或多个维度降为为标量。每个返回的数组的秩是 `rank(operand) - len(dimensions)`。 `init_value` 是用于每次减少的初始值，可以在后端计算过程中插入到任何位置。在大多数情况下，`init_value` 则是缩减函数的标识(例如，0表示加法)。应用的 `computation` 总是在左侧传递 `init_value`。
 
 归约函数的执行顺序是任意的，即可能是非确定的。因而，归约函数不应对运算的结合性敏感。
 
@@ -1139,7 +1140,7 @@ for r0 in range(result_shape[0]), r1 in range(result_shape[1]), ...:
 
 对这个三维数组的所有元素进行求和归约，得到一个标量 `84`。
 
-When `N > 1`, reduce function application is slightly more complex, as it is applied simultaneously to all inputs. For example, consider the following reduction function, which can be used to compute the max and the argmax of a a 1-D tensor in parallel:
+当“ `N > 1` 时，Reduce函数应用程序稍微复杂一些，因为它同时应用于所有输入。例如，考虑以下简化函数，该函数可用于并行计算一维张量的最大值和最大值：
 
 ```
 f: (Float, Int, Float, Int) -> Float, Int
@@ -1150,7 +1151,7 @@ f(max, argmax, value, index):
     return (max, argmax)
 ```
 
-For 1-D Input arrays `V = Float[N], K = Int[N]`, and init values `I_V = Float, I_K =  Int`, the result `f_(N-1)` of reducing across the only input dimension is equivalent to the following recursive application:
+对于一维输入数组 `V = Float[N], K = Int[N]` 和 init 值`I_V = Float, I_K =  Int`，跨唯一输入维度缩小的结果 `f_(N-1)`  相当于以下递归程序：
 
 ```
 f_0 = f(I_V, I_K, V_0, K_0)
@@ -1159,7 +1160,7 @@ f_1 = f(f_0.first, f_0.second, V_1, K_1)
 f_(N-1) = f(f_(N-2).first, f_(N-2).second, V_(N-1), K_(N-1))
 ```
 
-Applying this reduction to an array of values, and an array of sequential indices (i.e. iota), will co-iterate over the arrays, and return a tuple containing the maximal value and the matching index.
+将此缩减应用于值数组和顺序索引数组(即 iota)，将在数组上进行共迭代，并返回包含最大值和匹配索引的元组。
 
 ## ReducePrecision
 
@@ -1304,9 +1305,9 @@ Reshape(5, {}, {1,1}) == f32[1x1] {{5}};
 
 <b>`Rev(operand, dimensions)`</b>
 
-|参数 | 类型 | 语义|
+|参数          | 类型                    | 语义                  |
 |------------ | ----------------------- | ---------------------|
-|`operand`    | `XlaOp` | 类型为 T 的数组 |
+|`operand`    | `XlaOp`                 | 类型为 T 的数组 |
 |`dimensions` | `ArraySlice<int64>`     | 待反转的维度|
 
 反转操作是将 `operand` 数组沿指定的维度 `dimensions` 对元素的顺序反转，产生一个形状相同的数组。operand 数组的每个元素被存储在输出数组的变换后的位置上。元素的原索引位置在每个待倒置维度上都被反转了，得到其在输出数组中的索引位置（即，如果一个大小为 N 的维度是待倒置的，则索引 i 被变换为 N-i-i）。
@@ -1317,75 +1318,56 @@ Reshape(5, {}, {1,1}) == f32[1x1] {{5}};
 
 另请参阅 [`XlaBuilder::RngNormal`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
-
-Constructs an output of a given shape with random numbers generated following the $$N(\mu, \sigma)$$ normal distribution. The parameters $$\mu$$ and $$\sigma$$, and output shape have to have a floating point elemental type. The parameters furthermore have to be scalar valued.
+构造给定形状的输出，按 $$N(\mu，\sigma)$$ 正态分布生成随机数。参数 $$\mu$$ 和 $$\sigma$$，以及输出形状必须具有浮点元素类型。此外，参数还必须是标量值。
 
 <b>`RngNormal(mu, sigma, shape)`</b>
 
 | 参数 | 类型    |语义                                           |
 | --------- | ------- | --------------------------------------------------- |
-| `mu`      | `XlaOp` | Scalar of type T specifying mean of generated numbers |
-| `sigma`   | `XlaOp` | Scalar of type T specifying standard deviation of generated numbers |
-| `shape`   | `Shape` | Output shape of type T                              |
+| `mu`      | `XlaOp` | T 类型标量，指定生成数的平均值。 |
+| `sigma`   | `XlaOp` | T 类型标量，指定生成数的标准差 |
+| `shape`   | `Shape` | 输出类型形状                             |
 
 ## RngUniform
 
-See also [`XlaBuilder::RngUniform`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h).
+另请参阅 [`XlaBuilder::RngUniform`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
 Constructs an output of a given shape with random numbers generated following the uniform distribution over the interval $$[a,b)$$. The parameters and output element type have to be a boolean type, an integral type or a floating point types, and the types have to be consistent. The CPU and GPU backends currently only support F64, F32, F16, BF16, S64, U64, S32 and U32. Furthermore, the parameters need to be scalar valued. If $$b <= a$$ the result is implementation-defined.
+
+构造一个给定形状的输出，在区间 $$[a,b)$$ 上均匀分布后生成随机数。参数和输出元素类型必须是布尔类型、整型或浮点类型，而且类型必须一致。CPU 和 GPU 后端当前仅支持 F64、F32、F16、BF16、S64、U64、S32 和 U32。此外，还需要对参数进行标量赋值。如果 $$b <= a$$，则结果是由实现过程定义的。
 
 <b>`RngUniform(a, b, shape)`</b>
 
 | 参数 | 类型                    | 语义                         |
 | --------- | ----------------------- | --------------------------------- |
-| `a`       | `XlaOp`                 | Scalar of type T specifying lower limit of interval |
-| `b`       | `XlaOp`                 | Scalar of type T specifying upper limit of interval |
-| `shape`   | `Shape`                 | Output shape of type T            |
+| `a`       | `XlaOp`                 | T 类型标量，指定生成数的下限。 |
+| `b`       | `XlaOp`                 | T 类型标量，指定生成数的上限。 |
+| `shape`   | `Shape`                 | 输出类型形状             |
 
 ## Scatter
 
-The XLA scatter operation generates a result which is the value of the input
-tensor `operand`, with several slices (at indices specified by
-`scatter_indices`) updated with the values in `updates` using
-`update_computation`.
+XLA Scatter操作生成一个结果，它是输入张量 `operand` 的值，有几个切片(按 `scatter_indices` 指定的索引值)使用 `update_computation` 更新为 `updates` 中的值。
 
-See also
-[`XlaBuilder::Scatter`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h).
+另请参阅 [`XlaBuilder::Scatter`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
 <b> `scatter(operand, scatter_indices, updates, update_computation, index_vector_dim, update_window_dims, inserted_window_dims, scatter_dims_to_operand_dims)` </b>
 
-|Arguments         | Type                   | Semantics                        |
+|参数         | 类型                   | 语义                        |
 |------------------|------------------------|----------------------------------|
-|`operand`         | `XlaOp`                | Tensor to be scattered into.     |
-|`scatter_indices` | `XlaOp`                | Tensor containing the starting indices of the slices that must be scattered to. |
-|`updates`         | `XlaOp`                | Tensor containing the values that must be used for scattering. |
-|`update_computation`| `XlaComputation`     | Computation to be used for       |
-:                  :                        : combining the existing values in :
-:                  :                        : the input tensor and the updates :
-:                  :                        : during scatter. This computation :
-:                  :                        : should be of type `T, T -> T`.   :
-|`index_vector_dim`| `int64`                | The dimension in                 |
-:                  :                        : `scatter_indices` that contains  :
-:                  :                        : the starting indices.            :
-|`update_window_dims`| `ArraySlice<int64>`  | The set of dimensions in         |
-:                  :                        : `updates` shape that are _window :
-:                  :                        : dimensions_.                     :
-|`inserted_window_dims`| `ArraySlice<int64>`| The set of _window dimensions_   |
-:                  :                        : that must be inserted into       :
-:                  :                        : `updates` shape.                 :
-|`scatter_dims_to_operand_dims`| `ArraySlice<int64>`  | A dimensions map from  |
-:                  :                        : the scatter indices to the       :
-:                  :                        : operand index space. This array  :
-:                  :                        : is interpreted as mapping `i` to :
-:                  :                        : `scatter_dims_to_operand_dims[i]`:
-:                  :                        : . It has to be one-to-one and    :
-:                  :                        : total.                           :
+|`operand`         | `XlaOp`                | 将被分散到的张量。    |
+|`scatter_indices` | `XlaOp`                | 包含必须分散到的切片的起始索引的张量。 |
+|`updates`         | `XlaOp`                | 包含散射必须使用的值的张量。        |
+|`update_computation`| `XlaComputation`     | 用于将输入张量中的现有值与散射期间的更新组合在一起的计算。此计算应为类型 `T, T -> T`。 |
+|`index_vector_dim`| `int64`                | `scatter_indices` 中包含起始索引的维度。`scatter_indices` |     
+|`update_window_dims`| `ArraySlice<int64>`  | `updates`  形状中的一组维度，它们是 _window dimensions_ |
+|`inserted_window_dims`| `ArraySlice<int64>`| 必须插入到 `updates` 形状中的 _window dimensions_|
+|`scatter_dims_to_operand_dims`| `ArraySlice<int64>`  | 维数从分散指数映射到操作数索引空间。此数组被解释为将 `i` 映射到 `scatter_dims_to_operand_dims[i]`。它必须是一对一且完全的。 |
 
-If `index_vector_dim` is equal to `scatter_indices.rank` we implicitly consider `scatter_indices` to have a trailing `1` dimension.
+如果 `index_vector_dim` 等于 `scatter_indices.rank` ，我们会默认 `scatter_indices` 有一个尾随的 `1` 维。
 
-We define `update_scatter_dims` of type `ArraySlice<int64>` as the set of dimensions in `updates` shape that are not in `update_window_dims`, in ascending order.
+我们将  `ArraySlice<int64>` 类型的 `update_scatter_dims` 当作以升序排列的在 `updates` 而不在 `update_window_dims` 的维度元组。
 
-The arguments of scatter should follow these constraints:
+scatter 的参数应遵循以下限制条件：
 
   - `updates` tensor must be of rank `update_window_dims.size + scatter_indices.rank - 1`.
 
@@ -1435,11 +1417,11 @@ Constructs an output array from elements of two input arrays, based on the value
 
 <b> `Select(pred, on_true, on_false)` </b>
 
-Arguments  | Type    | Semantics
----------- | ------- | ------------------
-`pred`     | `XlaOp` | array of type PRED
-`on_true`  | `XlaOp` | array of type T
-`on_false` | `XlaOp` | array of type T
+| 参数      | 类型     | 语义              |
+|---------- | ------- | ------------------ |
+|`pred`     | `XlaOp` | 类型 PRED 的数组 |
+|`on_true`  | `XlaOp` | 类型 T 的数组 |
+|`on_false` | `XlaOp` |类型 T 的数组 |
 
 The arrays `on_true` and `on_false` must have the same shape. This is also the shape of the output array. The array `pred` must have the same dimensionality as `on_true` and `on_false`, with the `PRED` element type.
 
@@ -1524,42 +1506,43 @@ The evaluation order of the `scatter` function is arbitrary and may be non-deter
 
 ## Send
 
-See also
-[`XlaBuilder::Send`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h).
+也可参见
+[`XlaBuilder::Send`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
 <b> `Send(operand, channel_handle)` </b>
 
-Arguments        | Type            | Semantics
+参数              | 类型               | 语义
 ---------------- | --------------- | -----------------------------------------
-`operand`        | `XlaOp`         | data to send (array of type T)
-`channel_handle` | `ChannelHandle` | unique identifier for each send/recv pair
+`operand`        | `XlaOp`         | 发送的数据
+`channel_handle` | `ChannelHandle` | 每个发送/接收配对的唯一标识符
 
-Sends the given operand data to a `Recv` instruction in another computation that shares the same channel handle. Does not return any data.
+将给定的操作数据发送到共享相同通道句柄的另一次计算中的 `Recv` 指令下。不返回任何数据。
 
-Similar to the `Recv` operation, the client API of `Send` operation represents synchronous communication, and is internally decomposed into 2 HLO instructions (`Send` and `SendDone`) to enable asynchronous data transfers. See also [`HloInstruction::CreateSend` and `HloInstruction::CreateSendDone`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/hlo_instruction.h).
+与 `Recv` 操作类似，`Send` 操作的客户端 API 也是同步通信，并在内部分解为两个 HLO 指令(`Send` 和 `SendDone`)，以支持异步数据传输。另见[`HloInstruction：CreateSend` 和 `HloInstructions：CreateSendDone`](https://www.tensorflow.org/code/tensorflow/compiler/xla/service/hlo_instruction.h)。
 
 <b>`Send(HloInstruction operand, int64 channel_id)`</b>
 
-Initiates an asynchronous transfer of the operand to the resources allocated by the `Recv` instruction with the same channel id. Returns a context, which is used by a following `SendDone` instruction to wait for the completion of the data transfer. The context is a tuple of {operand (shape), request identifier (U32)} and it can only be used by a `SendDone` instruction.
+，下面的“SendDone”指令使用该上下文等待数据传输完成。上下文是{操作数(形)、请求标识符(U32)}的元组，只能由“SendDone”指令使用。
+要开始一次将操作数发送到具有相同 id 的 `Recv` 指令下的异步操作。返回一个环境设置，它会在数据传输完成后被一个随后的 `SendDone` 指令所使用。这个环境配置是一个 {operand (shape), request identifier (U32)} 元组，只能由 `SendDone` 使用。
 
 <b> `SendDone(HloInstruction context)` </b>
 
-Given a context created by a `Send` instruction, waits for the data transfer to complete.  The instruction does not return any data.
+发送一条由 `Send` 指令创建的环境配置，等待数据传输完成。指令不返回任何数据。
 
 <b> Scheduling of channel instructions </b>
 
-The execution order of the 4 instructions for each channel (`Recv`, `RecvDone`, `Send`, `SendDone`) is as below.
+每个通道的 4 条指令(`Recv`、`RecvDone`、`Send`、 `SendDone`)的执行顺序如下所示。
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:70%" src="../../images/send_recv_order.png">
 </div>
 
-* `Recv` happens before `Send`
-* `Send` happens before `RecvDone`
-* `Recv` happens before `RecvDone`
-* `Send` happens before `SendDone`
+* `Recv` 在 `Send` 之前发生
+* `Send` 在 `RecvDone` 之前发生
+* `Recv` 在 `RecvDone` 之前发生
+* `Send` 在 `SendDone` 之前发生
 
-When the backend compilers generate a linear schedule for each computation that communicates via channel instructions, there must not be cycles across the computations. For example, below schedules lead to deadlocks.
+当后端编译器为通过通道指令进行通信的每个计算生成线性调度时，计算之间不能有数据循环。例如，以下计划会导致死锁。
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%" src="../../images/send_recv_schedule.png">
@@ -1567,29 +1550,20 @@ When the backend compilers generate a linear schedule for each computation that 
 
 ## Slice
 
-See also
-[`XlaBuilder::Slice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h).
+也可参见
+[`XlaBuilder::Slice`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
-Slicing extracts a sub-array from the input array. The sub-array is of the same rank as the input and contains the values inside a bounding box within the input array where the dimensions and indices of the bounding box are given as arguments to the slice operation.
+Slice 是从输入数组中提取子数组。子数组与输入数组保持相同的秩，并且包含输入数组内的边界框内的值，其中边界框的尺寸和索引作为切片操作的参数提供。
 
 <b> `Slice(operand, start_indices, limit_indices)` </b>
 
 | Arguments       | Type                | Semantics                            |
 | --------------- | ------------------- | ------------------------------------ |
-| `operand`       | `XlaOp`             | N dimensional array of type T        |
-| `start_indices` | `ArraySlice<int64>` | List of N integers containing the    |
-:                 :                     : starting indices of the slice for    :
-:                 :                     : each dimension. Values must be       :
-:                 :                     : greater than or equal to zero.       :
-| `limit_indices` | `ArraySlice<int64>` | List of N integers containing the    |
-:                 :                     : ending indices (exclusive) for the   :
-:                 :                     : slice for each dimension. Each value :
-:                 :                     : must be greater than or equal to the :
-:                 :                     : respective `start_indices` value for :
-:                 :                     : the dimension and less than or equal :
-:                 :                     : to the size of the dimension.        :
+| `operand`       | `XlaOp`             | T 类型的 N 维数组         |
+| `start_indices` | `ArraySlice<int64>` | 包含每个维度切片起始索引的N个整数的列表。值必须大于或等于零。    |
+| `limit_indices` | `ArraySlice<int64>` | 包含每个维度切片的结尾索引(独占)的 N 个整数的列表。每个值必须大于或等于维度的相应`start_indices`，并且小于或等于维度的大小。   |
 
-1-dimensional example:
+1-维样例：
 
 ```
 let a = {0.0, 1.0, 2.0, 3.0, 4.0}
@@ -1597,7 +1571,7 @@ Slice(a, {2}, {4}) produces:
   {2.0, 3.0}
 ```
 
-2-dimensional example:
+2-维样例：
 
 ```
 let b =
@@ -1613,58 +1587,60 @@ Slice(b, {2, 1}, {4, 3}) produces:
 
 ## Sort
 
-See also [`XlaBuilder::Sort`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h).
+也可查看 [`XlaBuilder::Sort`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
-There are two versions of the Sort instruction: a single-operand and a two-operand version.
+有两种不同类型的 Sort 指令：单操作数和双操作数。
 
 <b>`Sort(operand)`</b>
 
-Arguments   | Type    | Semantics
+参数   | 类型    | 语义
 ----------- | ------- | --------------------
-`operand`   | `XlaOp` | The operand to sort.
-`dimension` | `int64` | The dimension along which to sort.
+`operand`   | `XlaOp` | 需要排序的操作数。
+`dimension` | `int64` | 排序所依据的维度。
 
-Sorts the elements in the operand in ascending order along the provided dimension. For example, for a rank-2 (matrix) operand, a `dimension` value of 0 will sort each column independently, and a `dimension` value of 1 will sort each row independently. If the operand's elements have floating point type, and the operand contains NaN elements, the order of elements in the output is implementation-defined.
+按照提供的维度按升序对操作数中的元素进行排序。例如，对于一个秩为 2 的操作数(矩阵)，`dimension` 值如为 0 将对每列进行独立排序，而`dimension` 值如为 1 则将对每行进行独立排序。如果操作数的元素具有浮点类型，并且操作数包含 NaN 元素，则输出中元素的顺序由实现过程定义。
 
 <b>`Sort(key, value)`</b>
 
-Sorts both the key and the value operands. The keys are sorted as in the single-operand version. The values are sorted according to the order of their corresponding keys. For example, if the inputs are `keys = [3, 1]` and `values = [42, 50]`, then the output of the sort is the tuple `{[1, 3], [50, 42]}`.
+Sorts both the key and the value operands. The keys are sorted as in the single-operand version. The values are sorted according to the order of their corresponding keys. For example, if the inputs are  and , then the output of the sort is the tuple.
 
-The sort is not guaranteed to be stable, that is, if the keys array contains duplicates, the order of their corresponding values may not be preserved.
+对键和值操作数进行排序。键按单操作数版本进行排序。这些值根据其相应键的顺序进行排序。例如，如果输入是 `keys = [3, 1]` 和 `values = [42, 50]`，则排序的输出是元组  `{[1, 3], [50, 42]}`。
 
-Arguments   | Type    | Semantics
+排序不能保证是稳定的，也就是说，如果键数组包含重复项，则可能不会保留它们对应的值的顺序。
+
+参数   | 类型    | 语义
 ----------- | ------- | -------------------
-`keys`      | `XlaOp` | The sort keys.
-`values`    | `XlaOp` | The values to sort.
-`dimension` | `int64` | The dimension along which to sort.
+`keys`      | `XlaOp` | 用于排序的键。
+`values`    | `XlaOp` | 需要排序的值。
+`dimension` | `int64` | 需要排序的维度。
 
-The `keys` and `values` must have the same dimensions, but may have different element types.
+`keys` 和 `values` 必须具有相同的维度，但可能具有不同的元素类型。
 
 ## Transpose
 
-See also the `tf.reshape` operation.
+也可参见 `tf.reshape` 操作.
 
 <b>`Transpose(operand)`</b>
 
-Arguments     | Type                | Semantics
-------------- | ------------------- | ------------------------------
-`operand`     | `XlaOp`             | The operand to transpose.
-`permutation` | `ArraySlice<int64>` | How to permute the dimensions.
+| 参数          | 类型                | 语义                   |
+|------------- | ------------------- | ------------------------------|
+|`operand`     | `XlaOp`             | 需要转置的操作数。      |
+|`permutation` | `ArraySlice<int64>` | 如何变更维度。         |
 
-
-Permutes the operand dimensions with the given permutation, so
+=
+使用给定的置换来变更操作数维数，因此
 `∀ i . 0 ≤ i < rank ⇒ input_dimensions[permutation[i]] = output_dimensions[i]`.
 
-This is the same as Reshape(operand, permutation,
-                            Permute(permutation, operand.shape.dimensions)).
+这如同 Reshape(operand, permutation,
+                            Permute(permutation, operand.shape.dimensions)) 作用一样。
 
 ## Tuple
 
-See also [`XlaBuilder::Tuple`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h).
+请参见 [`XlaBuilder::Tuple`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
-A tuple containing a variable number of data handles, each of which has its own shape.
+包含可变数量的数据句柄的元组，每个数据句柄都有自己的形状。
 
-This is analogous to `std::tuple` in C++. Conceptually:
+这类似于 C++ 中的 `std：tuple`。概念上如同：
 
 ```
 let v: f32[10] = f32[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -1672,31 +1648,31 @@ let s: s32 = 5;
 let t: (f32[10], s32) = tuple(v, s);
 ```
 
-Tuples can be deconstructed (accessed) via the [`GetTupleElement`](#gettupleelement) operation.
+可以通过 [`GetTupleElement`](#gettupleelement) 操作解构(访问)元组。
 
 ## While
 
-See also [`XlaBuilder::While`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h).
+请参见 [`XlaBuilder::While`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
 <b> `While(condition, body, init)` </b>
 
-| Arguments   | Type             | Semantics                                |
+| 参数        | 类型              | 语义                                |
 | ----------- | ---------------- | ---------------------------------------- |
-| `condition` | `XlaComputation` | XlaComputation of type `T -> PRED` which defines the termination condition of the loop. |
-| `body`      | `XlaComputation` | XlaComputation of type `T -> T` which defines the body of the loop. |
-| `init`      | `T`              | Initial value for the parameter of `condition` and `body`. |
+| `condition` | `XlaComputation` | `T -> PRED` 类型的 XlaComputation，其定义循环的终止条件 |
+| `body`      | `XlaComputation` | XlaComputation of type `T -> T` 类型的XlaComputation，其定义了循环的执行内容 |
+| `init`      | `T`              | 参数 `condition` 和 `body` 的初始值 |
 
-Sequentially executes the `body` until the `condition` fails. This is similar to a typical while loop in many other languages except for the differences and restrictions listed below.
+顺序执行 `body`，直到 `condition` 失败。除了下面列出的差异和限制之外，这与许多其他语言中的 While 循环类似。
 
-*   A `While` node returns a value of type `T`, which is the result from the last execution of the `body`.
-*   The shape of the type `T` is statically determined and must be the same across all iterations.
+*   `While` 节点返回类型为 `T` 的值，该值是 `body` 的最后一次执行的结果。
+*   类型 `T` 的形状是静态确定的，并且在所有迭代中必须是相同的。
 
-The T parameters of the computations are initialized with the `init` value in the first iteration and are automatically updated to the new result from `body` in each subsequent iteration.
+计算的 T 参数在第一次迭代中用 `init` 值初始化，并在每次后续迭代中从 `body` 自动更新为新结果。
 
-One main use case of the `While` node is to implement the repeated execution of training in neural networks. Simplified pseudocode is shown below with a graph that represents the computation. The code can be found in [`while_test.cc`](https://www.tensorflow.org/code/tensorflow/compiler/xla/tests/while_test.cc). The type `T` in this example is a `Tuple` consisting of an `int32` for the iteration count and a `vector[10]` for the accumulator. For 1000 iterations, the loop keeps adding a constant vector to the accumulator.
+ `While` 节点的一个主要用例是在神经网络中实现重复执行训练。简化的伪代码如下所示，其中有一个表示计算的图。代码可在 [`while_test.cc`](https://www.tensorflow.org/code/tensorflow/compiler/xla/tests/while_test.cc)中找到。本例中的类型 `T` 是由一个用于迭代计数的 `int32` 和一个用于累加器的 `vector[10]` 组成的 `Tuple`。对于 1000 次迭代，循环不断向累加器添加一个常量向量。
 
 ```
-// Pseudocode for the computation.
+// 计算过程的伪代码。
 init = {0, zero_vector[10]} // Tuple of int32 and float[10].
 result = init;
 while (result(0) < 1000) {
