@@ -1332,8 +1332,6 @@ Reshape(5, {}, {1,1}) == f32[1x1] {{5}};
 
 另请参阅 [`XlaBuilder::RngUniform`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
-Constructs an output of a given shape with random numbers generated following the uniform distribution over the interval $$[a,b)$$. The parameters and output element type have to be a boolean type, an integral type or a floating point types, and the types have to be consistent. The CPU and GPU backends currently only support F64, F32, F16, BF16, S64, U64, S32 and U32. Furthermore, the parameters need to be scalar valued. If $$b <= a$$ the result is implementation-defined.
-
 构造一个给定形状的输出，在区间 $$[a,b)$$ 上均匀分布后生成随机数。参数和输出元素类型必须是布尔类型、整型或浮点类型，而且类型必须一致。CPU 和 GPU 后端当前仅支持 F64、F32、F16、BF16、S64、U64、S32 和 U32。此外，还需要对参数进行标量赋值。如果 $$b <= a$$，则结果是由实现过程定义的。
 
 <b>`RngUniform(a, b, shape)`</b>
@@ -1352,7 +1350,7 @@ XLA Scatter操作生成一个结果，它是输入张量 `operand` 的值，有�
 
 <b> `scatter(operand, scatter_indices, updates, update_computation, index_vector_dim, update_window_dims, inserted_window_dims, scatter_dims_to_operand_dims)` </b>
 
-|参数         | 类型                   | 语义                        |
+|参数              | 类型                   | 语义                        |
 |------------------|------------------------|----------------------------------|
 |`operand`         | `XlaOp`                | 将被分散到的张量。    |
 |`scatter_indices` | `XlaOp`                | 包含必须分散到的切片的起始索引的张量。 |
@@ -1369,51 +1367,52 @@ XLA Scatter操作生成一个结果，它是输入张量 `operand` 的值，有�
 
 scatter 的参数应遵循以下限制条件：
 
-  - `updates` tensor must be of rank `update_window_dims.size + scatter_indices.rank - 1`.
+  - `updates` 张量秩必须为 `update_window_dims.size + scatter_indices.rank - 1`。
 
-  - Bounds of dimension `i` in `updates` must conform to the following:
-      - If `i` is present in `update_window_dims` (i.e. equal to `update_window_dims`[`k`] for some `k`), then the bound of dimension `i` in `updates` must not exceed the corresponding bound of `operand` after accounting for the `inserted_window_dims` (i.e.  `adjusted_window_bounds`[`k`], where `adjusted_window_bounds` contains the bounds of `operand` with the bounds at indices `inserted_window_dims` removed).
-      - If `i` is present in `update_scatter_dims` (i.e. equal to `update_scatter_dims`[`k`] for some `k`), then the bound of dimension `i` in `updates` must be equal to the corresponding bound of `scatter_indices`, skipping `index_vector_dim` (i.e. `scatter_indices.shape.dims`[`k`], if `k` < `index_vector_dim` and `scatter_indices.shape.dims`[`k+1`] otherwise).
+  - `updates` 中的维度 `i` 的边界必须符合以下条件：
+      - 如果 `i` 出现在 `update_window_dims` 中（即对于某些 `k` 其等于 `update_window_dims`[`k`]）,则  `updates` 中维度 `i` 的范围在计算  `inserted_window_dims` 后必须不能超过 `oprand` 的相应界限（即 `adjusted_window_bounds`[`k`]，其中 `adjusted_window_bounds` 包含 `oprand` 的界限，而索引 `inserted_window_dims` 处的界限已被删除）。
+      - If `i` is present in 如果 `i` 出现在 `update_scatter_dims` 中（即对于某些 `k` 其等于 `update_scatter_dims`[`k`]），则 `update` 中的维度 `i` 的界限必须等于 `scatter_indices` 中的相应界限，跳过 `index_vector_dim`（即 `scatter_indices.shape.dims`[`k`]，如果 `k` < `index_vector_dim`，否则d `scatter_indices.shape.dims`[`k+1`]）。
+      
+  - `update_window_dims` 必须按升序排列，没有任何重复的标注编号，并且必须在 `[0, updates.rank)` 范围内。
 
-  - `update_window_dims` must be in ascending order, not have any repeating dimension numbers, and be in the range `[0, updates.rank)`.
+  - `inserted_window_dims` 必须按升序排列，没有任何重复的标注编号，并且必须在 `[0, operand.rank)` 范围内。
 
-  - `inserted_window_dims` must be in ascending order, not have any repeating dimension numbers, and be in the range `[0, operand.rank)`.
+  - `scatter_dims_to_operand_dims.size` 必须等于 `scatter_indices`[`index_vector_dim`]， 且它的值在 `[0, operand.rank)` 范围内。
 
-  - `scatter_dims_to_operand_dims.size` must be equal to `scatter_indices`[`index_vector_dim`], and its values must be in the range  `[0, operand.rank)`.
+对于 `updates` 张量中的给定索引 `U`，必须对其应用此更新的 `oprand` 张量中的相应索引 `I` 计算如下：
 
-For a given index `U` in the `updates` tensor, the corresponding index `I` in the `operand` tensor into which this update has to be applied is computed as follows:
+  1. 使 `G` = { `U`[`k`] for `k` in `update_scatter_dims` }。用 `G` 在 `scatter_indices` 中查找索引向量比如  `S`[`i`] = `scatter_indices`[Combine(`G`, `i`)]，其中 Combine(A, b) 表示将 b 插入 A 中的 `index_vector_dim` 位置。
+  2.  使用 `S` 在 `operand` 创建索引 `S`<sub>`in`</sub>，其使用 `scatter_dims_to_operand_dims` 映射分散 `S`。更准确地说：
+       1. `S`<sub>`in`</sub>[`scatter_dims_to_operand_dims`[`k`]] = `S`[`k`] 如果 `k` < `scatter_dims_to_operand_dims.size`。
+       2. 否则 `S`<sub>`in`</sub>[`_`] = `0`。
+  3. 在 `oprand` 中创建一个索引 `W`<sub>`in`</sub>，其按 `inserted_window_dims` 将 `update_window_dims` 分散到 `U` 中。
+     更准确地说：
+       1. `W`<sub>`in`</sub>[`window_dims_to_operand_dims`(`k`)] = `U`[`k`] 如果 `k` < `update_window_dims.size`, 且 `window_dims_to_operand_dims` 在定义域 [`0`, `update_window_dims.size`) 和值域 [`0`, `operand.rank`) \\ `inserted_window_dims` 中为单调函数。（例如，如果 `update_window_dims.size` 是 `4`，`operand.rank` 为 `6` 且 `inserted_window_dims` 为 {`0`, `2`} 那么 `window_dims_to_operand_dims` 为 {`0`→`1`, `1`→`3`, `2`→`4`, `3`→`5`})。
+       2. 否则 `W`<sub>`in`</sub>[`_`] = `0`
+  4. `I` 为 `W`<sub>`in`</sub> + `S`<sub>`in`</sub> 这里 + 为元素对应相加。
 
-  1. Let `G` = { `U`[`k`] for `k` in `update_scatter_dims` }. Use `G` to look up an index vector `S` in the `scatter_indices` tensor such that `S`[`i`] = `scatter_indices`[Combine(`G`, `i`)] where Combine(A, b) inserts b at positions `index_vector_dim` into A.
-  2. Create an index `S`<sub>`in`</sub> into `operand` using `S` by scattering `S` using the `scatter_dims_to_operand_dims` map. More formally:
-       1. `S`<sub>`in`</sub>[`scatter_dims_to_operand_dims`[`k`]] = `S`[`k`] if `k` < `scatter_dims_to_operand_dims.size`.
-       2. `S`<sub>`in`</sub>[`_`] = `0` otherwise.
-  3. Create an index `W`<sub>`in`</sub> into `operand` by scattering the indices at `update_window_dims` in `U` according to `inserted_window_dims`.
-     More formally:
-       1. `W`<sub>`in`</sub>[`window_dims_to_operand_dims`(`k`)] = `U`[`k`] if `k` < `update_window_dims.size`, where `window_dims_to_operand_dims` is the monotonic function with domain [`0`, `update_window_dims.size`) and range [`0`, `operand.rank`) \\ `inserted_window_dims`. (For example, if `update_window_dims.size` is `4`, `operand.rank` is `6`, and `inserted_window_dims` is {`0`, `2`} then `window_dims_to_operand_dims` is {`0`→`1`, `1`→`3`, `2`→`4`, `3`→`5`}).
-       2. `W`<sub>`in`</sub>[`_`] = `0` otherwise.
-  4. `I` is `W`<sub>`in`</sub> + `S`<sub>`in`</sub> where + is element-wise addition.
+总而言之，scatter 操作可以定义如下。
 
-In summary, the scatter operation can be defined as follows.
-
-   - Initialize `output` with `operand`, i.e. for all indices `O` in the `operand` tensor:\
+   - 根据  `operand` 初始化 `output`，即对于 `operand` 张量中的所有索引 `O`：\
        `output`[`O`] = `operand`[`O`]
-   - For every index `U` in the `updates` tensor and the corresponding index `O` in the `operand` tensor:\
+   - 对于 `updates` 张量中的每个索引 `U` 和 `oprand` 张量中的相应索引 `O`：
        `output`[`O`] = `update_computation`(`output`[`O`], `updates`[`U`])
 
-The order in which updates are applied is non-deterministic. So, when multiple indices in `updates` refer to the same index in `operand`, the corresponding value in `output` will be non-deterministic.
+应用更新的顺序是不确定的。因此，当 `updates` 中的多个索引引用 `operand` 中的同一索引时，`output` 中的相应值将是不确定的。
 
-Note that the first parameter that is passed into the `update_computation` will always be the current value from the `output` tensor and the second parameter will always be the value from the `updates` tensor. This is important specifically for cases when the `update_computation` is _not commutative_.
+请注意，传递到 `update_computation` 中的第一个参数将始终是 `output` 张量的当前值，而第二个参数将始终是 `updates`张量的值。这一点对于`update_computation` **不可交换性**是很重要的。
 
-Informally, the scatter op can be viewed as an _inverse_ of the gather op, i.e. the scatter op updates the elements in the input that are extracted by the corresponding gather op.
+通俗来说，散布OP可以被看作是 gather 操作的一个**逆向**，即 scatter 操作更新输入中由相应的 gather 操作提取的元素。
 
-For a detailed informal description and examples, refer to the "Informal Description" section under `Gather`.
+有关详细的非正式描述和示例，请参阅 `Gather` 下的 “非正式描述” 一节。
 
 ## Select
 
-See also
-[`XlaBuilder::Select`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h).
+也可参见
+[`XlaBuilder::Select`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
 Constructs an output array from elements of two input arrays, based on the values of a predicate array.
+从两个输入数组的元素构造输出数组，此操作基于 pred 数组的值。
 
 <b> `Select(pred, on_true, on_false)` </b>
 
@@ -1421,13 +1420,13 @@ Constructs an output array from elements of two input arrays, based on the value
 |---------- | ------- | ------------------ |
 |`pred`     | `XlaOp` | 类型 PRED 的数组 |
 |`on_true`  | `XlaOp` | 类型 T 的数组 |
-|`on_false` | `XlaOp` |类型 T 的数组 |
+|`on_false` | `XlaOp` | 类型 T 的数组 |
 
-The arrays `on_true` and `on_false` must have the same shape. This is also the shape of the output array. The array `pred` must have the same dimensionality as `on_true` and `on_false`, with the `PRED` element type.
+数组 `on_true` 和 `on_false` 必须具有相同的形状。这也是输出数组的形状。数组 `pred` 必须与 `on_true` 和 `on_false` 具有相同的维数，其元素类型为 `PRED`。
 
-For each element `P` of `pred`, the corresponding element of the output array is taken from `on_true` if the value of `P` is `true`, and from `on_false` if the value of `P` is `false`. As a restricted form of [broadcasting](broadcasting.md), `pred` can be a scalar of type `PRED`. In this case, the output array is taken wholly from `on_true` if `pred` is `true`, and from `on_false` if `pred` is `false`.
+对于 `pred` 的每个元素 `P`，如果 `P` 的值是 `true`，则输出数组的相应元素取自 `on_true`；如果 `P` 的值是 `false`，则取自 `on_false`。作为受限形式的 [broadcasting](broadcasting.md)，`pred` 可以是 `PRED` 类型的标量。在本例中，如果 `pred` 是 `true`，则输出数组完全取自`on_true`；如果`pred` 是 `false`，则取自 `on_false`。
 
-Example with non-scalar `pred`:
+非标量 `pred` 的样例：
 
 ```
 let pred: PRED[4] = {true, false, false, true};
@@ -1436,8 +1435,7 @@ let v2: s32[4] = {100, 200, 300, 400};
 ==>
 Select(pred, v1, v2) = s32[4]{1, 200, 300, 4};
 ```
-
-Example with scalar `pred`:
+标量 `pred` 的样例：
 
 ```
 let pred: PRED = true;
@@ -1447,62 +1445,46 @@ let v2: s32[4] = {100, 200, 300, 400};
 Select(pred, v1, v2) = s32[4]{1, 2, 3, 4};
 ```
 
-Selections between tuples are supported. Tuples are considered to be scalar types for this purpose. If `on_true` and `on_false` are tuples (which must have the same shape!) then `pred` has to be a scalar of type `PRED`.
+支持元组之间的选择。为此，元组被视为标量类型。如果 `on_true` 和 `on_false` 是元组(必须具有相同的形状！)然后，`pred` 必须是 `PRED` 类型的标量。
 
 ## SelectAndScatter
 
-See also
-[`XlaBuilder::SelectAndScatter`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h).
+也可参见
+[`XlaBuilder::SelectAndScatter`](https://www.tensorflow.org/code/tensorflow/compiler/xla/client/xla_builder.h)。
 
-This operation can be considered as a composite operation that first computes `ReduceWindow` on the `operand` array to select an element from each window, and then scatters the `source` array to the indices of the selected elements to construct an output array with the same shape as the operand array. The binary `select` function is used to select an element from each window by applying it across each window, and it is called with the property that the first parameter's index vector is lexicographically less than the second parameter's index vector. The `select` function returns `true` if the first parameter is selected and returns `false` if the second parameter is selected, and the function must hold transitivity (i.e., if `select(a, b)` and `select(b, c)` are `true`, then `select(a, c)` is also `true`) so that the selected element does not depend on the order of the elements traversed for a given window.
+此操作可被视为一种复合操作，该操作首先计算  `operand` 数组上的 `ReduceWindow`，以从每个窗口中选择一个元素，然后将 `source` 数组分散到所选元素的索引中，以构造与操作数组形状相同的输出数组。`select` 二元函数用于通过将元素应用于每个窗口从每个窗口中选择一个元素，并且调用该函数时具有这样的特性，即第一个参数的索引向量在词典上小于第二个参数的索引向量。如果选择了第一个参数，则 `select` 函数返回 `true`，如果选择了第二个参数，则返回 `false`，并且函数必须具保持传递性(即，如果 `select(a, b)` 和 `select(b, c)` 为 `true`，则 `select(a，c)`也为 `true`)，因此所选元素不依赖于为给定窗口遍历的元素的顺序。
 
-The function `scatter` is applied at each selected index in the output array. It takes two scalar parameters:
+在输出数组中的每个选定索引处应用函数 `scatter`。它需要两个标量参数：
 
-1.  Current value at the selected index in the output array
-2.  The scatter value from `source` that applies to the selected index
+1.  输出数组中选定索引处的当前值。
+2.  应用于所选索引的  `source` 中的分散量。
 
-It combines the two parameters and returns a scalar value that's used to update the value at the selected index in the output array. Initially, all indices of the output array are set to `init_value`.
+它组合了这两个参数并返回一个标量值，该值用于更新输出数组中所选索引处的值。最初，输出数组的所有索引都设置为 `init_value`。
 
-The output array has the same shape as the `operand` array and the `source` array must have the same shape as the result of applying a `ReduceWindow` operation on the `operand` array. `SelectAndScatter` can be used to backpropagate the gradient values for a pooling layer in a neural network.
+输出数组的形状与 `operand` 数组相同，而 `source` 数组的形状必须与对 `operand` 数组应用 `ReduceWindow` 操作的结果相同。`SelectAndScatter`可用于反向传播神经网络中的池化层的梯度值。
 
 <b>`SelectAndScatter(operand, select, window_dimensions, window_strides,
 padding, source, init_value, scatter)`</b>
 
 | Arguments           | Type                | Semantics                        |
 | ------------------- | ------------------- | -------------------------------- |
-| `operand`           | `XlaOp`             | array of type T over which the   |
-:                     :                     : windows slide                    :
-| `select`            | `XlaComputation`    | binary computation of type `T, T |
-:                     :                     : -> PRED`, to apply to all        :
-:                     :                     : elements in each window; returns :
-:                     :                     : `true` if the first parameter is :
-:                     :                     : selected and returns `false` if  :
-:                     :                     : the second parameter is selected :
-| `window_dimensions` | `ArraySlice<int64>` | array of integers for window     |
-:                     :                     : dimension values                 :
-| `window_strides`    | `ArraySlice<int64>` | array of integers for window     |
-:                     :                     : stride values                    :
-| `padding`           | `Padding`           | padding type for window          |
-:                     :                     : (Padding\:\:kSame or             :
-:                     :                     : Padding\:\:kValid)               :
-| `source`            | `XlaOp`             | array of type T with the values  |
-:                     :                     : to scatter                       :
-| `init_value`        | `XlaOp`             | scalar value of type T for the   |
-:                     :                     : initial value of the output      :
-:                     :                     : array                            :
-| `scatter`           | `XlaComputation`    | binary computation of type `T, T |
-:                     :                     : -> T`, to apply each scatter     :
-:                     :                     : source element with its          :
-:                     :                     : destination element              :
+| `operand`           | `XlaOp`             | T 类型数组，窗口在其中滑动 |
+| `select`            | `XlaComputation`    | `T, T -> PRED` 类型的二元计算，应用于每个窗口中的所有元素中；如果选择了第一个参数，则返回 `true`，如果选择第二个参数，则返回 `false`。 |
+| `window_dimensions` | `ArraySlice<int64>` | 窗口维度值的整数数组   |
+| `window_strides`    | `ArraySlice<int64>` | 窗口步距值的整数数组   |
+| `padding`           | `Padding`           | 窗口的填充类型（Padding\:\:kSame or Padding\:\:kValid） |
+| `source`            | `XlaOp`             | 具有要散布的值的 T 类型数组  |
+| `init_value`        | `XlaOp`             | 输出数组初始值的类型为 T 的标量值  |
+| `scatter`           | `XlaComputation`    | `T, T -> T` 类型的二元计算，以将源元素与其目标元素绑定执行每个分散操作 |
 
-The figure below shows examples of using `SelectAndScatter`, with the `select` function computing the maximal value among its parameters. Note that when the windows overlap, as in the figure (2) below, an index of the `operand` array may be selected multiple times by different windows. In the figure, the element of value 9 is selected by both of the top windows (blue and red) and the binary addition `scatter` function produces the output element of value 8 (2 + 6).
+下图显示了使用 `SelectAndScatter` 的示例，其中 `select` 函数计算其参数中的最大值。请注意，当窗口重叠时，如下图 (2) 所示， `operand` 数组的索引可以由不同的窗口多次选择。在图中，值为 9 的元素由上面的两个窗口(蓝色和红色)选择，二进制相加 `scatter` 函数生成值 8(2+6) 的输出元素。
 
 <div style="width:95%; margin:auto; margin-bottom:10px; margin-top:20px;">
   <img style="width:100%"
     src="https://www.tensorflow.org/images/ops_scatter_to_selected_window_element.png">
 </div>
 
-The evaluation order of the `scatter` function is arbitrary and may be non-deterministic. Therefore, the `scatter` function should not be overly sensitive to reassociation. See the discussion about associativity in the context of [`Reduce`](#reduce) for more details.
+`scatter` 函数的评估顺序是任意的，可能是不确定的。因此，`scatter` 功能不应对重新关联过于敏感。有关更多详细信息，请参见 [`Reduce`](#reduce) 上下文中关于关联性的讨论。
 
 ## Send
 
@@ -1602,8 +1584,6 @@ Slice(b, {2, 1}, {4, 3}) produces:
 
 <b>`Sort(key, value)`</b>
 
-Sorts both the key and the value operands. The keys are sorted as in the single-operand version. The values are sorted according to the order of their corresponding keys. For example, if the inputs are  and , then the output of the sort is the tuple.
-
 对键和值操作数进行排序。键按单操作数版本进行排序。这些值根据其相应键的顺序进行排序。例如，如果输入是 `keys = [3, 1]` 和 `values = [42, 50]`，则排序的输出是元组  `{[1, 3], [50, 42]}`。
 
 排序不能保证是稳定的，也就是说，如果键数组包含重复项，则可能不会保留它们对应的值的顺序。
@@ -1627,12 +1607,11 @@ Sorts both the key and the value operands. The keys are sorted as in the single-
 |`operand`     | `XlaOp`             | 需要转置的操作数。      |
 |`permutation` | `ArraySlice<int64>` | 如何变更维度。         |
 
-=
-使用给定的置换来变更操作数维数，因此
+使用给定的置换来变更操作数维数，因此：
 `∀ i . 0 ≤ i < rank ⇒ input_dimensions[permutation[i]] = output_dimensions[i]`.
 
 这如同 Reshape(operand, permutation,
-                            Permute(permutation, operand.shape.dimensions)) 作用一样。
+              Permute(permutation, operand.shape.dimensions)) 作用一样。
 
 ## Tuple
 
