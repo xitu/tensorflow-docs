@@ -17,12 +17,10 @@ Alltoall 是一个将数据在所有核心间互相传送的集合操作。它�
 
 -   `replica_groups`：每个 ReplicaGroup 都有一个包含所有副本 id 的数组。如果其为空，所有副本会按照 0-(n-1) 的顺序编入一个组中。Alltoall 将会按照特定的顺序应用到子组中。例如： 副本组为 {{1, 2, 3}, {4, 5, 0}}，Alltoall 操作会应用到副本 1, 2, 3 中，并在聚合阶段 ，所有收到的块会按照 1, 2, 3 的顺序联结；另一个 Alltoall 则会应用到副本 4, 5, 0 中，并按 4, 5, 0 的顺序联结。
 
-
 先决条件：
 
 -   split_dimission 中操作数的维度大小要能被 split_count 整除。
 -   操作数的形状不能是 tuple。
-
 
 <b> `AllToAll(operand, split_dimension, concat_dimension, split_count,
 replica_groups)` </b>
@@ -31,7 +29,6 @@ replica_groups)` </b>
 | ------------------ | --------------------- | ------------------------------- |
 | `operand`          | `XlaOp`               | n 维输入操作数                   |
 | `split_dimension`  | `int64`               | 要将操作数分割成的维度数，其介于 `[0,  n]` 间  |
-
 | `concat_dimension` | `int64`               | 将分割块联结起来的维度数，其介于 `[0, n]` 间  |
 | `split_count`      | `int64`               | 参与操作的核心数，如果 `replica_groups` 为空，其为副本数；否则，其为每个组中的副本数。|
 | `replica_groups`   | `ReplicaGroup` 向量   | 每一个组中包含一个副本 id 的数组  |
@@ -48,7 +45,7 @@ AllToAll(x, /*split_dimension=*/1, /*concat_dimension=*/0, /*split_count=*/4);
   <img style="width:100%" src="../../images/xla/ops_alltoall.png">
 </div>
 
-这个例子中，共有 4 个核心参与到 Alltoall 操作中。在每个核心上，操作数会按维度 0 被切割成 4 份，所以每一部分的形状是 f32[4,4]。这 4 部分会分散到所有核心中。然后每个核心会按维度 1 联结接收到的数据，这里的顺序为核心 0-4,。所以每个核心的输出的形状都应该是 f32[16,4]。
+这个例子中，共有 4 个核心参与到 Alltoall 操作中。在每个核心上，操作数会按维度 0 被切割成 4 份，所以每一部分的形状是 f32[4,4]。这 4 部分会分散到所有核心中。然后每个核心会按维度 1 联结接收到的数据，这里的顺序为核心 0-4。所以每个核心的输出的形状都应该是 f32[16,4]。
 
 ## BatchNormGrad
 
@@ -688,9 +685,9 @@ DynamicUpdateSlice 是在输入数组 `operand` 上，通过切片 `update` 操�
 | --------------- | ------- | -------------------------------- |
 | `operand`       | `XlaOp` | 类型为 T 的 N 维数组    |
 | `update`        | `XlaOp` | 类型为 T 的包含切片更新的 N 维数组，每个维度的更新形状必须大于 0 ，且 start + update 必须小于维度大小，从而避免越界更新索引    |
-| `start_indices` | `XlaOp` | N 个整数组成的秩为 1 的数组，其中包含每个维度的起始切片索引。值必须大于等于0       |
+| `start_indices` | `XlaOp` | N 个整数组成的秩为 1 的数组，其中包含每个维度的起始切片索引。值必须大于等于 0       |
 
-在执行切片操作之前，通过对 `[1, N)` 中的每个索引 `i`  应用以下转换来计算有效切片索引： 
+在执行切片操作之前，通过对 `[1, N)` 中的每个索引 `i` 应用以下转换来计算有效切片索引：
 
 ```
 start_indices[i] = clamp(start_indices[i], 0, operand.dimension_size[i] - update.dimension_size[i])
@@ -860,7 +857,7 @@ XLA 收集操作将一个输入数组的几个片（每个片在一个可能不�
        1. `S`<sub>`in`</sub>[`start_index_map`[`k`]] = `S`[`k`] 如果 `k` < `start_index_map.size`。
        2. 否则，`S`<sub>`in`</sub>[`_`] = `0`。
   3. 创建索引 `O`<sub>`in`</sub>，通过将 `Out` 中偏移维度中的索引按照 `collapsed_slice_dims` 分散到 `operand` 中。更确切的来说：
-       1. `O`<sub>`in`</sub>[`expand_offset_dims`(`k`)] = `Out`[`offset_dims`[`k`]] 如果 `k` < `offset_dims.size` (`expand_offset_dims`  的定义在下方)。
+       1. `O`<sub>`in`</sub>[`expand_offset_dims`(`k`)] = `Out`[`offset_dims`[`k`]] 如果 `k` < `offset_dims.size`（`expand_offset_dims`  的定义在下方）。
        2. 否则，`O`<sub>`in`</sub>[`_`] = `0`。
   4. `In` 是 `O`<sub>`in`</sub> + `S`<sub>`in`</sub>，是元素级加法。
 
@@ -868,15 +865,15 @@ XLA 收集操作将一个输入数组的几个片（每个片在一个可能不�
 
 ### 非正式说明和实例
 
-
 非正式情况下，输出数组中的每个索引 `Out` 对应于操作数组中的元素 `E`， 计算方法如下：
+
     - 我们使用 `Out` 中的批处理维度从 `start_indedices` 中查找起始索引。
     - 我们使用 `start_index_map` 将起始索引（其大小可能小于 operand.rank）映射到“完整”的起始索引到操作数。
     - 我们使用完整的起始索引动态切片大小为 `Slice_sizes` 的切片。
     - 我们通过折叠 `collapsed_slice_dims` 维度来重塑切片。因为所有折叠的切片维度都必须绑定为 1，所以这种重塑总是合法的。
     - 我们使用 `Out` 中的偏移量维度索引到此切片中，以获取与输出索引 `Out` 对应的输入元素 `E`。
     
-在下面的所有示例中，`index_vector_dim` 被设置为 `start_indices.rank` - `1`，`index_vector_dim`的更有趣的值不会从根本上改变操作，但会使可视化表示更麻烦。
+在下面的所有示例中，`index_vector_dim` 被设置为 `start_indices.rank` - `1`，`index_vector_dim` 的更有趣的值不会从根本上改变操作，但会使可视化表示更麻烦。
 
 为了直观地了解所有上述情况如何结合在一起，我们来看一个例子，它从一个 `[16,11]` 数组中收集 5 片形状为 `[8,6]` 的数组。切片到 `[16,11]` 数组中的位置可以表示为形状为 `S64[2]` 的索引向量，所有以 5 个位置的集合可以表示 `S64[5,2]` 数组。
 
@@ -886,7 +883,7 @@ XLA 收集操作将一个输入数组的几个片（每个片在一个可能不�
   <img style="width:100%" src="https://www.tensorflow.org/images/ops_xla_gather_1.svg">
 </div>
 
-我们首先使用 `G` 从聚集索引数组中选择一个 (`X`,`Y`) 向量。索引处的输出数组 [`G`,`O`<sub>`0`</sub>,`O`<sub>`1`</sub>]；]中的元素是索引 [`X`+`O`<sub>`0`</sub>,`Y`+`O`<sub>`1`</sub>] 处的输入数组中的元素。
+我们首先使用 `G` 从聚集索引数组中选择一个 (`X`,`Y`) 向量。索引处的输出数组 [`G`,`O`<sub>`0`</sub>,`O`<sub>`1`</sub>] 中的元素是索引 [`X`+`O`<sub>`0`</sub>,`Y`+`O`<sub>`1`</sub>] 处的输入数组中的元素。
 
 `slice_sizes` 是 `[8,6]`，它决定 W<sub>`0`</sub> 和 W<sub>`1`</sub> 的范围，这反过来决定切片的边界。
 
@@ -914,7 +911,7 @@ XLA 中收集的数据操作概括了以上概述的非正式语义：
   <img style="width:100%" src="../../images/ops_xla_gather_2.svg">
 </div>
 
-除了起始索引只有一个元素 `X` 之外，其他元素通常都来自聚集索引数组。类似地，只有一个输出偏移量索引的值为 `O`<sub>`0`</sub>。但是，在将它们用作输入数组的索引之前，将根据 “Gather Index Mapping”(正式描述中的 `start_index_map`)和 “Offset Mapping”(正式描述中的 `expand_offset_dims`)扩展为 [`X`,`0`] and [`0`,`O`<sub>`0`</sub>]，加起来分别为 [`X`,`O`<sub>`0`</sub>]。换句话说，输出索引为 [`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`O`<sub>`0`</sub>] 映射到输入索引 [`GatherIndices`[`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`0`],`X`]，它为我们提供了 `tf.gather_nd` 的语义。
+除了起始索引只有一个元素 `X` 之外，其他元素通常都来自聚集索引数组。类似地，只有一个输出偏移量索引的值为 `O`<sub>`0`</sub>。但是，在将它们用作输入数组的索引之前，将根据 “Gather Index Mapping”(正式描述中的 `start_index_map`)和 “Offset Mapping”（正式描述中的 `expand_offset_dims`）扩展为 [`X`,`0`] and [`0`,`O`<sub>`0`</sub>]，加起来分别为 [`X`,`O`<sub>`0`</sub>]。换句话说，输出索引为 [`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`O`<sub>`0`</sub>] 映射到输入索引 [`GatherIndices`[`G`<sub>`0`</sub>,`G`<sub>`1`</sub>,`0`],`X`]，它为我们提供了 `tf.gather_nd` 的语义。
 
 
 在这种情况下，`slice_sizes` 是 `[1,11]`。直觉上这意味着集合索引数组中的每一个索引 `X` 都会选择整行，结果是所有这些行连在一起。
@@ -1066,7 +1063,7 @@ computation(elem1, elem2, elem3, par1)` 将输入数组中的每个（多维）�
 
 OP的输出是 `Collate(Q_0, ..., Q_N)`，其中 `Q_i` 是一个类型为 `T_i` 的数组，其维数如下所述。
 
-此操作将每个输入数组的一个或多个维度降为为标量。每个返回的数组的秩是 `rank(operand) - len(dimensions)`。 `init_value` 是用于每次减少的初始值，可以在后端计算过程中插入到任何位置。在大多数情况下，`init_value` 则是缩减函数的标识(例如，0表示加法)。应用的 `computation` 总是在左侧传递 `init_value`。
+此操作将每个输入数组的一个或多个维度降为为标量。每个返回的数组的秩是 `rank(operand) - len(dimensions)`。`init_value` 是用于每次减少的初始值，可以在后端计算过程中插入到任何位置。在大多数情况下，`init_value` 则是缩减函数的标识(例如，0表示加法)。应用的 `computation` 总是在左侧传递 `init_value`。
 
 归约函数的执行顺序是任意的，即可能是非确定的。因而，归约函数不应对运算的结合性敏感。
 
@@ -1151,7 +1148,7 @@ f(max, argmax, value, index):
     return (max, argmax)
 ```
 
-对于一维输入数组 `V = Float[N], K = Int[N]` 和 init 值`I_V = Float, I_K =  Int`，跨唯一输入维度缩小的结果 `f_(N-1)`  相当于以下递归程序：
+对于一维输入数组 `V = Float[N], K = Int[N]` 和 init 值 `I_V = Float, I_K =  Int`，跨唯一输入维度缩小的结果 `f_(N-1)` 相当于以下递归程序：
 
 ```
 f_0 = f(I_V, I_K, V_0, K_0)
@@ -1160,7 +1157,7 @@ f_1 = f(f_0.first, f_0.second, V_1, K_1)
 f_(N-1) = f(f_(N-2).first, f_(N-2).second, V_(N-1), K_(N-1))
 ```
 
-将此缩减应用于值数组和顺序索引数组(即 iota)，将在数组上进行共迭代，并返回包含最大值和匹配索引的元组。
+将此缩减应用于值数组和顺序索引数组（即 iota），将在数组上进行共迭代，并返回包含最大值和匹配索引的元组。
 
 ## ReducePrecision
 
