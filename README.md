@@ -116,7 +116,8 @@ TensorFlow 项目致力于遵守开源软件开发中普遍接受的最佳实践
 ## 文档维护支持
 
 [<img src="https://user-images.githubusercontent.com/26959437/37653530-37bd3cde-2c7a-11e8-98d0-749a59194c22.png" width="200px;"/>](https://juejin.im)
-<a href="https://coding.net/?utm_source=javascript-tutorial-zh&utm_medium=banner&utm_campaign=march2019" target="_blank"><img src="https://user-images.githubusercontent.com/26959437/56262524-96920100-6111-11e9-930e-951ba4931e58.png" width="200px;" target="_blank"/></a>
+
+<a href="https://coding.net/?utm_source=javascript-tutorial-zh&utm_medium=banner&utm_campaign=march2019" target="_blank"><img src="https://user-images.githubusercontent.com/26959437/56273145-c56aa000-612e-11e9-9137-a1388ef18cf2.png" width="200px;" target="_blank"/></a>
 
 <!--
 
