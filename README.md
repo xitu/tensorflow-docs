@@ -117,9 +117,9 @@ TensorFlow 项目致力于遵守开源软件开发中普遍接受的最佳实践
 
 [<img src="https://user-images.githubusercontent.com/26959437/37653530-37bd3cde-2c7a-11e8-98d0-749a59194c22.png" width="200px;"/>](https://juejin.im)
 
-<a href="https://coding.net/?utm_source=javascript-tutorial-zh&utm_medium=banner&utm_campaign=march2019" target="_blank"><img src="https://user-images.githubusercontent.com/26959437/56273145-c56aa000-612e-11e9-9137-a1388ef18cf2.png" width="200px;" target="_blank"/></a>
-
 <!--
+
+<a href="https://coding.net/?utm_source=javascript-tutorial-zh&utm_medium=banner&utm_campaign=march2019" target="_blank"><img src="https://user-images.githubusercontent.com/26959437/56273145-c56aa000-612e-11e9-9137-a1388ef18cf2.png" width="200px;" target="_blank"/></a>
 
 [<img src="https://user-images.githubusercontent.com/26959437/37953025-3fa103ae-31d4-11e8-9e55-136b05d7cb96.jpg" width="200px;"/>](https://jizhi.im/index)<br />了解更多人工智能知识请前往[景略集智](https://jizhi.im/index)，想从零开始学习人工智能请前往[景略集智 AI 课堂](https://h5.youzan.com/v2/showcase/homepage?alias=U5eAeeuRD2)。
 
